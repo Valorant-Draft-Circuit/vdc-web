@@ -17,6 +17,10 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	
+	"limits" :{
+		"cpu_ms": 300
 	}
 	/**
 	 * Smart Placement
