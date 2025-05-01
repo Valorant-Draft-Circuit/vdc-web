@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
+import Link from "next/link";
 export default async function AuthButton() {
   const session = await auth();
   if (!session) return <SignIn />;
@@ -14,13 +15,15 @@ export default async function AuthButton() {
         <h2>team</h2>
       </div>
       <div className="flex m-auto">
-        <Image
-          alt="user avatar"
-          src={userAvatar ?? ""}
-          width={25}
-          height={25}
-          className="inline-block size-12 rounded-full"
-        />
+        <Link href="/me">
+          <Image
+            alt="user avatar"
+            src={userAvatar ?? ""}
+            width={25}
+            height={25}
+            className="inline-block size-12 rounded-full"
+          />
+        </Link>
       </div>
       <div className="flex m-auto pl-4">
         <SignOut />
