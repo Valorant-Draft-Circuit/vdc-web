@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ThemeSwitch from "../theme/ThemeSwitch";
 import NavLinks from "./NavLinks";
-import AuthButton from "../auth/AuthButton";
+import AuthSection from "../auth/AuthSection";
 
 export default function NavBar() {
   return (
@@ -27,7 +27,7 @@ export default function NavBar() {
           <NavLinks />
         </div>
         <div className="flex flex-row space-x-5 items-center">
-          <AuthButton />
+          <AuthSection />
           <ThemeSwitch />
         </div>
       </div>

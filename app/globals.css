@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: Discord;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/ABCGintoDiscordNord-Bold.woff2") format("woff2");
+}
+
 @layer base {
   :root {
     --background: #fffbf5;
@@ -28,6 +35,7 @@
   --color-vdcYellow: #f1c40f;
   --color-vdcWhite: #fffbf5;
   --color-vdcStaff: #68194f;
+  --font-discord: "Discord", sans-serif;
 }
 
 body {
@@ -40,4 +48,9 @@ h1 {
   font-family: var(--font-montserrat);
   font-weight: bold;
   text-transform: uppercase;
+}
+
+h2 {
+  font-family: var(--font-montserrat);
+  font-weight: bold;
 }

@@ -65,7 +65,7 @@ const navigation = [
 
 export default function Example() {
   return (
-    <footer className="bg-black rounded-2xl m-2">
+    <footer className="bg-vdcBlack xl:rounded-2xl xl:m-2">
       <div className="mx-auto max-w-7xl px-6 py-10 md:flex md:items-center md:justify-between lg:px-8">
         <div className="flex justify-center gap-x-6 md:order-2">
           {navigation.map((item) => (

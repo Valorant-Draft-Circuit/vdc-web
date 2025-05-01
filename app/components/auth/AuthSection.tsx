@@ -3,7 +3,7 @@ import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
-export default async function AuthButton() {
+export default async function AuthSection() {
   const session = await auth();
   if (!session) return <SignIn />;
   const userAvatar = session?.user?.image;
