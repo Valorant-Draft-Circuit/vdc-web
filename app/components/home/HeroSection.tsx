@@ -1,15 +1,18 @@
+import { auth } from "@/lib/auth";
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
-export default function HeroSection() {
+export default async function HeroSection() {
+  const session = await auth();
+
   return (
-    <div className="xl:p-4 2xl:p-10">
-      <div className="relative isolate overflow-hidden py-28 xl:py-12 2xl:py-24 text-center shadow-xl xl:rounded-3xl sm:px-16 2xl:px-32 flex flex-col lg:flex-row space-y-10">
+    <div className="xl:p-4 ">
+      <div className="relative isolate overflow-hidden py-28 xl:py-12 text-center shadow-xl xl:rounded-3xl sm:px-16 flex flex-col lg:flex-row space-y-10">
         <Image
           alt="hero image"
-          src="/hero-image.webp"
-          width={500}
-          height={500}
-          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 2xl:scale-125 xl:absolute xl:left-20 2xl:left-50 xl:top-20 2xl:top-2"
+          src="/hero-section.webp"
+          width={5000}
+          height={5000}
+          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 xl:absolute xl:left-20 xl:top-20 "
         />
         <div
           aria-hidden="true"
@@ -43,12 +46,25 @@ export default function HeroSection() {
           </div>
         </div>
         <div className="flex flex-col space-y-2 lg:my-auto lg:ml-auto">
-          <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
-            Join the Draft.
-          </h2>
-          <div>
-            <DiscordButton />
-          </div>
+          {!session ? (
+            <>
+              <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+                Join the Draft.
+              </h2>
+              <div>
+                <DiscordButton />
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+                {session.user?.name} has
+                <br />
+                Joined the Draft.
+              </h2>
+              <div></div>
+            </>
+          )}
         </div>
       </div>
     </div>
