@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "./components/theme/ThemeProvider";
 import NavBar from "./components/navbar/NavBar";
+import Footer from "./components/footer/Footer";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl">{children}</div>
           </div>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
