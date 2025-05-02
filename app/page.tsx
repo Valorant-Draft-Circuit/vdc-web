@@ -39,10 +39,8 @@ export default async function Home() {
         <div className="overflow-hidden xl:w-1/2">
           <div className="px-4 py-2 sm:px-6">
             <h1 className="italic text-lg lg:text-xl">
-              Latest Media
-              <Link href={CHANNEL_URL} className="text-vdcRed">
-                {" "}
-                (From YT)
+              <Link href={CHANNEL_URL} className="hover:text-vdcRed">
+                Latest Media
               </Link>
               <span className="text-vdcWhite dark:text-vdcBlack">
                 (Hi GumbaYum!)

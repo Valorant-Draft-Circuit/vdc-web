@@ -6,7 +6,7 @@ export default async function HeroSection() {
 
   return (
     <div className="xl:p-4">
-      <div className="relative isolate overflow-hidden py-28 xl:py-12 text-center xl:rounded-3xl sm:px-16 flex flex-col lg:flex-row space-y-10">
+      <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
         <Image
           alt="hero image"
           src="/hero-section.webp"
