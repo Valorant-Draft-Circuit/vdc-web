@@ -91,10 +91,10 @@ export default function HowToPlay() {
           <div key={step} className="relative flex flex-col mx-8 py-3 mb-12">
             <div className="absolute z-10 bottom-42 w-full xl:-top-0">
               <div className="flex flex-row justify-between">
-                <h1 className="text-vdcRed text-8xl italic xl:text-7xl drop-shadow-gray-300 drop-shadow-xl">
+                <h1 className="text-vdcRed text-8xl italic xl:text-7xl drop-shadow-xl">
                   {step}
                 </h1>
-                <div className="bg-vdcRed rounded-lg px-5 py-3 drop-shadow-gray-300 drop-shadow-xl my-auto">
+                <div className="bg-vdcRed rounded-lg px-5 py-3 drop-shadow-xl my-auto">
                   {title}
                 </div>
               </div>

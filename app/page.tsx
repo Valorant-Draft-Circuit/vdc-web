@@ -20,7 +20,7 @@ export default function Home() {
           <HowToPlay />
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col xl:flex-row">
         <div className="overflow-hidden">
           <div className="px-4 py-2 sm:px-6 text-lg lg:text-xl">
             <h1 className="italic">Latest News</h1>
@@ -29,11 +29,21 @@ export default function Home() {
             <News />
           </div>
         </div>
-        <div className="overflow-hidden">
+        <div className="overflow-hidden xl:w-1/2 ">
           <div className="px-4 py-2 sm:px-6">
             <h1 className="italic text-lg lg:text-xl">Media</h1>
           </div>
-          <div className="px-4 py-2 sm:p-6">{/* Content goes here */}</div>
+          <div className="px-4 py-2 sm:p-6 ">
+            <div>
+              <iframe
+                className="w-full xl:h-full aspect-video"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=_m6csars22cbelza"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
     </>
