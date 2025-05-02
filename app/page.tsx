@@ -8,7 +8,6 @@ import Link from "next/link";
 export default async function Home() {
   const session = await auth();
   const mostRecentVideo = await getLatestYouTubeVideo();
-  console.log(mostRecentVideo);
   return (
     <>
       <div className="overflow-hidden">

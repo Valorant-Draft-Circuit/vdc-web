@@ -5,7 +5,6 @@ const PLACEHOLDER_URL =
 
 export async function getLatestYouTubeVideo() {
   const url = `https://www.googleapis.com/youtube/v3/search?key=${process.env.GOOGLE_API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=1`;
-  console.log(url);
   try {
     const res = await fetch(url);
     const data: any = await res.json();
@@ -15,7 +14,6 @@ export async function getLatestYouTubeVideo() {
       const videoId = latestVideo.id.videoId;
       const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
-      console.log("Watch here:", videoUrl);
       return videoUrl;
     } else {
       console.log("No videos found. Time to Rick Roll.");
