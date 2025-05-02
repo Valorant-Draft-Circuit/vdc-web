@@ -54,3 +54,8 @@ h2 {
   font-family: var(--font-montserrat);
   font-weight: bold;
 }
+
+p {
+  font-family: var(--font-roboto);
+  font-weight: normal;
+}

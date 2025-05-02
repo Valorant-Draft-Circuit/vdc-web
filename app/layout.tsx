@@ -30,7 +30,7 @@ export default function RootLayout({
         >
           <NavBar />
           <div className="mx-auto max-w-7xl xl:max-w-11/12 xl:px-2">
-            <div>{children}</div>
+            <div className="min-h-screen">{children}</div>
           </div>
           <Footer />
         </ThemeProvider>

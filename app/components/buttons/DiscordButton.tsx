@@ -25,7 +25,7 @@ export default function DiscordButton(props: DiscordButtonProps) {
             height={45}
             className="my-auto"
           />
-          <div className="font-discord max-w-32 my-auto text-center break-words">
+          <div className="font-discord max-w-32 my-auto text-center break-words font-extralight">
             {props.text}
           </div>
         </button>

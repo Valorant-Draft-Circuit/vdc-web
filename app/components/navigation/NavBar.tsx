@@ -7,10 +7,7 @@ import AuthSection from "../auth/AuthSection";
 
 export default function NavBar() {
   return (
-    <Disclosure
-      as="nav"
-      className="bg-stone-950 rounded-2xl mt-2 mx-2 hidden xl:block z-10"
-    >
+    <Disclosure as="nav" className="bg-stone-950 hidden xl:block z-10 sticky top-0">
       <div className="flex px-12 h-20 items-center justify-between">
         <div className="flex items-center justify-center">
           <div className="flex items-center">
