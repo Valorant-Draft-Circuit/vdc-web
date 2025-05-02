@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "./components/theme/ThemeProvider";
-import NavBar from "./components/navbar/NavBar";
+import NavBar from "./components/navigation/NavBar";
 import Footer from "./components/footer/Footer";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -29,7 +29,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <NavBar />
-          <div className="mx-auto max-w-7xl xl:px-8">
+          <div className="mx-auto max-w-7xl xl:max-w-11/12 xl:px-2">
             <div>{children}</div>
           </div>
           <Footer />

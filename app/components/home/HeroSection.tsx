@@ -5,8 +5,8 @@ export default async function HeroSection() {
   const session = await auth();
 
   return (
-    <div className="xl:p-4 ">
-      <div className="relative isolate overflow-hidden py-28 xl:py-12 text-center shadow-xl xl:rounded-3xl sm:px-16 flex flex-col lg:flex-row space-y-10">
+    <div className="xl:p-4">
+      <div className="relative isolate overflow-hidden py-28 xl:py-12 text-center xl:rounded-3xl sm:px-16 flex flex-col lg:flex-row space-y-10">
         <Image
           alt="hero image"
           src="/hero-section.webp"
@@ -26,7 +26,7 @@ export default async function HeroSection() {
             className="relative left-[calc(50%-7rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-slate-800 to-black lg:left-[calc(50%-30rem)] lg:w-[72.1875rem]"
           />
         </div>
-        <div className="bg-vdcBlack py-8 mx-2 rounded-2xl flex flex-col space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto">
+        <div className="bg-vdcBlack py-8 mx-2 rounded-2xl flex flex-col space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-8/12">
           <div className="flex flex-row items-end space-x-4 mx-10">
             <Image
               src="/vdc-flame.svg"
@@ -37,7 +37,7 @@ export default async function HeroSection() {
             />
             <h2 className="text-vdcRed text-3xl">What is VDC?</h2>
           </div>
-          <div className="px-10 text-start lg:w-96 lg:pr-8">
+          <div className="px-10 text-start xl:w-96 lg:pr-8">
             <p className="text-white text-sm italic ">
               VDC is an NA based, community run VALORANT league for all skill
               levels. We offer a casually competitive season based environment
@@ -52,7 +52,7 @@ export default async function HeroSection() {
                 Join the Draft.
               </h2>
               <div>
-                <DiscordButton />
+                <DiscordButton text="Sign Up with Discord" />
               </div>
             </>
           ) : (

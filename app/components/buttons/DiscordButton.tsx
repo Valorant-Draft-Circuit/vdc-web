@@ -1,7 +1,11 @@
 import { signIn } from "@/lib/auth";
 import Image from "next/image";
 
-export default function DiscordButton() {
+interface DiscordButtonProps {
+  text: string;
+}
+
+export default function DiscordButton(props: DiscordButtonProps) {
   return (
     <>
       <form
@@ -12,7 +16,7 @@ export default function DiscordButton() {
       >
         <button
           type="submit"
-          className="flex flex-row m-auto space-x-5 rounded-lg bg-[#5865F2] px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-[#626eee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:cursor-pointer shadow-2xl"
+          className="flex flex-row m-auto space-x-5 rounded-lg bg-[#5865F2] px-3.5 py-3 text-sm font-semibold text-white hover:bg-[#626eee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:cursor-pointer shadow-2xl"
         >
           <Image
             src="/external/discord-logo.svg"
@@ -21,9 +25,8 @@ export default function DiscordButton() {
             height={45}
             className="my-auto"
           />
-          <div className="font-discord">
-            Sign Up <br />
-            with Discord
+          <div className="font-discord max-w-32 my-auto text-center break-words">
+            {props.text}
           </div>
         </button>
       </form>

@@ -9,7 +9,7 @@ export default function NavBar() {
   return (
     <Disclosure
       as="nav"
-      className="bg-black rounded-2xl mt-2 mx-2 hidden xl:block z-10"
+      className="bg-stone-950 rounded-2xl mt-2 mx-2 hidden xl:block z-10"
     >
       <div className="flex px-12 h-20 items-center justify-between">
         <div className="flex items-center justify-center">
