@@ -1,4 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import "tailwindcss";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
@@ -35,10 +37,11 @@
   --color-vdcYellow: #f1c40f;
   --color-vdcWhite: #fffbf5;
   --color-vdcStaff: #68194f;
-  --font-discord: "Discord", sans-serif;
   --breakpoint-2xl: 100rem;
   --breakpoint-3xl: 120rem;
   --breakpoint-4xl: 140rem;
+  --font-discord: "Discord", sans-serif;
+  --font-roboto: "Roboto", sans-serif; 
 }
 
 body {

@@ -4,6 +4,8 @@ import HowToPlay from "./components/home/HowToPlay";
 import News from "./components/home/News";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/youtube";
 import Link from "next/link";
+import { Suspense } from "react";
+import NewsSkeleton from "./components/home/NewsSkeleton";
 
 export default async function Home() {
   const session = await auth();
@@ -33,7 +35,17 @@ export default async function Home() {
             <h1 className="italic">Latest News</h1>
           </div>
           <div className="px-4 py-2 sm:p-6">
-            <News />
+            <Suspense
+              fallback={
+                <div className="flex flex-col xl:flex-row space-y-4 xl:space-x-4">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <NewsSkeleton key={i} />
+                  ))}
+                </div>
+              }
+            >
+              <News />
+            </Suspense>
           </div>
         </div>
         <div className="overflow-hidden xl:w-1/2">
@@ -47,7 +59,7 @@ export default async function Home() {
               </span>
             </h1>
           </div>
-          <div className="px-4 py-2 sm:p-6 ">
+          <div className="px-4 py-2 sm:p-6 hover:scale-105 transition duration-150 ease-in-out">
             <div>
               <iframe
                 className="w-full xl:h-full aspect-video rounded-xl"
