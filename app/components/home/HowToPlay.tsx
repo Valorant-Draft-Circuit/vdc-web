@@ -1,7 +1,7 @@
 import Link from "next/link";
 import DiscordButton from "../buttons/DiscordButton";
 const StepTitle = ({ children }: { children: React.ReactNode }) => (
-  <h1 className="text-vdcWhite dark:text-vdcBlack italic text-center mx-5 text-md xl:mx-0 xl:px-4">
+  <h1 className="text-vdcWhite italic text-center mx-5 text-md xl:mx-0 xl:px-4">
     {children}
   </h1>
 );
