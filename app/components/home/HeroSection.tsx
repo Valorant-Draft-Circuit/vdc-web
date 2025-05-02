@@ -37,7 +37,7 @@ export default async function HeroSection() {
             <h2 className="text-vdcRed text-3xl">What is VDC?</h2>
           </div>
           <div className="px-10 text-start xl:w-96 lg:pr-8">
-            <p className="text-white text-sm italic">
+            <p className="text-white text-md italic">
               VDC is an NA based, community run VALORANT league for all skill
               levels. We offer a casually competitive season based environment
               without the need to make a team of your own.
