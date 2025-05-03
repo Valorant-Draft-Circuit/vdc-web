@@ -4,8 +4,67 @@ import Link from "next/link";
 import ThemeSwitch from "../theme/ThemeSwitch";
 import NavLinks from "./NavLinks";
 import AuthSection from "../auth/AuthSection";
-import SideBar from "./SideBar";
-import Test from "./Test";
+import SideBar from "./side/SideBar";
+import {
+  PlayIcon,
+  InformationCircleIcon,
+  LinkIcon,
+} from "@heroicons/react/24/solid";
+import { BEHAVIOR_GUIDELINE_URL, RULEBOOK_URL } from "@/lib/constants";
+
+export const navLinks = [
+  {
+    name: "Season",
+    icon: <PlayIcon />,
+    links: [
+      { name: "Schedule", href: "/schedule" },
+      { name: "Stats", href: "/stats" },
+      { name: "Standings", href: "/standings" },
+    ],
+  },
+  {
+    name: "About",
+    icon: <InformationCircleIcon />,
+    links: [
+      { name: "Franchises", href: "/about/franchises" },
+      { name: "FAQ", href: "/about" },
+      { name: "Rulebook", href: RULEBOOK_URL, ext: true },
+      { name: "Guidelines", href: BEHAVIOR_GUIDELINE_URL, ext: true },
+    ],
+  },
+  {
+    name: "Links",
+    icon: <LinkIcon />,
+    links: [
+      { name: "Discord", href: "https://go.vdc.gg/discord", ext: true },
+      {
+        name: "Youtube",
+        href: "https://youtube.com/@ValorantDraftCircuit",
+        ext: true,
+      },
+      {
+        name: "Twitch",
+        href: "https://twitch.tv/valorantdraftcircuit",
+        ext: true,
+      },
+    ],
+  },
+];
+
+export const staffDropDown = {
+  name: "Staff",
+
+  links: [
+    {
+      name: "Dashboard",
+      href: "/staff/dashboard",
+    },
+    {
+      name: "Management",
+      href: "/staff/management",
+    },
+  ],
+};
 
 export default function NavBar() {
   return (

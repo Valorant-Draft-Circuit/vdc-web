@@ -1,16 +1,14 @@
-import { signIn } from "@/lib/auth";
+"use client";
+
 import Image from "next/image";
+import { signInAction } from "./actions";
+
 export default function SignIn() {
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signIn();
-      }}
-    >
+    <form action={signInAction} method="POST">
       <button
         type="submit"
-        className="flex flex-row  space-x-2 bg-vdcRed rounded-sm px-4 py-2 text-sm font-semibold text-vdcWhite shadow-xs hover:bg-red-500 hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        className="flex flex-row space-x-2 bg-vdcRed rounded-sm px-4 py-2 text-sm font-semibold text-vdcWhite shadow-xs hover:bg-red-500 hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
       >
         <Image
           src="/external/discord-logo.svg"

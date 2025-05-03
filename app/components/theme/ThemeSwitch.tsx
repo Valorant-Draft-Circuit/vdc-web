@@ -24,7 +24,7 @@ export default function ThemeSwitch() {
       <span className="pointer-events-none relative inline-block size-5 transform rounded-full bg-vdcWhite shadow-sm ring-0 transition duration-200 ease-in-out group-data-checked:translate-x-5">
         <span
           aria-hidden="true"
-          className="absolute inset-0 flex size-full items-center justify-center transition-opacity duration-200 ease-in group-data-checked:opacity-0 group-data-checked:duration-100 group-data-checked:ease-out"
+          className="absolute inset-0 flex size-full items-center justify-center transition-opacity duration-100 ease-in group-data-checked:opacity-0 group-data-checked:duration-100 group-data-checked:ease-out"
         >
           <SunIcon className="size-3" />
         </span>

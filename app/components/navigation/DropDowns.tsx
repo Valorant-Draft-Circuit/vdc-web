@@ -69,10 +69,12 @@ export function VerticalDropDown({
   title,
   links,
   icon,
+  onLinkClick,
 }: {
   title: string;
-  links: { name: string; href: string }[];
+  links: { name: string; href: string; ext?: boolean }[];
   icon: React.ReactNode;
+  onLinkClick?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -95,19 +97,23 @@ export function VerticalDropDown({
         </div>
       </button>
       <ul
-        className={`pl-10 pr-3 mt-1 space-y-1 text-sm transition-all duration-300 ${
+        className={`pl-10 pr-3 space-y-1 text-sm transition-all duration-300 ${
           open ? "opacity-100 max-h-96" : "opacity-0 max-h-0 overflow-hidden"
         }`}
       >
         {links.map((link) => (
           <li key={link.name}>
             <Link
+              onClick={onLinkClick}
               href={link.href}
-              className={`block py-1 hover:text-vdcRed hover:bg-vdcGrey rounded-lg p-2 ${
+              target={link.ext ? "_blank" : ""}
+              rel={link.ext ? "noreferrer" : ""}
+              className={`py-1 hover:text-vdcRed hover:bg-vdcGrey rounded-lg p-2 flex flex-row gap-2${
                 pathname === link.href ? "text-vdcRed" : ""
               }`}
             >
               <h1 className="italic">{link.name}</h1>
+              {link.ext ? <ArrowTopRightOnSquareIcon className="w-4" /> : null}
             </Link>
           </li>
         ))}

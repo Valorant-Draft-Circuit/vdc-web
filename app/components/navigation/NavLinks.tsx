@@ -4,64 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DropDown } from "./DropDowns";
 import { auth } from "@/lib/auth";
-import { InformationCircleIcon, LinkIcon } from "@heroicons/react/24/solid";
-import { PlayIcon } from "@heroicons/react/16/solid";
-
-const rulebook = "https://blog.vdc.gg/rulebook/";
-const behaviorGuideline =
-  "https://docs.google.com/spreadsheets/d/14wmSU43cB2xf9IOCuW0-74Ec8AXt6I6UGZHJhDNJJGc/edit?gid=0#gid=0";
-export const navLinks = [
-  {
-    name: "Season",
-    icon: <PlayIcon />,
-    links: [
-      { name: "Schedule", href: "/schedule" },
-      { name: "Stats", href: "/stats" },
-      { name: "Standings", href: "/standings" },
-    ],
-  },
-  {
-    name: "About",
-    icon: <InformationCircleIcon />,
-    links: [
-      { name: "Franchises", href: "/about/franchises" },
-      { name: "FAQ", href: "/about" },
-      { name: "Rulebook", href: rulebook, ext: true },
-      { name: "Guidelines", href: behaviorGuideline, ext: true },
-    ],
-  },
-  {
-    name: "Links",
-    icon: <LinkIcon />,
-    links: [
-      { name: "Discord", href: "https://go.vdc.gg/discord", ext: true },
-      {
-        name: "Youtube",
-        href: "https://youtube.com/@ValorantDraftCircuit",
-        ext: true,
-      },
-      {
-        name: "Twitch",
-        href: "https://twitch.tv/valorantdraftcircuit",
-        ext: true,
-      },
-    ],
-  },
-];
-
-const staffDropDown = {
-  name: "Staff",
-  links: [
-    {
-      name: "Dashboard",
-      href: "/staff/dashboard",
-    },
-    {
-      name: "Management",
-      href: "/staff/management",
-    },
-  ],
-};
+import { navLinks, staffDropDown } from "./NavBar";
 
 export default function NavLinks() {
   const staff = false;
