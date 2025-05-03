@@ -42,7 +42,7 @@ export default function DropDown({ title, links }: DropDownProps) {
         </button>
         <ul
           className={`absolute -left-3 w-48 py-2 rounded-lg bg-stone-950 shadow-xl z-10 transition-opacity ease-in-out duration-200 ${
-            open ? "opacity-100" : "opacity-0"
+            open ? "opacity-100" : "opacity-0 hidden"
           }`}
         >
           {links.map((link) => (

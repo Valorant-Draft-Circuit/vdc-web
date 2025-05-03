@@ -6,8 +6,11 @@ const PLACEHOLDER_URL =
 export async function getLatestYouTubeVideo() {
   const url = `https://www.googleapis.com/youtube/v3/search?key=${process.env.GOOGLE_API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=1`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      next: { revalidate: 3600 }, 
+    });
     const data: any = await res.json();
+
     if (data.items && data.items.length > 0) {
       const latestVideo = data.items[0];
       const videoId = latestVideo.id.videoId;

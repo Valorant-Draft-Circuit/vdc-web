@@ -20,8 +20,8 @@ const navigation = [
   {
     name: "About",
     links: [
-      { name: "Franchises", href: "/franchises" },
-      { name: "FAQ", href: "/faq" },
+      { name: "Franchises", href: "/about/franchises" },
+      { name: "FAQ", href: "/about" },
       { name: "Rulebook", href: rulebook, ext: true },
       { name: "Guidelines", href: behaviorGuideline, ext: true },
     ],
