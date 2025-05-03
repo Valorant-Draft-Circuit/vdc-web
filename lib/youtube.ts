@@ -3,25 +3,28 @@ const CHANNEL_ID = "UCcNoS_eA8_cnBj4jmyHjlkQ";
 const PLACEHOLDER_URL =
   "https://www.youtube.com/embed/dQw4w9WgXcQ?si=_m6csars22cbelza";
 
-export async function getLatestYouTubeVideo() {
+interface YouTubeSearchResponse {
+  items?: Array<{
+    id: { videoId: string };
+  }>;
+}
+
+export async function getLatestYouTubeVideo(): Promise<string> {
   const url = `https://www.googleapis.com/youtube/v3/search?key=${process.env.GOOGLE_API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=1`;
+
   try {
-    const res = await fetch(url, {
-      next: { revalidate: 3600 }, 
-    });
-    const data: any = await res.json();
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const data = (await res.json()) as YouTubeSearchResponse;
 
-    if (data.items && data.items.length > 0) {
-      const latestVideo = data.items[0];
-      const videoId = latestVideo.id.videoId;
-      const videoUrl = `https://www.youtube.com/embed/${videoId}`;
-
-      return videoUrl;
-    } else {
-      console.log("No videos found. Time to Rick Roll.");
-      return PLACEHOLDER_URL;
+    if (data.items?.length) {
+      const videoId = data.items[0].id.videoId;
+      return `https://www.youtube.com/embed/${videoId}`;
     }
+
+    console.log("No videos found. Time to Rick Roll.");
+    return PLACEHOLDER_URL;
   } catch (error) {
     console.error("Failed to fetch latest video:", error);
+    return PLACEHOLDER_URL;
   }
 }

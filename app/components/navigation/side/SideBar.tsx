@@ -1,4 +1,4 @@
-import AuthSection from "../../auth/AuthSection";
+// import AuthSection from "../../auth/AuthSection";
 import SideLinks from "./SideLinks";
 
 export default function SideBar() {

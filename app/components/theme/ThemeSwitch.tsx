@@ -11,8 +11,8 @@ export default function ThemeSwitch() {
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    dark ? setTheme("dark") : setTheme("light");
-  }, [dark]);
+    setTheme(dark ? "dark" : "light");
+  }, [dark, setTheme]);
 
   return (
     <Switch

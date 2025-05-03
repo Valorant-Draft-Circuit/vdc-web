@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DropDown } from "./DropDowns";
-import { auth } from "@/lib/auth";
+// import { auth } from "@/lib/auth";
 import { navLinks, staffDropDown } from "./NavBar";
 
 export default function NavLinks() {
