@@ -73,7 +73,7 @@ const steps = [
     desc: (
       <StepDesc>
         Check out our <br />
-        <Link href="/faq" className="text-vdcRed underline">
+        <Link href="/about" className="text-vdcRed underline">
           FAQ
         </Link>
         <br />

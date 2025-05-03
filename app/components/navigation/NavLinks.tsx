@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import DropDown from "./DropDown";
+import { DropDown } from "./DropDowns";
 import { auth } from "@/lib/auth";
+import { InformationCircleIcon, LinkIcon } from "@heroicons/react/24/solid";
+import { PlayIcon } from "@heroicons/react/16/solid";
 
 const rulebook = "https://blog.vdc.gg/rulebook/";
 const behaviorGuideline =
   "https://docs.google.com/spreadsheets/d/14wmSU43cB2xf9IOCuW0-74Ec8AXt6I6UGZHJhDNJJGc/edit?gid=0#gid=0";
-const navigation = [
+export const navLinks = [
   {
     name: "Season",
+    icon: <PlayIcon />,
     links: [
       { name: "Schedule", href: "/schedule" },
       { name: "Stats", href: "/stats" },
@@ -19,6 +22,7 @@ const navigation = [
   },
   {
     name: "About",
+    icon: <InformationCircleIcon />,
     links: [
       { name: "Franchises", href: "/about/franchises" },
       { name: "FAQ", href: "/about" },
@@ -28,6 +32,7 @@ const navigation = [
   },
   {
     name: "Links",
+    icon: <LinkIcon />,
     links: [
       { name: "Discord", href: "https://go.vdc.gg/discord", ext: true },
       {
@@ -79,7 +84,7 @@ export default function NavLinks() {
       </div>
 
       <div className="hidden sm:flex space-x-10">
-        {navigation.map((navItem) => (
+        {navLinks.map((navItem) => (
           <DropDown
             key={navItem.name}
             title={navItem.name}
