@@ -17,6 +17,9 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"AUTH_TRUST_HOST": true,
 	}
 	
 	// "limits" :{
