@@ -17,11 +17,11 @@
 	},
 	"observability": {
 		"enabled": true
-	},
-	
-	"limits" :{
-		"cpu_ms": 300
 	}
+	
+	// "limits" :{
+	// 	"cpu_ms": 300
+	// }
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
