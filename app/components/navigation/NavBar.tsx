@@ -26,7 +26,7 @@ export default function NavBar() {
           </div>
           <NavLinks />
         </div>
-        <div className="flex flex-row space-x-5 items-center">
+        <div className="flex flex-row space-x-5 items-center 4xl:space-x-10">
           <AuthSection />
           <ThemeSwitch />
         </div>

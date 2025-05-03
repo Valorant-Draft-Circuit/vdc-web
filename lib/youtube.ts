@@ -8,7 +8,6 @@ export async function getLatestYouTubeVideo() {
   try {
     const res = await fetch(url);
     const data: any = await res.json();
-
     if (data.items && data.items.length > 0) {
       const latestVideo = data.items[0];
       const videoId = latestVideo.id.videoId;
