@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -32,23 +33,12 @@ export default function DropDown({ title, links }: DropDownProps) {
     >
       <div className="relative w-auto h-auto">
         <button className="flex items-center uppercase text-sm">
-          <h1 className="italic">{title}</h1>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
+          <h1 className="italic 4xl:text-xl">{title}</h1>
+          <ChevronDownIcon
             className={`${
               open ? "rotate-180" : ""
             } w-4 h-4 ml-1 transition-transform`}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-            />
-          </svg>
+          />
         </button>
         <ul
           className={`absolute -left-3 w-48 py-2 rounded-lg bg-stone-950 shadow-xl z-10 transition-opacity ease-in-out duration-200 ${
@@ -65,7 +55,7 @@ export default function DropDown({ title, links }: DropDownProps) {
                 currentPath === `${link.href}` ? "text-vdcRed" : "text-gray-200"
               } px-3 py-2 flex flex-row text-gray-200 hover:text-vdcRed text-sm space-x-1`}
             >
-              <h1 className="italic break-keep">{link.name}</h1>
+              <h1 className="italic break-keep 4xl:text-xl">{link.name}</h1>
               {link.ext ? <ArrowTopRightOnSquareIcon className="w-4" /> : null}
             </Link>
           ))}

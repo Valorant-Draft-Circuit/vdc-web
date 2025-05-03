@@ -17,9 +17,9 @@ export default function SignIn() {
           alt="discord symbol"
           width={20}
           height={20}
-          className="my-auto"
+          className="my-auto 4xl:w-8"
         />
-        <h1 className="italic">Sign In</h1>
+        <h1 className="italic 4xl:text-2xl">Sign In</h1>
       </button>
     </form>
   );

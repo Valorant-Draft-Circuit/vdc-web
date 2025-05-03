@@ -85,7 +85,7 @@ const steps = [
 
 export default function HowToPlay() {
   return (
-    <div className="xl:flex">
+    <div className="xl:flex 4xl:scale-125 4xl:pt-10">
       <div className="flex flex-col xl:flex-row xl:mx-auto overflow-auto">
         {steps.map(({ step, title, desc, button }) => (
           <div key={step} className="relative flex flex-col mx-8 py-3 mb-12">

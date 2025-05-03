@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import DropDown from "./DropDown";
+import { auth } from "@/lib/auth";
 
 const rulebook = "https://blog.vdc.gg/rulebook/";
 const behaviorGuideline =
@@ -19,8 +20,8 @@ const navigation = [
   {
     name: "About",
     links: [
-      { name: "FAQ", href: "/faq" },
       { name: "Franchises", href: "/franchises" },
+      { name: "FAQ", href: "/faq" },
       { name: "Rulebook", href: rulebook, ext: true },
       { name: "Guidelines", href: behaviorGuideline, ext: true },
     ],
@@ -41,26 +42,29 @@ const navigation = [
       },
     ],
   },
-  {
-    name: "Staff",
-    links: [
-      {
-        name: "Dashboard",
-        href: "/staff/dashboard",
-      },
-      {
-        name: "Management",
-        href: "/staff/management",
-      },
-    ],
-  },
 ];
 
+const staffDropDown = {
+  name: "Staff",
+  links: [
+    {
+      name: "Dashboard",
+      href: "/staff/dashboard",
+    },
+    {
+      name: "Management",
+      href: "/staff/management",
+    },
+  ],
+};
+
 export default function NavLinks() {
+  const staff = false;
+  // const session = auth(); // todo: check if user is staff
   const currentPath = usePathname();
 
   return (
-    <div className="flex flex-col text-xl sm:ml-24 space-y-1">
+    <div className="flex flex-col text-xl sm:ml-24 space-y-1 ">
       <div className="text-white italic">
         <Link
           href="/"
@@ -70,7 +74,7 @@ export default function NavLinks() {
               : "text-vdcWhite hover:text-vdcRed"
           }
         >
-          <h1>VALORANT DRAFT CIRCUIT</h1>
+          <h1 className="4xl:text-3xl">VALORANT DRAFT CIRCUIT</h1>
         </Link>
       </div>
 
@@ -82,6 +86,13 @@ export default function NavLinks() {
             links={navItem.links}
           />
         ))}
+        {staff ? (
+          <DropDown
+            key={staffDropDown.name}
+            title={staffDropDown.name}
+            links={staffDropDown.links}
+          />
+        ) : null}
       </div>
     </div>
   );

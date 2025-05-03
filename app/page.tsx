@@ -29,8 +29,8 @@ export default async function Home() {
           </div>
         </div>
       ) : null}
-      <div className="flex flex-col xl:flex-row">
-        <div className="overflow-hidden xl:w-3/4">
+      <div className="flex flex-col xl:flex-row 4xl:flex-col">
+        <div className="overflow-hidden xl:w-3/4 4xl:w-full">
           <div className="px-4 py-2 sm:px-6 text-lg lg:text-xl">
             <h1 className="italic">Latest News</h1>
           </div>
@@ -48,7 +48,7 @@ export default async function Home() {
             </Suspense>
           </div>
         </div>
-        <div className="overflow-hidden xl:w-1/2">
+        <div className="overflow-hidden xl:w-1/2 4xl:w-full">
           <div className="px-4 py-2 sm:px-6">
             <h1 className="italic text-lg lg:text-xl">
               <Link href={CHANNEL_URL} className="hover:text-vdcRed">
@@ -59,7 +59,7 @@ export default async function Home() {
               </span>
             </h1>
           </div>
-          <div className="px-4 py-2 sm:p-6 hover:scale-105 transition duration-150 ease-in-out">
+          <div className="px-4 py-2 sm:p-6 hover:scale-105 transition duration-150 ease-in-out 4xl:hover:scale-101">
             <div>
               <iframe
                 className="w-full xl:h-full aspect-video rounded-xl"
