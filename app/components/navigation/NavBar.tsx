@@ -71,7 +71,7 @@ export default function NavBar() {
     <>
       <Disclosure
         as="nav"
-        className="bg-stone-950 hidden xl:block z-10 sticky top-0"
+        className="bg-stone-950 hidden xl:block z-20 sticky top-0"
       >
         <div className="flex px-12 h-20 items-center justify-between 4xl:max-w-2/3 4xl:mx-auto 4xl:h-24">
           <div className="flex items-center justify-center">
