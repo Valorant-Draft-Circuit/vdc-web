@@ -35,9 +35,9 @@ export default function StandingsCard(props: {
             <Image
               src={`${TEAM_LOGOS_URL}${props.standing.teamLogo}`}
               alt={props.standing.teamName}
-              width={50}
-              height={50}
-              className="w-full drop-shadow-md"
+              width={250}
+              height={250}
+              className="w-20 drop-shadow-md"
             />
           </div>
           <div className="flex flex-col my-auto">
