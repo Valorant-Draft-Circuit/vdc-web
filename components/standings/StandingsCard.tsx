@@ -31,13 +31,13 @@ export default function StandingsCard(props: {
               {props.rank}
             </h1>
           </div>
-          <div className="flex my-auto">
+          <div className="flex my-auto drop-shadow-md">
             <Image
               src={`${TEAM_LOGOS_URL}${props.standing.teamLogo}`}
               alt={props.standing.teamName}
               width={50}
               height={50}
-              className="w-full"
+              className="w-full drop-shadow-md"
             />
           </div>
           <div className="flex flex-col my-auto">
