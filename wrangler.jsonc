@@ -20,6 +20,7 @@
 	},
 	"vars": {
 		"AUTH_TRUST_HOST": "true",
+		"AUTH_URL": "https://vdc-web.unieveth.workers.dev"
 	}
 	
 	// "limits" :{
