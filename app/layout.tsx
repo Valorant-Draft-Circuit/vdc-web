@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "./components/theme/ThemeProvider";
-import NavBar from "./components/navigation/NavBar";
-import Footer from "./components/footer/Footer";
+import ThemeProvider from "../components/theme/ThemeProvider";
+import NavBar from "../components/navigation/NavBar";
+import Footer from "../components/footer/Footer";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],

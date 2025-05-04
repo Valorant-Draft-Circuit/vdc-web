@@ -41,8 +41,10 @@
   --breakpoint-3xl: 120rem;
   --breakpoint-4xl: 140rem;
   --font-discord: "Discord", sans-serif;
-  --font-roboto: "Roboto", sans-serif; 
+  --font-roboto: "Roboto", sans-serif;
 }
+@source inline('{data-hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
+@source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
 
 body {
   background: var(--background);

@@ -1,11 +1,11 @@
 import { auth } from "@/lib/auth";
-import HeroSection from "./components/home/HeroSection";
-import HowToPlay from "./components/home/HowToPlay";
-import News from "./components/home/News";
+import HeroSection from "../components/home/HeroSection";
+import HowToPlay from "../components/home/HowToPlay";
+import News from "../components/home/News";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/youtube";
 import Link from "next/link";
 import { Suspense } from "react";
-import NewsSkeleton from "./components/home/NewsSkeleton";
+import NewsSkeleton from "../components/home/NewsSkeleton";
 
 export default async function Home() {
   const session = await auth();
