@@ -12,7 +12,7 @@ export default async function HeroSection() {
           src="/hero-section.webp"
           width={5000}
           height={5000}
-          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 xl:absolute xl:left-20 xl:top-20 "
+          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 xl:absolute xl:left-20 xl:top-20 brightness-75"
         />
         <div
           aria-hidden="true"

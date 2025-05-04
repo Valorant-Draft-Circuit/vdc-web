@@ -1,15 +1,17 @@
-'use client';
+"use client";
 
-import { signOutAction } from './actions';
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/16/solid";
+import { signOutAction } from "./actions";
 
 export default function SignOut() {
   return (
     <form action={signOutAction} method="POST">
       <button
         type="submit"
-        className="bg-vdcRed rounded-sm px-4 py-1 text-sm font-semibold text-vdcWhite shadow-xs hover:bg-red-500 hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        className="xl:bg-vdcRed rounded-sm px-4 py-1 text-sm flex flex-row gap-1 font-semibold text-gray-300 xl:text-vdcWhite shadow-xs xl:hover:bg-red-500 hover:text-vdcRed hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
       >
-        <h1 className="italic 4xl:text-2xl">Sign Out</h1>
+        <ArrowRightStartOnRectangleIcon className="m-auto w-5" />
+        <h1 className="italic text-lg xl:text-md 4xl:text-2xl">Sign Out</h1>
       </button>
     </form>
   );

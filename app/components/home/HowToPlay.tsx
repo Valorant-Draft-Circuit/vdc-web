@@ -1,5 +1,6 @@
 import Link from "next/link";
 import DiscordButton from "../buttons/DiscordButton";
+import { DISCORD_LINK } from "@/lib/constants";
 const StepTitle = ({ children }: { children: React.ReactNode }) => (
   <h1 className="text-vdcWhite italic text-center mx-5 text-md xl:mx-0 xl:px-4">
     {children}
@@ -18,7 +19,10 @@ const steps = [
       <StepDesc>
         Lets Start easy,
         <br />
-        Join our Discord!
+        Join our{" "}
+        <Link href={DISCORD_LINK} className="text-vdcRed underline">
+          Discord!
+        </Link>
       </StepDesc>
     ),
     button: true,

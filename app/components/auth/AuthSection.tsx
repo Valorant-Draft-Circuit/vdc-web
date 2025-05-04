@@ -3,6 +3,7 @@ import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
+
 export default async function AuthSection() {
   const session = await auth();
   if (!session) return <SignIn />;
@@ -25,7 +26,7 @@ export default async function AuthSection() {
           />
         </Link>
       </div>
-      <div className="flex m-auto pl-4">
+      <div className="flex m-auto pl-4 ">
         <SignOut />
       </div>
     </div>

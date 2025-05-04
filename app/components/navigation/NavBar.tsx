@@ -94,7 +94,7 @@ export default function NavBar() {
           </div>
         </div>
       </Disclosure>
-      <SideBar></SideBar>
+      <SideBar />
     </>
   );
 }

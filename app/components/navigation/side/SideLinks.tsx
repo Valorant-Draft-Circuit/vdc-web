@@ -9,6 +9,8 @@ import FlameLogo from "../../theme/FlameLogo";
 import ThemeSwitch from "../../theme/ThemeSwitch";
 import { VerticalDropDown } from "../DropDowns";
 import { navLinks } from "../NavBar";
+import MobileAuth from "../../auth/MobileAuth";
+import { SessionProvider } from "next-auth/react";
 
 export default function SideLinks() {
   const [open, setOpen] = useState(false);
@@ -35,12 +37,12 @@ export default function SideLinks() {
         />
       </InactivityWrapper>
       <div
-        className={`bg-vdcBlack pr-12 h-screen relative border-2 border-transparent transition-all duration-100 ${
-          open ? "w-auto" : "-translate-x-full"
+        className={`bg-vdcBlack flex flex-col justify-between pb-10 pl-2 pr-12 h-screen relative border-2 border-transparent transition-all duration-100 ${
+          open ? "w-auto" : "-translate-x-full hidden"
         }`}
       >
         <div
-          className={`m-auto p-3 flex flex-col gap-3 transition-opacity ${
+          className={`p-3 flex flex-col gap-3 transition-opacity ${
             open ? "visible" : "invisible"
           }`}
         >
@@ -48,7 +50,7 @@ export default function SideLinks() {
             <Link href="/" onClick={() => setOpen(!open)}>
               <FlameLogo
                 color={currentPath === "/" ? "#de3845" : "#fffbf5"}
-                className="w-8"
+                className="w-10"
               />
             </Link>
           </div>
@@ -69,6 +71,11 @@ export default function SideLinks() {
               onLinkClick={() => setOpen(false)}
             />
           ))}
+        </div>
+        <div className="mx-auto">
+          <SessionProvider>
+            <MobileAuth />
+          </SessionProvider>
         </div>
       </div>
     </>
