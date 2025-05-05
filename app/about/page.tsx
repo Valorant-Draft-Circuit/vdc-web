@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default async function Page() {
   const faqs = await getFaq();
-
+  
   return (
     <div>
       <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
