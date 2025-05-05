@@ -1,5 +1,5 @@
-import getFaq from "@/lib/about/faq";
 import { DISCORD_LINK } from "@/lib/constants";
+import { getFaq } from "@/lib/queries/about";
 import {
   Disclosure,
   DisclosureButton,

@@ -1,8 +1,9 @@
-import { MatchType } from "@prisma/client";
 import { prisma } from "@/prisma/prismadb";
+import { MatchType } from "@prisma/client";
 
 export default async function getFranchiseStandings(seasonNumber: number) {
   // 1) Fetch all BO2 games in the season
+  console.log(prisma)
   const allGames = await prisma.games.findMany({
     where: {
       season: seasonNumber,
