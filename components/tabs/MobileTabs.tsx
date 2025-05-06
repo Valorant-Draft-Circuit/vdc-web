@@ -24,7 +24,7 @@ export default function MobileTabs(props: {
       >
         <div className="relative col-start-1 row-start-1">
           <ListboxButton
-            className={`w-full rounded-md bg-vdcWhite data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl italic text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
+            className={`w-full rounded-md  data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl italic text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
             <h1 className="truncate">{selectedTab.tier}</h1>
             <ChevronUpDownIcon
@@ -33,16 +33,16 @@ export default function MobileTabs(props: {
             />
           </ListboxButton>
 
-          <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+          <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
             {props.tabElements.map((tab) => (
               <ListboxOption
                 key={tab.tier}
                 value={tab}
                 className={({ selected }) =>
-                  `relative cursor-pointer select-none py-2 pl-3 pr-9 hover:text-${
+                  `relative  cursor-pointer select-none py-2 pl-3 pr-9 hover:text-${
                     tab.color
-                  } ${
-                    selected ? `bg-gray-200 text-${tab.color}` : "text-vdcBlack"
+                  } hover:bg-slate-200 ${
+                    selected ? `bg-slate-200 text-${tab.color}` : ""
                   }`
                 }
               >

@@ -18,8 +18,8 @@ export const navLinks = [
     icon: <PlayIcon />,
     links: [
       { name: "Schedule", href: "/schedule" },
-      { name: "Stats", href: "/stats" },
       { name: "Standings", href: "/standings" },
+      { name: "Stats", href: "/stats" },
     ],
   },
   {

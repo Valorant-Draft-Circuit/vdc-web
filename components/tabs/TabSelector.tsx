@@ -1,32 +1,52 @@
 "use client";
 import { StandingsTab } from "@/app/standings/page";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MobileTabs from "./MobileTabs";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function TabSelector(props: { tabElements: StandingsTab[] }) {
-  const initial = props.tabElements.findIndex((t) => t.current);
-  const [selectedIndex, setSelectedIndex] = useState(
-    initial >= 0 ? initial : 0
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get("by")?.toLowerCase();
+  const initialIndex = props.tabElements.findIndex(
+    (t) => t.tier.toLowerCase() === queryParam
   );
+  const [selectedIndex, setSelectedIndex] = useState(
+    initialIndex >= 0 ? initialIndex : 0
+  );
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (initialIndex !== selectedIndex && initialIndex >= 0) {
+      setSelectedIndex(initialIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialIndex]);
   return (
     <>
       <TabGroup
-        as="div"
         selectedIndex={selectedIndex}
-        onChange={setSelectedIndex}
+        onChange={(index) => {
+          setSelectedIndex(index);
+          const newTier = props.tabElements[index].tier.toLowerCase();
+          const newUrl = `${pathname}?by=${newTier}`;
+          router.push(newUrl);
+        }}
         vertical
-        className="flex flex-col xl:flex-row "
+        className="flex flex-col xl:flex-row"
       >
-        <MobileTabs
-          setSelected={setSelectedIndex}
-          selected={selectedIndex}
-          tabElements={props.tabElements}
-        />
+        <div className="xl:hidden w-3/4 m-auto">
+          <MobileTabs
+            setSelected={setSelectedIndex}
+            selected={selectedIndex}
+            tabElements={props.tabElements}
+          />
+        </div>
 
         <div className="hidden xl:block">
-          <div className="flex flex-row gap-2">
-            <div className="sticky top-24 self-start p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl ">
+          <div className="flex flex-row gap-2  sticky top-26 self-start">
+            <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl">
               <TabList className="flex flex-col items-start gap-1 rounded-2xl drop-shadow-2xl">
                 {props.tabElements.map(({ tier, color }) => (
                   <Tab

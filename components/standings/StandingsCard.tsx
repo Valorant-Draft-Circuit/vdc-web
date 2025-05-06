@@ -1,6 +1,7 @@
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import Image from "next/image";
 import Link from "next/link";
+
 export type StandingProps = {
   franchiseSlug: string;
   teamLogo: string | null;
@@ -9,9 +10,10 @@ export type StandingProps = {
   losses: number;
   rwp: number;
 };
+
 export default function StandingsCard(props: {
   standing: StandingProps;
-  rank: number;
+  ranking: number;
   isFranchise: boolean;
 }) {
   let highlight = 3;
@@ -21,27 +23,30 @@ export default function StandingsCard(props: {
   return (
     <>
       <Link href={`/about/franchise/${props.standing.franchiseSlug}`}>
-        <div className=" hover:cursor-pointer hover:scale-102 transition-transform ease-in-out duration-150 flex flex-row gap-10 rounded-2xl xl:w-full bg-vdcWhite dark:bg-vdcGrey py-2 px-10 xl:px-24 drop-shadow-lg">
+        <div className="hover:cursor-pointer hover:scale-102 transition-transform ease-in-out duration-150 flex flex-row gap-10 rounded-2xl xl:w-full bg-vdcWhite dark:bg-vdcGrey py-4 px-5 xl:px-24 drop-shadow-lg">
           <div className="my-auto">
             <h1
               className={`${
-                props.rank <= highlight ? "text-vdcRed" : ""
-              } italic text-5xl xl:text-6xl min-w-10 xl:min-w-17`}
+                props.ranking <= highlight ? "text-vdcRed" : ""
+              } italic text-5xl xl:text-6xl min-w-5 xl:min-w-17`}
             >
-              {props.rank}
+              {props.ranking}
             </h1>
           </div>
           <div className="flex my-auto drop-shadow-md">
             <Image
               src={`${TEAM_LOGOS_URL}${props.standing.teamLogo}`}
-              alt={props.standing.teamName}
+              alt={props.standing.franchiseSlug}
               width={250}
               height={250}
               className="w-20 drop-shadow-md"
             />
           </div>
           <div className="flex flex-col my-auto">
-            <h1 className="italic text-xl xl:text-2xl">
+            <h1 className="md:hidden italic text-2xl">
+              {props.standing.franchiseSlug}
+            </h1>
+            <h1 className="hidden md:block italic text-lg xl:text-2xl">
               {props.standing.teamName}
             </h1>
             <h1 className="italic text-sm xl:text-sm">

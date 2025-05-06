@@ -10,6 +10,10 @@ export async function getFranchiseStandings(
     getFranchises(),
   ]);
 
+  if (allBo2Games.length === 0) {
+    return [];
+  }
+
   const rawStandings = franchises.map((franchise) =>
     buildFranchiseStanding(franchise, allBo2Games)
   );

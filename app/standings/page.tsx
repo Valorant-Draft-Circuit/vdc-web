@@ -43,7 +43,7 @@ export default async function Standings() {
 
   return (
     <div className="mx-auto py-10 max-w-7xl px-4 sm:px-6 xl:px-12 xl:py-12 flex flex-col gap-10">
-      <h1 className="text-vdcRed italic text-2xl text-center">
+      <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {currentSeason} Standings
       </h1>
       <TabSelector tabElements={tabs} />

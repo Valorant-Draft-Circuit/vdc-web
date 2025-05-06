@@ -4,6 +4,8 @@ import { FAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { StandingProps } from "@/components/standings/StandingsCard";
 import { getFranchiseStandings } from "../queries/standings/franchise-standings";
+import { Tier } from "@prisma/client";
+import { getStandingsByTier } from "../queries/standings/tier-standings";
 
 const cache = new NodeCache({
   stdTTL: 0,
@@ -40,4 +42,17 @@ export async function getFranchiseStandingsCached(
   const franchiseStandings = await getFranchiseStandings(season);
   cache.set(key, franchiseStandings, minutes(5));
   return franchiseStandings;
+}
+
+export async function getStandingsByCached(
+  season: number,
+  tier: Tier
+): Promise<StandingProps[]> {
+  const key = `s${season}-${tier}-standing`;
+  const hit = cache.get<StandingProps[]>(key);
+  if (hit !== undefined) return hit;
+
+  const standingByTier = await getStandingsByTier(season, tier);
+  cache.set(key, standingByTier, minutes(5));
+  return standingByTier;
 }
