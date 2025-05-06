@@ -111,7 +111,7 @@ function buildFranchiseStanding(
  * @returns all BO2 games
  */
 async function getAllBo2Games(seasonNumber: number) {
-  return prisma.games.findMany({
+  const res = prisma.games.findMany({
     where: {
       season: seasonNumber,
       Match: {
@@ -132,6 +132,8 @@ async function getAllBo2Games(seasonNumber: number) {
       },
     },
   });
+  await prisma.$disconnect();
+  return res;
 }
 
 /**
@@ -140,7 +142,7 @@ async function getAllBo2Games(seasonNumber: number) {
  * @returns all active franchises
  */
 async function getFranchises() {
-  const franchises = await prisma.franchise.findMany({
+  const res = await prisma.franchise.findMany({
     where: { active: true },
     select: {
       slug: true,
@@ -155,5 +157,6 @@ async function getFranchises() {
       },
     },
   });
-  return franchises;
+  await prisma.$disconnect();
+  return res;
 }

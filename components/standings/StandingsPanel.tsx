@@ -6,15 +6,23 @@ import {
 
 export default async function StandingsPanel(props: { query: string }) {
   const currentSeason = await getSeasonCached();
-  const standings = await getFranchiseStandingsCached(currentSeason);
-
+  let standings;
   let isFranchise = false;
   if (props.query === "franchises") {
     isFranchise = true;
+    standings = await getFranchiseStandingsCached(currentSeason);
+  } else {
+    standings = null;
   }
-
+  if (!standings) {
+    return (
+      <div className="flex bg-vdcWhite">
+        <h1>No standings yet!</h1>
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 bg-vdcRed p-5 rounded-2xl">
       {standings?.map((standing, index) => (
         <StandingsCard
           key={index}

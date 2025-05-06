@@ -21,12 +21,12 @@ export default function StandingsCard(props: {
   return (
     <>
       <Link href={`/about/franchise/${props.standing.franchiseSlug}`}>
-        <div className="hover:cursor-pointer hover:scale-102 transition-transform ease-in-out duration-150 flex flex-row gap-10 rounded-2xl w-full bg-vdcWhite dark:bg-vdcGrey py-2 px-24 drop-shadow-lg">
+        <div className=" hover:cursor-pointer hover:scale-102 transition-transform ease-in-out duration-150 flex flex-row gap-10 rounded-2xl xl:w-full bg-vdcWhite dark:bg-vdcGrey py-2 px-10 xl:px-24 drop-shadow-lg">
           <div className="my-auto">
             <h1
               className={`${
                 props.rank <= highlight ? "text-vdcRed" : ""
-              } italic text-6xl min-w-17`}
+              } italic text-5xl xl:text-6xl min-w-10 xl:min-w-17`}
             >
               {props.rank}
             </h1>
@@ -41,11 +41,15 @@ export default function StandingsCard(props: {
             />
           </div>
           <div className="flex flex-col my-auto">
-            <h1 className="italic text-2xl">{props.standing.teamName}</h1>
-            <h1 className="italic text-sm">
+            <h1 className="italic text-xl xl:text-2xl">
+              {props.standing.teamName}
+            </h1>
+            <h1 className="italic text-sm xl:text-sm">
               {props.standing.wins}W {props.standing.losses}L
             </h1>
-            <h1 className="italic text-sm">RWP: {props.standing.rwp}%</h1>
+            <h1 className="italic text-sm xl:text-sm">
+              RWP: {props.standing.rwp}%
+            </h1>
           </div>
         </div>
       </Link>

@@ -5,6 +5,7 @@ import { Tier } from "@prisma/client";
 import { getSeasonCached } from "@/lib/common/cache";
 
 export type StandingsTab = {
+  current?: boolean;
   tier: string;
   color: string;
   content: React.ReactNode;
@@ -12,27 +13,27 @@ export type StandingsTab = {
 const tabs: StandingsTab[] = [
   {
     tier: "franchises",
-    color: "text-vdcRed",
+    color: "vdcRed",
     content: <StandingsPanel query="franchises" />,
   },
   {
     tier: Tier.MYTHIC,
-    color: "text-vdcPurple",
+    color: "vdcPurple",
     content: <StandingsPanel query={Tier.MYTHIC} />,
   },
   {
     tier: Tier.EXPERT,
-    color: "text-vdcBlue",
+    color: "vdcBlue",
     content: <StandingsPanel query={Tier.EXPERT} />,
   },
   {
     tier: Tier.APPRENTICE,
-    color: "text-vdcGreen",
+    color: "vdcGreen",
     content: <StandingsPanel query={Tier.APPRENTICE} />,
   },
   {
     tier: Tier.PROSPECT,
-    color: "text-vdcYellow",
+    color: "vdcYellow",
     content: <StandingsPanel query={Tier.PROSPECT} />,
   },
 ];
@@ -41,7 +42,7 @@ export default async function Standings() {
   const currentSeason = await getSeasonCached();
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 xl:px-12 xl:py-12 flex flex-col gap-10">
+    <div className="mx-auto py-10 max-w-7xl px-4 sm:px-6 xl:px-12 xl:py-12 flex flex-col gap-10">
       <h1 className="text-vdcRed italic text-2xl text-center">
         Season {currentSeason} Standings
       </h1>
