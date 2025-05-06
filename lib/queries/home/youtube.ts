@@ -1,3 +1,5 @@
+import { Times } from "@/lib/common/times";
+
 export const CHANNEL_URL = "https://www.youtube.com/@ValorantDraftCircuit";
 const CHANNEL_ID = "UCcNoS_eA8_cnBj4jmyHjlkQ";
 const PLACEHOLDER_URL =
@@ -13,7 +15,7 @@ export async function getLatestYouTubeVideo(): Promise<string> {
   const url = `https://www.googleapis.com/youtube/v3/search?key=${process.env.GOOGLE_API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=1`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url, { next: { revalidate: Times.HOUR } });
     const data = (await res.json()) as YouTubeSearchResponse;
 
     if (data.items?.length) {

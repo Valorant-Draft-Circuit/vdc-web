@@ -1,5 +1,4 @@
-import getFaq from "@/lib/about/faq";
-import { DISCORD_LINK } from "@/lib/constants";
+import { DISCORD_LINK } from "@/lib/common/constants";
 import {
   Disclosure,
   DisclosureButton,
@@ -8,9 +7,10 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
+import { getFaqCached } from "@/lib/common/cache";
 
 export default async function Page() {
-  const faqs = await getFaq();
+  const faqs = await getFaqCached();
 
   return (
     <div>

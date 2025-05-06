@@ -1,6 +1,6 @@
 import Link from "next/link";
 import DiscordButton from "../buttons/DiscordButton";
-import { DISCORD_LINK } from "@/lib/constants";
+import { DISCORD_LINK } from "@/lib/common/constants";
 const StepTitle = ({ children }: { children: React.ReactNode }) => (
   <h1 className="text-vdcWhite italic text-center mx-5 text-md xl:mx-0 xl:px-4">
     {children}

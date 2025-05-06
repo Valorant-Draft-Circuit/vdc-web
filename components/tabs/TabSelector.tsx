@@ -1,26 +1,11 @@
 import { StandingsTab } from "@/app/standings/page";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { ControlPanel } from "@/prisma";
-import React from "react";
-import { cache } from "@/lib/cache";
 
 export default async function TabSelector(props: {
   tabElements: StandingsTab[];
 }) {
-  let season;
-  if (cache.currentSeason) {
-    season = cache.currentSeason;
-    console.log("cache hit for season:", season);
-  } else {
-    season = await ControlPanel.getSeason();
-    cache.currentSeason = season;
-  }
-
   return (
     <>
-      <h1 className="text-vdcRed italic text-2xl text-center">
-        Season {season} Standings
-      </h1>
       <TabGroup vertical className="">
         <div className="flex flex-row gap-2">
           <div className="hidden xl:block sticky top-24 self-start p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl ">

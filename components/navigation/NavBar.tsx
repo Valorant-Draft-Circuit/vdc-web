@@ -10,7 +10,7 @@ import {
   InformationCircleIcon,
   LinkIcon,
 } from "@heroicons/react/24/solid";
-import { BEHAVIOR_GUIDELINE_URL, RULEBOOK_URL } from "@/lib/constants";
+import { BEHAVIOR_GUIDELINE_URL, RULEBOOK_URL } from "@/lib/common/constants";
 
 export const navLinks = [
   {

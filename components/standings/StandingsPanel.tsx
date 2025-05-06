@@ -1,19 +1,16 @@
-import getFranchiseStandings from "@/lib/standings/franchise-standings";
 import StandingsCard from "./StandingsCard";
-import { cache } from "@/lib/cache";
+import {
+  getFranchiseStandingsCached,
+  getSeasonCached,
+} from "@/lib/common/cache";
 
 export default async function StandingsPanel(props: { query: string }) {
-  let standings;
+  const currentSeason = await getSeasonCached();
+  const standings = await getFranchiseStandingsCached(currentSeason);
+
   let isFranchise = false;
   if (props.query === "franchises") {
     isFranchise = true;
-    if (cache.standings.franchise) {
-      console.log("cache hit for frachises");
-      standings = cache.standings.franchise;
-    } else {
-      standings = await getFranchiseStandings(cache.currentSeason!);
-      cache.standings.franchise = standings;
-    }
   }
 
   return (

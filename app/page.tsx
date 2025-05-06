@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import HeroSection from "../components/home/HeroSection";
 import HowToPlay from "../components/home/HowToPlay";
 import News from "../components/home/News";
-import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/youtube";
+import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/queries/home/youtube";
 import Link from "next/link";
 import { Suspense } from "react";
 import NewsSkeleton from "../components/home/NewsSkeleton";

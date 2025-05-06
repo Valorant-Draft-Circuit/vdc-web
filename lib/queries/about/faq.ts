@@ -1,6 +1,11 @@
 import { prisma } from "@/prisma/prismadb";
 
-export default async function getFaq() {
+export type FAQ = {
+  question: string;
+  answer: string;
+};
+
+export async function getFaq(): Promise<FAQ[]> {
   const res = await prisma.fAQ.findMany({
     where: {
       visible: true,
@@ -8,7 +13,10 @@ export default async function getFaq() {
     orderBy: {
       id: "asc",
     },
+    select: {
+      question: true,
+      answer: true,
+    },
   });
-  await prisma.$disconnect();
   return res;
 }

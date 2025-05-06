@@ -1,13 +1,13 @@
-import { TEAM_LOGOS_URL } from "@/lib/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import Image from "next/image";
 import Link from "next/link";
 export type StandingProps = {
+  franchiseSlug: string;
   teamLogo: string | null;
   teamName: string;
   wins: number;
   losses: number;
   rwp: number;
-  franchiseSlug: string;
 };
 export default function StandingsCard(props: {
   standing: StandingProps;

@@ -1,4 +1,4 @@
-import { getNews } from "@/lib/posts";
+import { getNews } from "@/lib/queries/home/posts";
 import Image from "next/image";
 import Link from "next/link";
 
