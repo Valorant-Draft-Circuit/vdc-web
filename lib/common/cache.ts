@@ -3,9 +3,11 @@ import { ControlPanel } from "@/prisma";
 import { FAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { StandingProps } from "@/components/standings/StandingsCard";
-import { getFranchiseStandings } from "../queries/standings/franchise-standings";
+import {
+  getFranchiseStandings,
+  getStandingsByTier,
+} from "../queries/standings/standings";
 import { Tier } from "@prisma/client";
-import { getStandingsByTier } from "../queries/standings/tier-standings";
 
 const cache = new NodeCache({
   stdTTL: 0,

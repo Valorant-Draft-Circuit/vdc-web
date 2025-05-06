@@ -5,6 +5,7 @@ import {
   getSeasonCached,
   getStandingsByCached,
 } from "@/lib/common/cache";
+import { getApexRankings } from "@/lib/queries/standings/standings";
 
 const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
@@ -13,13 +14,16 @@ const isTier = (value: string): value is Tier => {
 export default async function StandingsPanel(props: { query: Tier | string }) {
   const currentSeason = await getSeasonCached();
   let standings;
-  let isFranchise = false;
+  let apexRanks;
+
   if (props.query === "franchises") {
-    isFranchise = true;
     standings = await getFranchiseStandingsCached(currentSeason);
+    apexRanks = 3;
   } else if (isTier(props.query)) {
     standings = await getStandingsByCached(currentSeason, props.query);
+    apexRanks = getApexRankings(standings);
   }
+
   if (standings.length === 0) {
     return (
       <div className="flex flex-col italic text-2xl text-center min-w-5 m-auto xl:mr-24">
@@ -40,7 +44,7 @@ export default async function StandingsPanel(props: { query: Tier | string }) {
           key={index}
           standing={standing}
           ranking={index + 1}
-          isFranchise={isFranchise}
+          apexRanks={apexRanks}
         />
       ))}
     </div>

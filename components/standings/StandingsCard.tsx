@@ -14,12 +14,8 @@ export type StandingProps = {
 export default function StandingsCard(props: {
   standing: StandingProps;
   ranking: number;
-  isFranchise: boolean;
+  apexRanks: number;
 }) {
-  let highlight = 3;
-  if (props.isFranchise) {
-    highlight = 3;
-  }
   return (
     <>
       <Link href={`/about/franchise/${props.standing.franchiseSlug}`}>
@@ -27,7 +23,7 @@ export default function StandingsCard(props: {
           <div className="my-auto">
             <h1
               className={`${
-                props.ranking <= highlight ? "text-vdcRed" : ""
+                props.ranking <= props.apexRanks ? "text-vdcRed" : ""
               } italic text-5xl xl:text-6xl min-w-5 xl:min-w-17`}
             >
               {props.ranking}
