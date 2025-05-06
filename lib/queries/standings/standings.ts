@@ -75,7 +75,7 @@ export async function getStandingsByTier(
     teamName: team.name,
     wins: team.wins,
     losses: team.losses,
-    rwp: team.rwp * 100,
+    rwp: Math.round(team.rwp * 100) / 100,
   }));
 }
 
@@ -175,7 +175,7 @@ function buildFranchiseStanding(
     totalRounds += record.totalRounds;
   }
 
-  const rwp = totalRounds > 0 ? (roundsWon / totalRounds) * 100 : 0;
+  const rwp = totalRounds > 0 ? Math.round((roundsWon / totalRounds) * 100) / 100 : 0;
   return {
     franchiseSlug: franchise.slug,
     teamName: franchise.name,
