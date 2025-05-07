@@ -14,7 +14,7 @@ export default function MobileTabs(props: {
   const selectedTab = props.tabElements[props.selected];
 
   return (
-    <div className="grid grid-cols-1 xl:hidden">
+    <div className="grid grid-cols-1 xl:hidden w-full">
       <Listbox
         value={selectedTab}
         onChange={(tab) => {

@@ -43,14 +43,14 @@ export default function TabSelector(props: { tabElements: TabElements[] }) {
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden flex items-center px-5">
-          <div className="flex-1">
+        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-sm">
+
             <MobileTabs
               setSelected={setSelectedIndex}
               selected={selectedIndex}
               tabElements={props.tabElements}
             />
-          </div>
+
         </div>
 
         <div className="hidden xl:block">
@@ -70,7 +70,7 @@ export default function TabSelector(props: { tabElements: TabElements[] }) {
           </div>
         </div>
 
-        <TabPanels className="w-auto xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
+        <TabPanels className="w-auto sm:w-xl md:w-2xl xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
           {props.tabElements.map(({ content, tier }) => (
             <TabPanel key={tier}>{content}</TabPanel>
           ))}
