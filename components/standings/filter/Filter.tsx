@@ -19,7 +19,7 @@ export default async function Filter(props: { tier: Tier }) {
           <PopoverPanel
             transition
             anchor="bottom"
-            className="rounded-xl ml-5 bg-gray-200 transition duration-200 ease-in-out [--anchor-gap:--spacing(5)] data-closed:-translate-y-1 data-closed:opacity-0"
+            className="rounded-xl ml-5 bg-gray-200 dark:bg-vdcGrey transition duration-200 ease-in-out [--anchor-gap:--spacing(5)] data-closed:-translate-y-1 data-closed:opacity-0"
           >
             <div className="p-3">
               <Field>
