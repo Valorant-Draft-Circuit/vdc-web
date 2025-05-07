@@ -1,16 +1,10 @@
 import StandingsPanel from "@/components/standings/StandingsPanel";
-import TabSelector from "@/components/tabs/TabSelector";
-import React from "react";
+import TabSelector, { TabElements } from "@/components/tabs/TabSelector";
+import React, { Suspense } from "react";
 import { Tier } from "@prisma/client";
 import { getSeasonCached } from "@/lib/common/cache";
 
-export type StandingsTab = {
-  current?: boolean;
-  tier: string;
-  color: string;
-  content: React.ReactNode;
-};
-const tabs: StandingsTab[] = [
+const tabs: TabElements[] = [
   {
     tier: "franchises",
     color: "vdcRed",
@@ -46,7 +40,9 @@ export default async function Standings() {
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {currentSeason} Standings
       </h1>
-      <TabSelector tabElements={tabs} />
+      <Suspense fallback={<div>Loading schedule…</div>}>
+        <TabSelector tabElements={tabs} />
+      </Suspense>
     </div>
   );
 }

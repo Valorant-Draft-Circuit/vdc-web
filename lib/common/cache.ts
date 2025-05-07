@@ -7,7 +7,7 @@ import {
   getFranchiseStandings,
   getStandingsByTier,
 } from "../queries/standings/standings";
-import { Tier } from "@prisma/client";
+import { Prisma, Tier } from "@prisma/client";
 
 const cache = new NodeCache({
   stdTTL: 0,
@@ -42,7 +42,7 @@ export async function getFranchiseStandingsCached(
   if (hit !== undefined) return hit;
 
   const franchiseStandings = await getFranchiseStandings(season);
-  cache.set(key, franchiseStandings, minutes(5));
+  cache.set(key, franchiseStandings, Times.MINUTE);
   return franchiseStandings;
 }
 
@@ -55,13 +55,23 @@ export async function getStandingsByCached(
   if (hit !== undefined) return hit;
 
   const standingByTier = await getStandingsByTier(season, tier);
-  cache.set(key, standingByTier, minutes(5));
+  cache.set(key, standingByTier, Times.MINUTE);
   return standingByTier;
 }
 
-export async function getAllTeamsByTierCached(tier: Tier): Promise<any[]> {
+
+type TeamWithFranchiseAndBrand = Prisma.TeamsGetPayload<{
+  include: {
+    Franchise: {
+      include: { Brand: true };
+    };
+  };
+}>;
+export async function getAllTeamsByTierCached(
+  tier: Tier
+): Promise<TeamWithFranchiseAndBrand[]> {
   const key = `${tier}-teams`;
-  const hit = cache.get<any[]>(key);
+  const hit = cache.get<TeamWithFranchiseAndBrand[]>(key);
   if (hit !== undefined) return hit;
 
   const allTeamsByTier = await Team.getAllActiveByTier(tier);

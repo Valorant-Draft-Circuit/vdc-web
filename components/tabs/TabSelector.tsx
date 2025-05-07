@@ -1,13 +1,18 @@
 "use client";
-import { StandingsTab } from "@/app/standings/page";
+
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import MobileTabs from "./MobileTabs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { isTier } from "@/lib/common/utils";
-import { Tier } from "@prisma/client";
 
-export default function TabSelector(props: { tabElements: StandingsTab[] }) {
+export type TabElements = {
+  current?: boolean;
+  tier: string;
+  color: string;
+  content: React.ReactNode;
+};
+
+export default function TabSelector(props: { tabElements: TabElements[] }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("by")?.toLowerCase();
   const initialIndex = props.tabElements.findIndex(
@@ -18,11 +23,6 @@ export default function TabSelector(props: { tabElements: StandingsTab[] }) {
   );
   const router = useRouter();
   const pathname = usePathname();
-  let tier: Tier;
-  if (isTier(queryParam!)) {
-    console.log(queryParam);
-    tier = queryParam;
-  }
 
   useEffect(() => {
     if (initialIndex !== selectedIndex && initialIndex >= 0) {

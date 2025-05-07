@@ -5,7 +5,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 
 export default async function SchedulePanel(props: { query: Tier | string }) {
   const currentSeason = await getSeasonCached()
-  let schedule = [];
+  const schedule = [];
   let tier;
   if (isTier(props.query)) {
     tier = props.query;
