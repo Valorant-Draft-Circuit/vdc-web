@@ -1,11 +1,18 @@
 "use client";
-import { StandingsTab } from "@/app/standings/page";
+
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import MobileTabs from "./MobileTabs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-export default function TabSelector(props: { tabElements: StandingsTab[] }) {
+export type TabElements = {
+  current?: boolean;
+  tier: string;
+  color: string;
+  content: React.ReactNode;
+};
+
+export default function TabSelector(props: { tabElements: TabElements[] }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("by")?.toLowerCase();
   const initialIndex = props.tabElements.findIndex(
@@ -36,12 +43,14 @@ export default function TabSelector(props: { tabElements: StandingsTab[] }) {
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden w-3/4 m-auto">
-          <MobileTabs
-            setSelected={setSelectedIndex}
-            selected={selectedIndex}
-            tabElements={props.tabElements}
-          />
+        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-sm">
+
+            <MobileTabs
+              setSelected={setSelectedIndex}
+              selected={selectedIndex}
+              tabElements={props.tabElements}
+            />
+
         </div>
 
         <div className="hidden xl:block">
@@ -61,7 +70,7 @@ export default function TabSelector(props: { tabElements: StandingsTab[] }) {
           </div>
         </div>
 
-        <TabPanels className="w-auto xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
+        <TabPanels className="w-auto sm:w-xl md:w-2xl xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
           {props.tabElements.map(({ content, tier }) => (
             <TabPanel key={tier}>{content}</TabPanel>
           ))}

@@ -6,10 +6,7 @@ import {
   getStandingsByCached,
 } from "@/lib/common/cache";
 import { getApexRankings } from "@/lib/queries/standings/standings";
-
-const isTier = (value: string): value is Tier => {
-  return Object.values(Tier).includes(value as Tier);
-};
+import { isTier } from "@/lib/common/utils";
 
 export default async function StandingsPanel(props: { query: Tier | string }) {
   const currentSeason = await getSeasonCached();
