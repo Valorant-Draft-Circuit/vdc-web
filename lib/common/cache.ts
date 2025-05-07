@@ -1,5 +1,5 @@
 import NodeCache from "node-cache";
-import { ControlPanel } from "@/prisma";
+import { ControlPanel, Team } from "@/prisma";
 import { FAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { StandingProps } from "@/components/standings/StandingsCard";
@@ -57,4 +57,14 @@ export async function getStandingsByCached(
   const standingByTier = await getStandingsByTier(season, tier);
   cache.set(key, standingByTier, minutes(5));
   return standingByTier;
+}
+
+export async function getAllTeamsByTierCached(tier: Tier): Promise<any[]> {
+  const key = `${tier}-teams`;
+  const hit = cache.get<any[]>(key);
+  if (hit !== undefined) return hit;
+
+  const allTeamsByTier = await Team.getAllActiveByTier(tier);
+  cache.set(key, allTeamsByTier, Times.DAY);
+  return allTeamsByTier;
 }

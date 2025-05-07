@@ -4,6 +4,8 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import MobileTabs from "./MobileTabs";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { isTier } from "@/lib/common/utils";
+import { Tier } from "@prisma/client";
 
 export default function TabSelector(props: { tabElements: StandingsTab[] }) {
   const searchParams = useSearchParams();
@@ -16,6 +18,11 @@ export default function TabSelector(props: { tabElements: StandingsTab[] }) {
   );
   const router = useRouter();
   const pathname = usePathname();
+  let tier: Tier;
+  if (isTier(queryParam!)) {
+    console.log(queryParam);
+    tier = queryParam;
+  }
 
   useEffect(() => {
     if (initialIndex !== selectedIndex && initialIndex >= 0) {
@@ -36,12 +43,14 @@ export default function TabSelector(props: { tabElements: StandingsTab[] }) {
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden w-3/4 m-auto">
-          <MobileTabs
-            setSelected={setSelectedIndex}
-            selected={selectedIndex}
-            tabElements={props.tabElements}
-          />
+        <div className="xl:hidden flex items-center px-5">
+          <div className="flex-1">
+            <MobileTabs
+              setSelected={setSelectedIndex}
+              selected={selectedIndex}
+              tabElements={props.tabElements}
+            />
+          </div>
         </div>
 
         <div className="hidden xl:block">

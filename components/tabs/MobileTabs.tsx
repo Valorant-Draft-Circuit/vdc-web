@@ -14,7 +14,7 @@ export default function MobileTabs(props: {
   const selectedTab = props.tabElements[props.selected];
 
   return (
-    <div className="grid grid-cols-1 xl:hidden mb-4">
+    <div className="grid grid-cols-1 xl:hidden">
       <Listbox
         value={selectedTab}
         onChange={(tab) => {
@@ -24,7 +24,7 @@ export default function MobileTabs(props: {
       >
         <div className="relative col-start-1 row-start-1">
           <ListboxButton
-            className={`w-full rounded-md  data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl italic text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
+            className={`w-full rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl italic text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
             <h1 className="truncate">{selectedTab.tier}</h1>
             <ChevronUpDownIcon
