@@ -60,7 +60,7 @@ export default async function Page({
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
-        Season {season} (past!) Schedule
+        Season {season} Match History
       </h1>
       <Suspense fallback={<div>Loading schedule…</div>}>
         <TabSelector tabElements={tabs} />
