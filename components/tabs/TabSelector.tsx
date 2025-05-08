@@ -30,6 +30,7 @@ export default function TabSelector(props: { tabElements: TabElements[] }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
+
   return (
     <>
       <TabGroup
@@ -43,14 +44,12 @@ export default function TabSelector(props: { tabElements: TabElements[] }) {
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-sm">
-
-            <MobileTabs
-              setSelected={setSelectedIndex}
-              selected={selectedIndex}
-              tabElements={props.tabElements}
-            />
-
+        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 sm:px-12">
+          <MobileTabs
+            setSelected={setSelectedIndex}
+            selected={selectedIndex}
+            tabElements={props.tabElements}
+          />
         </div>
 
         <div className="hidden xl:block">

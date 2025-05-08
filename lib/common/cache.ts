@@ -8,11 +8,18 @@ import {
   getStandingsByTier,
 } from "../queries/standings/standings";
 import { Prisma, Tier } from "@prisma/client";
+import { getScheduleByTier, Schedule } from "../queries/schedule/schedule";
 
-const cache = new NodeCache({
-  stdTTL: 0,
-  checkperiod: minutes(10), // prune expired keys every 10 mins
-});
+let cache: NodeCache;
+
+export function initCache() {
+  if (!cache) {
+    cache = new NodeCache({
+      stdTTL: 0,
+      checkperiod: minutes(10), // prune expired keys every 10 mins
+    });
+  }
+}
 
 export async function getSeasonCached(): Promise<number> {
   const key = "currentSeason";
@@ -59,7 +66,6 @@ export async function getStandingsByCached(
   return standingByTier;
 }
 
-
 type TeamWithFranchiseAndBrand = Prisma.TeamsGetPayload<{
   include: {
     Franchise: {
@@ -67,6 +73,7 @@ type TeamWithFranchiseAndBrand = Prisma.TeamsGetPayload<{
     };
   };
 }>;
+
 export async function getAllTeamsByTierCached(
   tier: Tier
 ): Promise<TeamWithFranchiseAndBrand[]> {
@@ -77,4 +84,16 @@ export async function getAllTeamsByTierCached(
   const allTeamsByTier = await Team.getAllActiveByTier(tier);
   cache.set(key, allTeamsByTier, Times.DAY);
   return allTeamsByTier;
+}
+
+export async function getScheduleByTierCached(
+  tier: Tier,
+  season: number
+): Promise<Schedule> {
+  const key = `${tier}-schedule`;
+  const hit = cache.get<Schedule>(key);
+  if (hit !== undefined) return hit;
+  const scheduleByTier = getScheduleByTier(tier, season);
+  cache.set(key, scheduleByTier, minutes(30));
+  return scheduleByTier;
 }

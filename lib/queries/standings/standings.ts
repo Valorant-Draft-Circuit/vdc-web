@@ -54,6 +54,7 @@ export function getApexRankings(standings: StandingProps[]) {
       : 4;
   return highlight;
 }
+
 export async function getStandingsByTier(
   seasonNumber: number,
   tier: Tier
