@@ -61,7 +61,7 @@ const steps = [
         <br />
         commitment, high quality
         <br />
-        VALOARNT experience
+        VALORANT experience
       </StepDesc>
     ),
   },

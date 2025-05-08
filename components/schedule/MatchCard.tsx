@@ -1,7 +1,7 @@
 "use client";
 
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
-import { EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function MatchCard({ match }: { match: Match }) {
   return (
     <div
       onClick={goToMatch}
-      className="hover:cursor-pointer hover:scale-101 hover:brightness-98 transition-transform ease-in-out duration-150 flex flex-row gap-3 rounded-2xl m-auto xl:w-full bg-vdcWhite dark:bg-vdcGrey py-3 px-5 w-full xl:px-24 drop-shadow-lg z-0 justify-center"
+      className="hover:cursor-pointer hover:brightness-98 transition-transform ease-in-out duration-150 flex flex-row gap-3 rounded-2xl m-auto xl:w-full bg-vdcWhite dark:bg-vdcGrey py-3 px-5 w-full xl:px-24 drop-shadow-lg z-0 justify-center"
     >
       <HomeBadge home={match.home} />
       <MatchScore home={match.homeScore!} away={match.awayScore!} />
@@ -39,6 +39,9 @@ export default function MatchCard({ match }: { match: Match }) {
 function HomeBadge({ home }: { home: Team }) {
   return (
     <Link
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
       href={`/franchise/${home.slug}?team=${home.teamName}`}
       className="sm:min-w-1/6 flex flex-row mx-auto text-center hover:scale-105 hover:brightness-90 rounded-md transition-transform sm:px-2 py-1"
     >
@@ -59,6 +62,9 @@ function HomeBadge({ home }: { home: Team }) {
 function AwayBadge({ away }: { away: Team }) {
   return (
     <Link
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
       href={`/franchise/${away.slug}?team=${away.teamName}`}
       className="sm:min-w-1/6 flex flex-row mx-auto text-center hover:scale-105 hover:brightness-90 rounded-md transition-transform"
     >
@@ -88,22 +94,22 @@ function MatchScore({ home, away }: { home?: number; away?: number }) {
   }
 
   return (
-    <div className="min-w-1/4 sm:m-auto flex flex-row italic text-xl sm:text-3xl gap-5 xl:text-5xl items-center z-20">
+    <div className="min-w-1/6 sm:min-w-1/4 sm:m-auto flex flex-row italic text-xl sm:text-3xl gap-5 xl:text-5xl items-center z-20">
       {!revealed && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             setRevealed(true);
           }}
-          className="m-auto rounded-md bg-vdcGrey dark:bg-vdcBlack px-6 py-2 xl:px-10 xl:py-3text-sm font-semibold shadow-xs hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer hover:scale-105 transition-transform"
+          className="m-auto rounded-md bg-vdcGrey dark:bg-vdcBlack px-3 py-1 sm:px-6 sm:py-2 xl:px-10 xl:py-3text-sm font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer hover:brightness-20 transition-all"
         >
-          <EyeSlashIcon className="w-7 text-vdcWhite" />
+          <EyeSlashIcon className="w-5 sm:w-7 text-vdcWhite" />
         </button>
       )}
       <div
         className={
           revealed
-            ? "flex flex-row italic gap-2 text-xl m-auto sm:text-2xl xl:text-3xl sm:gap-5 my-auto items-center z-20"
+            ? "flex flex-row italic gap-1 m-auto text-sm sm:text-2xl xl:text-3xl sm:gap-5 my-auto items-center z-20"
             : "hidden"
         }
       >
