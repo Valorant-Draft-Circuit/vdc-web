@@ -18,12 +18,12 @@ export default async function SchedulePanel(props: { query: Tier | string }) {
           awayScore: 1,
           home: {
             slug: "pn",
-            teamName: "orion",
+            teamName: "meteor marauders",
             teamLogo: "pn.png",
           },
           away: {
             slug: "ht",
-            teamName: "riptide",
+            teamName: "royal flush",
             teamLogo: "ht.png",
           },
         },
