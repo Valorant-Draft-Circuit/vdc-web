@@ -8,29 +8,29 @@ const tabs: TabElements[] = [
   {
     tier: Tier.MYTHIC,
     color: "vdcPurple",
-    content: <SchedulePanel query={Tier.MYTHIC} />,
+    content: <SchedulePanel tier={Tier.MYTHIC} />,
   },
   {
     tier: Tier.EXPERT,
     color: "vdcBlue",
-    content: <SchedulePanel query={Tier.EXPERT} />,
+    content: <SchedulePanel tier={Tier.EXPERT} />,
   },
   {
     tier: Tier.APPRENTICE,
     color: "vdcGreen",
-    content: <SchedulePanel query={Tier.APPRENTICE} />,
+    content: <SchedulePanel tier={Tier.APPRENTICE} />,
   },
   {
     tier: Tier.PROSPECT,
     color: "vdcYellow",
-    content: <SchedulePanel query={Tier.PROSPECT} />,
+    content: <SchedulePanel tier={Tier.PROSPECT} />,
   },
 ];
 
 export default function Page() {
   const currentSeason = getSeasonCached();
   return (
-    <div className="mx-auto py-10 max-w-7xl px-1 sm:px-6 xl:px-12 xl:py-12 flex flex-col gap-10">
+    <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {currentSeason} Schedule
       </h1>

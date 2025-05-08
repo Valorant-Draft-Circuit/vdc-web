@@ -24,7 +24,7 @@ export default function MobileTabs(props: {
       >
         <div className="relative col-start-1 row-start-1">
           <ListboxButton
-            className={`w-full rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl italic text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
+            className={`w-full italic rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl  text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
             <h1 className="truncate">{selectedTab.tier}</h1>
             <ChevronUpDownIcon
@@ -39,7 +39,7 @@ export default function MobileTabs(props: {
                 key={tab.tier}
                 value={tab}
                 className={({ selected }) =>
-                  `relative  cursor-pointer select-none py-2 pl-3 pr-9 hover:text-${
+                  `relative  cursor-pointer select-none py-2 pl-3 pr-9 sm:text-xl hover:text-${
                     tab.color
                   } hover:bg-slate-200 ${
                     selected ? `bg-slate-200 text-${tab.color}` : ""

@@ -3,148 +3,45 @@ import Filter from "../standings/filter/Filter";
 import { isTier } from "@/lib/common/utils";
 import { getSeasonCached } from "@/lib/common/cache";
 import ScheduleCard from "./ScheduleCard";
+import { getScheduleByTier } from "@/lib/queries/schedule/schedule";
 
-export default async function SchedulePanel(props: { query: Tier | string }) {
+export default async function SchedulePanel(props: {
+  tier: Tier;
+  season?: number;
+}) {
   const currentSeason = await getSeasonCached();
-  const schedule = [
-    {
-      md: 1,
-      date: "Monday, April 28",
-      time: "9:00PM",
-      matches: [
-        {
-          matchId: 1,
-          homeScore: 1,
-          awayScore: 1,
-          home: {
-            slug: "pn",
-            teamName: "meteor marauders",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "royal flush",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 2,
-          homeScore: 2,
-          awayScore: 0,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 3,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 4,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-      ],
-    },
-    {
-      md: 2,
-      date: "Wednesday, May 7",
-      time: "9:00PM",
-      matches: [
-        {
-          matchId: 1,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 2,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 3,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-        {
-          matchId: 4,
-          home: {
-            slug: "pn",
-            teamName: "orion",
-            teamLogo: "pn.png",
-          },
-          away: {
-            slug: "ht",
-            teamName: "riptide",
-            teamLogo: "ht.png",
-          },
-        },
-      ],
-    },
-  ];
-  let tier;
-  if (isTier(props.query)) {
-    tier = props.query;
+  let season = props.season;
+  if (!season) {
+    season = currentSeason;
   }
+  let tier;
 
-  if (schedule.length === 0) {
+  if (isTier(props.tier)) {
+    tier = props.tier;
+  }
+  const schedule = await getScheduleByTier(tier, season);
+  const isCurrentSeason = currentSeason === season;
+  const isScheduleEmpty =
+    Object.keys(schedule.regularSeason).length === 0 &&
+    Object.keys(schedule.preSeason).length === 0;
+  if (isScheduleEmpty) {
     return (
       <>
         <div className="flex flex-col italic text-2xl text-center min-w-5 m-auto xl:mr-24">
           <div className="flex flex-col gap-3 xl:bg-auto">
-            <h1>No scheduled matches found for {props.query}</h1>
-            <h2 className="text-xl">
-              (Season <span>{currentSeason}</span> probably hasnt started yet,
-              please check back later!)
-            </h2>
+            <h1>
+              No scheduled season {season} matches found for {props.tier}
+            </h1>
+            {isCurrentSeason ? (
+              <h2 className="text-xl">
+                (Season <span>{season}</span> probably hasnt started yet, please
+                check back later!)
+              </h2>
+            ) : (
+              <h2 className="text-xl">
+                (We probably didnt keep track of matches back then!)
+              </h2>
+            )}
           </div>
         </div>
       </>
@@ -153,8 +50,15 @@ export default async function SchedulePanel(props: { query: Tier | string }) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl xl:gap-5">
       <Filter tier={tier} />
-      {schedule.map((matchDay, md) => (
-        <ScheduleCard key={md} matchDay={matchDay} />
+      {Object.keys(schedule.preSeason).map((matchDay, i) => (
+        <ScheduleCard key={i} matchDay={matchDay} season={schedule.preSeason} />
+      ))}
+      {Object.keys(schedule.regularSeason).map((matchDay, i) => (
+        <ScheduleCard
+          key={i}
+          matchDay={matchDay}
+          season={schedule.regularSeason}
+        />
       ))}
     </div>
   );
