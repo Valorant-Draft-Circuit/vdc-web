@@ -131,10 +131,9 @@ async function getUpcomingMatchesDates(tier: Tier, season: number) {
     },
   });
   await prisma.$disconnect();
-  upcomingMatches.sort((a, b) => {
-    return (
-      new Date(a.dateScheduled).getTime() - new Date(b.dateScheduled).getTime()
-    );
-  });
+  upcomingMatches.sort((a, b) =>
+    a.dateScheduled.toISOString().localeCompare(b.dateScheduled.toISOString())
+  );
+
   return upcomingMatches;
 }
