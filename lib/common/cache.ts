@@ -1,5 +1,5 @@
 import NodeCache from "node-cache";
-import { ControlPanel, Team } from "@/prisma";
+import { ControlPanel, Franchise, Team } from "@/prisma";
 import { FAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { StandingProps } from "@/components/standings/StandingsCard";
@@ -96,4 +96,20 @@ export async function getScheduleByTierCached(
   const scheduleByTier = getScheduleByTier(tier, season);
   cache.set(key, scheduleByTier, minutes(30));
   return scheduleByTier;
+}
+
+type ActiveFranchises = Prisma.FranchiseGetPayload<{
+  include: {
+    Teams: true;
+    Brand: true;
+  };
+}>[];
+export async function getAllActiveFranchisesCached() {
+  const key = "activeFranchises";
+  const hit = cache.get<ActiveFranchises>(key);
+  if (hit !== undefined) return hit;
+
+  const activeFranchises = await Franchise.getAllActive();
+  cache.set(key, activeFranchises, Times.DAY);
+  return activeFranchises;
 }
