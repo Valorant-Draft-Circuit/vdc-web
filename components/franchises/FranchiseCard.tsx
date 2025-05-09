@@ -9,27 +9,28 @@ export default function FranchiseCard({ franchise }: { franchise }) {
   return (
     <div
       style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
-      className="
-        flex flex-row py-4 px-5 rounded-2xl drop-shadow-xl
-        bg-gradient-to-tl
-        from-[var(--p)] to-[var(--s)]
-        hover:from-[var(--s)] hover:to-[var(--p)]
-        transition-colors duration-800
-      "
+      className="flex flex-row py-4 px-5 rounded-2xl drop-shadow-xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)] hover:from-[var(--s)] hover:to-[var(--p)] transition-colors duration-800"
     >
+      <div className="absolute inset-0 bg-black/40 rounded-2xl pointer-events-none transition-opacity duration-800" />
       <Link href={`/about/franchises/${franchise.slug}`}>
-        <div className="flex flex-row gap-2 text-center">
-          <div className="w-1/4 h-auto drop-shadow-lg">
+        <div className="flex flex-row gap-4 text-center">
+          <div className="drop-shadow-lg">
             <Image
               src={`${TEAM_LOGOS_URL}${franchise.Brand.logo}`}
               alt={franchise.slug}
               height={250}
               width={250}
+              className="w-20 h-auto"
             />
           </div>
-          <h1 className="italic w-full text-lg my-auto drop-shadow-2xl text-vdcWhite">
-            {franchise.slug} | {franchise.name}
-          </h1>
+          <div className="flex flex-col text-start my-auto">
+            <h1 className="italic w-full text-md my-auto sm:m-auto drop-shadow-2xl text-vdcWhite">
+              {franchise.slug}
+            </h1>
+            <h1 className="italic w-full text-md my-auto sm:m-auto drop-shadow-2xl text-vdcWhite">
+              {franchise.name}
+            </h1>
+          </div>
         </div>
       </Link>
     </div>
