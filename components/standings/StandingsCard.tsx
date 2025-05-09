@@ -18,7 +18,7 @@ export default function StandingsCard(props: {
 }) {
   return (
     <>
-      <Link href={`/about/franchise/${props.standing.franchiseSlug}`}>
+      <Link href={`/about/franchises/${props.standing.franchiseSlug}`}>
         <div className="hover:cursor-pointer hover:scale-102 transition-transform ease-in-out duration-150 flex flex-row gap-10 rounded-2xl xl:w-full bg-vdcWhite dark:bg-vdcGrey py-4 px-5 xl:px-24 drop-shadow-lg">
           <div className="my-auto">
             <h1

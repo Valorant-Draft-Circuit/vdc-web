@@ -42,7 +42,7 @@ function HomeBadge({ home }: { home: Team }) {
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/franchise/${home.slug}?team=${home.name}`}
+      href={`/about/franchises/${home.slug}?team=${home.name}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center justify-end space-x-2 xl:space-x-5">
@@ -68,7 +68,7 @@ function AwayBadge({ away }: { away: Team }) {
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/franchise/${away.slug}?team=${away.name}`}
+      href={`/about/franchises/${away.slug}?team=${away.name}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center  space-x-2 xl:space-x-5">
