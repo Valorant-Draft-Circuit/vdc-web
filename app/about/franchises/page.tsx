@@ -25,7 +25,7 @@ export default async function Page() {
           </h1>
         </div>
 
-        <div className="mt-10 flex flex-col mx-2 p-5 rounded-xl gap-2 drop-shadow-2xl">
+        <div className="mt-10 xl:mt-5 flex flex-col mx-2 p-5 rounded-xl gap-2 drop-shadow-2xl xl:grid xl:grid-cols-3 xl:gap-4">
           {franchises?.map((franchise, index) => (
             <FranchiseCard key={index} franchise={franchise} />
           ))}
