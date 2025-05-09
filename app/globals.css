@@ -48,6 +48,7 @@
 @source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
 @source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
 
+
 body {
   background: var(--background);
   color: var(--foreground);
