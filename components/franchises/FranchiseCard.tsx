@@ -1,11 +1,11 @@
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
-import { toHexcode } from "@/lib/common/utils";
+import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function FranchiseCard({ franchise }: { franchise }) {
-  const primary = toHexcode(franchise.Brand.colorPrimary);
-  const secondary = toHexcode(franchise.Brand.colorSecondary);
+  const primary = toTailwindCustomHexCode(franchise.Brand.colorPrimary);
+  const secondary = toTailwindCustomHexCode(franchise.Brand.colorSecondary);
 
   return (
     <Link href={`/about/franchises/${franchise.slug}`}>

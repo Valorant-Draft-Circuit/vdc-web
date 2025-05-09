@@ -4,7 +4,7 @@ export const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
 };
 
-export function toHexcode(color) {
+export function toTailwindCustomHexCode(color) {
   const colorHex = String(color).split("x")[1];
   return `#${colorHex}`;
 }
