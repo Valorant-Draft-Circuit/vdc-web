@@ -59,7 +59,7 @@ export default async function Page({
                   <FlameLogo
                     color={color}
                     key={i}
-                    className={`size-5 ${color} drop-shadow-xl`}
+                    className={`size-5 xl:size-8 ${color} drop-shadow-xl`}
                   />
                 );
               })}
