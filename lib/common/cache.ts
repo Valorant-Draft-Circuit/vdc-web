@@ -114,7 +114,7 @@ export async function getAllActiveFranchisesCached() {
   return activeFranchises;
 }
 
-type FranchiseInfo = Prisma.FranchiseGetPayload<{
+export type FranchiseInfo = Prisma.FranchiseGetPayload<{
   include: {
     GM: {
       include: {
