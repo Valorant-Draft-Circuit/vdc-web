@@ -113,3 +113,24 @@ export async function getAllActiveFranchisesCached() {
   cache.set(key, activeFranchises, Times.DAY);
   return activeFranchises;
 }
+
+type FranchiseInfo = Prisma.FranchiseGetPayload<{
+  include: {
+    GM: true;
+    AGM1: true;
+    AGM2: true;
+    AGM3: true;
+    Teams: true;
+    Brand: true;
+  };
+}>;
+
+export async function getFranchiseBySlugCached(slug: string) {
+  const key = `${slug}-franchise`;
+  const hit = cache.get<Franchise>(key);
+  if (hit !== undefined) return hit;
+
+  const franchise = await Franchise.getBy({ slug: slug });
+  cache.set(key, franchise, Times.DAY);
+  return franchise;
+}
