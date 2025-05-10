@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "blog.vdc.gg",
       },
+      {
+        protocol: "http",
+        hostname: "localhost"
+      }
     ],
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],

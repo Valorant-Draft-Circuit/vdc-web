@@ -1,5 +1,5 @@
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import TabSelector, { TabElements } from "@/components/tabs/TabSelector";
+import TabSelector, { TabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { Tier } from "@prisma/client";
 import Link from "next/link";
@@ -17,28 +17,34 @@ export default async function Page({
   const tabs: TabElements[] = [
     {
       tier: Tier.MYTHIC,
+      tabName: Tier.MYTHIC,
       color: "vdcPurple",
       content: <SchedulePanel tier={Tier.MYTHIC} season={seasonNumber} />,
     },
     {
       tier: Tier.EXPERT,
+      tabName: Tier.EXPERT,
+
       color: "vdcBlue",
       content: <SchedulePanel tier={Tier.EXPERT} season={seasonNumber} />,
     },
     {
       tier: Tier.APPRENTICE,
+      tabName: Tier.APPRENTICE,
+
       color: "vdcGreen",
       content: <SchedulePanel tier={Tier.APPRENTICE} season={seasonNumber} />,
     },
     {
       tier: Tier.PROSPECT,
+      tabName: Tier.PROSPECT,
+
       color: "vdcYellow",
       content: <SchedulePanel tier={Tier.PROSPECT} season={seasonNumber} />,
     },
   ];
 
   if (seasonNumber === currentSeason) {
-    console.log("current season");
     redirect(`/schedule`);
   } else if (season > currentSeason) {
     return (
