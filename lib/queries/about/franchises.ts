@@ -1,3 +1,4 @@
+import { formatDate, packageMatch } from "@/lib/common/utils";
 import { prisma } from "@/prisma/prismadb";
 import { GameType, MatchType } from "@prisma/client";
 
@@ -42,9 +43,14 @@ export default async function getFranchiseDetails(slug, season) {
 
     const futureTeamGames = futureGames
       .map((game) => {
-        if (game.home === team.id || game.away === team.id) return game;
+        if (game.home === team.id || game.away === team.id) {
+          const formattedDate = formatDate(game.dateScheduled);
+          const packagedMatch = packageMatch(game, 0, 0, formattedDate);
+          return packagedMatch;
+        }
       })
       .filter((game) => game !== undefined);
+
     const pastTeamGames = pastGames
       .map((game) => {
         if (game.home === team.id || game.away === team.id) {
@@ -54,7 +60,14 @@ export default async function getFranchiseDetails(slug, season) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             map.winner === game.home ? homeWins++ : awayWins++;
           });
-          return { ...game, homeWins: homeWins, awayWins: awayWins };
+          const formattedDate = formatDate(game.dateScheduled);
+          const packagedMatch = packageMatch(
+            game,
+            homeWins,
+            awayWins,
+            formattedDate
+          );
+          return packagedMatch;
         }
       })
       .filter((game) => game !== undefined);
@@ -163,6 +176,7 @@ async function getFutureGames(franchise, season: number) {
         include: {
           Franchise: {
             select: {
+              slug: true,
               Brand: {
                 select: {
                   logo: true,
@@ -176,6 +190,7 @@ async function getFutureGames(franchise, season: number) {
         include: {
           Franchise: {
             select: {
+              slug: true,
               Brand: {
                 select: {
                   logo: true,
@@ -215,6 +230,7 @@ async function getPastGames(franchise, season) {
         include: {
           Franchise: {
             select: {
+              slug: true,
               Brand: {
                 select: {
                   logo: true,
@@ -228,6 +244,7 @@ async function getPastGames(franchise, season) {
         include: {
           Franchise: {
             select: {
+              slug: true,
               Brand: {
                 select: {
                   logo: true,

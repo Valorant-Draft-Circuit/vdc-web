@@ -75,7 +75,7 @@ export default function VerticalTab(props: { tabElements: FranchiseTeams[] }) {
           </div>
         </div>
 
-        <TabPanels className="flex flex-col gap-2 p-3 rounded-2xl">
+        <TabPanels className="flex flex-col gap-2 p-3 xl:px-0 ">
           {props.tabElements.map(({ content, tier }) => (
             <TabPanel key={tier}>{content}</TabPanel>
           ))}

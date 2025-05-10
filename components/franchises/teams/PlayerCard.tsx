@@ -14,10 +14,10 @@ export default function PlayerCard({ player }: { player }) {
   );
   // console.log(discordAccount)
   const isCaptain = player.Captain;
-  console.log(player);
+  // console.log(player);
   return (
     <>
-      <div className="flex flex-row items-center gap-3 rounded-md bg-[#353543] px-3 py-2 drop-shadow-lg text-gray-300 w-full max-w-xs">
+      <div className="flex flex-row items-center gap-3 rounded-md bg-gray-100 dark:bg-[#353543] px-3 py-2 drop-shadow-lg text-vdcGrey dark:text-gray-300 w-full max-w-xs">
         <div className="relative flex flex-row">
           <Image
             src={player.image}
