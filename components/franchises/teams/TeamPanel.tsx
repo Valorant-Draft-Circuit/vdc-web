@@ -4,7 +4,7 @@ import PlayerCard from "./PlayerCard";
 import MatchCard from "@/components/schedule/MatchCard";
 import Divider from "@/components/theme/Divider";
 
-export default async function TeamPanel({ team }: { team: any }) {
+export default async function TeamPanel({ team }: { team }) {
   const season = await getSeasonCached();
   const standings = await getStandingsByCached(season, team.tier);
   const idx = standings.findIndex((s) => s.teamName === team.name);
@@ -22,9 +22,9 @@ export default async function TeamPanel({ team }: { team: any }) {
 
       <div className="flex flex-col sm:flex-row gap-2 text-md">
         <PanelSection title="Roster">
-          <div className="grid grid-cols-1 gap-2 p-2 mx-auto">
-            {Roster.map((p: any, i: number) => (
-              <PlayerCard key={p.id ?? i} player={p} />
+          <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
+            {Roster.map((player, i: number) => (
+              <PlayerCard key={player.id ?? i} player={player} />
             ))}
           </div>
         </PanelSection>
@@ -36,14 +36,14 @@ export default async function TeamPanel({ team }: { team: any }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <GameSection
+        <MatchSection
           title="Match History"
-          games={pastGames}
+          matches={pastGames}
           emptyText="No games played yet"
         />
-        <GameSection
+        <MatchSection
           title="Upcoming Games"
-          games={futureGames}
+          matches={futureGames}
           emptyText="No games scheduled"
         />
       </div>
@@ -66,17 +66,25 @@ function PanelSection({
   );
 }
 
-function GameSection({ title, games, emptyText }: { title; games; emptyText }) {
+function MatchSection({
+  title,
+  matches,
+  emptyText,
+}: {
+  title;
+  matches;
+  emptyText;
+}) {
   return (
     <PanelSection title={title}>
-      {games.length > 0 ? (
+      {matches.length > 0 ? (
         <div className="grid grid-cols-1 gap-2 p-2">
-          {games.map((game, i) => (
-            <div key={i}>
+          {matches.map((match, index) => (
+            <div key={index}>
               <div className="pb-2 italic text-vdcGrey dark:text-gray-300 text-sm xl:text-md">
-                <h1>{game.formattedDate}</h1>
+                <h1>{match.date}</h1>
               </div>
-              <MatchCard match={game} />
+              <MatchCard match={match} />
             </div>
           ))}
         </div>
@@ -99,7 +107,7 @@ function EmptyMessage({ text }: { text: string }) {
 
 function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
   const entries = [
-    { label: "#: ", value: rank >= 0 ? rank + 1 : "N/A" },
+    { label: "RANK: ", value: rank >= 0 ? rank + 1 : "N/A" },
     { label: "W: ", value: stats?.wins || 0 },
     { label: "L: ", value: stats?.losses || 0 },
     { label: "RWP: ", value: `${stats?.rwp || 0}%` },
@@ -108,7 +116,7 @@ function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
   return (
     <div className="flex bg-gray-100 dark:bg-[#353543] text-sm text-vdcGrey dark:text-gray-300 rounded-md overflow-hidden">
       {entries.map((e) => {
-        const isRank = e.label === "#: ";
+        const isRank = e.label === "RANK: ";
         return (
           <div
             key={e.label}
