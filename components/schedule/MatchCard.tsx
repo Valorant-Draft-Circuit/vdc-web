@@ -108,7 +108,7 @@ function MatchScore({ homeWins, awayWins }: { homeWins?; awayWins? }) {
             e.stopPropagation();
             setRevealed(true);
           }}
-          className="m-auto rounded-sm px-5 py-1 sm:px-6 sm:py-2 xl:px-10 xl:py-3 text-sm font-semibold shadow-xs bg-vdcGrey dark:bg-vdcBlack hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer transition-all duration-75 "
+          className="m-auto rounded-sm px-7 py-3 sm:px-6 sm:py-2 xl:px-10 xl:py-3 text-sm font-semibold shadow-xs bg-vdcGrey dark:bg-vdcBlack hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer transition-all duration-75 "
         >
           <EyeSlashIcon className="w-5 sm:w-7 text-vdcWhite" />
         </button>
