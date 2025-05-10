@@ -38,13 +38,13 @@ export default async function Page({
           style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
           className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)] -z-20 "
         >
-          <div className="sm:hidden absolute inset-0 bg-black/60 pointer-events-none transition-opacity duration-800" />
+          <div className="absolute inset-0 bg-black/60 pointer-events-none transition-opacity duration-800" />
           <Image
             alt={franchiseInfo!.slug}
             src={`${TEAM_LOGOS_URL}${franchiseInfo!.Brand?.logo}`}
             width={5000}
             height={5000}
-            className="absolute inset-0 size-full object-contain sm:right-0 -z-10 sm:object-right justify-self-end brightness- drop-shadow-lg"
+            className="absolute inset-0 size-full object-contain sm:right-5 -z-10 sm:object-right xl:z-10 justify-self-end brightness-90 drop-shadow-lg"
           />
           <div className="flex flex-col tracking-tight text-pretty drop-shadow-xl rounded-2xl p-3 sm:w-1/2 text-vdcWhite gap-2 z-20">
             <h1 className="text-2xl lg:text-3xl italic">
