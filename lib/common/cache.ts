@@ -9,6 +9,7 @@ import {
 } from "../queries/standings/standings";
 import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, Schedule } from "../queries/schedule/schedule";
+import getFranchiseDetails from "../queries/about/franchises";
 
 let cache: NodeCache;
 
@@ -114,39 +115,25 @@ export async function getAllActiveFranchisesCached() {
   return activeFranchises;
 }
 
-export type FranchiseInfo = Prisma.FranchiseGetPayload<{
-  include: {
-    GM: {
-      include: {
-        Accounts: true;
-      };
-    };
-    AGM1: {
-      include: {
-        Accounts: true;
-      };
-    };
-    AGM2: {
-      include: {
-        Accounts: true;
-      };
-    };
-    AGM3: {
-      include: {
-        Accounts: true;
-      };
-    };
-    Brand: true;
-    Teams: true;
-  };
-}>;
+// export async function getFranchiseBySlugCached(slug: string) {
+//   const key = `${slug}-franchise`;
+//   const hit = cache.get<FranchiseInfo>(key);
+//   if (hit !== undefined) return hit;
 
-export async function getFranchiseBySlugCached(slug: string) {
-  const key = `${slug}-franchise`;
-  const hit = cache.get<FranchiseInfo>(key);
+//   const franchise = await Franchise.getBy({ slug: slug });
+//   cache.set(key, franchise, Times.DAY);
+//   return franchise;
+// }
+
+export async function getFranchiseDetailsBySlugCached(
+  slug: string,
+  season: number
+) {
+  const key = `s${season}-${slug}-franchise`;
+  const hit = cache.get(key);
   if (hit !== undefined) return hit;
 
-  const franchise = await Franchise.getBy({ slug: slug });
-  cache.set(key, franchise, Times.DAY);
+  const franchise = await getFranchiseDetails(slug, season);
+  cache.set(key, franchise, minutes(5));
   return franchise;
 }

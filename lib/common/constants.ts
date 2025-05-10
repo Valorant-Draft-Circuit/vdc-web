@@ -12,10 +12,20 @@ export const VDC_BLUE = "#3498db";
 export const VDC_GREEN = "#2ecc71";
 export const VDC_YELLOW = "#f1c40f";
 
-export const TIER_COLOR_MAP: Record<Tier, string> = {
+export const TIER_HEX_COLOR_MAP: Record<Tier, string> = {
   MYTHIC: VDC_PURPLE,
   EXPERT: VDC_BLUE,
   APPRENTICE: VDC_GREEN,
   PROSPECT: VDC_YELLOW,
-  MIXED: ""
+  MIXED: "",
 };
+
+export const TIER_COLOR_MAP: Record<Tier, string> = {
+  MYTHIC: "vdcPurple",
+  EXPERT: "vdcBlue",
+  APPRENTICE: "vdcGreen",
+  PROSPECT: "vdcYellow",
+  MIXED: "",
+};
+
+export const TIER_ORDER = ["MYTHIC", "EXPERT", "APPRENTICE", "PROSPECT"];
