@@ -2,6 +2,7 @@
 
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
+import { Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ type Match = {
   Away: Team;
   homeWins?: number;
   awayWins?: number;
+  tier: Tier;
 };
 
 export default function MatchCard({ match }: { match: Match }) {
@@ -29,20 +31,20 @@ export default function MatchCard({ match }: { match: Match }) {
       onClick={goToMatch}
       className="flex flex-row h-22 gap-8 sm:gap-3 py-3 w-full xl:px-24 m-auto justify-evenly rounded-2xl bg-vdcWhite dark:bg-vdcGrey drop-shadow-lg hover:cursor-pointer hover:opacity-98 transition-opacity ease-in-out duration-150"
     >
-      <HomeBadge home={match.Home} />
+      <HomeBadge home={match.Home} tier={match.tier} />
       <MatchScore homeWins={match.homeWins!} awayWins={match.awayWins!} />
-      <AwayBadge away={match.Away} />
+      <AwayBadge away={match.Away} tier={match.tier} />
     </div>
   );
 }
 
-function HomeBadge({ home }: { home: Team }) {
+function HomeBadge({ home, tier }: { home: Team; tier: Tier }) {
   return (
     <Link
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/about/franchises/${home.slug}?team=${home.name}`}
+      href={`/about/franchises/${home.slug}?team=${tier.toLocaleLowerCase()}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center justify-end space-x-2 xl:space-x-5">
@@ -62,13 +64,13 @@ function HomeBadge({ home }: { home: Team }) {
   );
 }
 
-function AwayBadge({ away }: { away: Team }) {
+function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
   return (
     <Link
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/about/franchises/${away.slug}?team=${away.name}`}
+      href={`/about/franchises/${away.slug}?team=${tier.toLocaleLowerCase()}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center  space-x-2 xl:space-x-5">

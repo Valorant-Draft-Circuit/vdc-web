@@ -1,35 +1,16 @@
+import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
+import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
-import { Tier } from "@prisma/client";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { Suspense } from "react";
 
-const tabs: TabElements[] = [
-  {
-    tier: Tier.MYTHIC,
-    tabName: Tier.MYTHIC,
-    color: "vdcPurple",
-    content: <SchedulePanel tier={Tier.MYTHIC} />,
-  },
-  {
-    tier: Tier.EXPERT,
-    tabName: Tier.EXPERT,
-    color: "vdcBlue",
-    content: <SchedulePanel tier={Tier.EXPERT} />,
-  },
-  {
-    tier: Tier.APPRENTICE,
-    tabName: Tier.APPRENTICE,
-    color: "vdcGreen",
-    content: <SchedulePanel tier={Tier.APPRENTICE} />,
-  },
-  {
-    tier: Tier.PROSPECT,
-    tabName: Tier.PROSPECT,
-    color: "vdcYellow",
-    content: <SchedulePanel tier={Tier.PROSPECT} />,
-  },
-];
+const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
+  tier: tier,
+  tabName: tier,
+  color: TIER_COLOR_MAP[tier],
+  content: <SchedulePanel tier={tier} />,
+}));
 
 export default function Page() {
   const currentSeason = getSeasonCached();
@@ -38,8 +19,8 @@ export default function Page() {
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {currentSeason} Schedule
       </h1>
-      <Suspense fallback={<div>Loading schedule…</div>}>
-        <HorizontalTab tabElements={tabs} />
+      <Suspense fallback={<SchedulePanelSkeleton />}>
+        <VerticalTab tabElements={tabs} params="by" />
       </Suspense>
     </div>
   );

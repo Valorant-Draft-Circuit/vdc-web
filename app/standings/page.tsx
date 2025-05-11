@@ -1,41 +1,22 @@
 import StandingsPanel from "@/components/standings/StandingsPanel";
-import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
+import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
 import React, { Suspense } from "react";
-import { Tier } from "@prisma/client";
 import { getSeasonCached } from "@/lib/common/cache";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import StandingsPanelSkeleton from "@/components/standings/StandingsPanelSkeleton";
 
-const tabs: TabElements[] = [
-  {
-    tier: "franchises",
-    tabName: "franchises",
-    color: "vdcRed",
-    content: <StandingsPanel query="franchises" />,
-  },
-  {
-    tier: Tier.MYTHIC,
-    tabName: Tier.MYTHIC,
-    color: "vdcPurple",
-    content: <StandingsPanel query={Tier.MYTHIC} />,
-  },
-  {
-    tier: Tier.EXPERT,
-    tabName: Tier.EXPERT,
-    color: "vdcBlue",
-    content: <StandingsPanel query={Tier.EXPERT} />,
-  },
-  {
-    tier: Tier.APPRENTICE,
-    tabName: Tier.APPRENTICE,
-    color: "vdcGreen",
-    content: <StandingsPanel query={Tier.APPRENTICE} />,
-  },
-  {
-    tier: Tier.PROSPECT,
-    tabName: Tier.PROSPECT,
-    color: "vdcYellow",
-    content: <StandingsPanel query={Tier.PROSPECT} />,
-  },
-];
+const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
+  tier: tier,
+  tabName: tier,
+  color: TIER_COLOR_MAP[tier],
+  content: <StandingsPanel query={tier} />,
+}));
+tabs.unshift({
+  tier: "franchises",
+  tabName: "franchises",
+  color: "vdcRed",
+  content: <StandingsPanel query="franchises" />,
+});
 
 export default async function Standings() {
   const currentSeason = await getSeasonCached();
@@ -45,8 +26,8 @@ export default async function Standings() {
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {currentSeason} Standings
       </h1>
-      <Suspense fallback={<div>Loading schedule…</div>}>
-        <HorizontalTab tabElements={tabs} />
+      <Suspense fallback={<StandingsPanelSkeleton />}>
+        <VerticalTab tabElements={tabs} params="by"/>
       </Suspense>
     </div>
   );

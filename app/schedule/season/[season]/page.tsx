@@ -1,7 +1,8 @@
+import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import TabSelector, { TabElements } from "@/components/tabs/HorizontalTab";
+import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
-import { Tier } from "@prisma/client";
+import { TIERS_LIST } from "@/lib/common/constants";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -14,35 +15,12 @@ export default async function Page({
   const currentSeason = await getSeasonCached();
   const { season } = await params;
   const seasonNumber = Number(season);
-  const tabs: TabElements[] = [
-    {
-      tier: Tier.MYTHIC,
-      tabName: Tier.MYTHIC,
-      color: "vdcPurple",
-      content: <SchedulePanel tier={Tier.MYTHIC} season={seasonNumber} />,
-    },
-    {
-      tier: Tier.EXPERT,
-      tabName: Tier.EXPERT,
-
-      color: "vdcBlue",
-      content: <SchedulePanel tier={Tier.EXPERT} season={seasonNumber} />,
-    },
-    {
-      tier: Tier.APPRENTICE,
-      tabName: Tier.APPRENTICE,
-
-      color: "vdcGreen",
-      content: <SchedulePanel tier={Tier.APPRENTICE} season={seasonNumber} />,
-    },
-    {
-      tier: Tier.PROSPECT,
-      tabName: Tier.PROSPECT,
-
-      color: "vdcYellow",
-      content: <SchedulePanel tier={Tier.PROSPECT} season={seasonNumber} />,
-    },
-  ];
+  const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
+    tier: tier,
+    tabName: tier,
+    color: "vdcPurple",
+    content: <SchedulePanel tier={tier} season={seasonNumber} />,
+  }));
 
   if (seasonNumber === currentSeason) {
     redirect(`/schedule`);
@@ -68,8 +46,8 @@ export default async function Page({
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {season} Match History
       </h1>
-      <Suspense fallback={<div>Loading schedule…</div>}>
-        <TabSelector tabElements={tabs} />
+      <Suspense fallback={<SchedulePanelSkeleton />}>
+        <VerticalTab tabElements={tabs} params="by" />
       </Suspense>
     </div>
   );

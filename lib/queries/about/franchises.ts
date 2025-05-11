@@ -91,17 +91,33 @@ async function getFranchise(slug) {
           Roster: {
             include: {
               PrimaryRiotAccount: true,
-              Accounts: true,
+              Accounts: { where: { provider: "discord" } },
               Captain: true,
             },
           },
         },
       },
       Brand: true,
-      GM: true,
-      AGM1: true,
-      AGM2: true,
-      AGM3: true,
+      GM: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
+      AGM1: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
+      AGM2: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
+      AGM3: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
     },
   });
 }
