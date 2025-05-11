@@ -8,16 +8,20 @@ import {
 import { getApexRankings } from "@/lib/queries/standings/standings";
 import { isTier } from "@/lib/common/utils";
 
-export default async function StandingsPanel(props: { query: Tier | string }) {
+export default async function StandingsPanel({
+  query,
+}: {
+  query: Tier | string;
+}) {
   const currentSeason = await getSeasonCached();
   let standings;
   let apexRanks;
 
-  if (props.query === "franchises") {
+  if (query === "franchises") {
     standings = await getFranchiseStandingsCached(currentSeason);
     apexRanks = 3;
-  } else if (isTier(props.query)) {
-    standings = await getStandingsByCached(currentSeason, props.query);
+  } else if (isTier(query)) {
+    standings = await getStandingsByCached(currentSeason, query);
     apexRanks = getApexRankings(standings);
   }
 
@@ -25,7 +29,7 @@ export default async function StandingsPanel(props: { query: Tier | string }) {
     return (
       <div className="flex flex-col italic text-2xl text-center min-w-5 m-auto xl:mr-24">
         <div className="flex flex-col gap-3 xl:bg-auto">
-          <h1>No standings Found for {props.query}</h1>
+          <h1>No standings Found for {query}</h1>
           <h2 className="text-xl">
             (Season <span>{currentSeason}</span> probably hasnt started yet,
             please check back later!)
@@ -42,6 +46,7 @@ export default async function StandingsPanel(props: { query: Tier | string }) {
           standing={standing}
           ranking={index + 1}
           apexRanks={apexRanks}
+          query={query}
         />
       ))}
     </div>

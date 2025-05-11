@@ -7,14 +7,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function PlayerCard({ player }: { player }) {
-  const goToProfile = () => router.push(`/profile/${player.name}`);
+  const goToProfile = () => router.push(`/profile/${player.riotName}`);
   const router = useRouter();
-  const discordAccount = player.Accounts.find(
-    (account) => account.provider === "discord"
-  );
-  // console.log(discordAccount)
+  const discordAccount = player.Accounts[0];
   const isCaptain = player.Captain;
-  // console.log(player);
   return (
     <>
       <div className="flex flex-row items-center gap-3 rounded-md bg-gray-100 dark:bg-[#353543] px-3 py-2 drop-shadow-lg text-vdcGrey dark:text-gray-300 w-full max-w-xs">

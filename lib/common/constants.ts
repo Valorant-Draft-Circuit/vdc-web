@@ -27,5 +27,10 @@ export const TIER_COLOR_MAP: Record<Tier, string> = {
   PROSPECT: "vdcYellow",
   MIXED: "",
 };
-
+export const TIERS_LIST = [
+  Tier.MYTHIC,
+  Tier.EXPERT,
+  Tier.APPRENTICE,
+  Tier.PROSPECT,
+];
 export const TIER_ORDER = ["MYTHIC", "EXPERT", "APPRENTICE", "PROSPECT"];

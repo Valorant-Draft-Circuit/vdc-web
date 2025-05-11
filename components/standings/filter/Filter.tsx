@@ -4,9 +4,9 @@ import { FunnelIcon } from "@heroicons/react/24/outline";
 import { Tier } from "@prisma/client";
 import FilterContent from "./FilterContent";
 
-export default async function Filter(props: { tier: Tier }) {
-  const allTeamsByTier = await getAllTeamsByTierCached(props.tier);
-  const teamNames = allTeamsByTier.map((team) => team.name)
+export default async function Filter({ tier }: { tier: Tier }) {
+  const allTeamsByTier = await getAllTeamsByTierCached(tier);
+  const teamNames = allTeamsByTier.map((team) => team.name);
 
   return (
     <div className="flex">
@@ -24,7 +24,11 @@ export default async function Filter(props: { tier: Tier }) {
             <div className="p-3">
               <Field>
                 {teamNames.map((teamName, index) => (
-                  <FilterContent filterBy={teamName} index={index} key={index} />
+                  <FilterContent
+                    filterBy={teamName}
+                    index={index}
+                    key={index}
+                  />
                 ))}
               </Field>
             </div>

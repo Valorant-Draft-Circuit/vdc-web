@@ -5,21 +5,24 @@ import { getSeasonCached } from "@/lib/common/cache";
 import ScheduleCard from "./ScheduleCard";
 import { getScheduleByTier } from "@/lib/queries/schedule/schedule";
 
-export default async function SchedulePanel(props: {
+export default async function SchedulePanel({
+  tier,
+  season,
+}: {
   tier: Tier;
   season?: number;
 }) {
   const currentSeason = await getSeasonCached();
-  let season = props.season;
-  if (!season) {
-    season = currentSeason;
+  let seasonNum = season;
+  if (!seasonNum) {
+    seasonNum = currentSeason;
   }
-  let tier;
+  let tierString;
 
-  if (isTier(props.tier)) {
-    tier = props.tier;
+  if (isTier(tierString)) {
+    tier = tierString;
   }
-  const schedule = await getScheduleByTier(tier, season);
+  const schedule = await getScheduleByTier(tier, seasonNum);
   const isCurrentSeason = currentSeason === season;
   const isScheduleEmpty =
     Object.keys(schedule.regularSeason).length === 0 &&
@@ -30,7 +33,7 @@ export default async function SchedulePanel(props: {
         <div className="flex flex-col italic text-2xl text-center min-w-5 m-auto xl:mr-24">
           <div className="flex flex-col gap-3 xl:bg-auto">
             <h1>
-              No scheduled season {season} matches found for {props.tier}
+              No scheduled season {season} matches found for {tier}
             </h1>
             {isCurrentSeason ? (
               <h2 className="text-xl">

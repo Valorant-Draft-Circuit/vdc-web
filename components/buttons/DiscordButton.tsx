@@ -5,7 +5,7 @@ interface DiscordButtonProps {
   text: string;
 }
 
-export default function DiscordButton(props: DiscordButtonProps) {
+export default function DiscordButton({ text }: DiscordButtonProps) {
   return (
     <>
       <form
@@ -26,7 +26,7 @@ export default function DiscordButton(props: DiscordButtonProps) {
             className="my-auto"
           />
           <div className="font-discord max-w-32 my-auto text-center break-words font-extralight">
-            {props.text}
+            {text}
           </div>
         </button>
       </form>
