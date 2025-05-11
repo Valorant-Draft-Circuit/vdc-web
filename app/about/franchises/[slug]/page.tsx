@@ -1,4 +1,6 @@
-import TeamPanel from "@/components/franchises/teams/TeamPanel";
+import TeamPanel, {
+  TeamPanelSkeleton,
+} from "@/components/franchises/teams/TeamPanel";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { FranchiseTeams } from "@/components/tabs/VerticalTab";
 import FlameLogo from "@/components/theme/FlameLogo";
@@ -92,7 +94,7 @@ export default async function Page({
           </div>
         </div>
         <div className="xl:max-w-4xl flex flex-col gap-5">
-          <Suspense fallback={<div>Loading teams...</div>}>
+          <Suspense fallback={<TeamPanelSkeleton />}>
             <VerticalTab tabElements={activeFranchiseTeams} />
           </Suspense>
         </div>

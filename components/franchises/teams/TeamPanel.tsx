@@ -23,16 +23,22 @@ export default async function TeamPanel({ team }: { team }) {
       <div className="flex flex-col sm:flex-row gap-2 text-md">
         <PanelSection title="Roster">
           <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
-            {Roster.map((player, i: number) => (
-              <PlayerCard key={player.id ?? i} player={player} />
-            ))}
+            {Roster.length > 0 ? (
+              <>
+                {Roster.map((player, i: number) => (
+                  <PlayerCard key={player.id ?? i} player={player} />
+                ))}
+              </>
+            ) : (
+              <EmptyMessage text={"There's no one here :("} />
+            )}
           </div>
         </PanelSection>
-        <PanelSection title="Team Stats">
-          <div className="px-4 py-5 sm:p-6 w-full">
-            <h1>TODO: Stats go here</h1>
-          </div>
-        </PanelSection>
+        <div className="flex-1 flex-col">
+          <PanelSection title="Team Stats">
+            <EmptyMessage text={"TODO: Stats Table go here "} />
+          </PanelSection>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -129,6 +135,53 @@ function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+export function TeamPanelSkeleton() {
+  return (
+    <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-5 animate-pulse">
+      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-md drop-shadow-lg" />
+      <div className="flex flex-col sm:flex-row gap-2 text-md">
+        <div className="flex-1 flex flex-col">
+          <Divider title="Roster" />
+          <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="h-16 bg-gray-200 dark:bg-gray-700 rounded-md w-full"
+                />
+              ))}
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col">
+          <Divider title="Team Stats" />
+          <div className="px-4 py-5 sm:p-6 w-full space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        {["Match History", "Upcoming Games"].map((section) => (
+          <div key={section} className="flex flex-col">
+            <Divider title={section} />
+            <div className="grid grid-cols-1 gap-2 p-2">
+              {Array(3)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 w-full">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                    <div className="flex-1 h-16 bg-gray-200 dark:bg-gray-700 rounded-md" />
+                  </div>
+                ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
