@@ -120,7 +120,7 @@ function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
   ];
 
   return (
-    <div className="flex bg-gray-100 dark:bg-[#353543] text-sm text-vdcGrey dark:text-gray-300 rounded-md overflow-hidden">
+    <div className="flex bg-gray-100 dark:bg-[#353543] text-xs text-vdcGrey dark:text-gray-300 rounded-md overflow-hidden">
       {entries.map((e) => {
         const isRank = e.label === "RANK: ";
         return (

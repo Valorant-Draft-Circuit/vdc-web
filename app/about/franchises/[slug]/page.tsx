@@ -50,26 +50,26 @@ export default async function Page({
           style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
           className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)]"
         >
-          <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/80 pointer-events-none" />
           <Image
             alt={franchiseInfo!.slug}
             src={`${TEAM_LOGOS_URL}${franchiseInfo!.Brand?.logo}`}
             width={5000}
             height={5000}
-            className="absolute pointer-events-none inset-0 size-full object-contain sm:right-5 z-0 sm:object-right xl:z-10 justify-self-end brightness-90 drop-shadow-lg"
+            className="absolute pointer-events-none inset-0 size-full object-contain sm:right-5 z-0 sm:object-right xl:z-10 justify-self-end brightness-70 drop-shadow-lg"
           />
-          <div className="flex flex-col z-20 tracking-tight text-pretty drop-shadow-xl rounded-2xl p-3 sm:w-1/2 text-vdcWhite gap-2">
+          <div className="flex flex-col z-20 tracking-tight text-pretty drop-shadow-lg rounded-2xl p-3 sm:w-1/2 text-vdcWhite gap-2">
             <h1 className="text-2xl lg:text-3xl italic">
               {franchiseInfo!.slug} | {franchiseInfo!.name}
             </h1>
-            <h2 className="font-roboto text-sm">
+            <h2 className="font-roboto text-xs">
               GM:{" "}
               <FMLink
                 name={franchiseInfo!.GM?.name}
                 id={franchiseInfo!.GM?.Accounts[0].providerAccountId}
               />
             </h2>
-            <h2 className="font-roboto flex flex-row gap-1 my-auto text-sm">
+            <h2 className="font-roboto flex flex-row gap-1 my-auto text-xs">
               AGMS:{" "}
               {agmList.map((agm) => (
                 <FMLink key={agm.id} name={agm.name} id={agm.id} />
@@ -105,7 +105,7 @@ function FMLink({ name, id }: { name; id }) {
       href={`https://discord.com/users/${id}`}
       className="hover:opacity-90 z-20"
     >
-      <span className="px-2 py-1 bg-[#353543] rounded-md shadow-2xl">
+      <span className="p-1 bg-[#353543] rounded-md shadow-2xl">
         {name}
       </span>
     </Link>
