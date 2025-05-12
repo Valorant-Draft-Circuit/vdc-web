@@ -12,7 +12,7 @@ export default async function Page({
   const decodedSearch = decodeURIComponent(search);
 
   // check if they passed in a discordID
-  handleDiscordIDSearch(decodedSearch);
+  await handleDiscordIDSearch(decodedSearch);
   return (
     <Suspense fallback={"Loading player..."}>
       <Player riotIGN={decodedSearch} />
