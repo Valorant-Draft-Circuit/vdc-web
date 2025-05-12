@@ -1,5 +1,5 @@
 import NodeCache from "node-cache";
-import { ControlPanel, Franchise, Team } from "@/prisma";
+import { ControlPanel, Franchise, Player, Team } from "@/prisma";
 import { FAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { StandingProps } from "@/components/standings/StandingsCard";
