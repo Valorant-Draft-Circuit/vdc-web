@@ -9,11 +9,11 @@ export default function PlayerNotFound({ player }: { player }) {
           Player {player} not found :(
         </h1>
         <h2>
-          Please make sure you search by either their Discord ID's or
+          Please make sure you search by either their Discord ID&apos;s or
           RiotIGN#Discriminator!
         </h2>
         <h2>
-          Not sure how to get a user's Discord ID? click{" "}
+          Not sure how to get a user&apos;s Discord ID? click{" "}
           <Link
             href={DISCORD_USER_HOWTO_URL}
             className="text-vdcRed hover:underline"

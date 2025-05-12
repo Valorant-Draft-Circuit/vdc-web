@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 
 export default function Player({ riotIGN }: { riotIGN }) {
   const [search, setSearch] = useState("");
-  const [found, setFound] = useState(false);
+  //   const [found, setFound] = useState(false);
   useEffect(() => {
     decodeSearch(riotIGN, setSearch);
-  }, []);
+  }, [riotIGN]);
 
   return <h1>{search}</h1>;
 }
