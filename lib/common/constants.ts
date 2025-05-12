@@ -5,6 +5,8 @@ export const DISCORD_LINK = "https://go.vdc.gg/discord";
 export const RULEBOOK_URL = "https://blog.vdc.gg/rulebook/";
 export const BEHAVIOR_GUIDELINE_URL =
   "https://docs.google.com/spreadsheets/d/14wmSU43cB2xf9IOCuW0-74Ec8AXt6I6UGZHJhDNJJGc/edit?gid=0#gid=0";
+export const DISCORD_USER_HOWTO_URL =
+  "https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5H5D7JBY2QKKPVKNA";
 export const WEB_ASSET_URL = BUCKET_URL + "web-assets/";
 export const TEAM_LOGOS_URL = BUCKET_URL + "team-logos/";
 export const VDC_PURPLE = "#9b59b6";

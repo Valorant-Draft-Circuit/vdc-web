@@ -1,9 +1,8 @@
 import { Tier } from "@prisma/client";
 import Filter from "../standings/filter/Filter";
 import { isTier } from "@/lib/common/utils";
-import { getSeasonCached } from "@/lib/common/cache";
+import { getScheduleByTierCached, getSeasonCached } from "@/lib/common/cache";
 import ScheduleCard from "./ScheduleCard";
-import { getScheduleByTier } from "@/lib/queries/schedule/schedule";
 
 export default async function SchedulePanel({
   tier,
@@ -22,7 +21,7 @@ export default async function SchedulePanel({
   if (isTier(tierString)) {
     tier = tierString;
   }
-  const schedule = await getScheduleByTier(tier, seasonNum);
+  const schedule = await getScheduleByTierCached(tier, seasonNum);
   const isCurrentSeason = currentSeason === season;
   const isScheduleEmpty =
     Object.keys(schedule.regularSeason).length === 0 &&
