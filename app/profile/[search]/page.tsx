@@ -3,7 +3,11 @@ import PlayerNotFound from "@/components/profile/PlayerNotFound";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-export default async function Page({ params }: { params: { search: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ search: string }>;
+}) {
   const { search } = await params;
   const decodedSearch = decodeURIComponent(search);
 
