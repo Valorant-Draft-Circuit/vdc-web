@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function PlayerCard({ player }: { player }) {
-  const goToProfile = () => router.push(`/profile/${player.riotName}`);
+  const goToProfile = () => router.push(`/player/${player.riotName}`);
   const router = useRouter();
   const discordAccount = player.Accounts[0];
   const isCaptain = player.Captain;
