@@ -41,3 +41,13 @@ export function packageMatch(match, homeWins, awayWins, formattedDate) {
     Games: match.Games,
   };
 }
+
+/**
+ * Splits riotIGN to [IGN, #Tag]
+ * @param riotIGN RiotIGN#Tag
+ * @returns [RiotIGN, #Tag]
+ */
+export function parseRiotIGN(riotIGN: string) {
+  const riotSplit = riotIGN.split("#");
+  return [riotSplit[0], `#${riotSplit[1]}`];
+}

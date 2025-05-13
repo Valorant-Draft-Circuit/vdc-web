@@ -7,7 +7,6 @@ export async function GET(
 ) {
   const discordID = (await params).discordID;
   const riotIGN = await Player.getIGNby({ discordID: discordID });
-  console.log(riotIGN);
   if (riotIGN) {
     return NextResponse.json(riotIGN);
   }
