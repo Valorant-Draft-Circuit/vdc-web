@@ -1,7 +1,5 @@
-import Player from "@/components/profile/Player";
 import PlayerNotFound from "@/components/profile/PlayerNotFound";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
 export default async function Page({
   params,
@@ -35,5 +33,3 @@ async function handleDiscordIDSearch(discordID: string) {
     return <PlayerNotFound player={discordID} />;
   }
 }
-
-async function handleRiotIgnSearch(player) {}
