@@ -27,7 +27,7 @@ export default function PlayerNotFound({ player }: { player }) {
         </div>
         <h1 className="text-vdcRed text-3xl">OR</h1>
         <div className="flex flex-col gap-1 text-xl">
-          <h2>RiotIGN#Tag but replace the "#" with "-"</h2>
+          <h2>RiotIGN#Tag but replace the &quot;#&quot; with &quot;-&quot;</h2>
           <h3>
             ex) RiotIGN<span className="text-vdcRed font-bold">#</span>VDC =
             RiotIGN
