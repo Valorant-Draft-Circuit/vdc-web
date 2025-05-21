@@ -52,7 +52,7 @@ export default function VerticalTab({
           setSelectedIndex(index);
           const newTier = tabElements[index].tier.toLowerCase();
           const newUrl = `${pathname}?${params}=${newTier}`;
-          router.push(newUrl);
+          router.push(newUrl, { scroll: false });
         }}
         vertical
         className="flex flex-col xl:flex-row"
