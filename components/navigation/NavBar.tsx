@@ -20,6 +20,7 @@ export const navLinks = [
       { name: "Schedule", href: "/schedule" },
       { name: "Standings", href: "/standings" },
       { name: "Stats", href: "/stats" },
+      { name: "Fantasy", href: "/fantasy" },
     ],
   },
   {
