@@ -22,9 +22,6 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": [
-        "@cloudflare/workers-types/2023-07-01"
-    ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/schedule/[season]"],
   "exclude": ["node_modules", "prisma"],
