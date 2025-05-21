@@ -1,12 +1,17 @@
 import Image from "next/image";
-import { TEAM_LOGOS_URL, TIER_COLOR_MAP } from "@/lib/common/constants";
+import {
+  TEAM_LOGOS_URL,
+  TIER_COLOR_MAP,
+  TRACKER_PROFILE_URL,
+} from "@/lib/common/constants";
 import Link from "next/link";
 import { parseRiotIGN } from "@/lib/common/utils";
-import { MVP, WIN, WIN_FM } from "../accolades/Accolades";
+import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
 import { LeagueStatus } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 
 export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
+  const encodedIGN = encodeURIComponent(playerInfo.PrimaryRiotAccount.riotIGN);
   const [riotIGN, riotTag] = parseRiotIGN(
     playerInfo.PrimaryRiotAccount.riotIGN
   );
@@ -72,16 +77,22 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               <Image
                 alt={playerInfo.name}
                 src={playerInfo.image}
-                className={`size-20 rounded-md border-5 border-${tierColor}`}
+                className={`size-20 rounded-md border-5 border-${tierColor} overflow-hidden text-sm`}
                 width={250}
                 height={250}
               />
             </Link>
           </span>
           <div className="flex flex-col my-auto gap-1">
-            <h2 className="text-vdcRed">
-              {riotIGN} <span className="text-gray-300 text-sm">{riotTag}</span>
-            </h2>
+            <Link
+              href={`${TRACKER_PROFILE_URL}/${encodedIGN}`}
+              className="hover:opacity-80"
+            >
+              <h2 className="text-vdcRed">
+                {riotIGN}{" "}
+                <span className="text-gray-300 text-sm">{riotTag}</span>
+              </h2>
+            </Link>
             <div className="flex flex-row gap-1">
               <h2 className="text-vdcWhite text-sm">
                 {isPlayerSigned ? (
@@ -130,13 +141,18 @@ function getAccolades(accolades) {
       case "WIN":
         symbol = <WIN metadata={accolade} />;
         break;
+      case "WIN_SUB":
+        symbol = <WIN metadata={accolade} />;
+        break;
       case "MVP":
         symbol = <MVP metadata={accolade} />;
         break;
       case "WIN_FM":
         symbol = <WIN_FM metadata={accolade} />;
         break;
-      // add more cases if needed
+      case "AST":
+        symbol = <AST metadata={accolade} />;
+        break;
       default:
         symbol = null;
     }
