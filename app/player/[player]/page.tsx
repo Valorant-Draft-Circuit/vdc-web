@@ -1,5 +1,11 @@
+import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
+import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
+import PlayerSummary from "@/components/player/PlayerSummary";
+import ListBox from "@/components/tabs/DropDown";
+import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
+import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
 type PlayerIGN = {
   encoded: string;
@@ -12,6 +18,33 @@ export default async function Page({
 }) {
   const ENCODED_DIVIDER = encodeURIComponent("#");
   const NUMBER_REGEX = /^\d+$/;
+  const tabElements: TabElements[] = [
+    {
+      query: "Summary",
+      color: "vdcRed",
+      name: "Summary",
+      content: <PlayerSummary />,
+    },
+    {
+      query: "Agents",
+      color: "vdcRed",
+      name: "Agents",
+      content: <PlayerAgents />,
+    },
+    {
+      query: "Maps",
+      color: "vdcRed",
+      name: "Maps",
+      content: <PlayerMaps />,
+    },
+  ];
+  const currentSeason = await getSeasonCached();
+  const listOfAllSeasons = listAllSeasons(currentSeason);
+  const menuElements = listOfAllSeasons.map((season) => ({
+    query: season,
+    name: season,
+  }));
+
   const { player } = await params;
   const playerIGN: PlayerIGN = { encoded: "", decoded: "" };
   if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
@@ -30,13 +63,16 @@ export default async function Page({
   if (!playerStats) {
     console.log("no stats found");
   }
-  console.log(playerInfo);
+  // console.log(playerInfo);
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
+        <div className="p-2 flex flex-col gap-5">
+          <ListBox params={"Season"} menuElements={menuElements} />
+          <HorizontalTab tabElements={tabElements} params={"by"} />
+        </div>
       </div>
-      <div></div>
     </div>
   );
 }
@@ -83,4 +119,12 @@ async function getPlayerStatsBySeason(riotIGN, season) {
   } else {
     return null;
   }
+}
+
+function listAllSeasons(currentSeason: number) {
+  const seasons: string[] = [];
+  for (let i = currentSeason; i >= 1; i--) {
+    seasons.push(String(i));
+  }
+  return seasons;
 }

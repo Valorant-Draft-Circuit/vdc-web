@@ -94,7 +94,7 @@ export async function getScheduleByTierCached(
   const key = `${tier}-schedule`;
   const hit = cache.get<Schedule>(key);
   if (hit !== undefined) return hit;
-  const scheduleByTier = getScheduleByTier(tier, season);
+  const scheduleByTier = await getScheduleByTier(tier, season);
   cache.set(key, scheduleByTier, minutes(30));
   return scheduleByTier;
 }

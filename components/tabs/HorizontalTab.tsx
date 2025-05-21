@@ -11,9 +11,9 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 
-export type FranchiseTeams = {
+export type TabElements = {
   current?: boolean;
-  tier: string;
+  query: string;
   color: string;
   name: string;
   content: React.ReactNode;
@@ -23,13 +23,13 @@ export default function HorizontalTab({
   tabElements,
   params,
 }: {
-  tabElements: FranchiseTeams[];
+  tabElements: TabElements[];
   params: string;
 }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get(params)?.toLowerCase();
   const initialIndex = tabElements.findIndex(
-    (t) => t.tier.toLowerCase() === queryParam
+    (t) => t.query.toLowerCase() === queryParam
   );
   const [selectedIndex, setSelectedIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
@@ -44,19 +44,24 @@ export default function HorizontalTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
+  const updateParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value); // overwrite or add
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <>
       <TabGroup
         selectedIndex={selectedIndex}
         onChange={(index) => {
           setSelectedIndex(index);
-          const newTier = tabElements[index].tier.toLowerCase();
-          const newUrl = `${pathname}?${params}=${newTier}`;
-          router.push(newUrl);
+          const newQuery = tabElements[index].query.toLowerCase();
+          updateParam(params, newQuery);
         }}
         className="flex flex-col xl:flex"
       >
-        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-10 sm:px-12 ">
+        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
           <MobileTabs
             setSelected={setSelectedIndex}
             selected={selectedIndex}
@@ -82,8 +87,8 @@ export default function HorizontalTab({
         </div>
 
         <TabPanels className="flex flex-col gap-2 p-3 xl:px-0 ">
-          {tabElements.map(({ content, tier }) => (
-            <TabPanel key={tier}>{content}</TabPanel>
+          {tabElements.map(({ content, query: query }) => (
+            <TabPanel key={query}>{content}</TabPanel>
           ))}
         </TabPanels>
       </TabGroup>
@@ -91,7 +96,7 @@ export default function HorizontalTab({
   );
 }
 
-function MobileTabs({
+export function MobileTabs({
   tabElements,
   setSelected,
   selected,
@@ -107,7 +112,7 @@ function MobileTabs({
       <Listbox
         value={selectedTab}
         onChange={(tab) => {
-          const idx = tabElements.findIndex((t) => t.tier === tab.tier);
+          const idx = tabElements.findIndex((t) => t.query === tab.query);
           if (idx >= 0) setSelected(idx);
         }}
       >
@@ -125,7 +130,7 @@ function MobileTabs({
           <ListboxOptions className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
             {tabElements.map((tab) => (
               <ListboxOption
-                key={tab.tier}
+                key={tab.query}
                 value={tab}
                 className={({ selected }) =>
                   `relative  cursor-pointer select-none py-2 pl-3 pr-9 sm:text-xl hover:text-${

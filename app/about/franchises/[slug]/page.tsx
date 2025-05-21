@@ -2,7 +2,7 @@ import TeamPanel, {
   TeamPanelSkeleton,
 } from "@/components/franchises/teams/TeamPanel";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
-import { FranchiseTeams } from "@/components/tabs/HorizontalTab";
+import { TabElements } from "@/components/tabs/HorizontalTab";
 import FlameLogo from "@/components/theme/FlameLogo";
 import {
   getFranchiseDetailsBySlugCached,
@@ -77,7 +77,7 @@ export default async function Page({
             </h2>
             <div className="flex flex-row gap-3 p-1">
               {activeTeams.map((team, i) => {
-                const color = TIER_HEX_COLOR_MAP[team.tier];
+                const color = TIER_HEX_COLOR_MAP[team.query];
                 return (
                   <FlameLogo
                     color={color}
@@ -128,7 +128,7 @@ function getAgms(franchiseInfo) {
 }
 
 function getActiveTeams(franchiseInfo) {
-  const activeFranchiseTeams: FranchiseTeams[] = franchiseInfo.Teams.filter(
+  const activeFranchiseTeams: TabElements[] = franchiseInfo.Teams.filter(
     (team) => team.active
   ).map((team) => ({
     id: team.id,
@@ -138,6 +138,6 @@ function getActiveTeams(franchiseInfo) {
     content: <TeamPanel team={team} />,
   }));
   return [...activeFranchiseTeams].sort(
-    (a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier)
+    (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query)
   );
 }
