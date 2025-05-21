@@ -7,39 +7,47 @@ import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+
 type PlayerIGN = {
   encoded: string;
   decoded: string;
 };
+
+type Props = {
+  params: Promise<{ player: string }>;
+};
+
+const NUMBER_REGEX = /^\d+$/;
+const ENCODED_DIVIDER = encodeURIComponent("#");
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { player } = await params;
+  let playerIGN;
+  if (NUMBER_REGEX.test(player)) {
+    const res = await fetch(`${process.env.URL}/api/users/${player}`);
+    if (res.ok) {
+      const riotIGN: string = await res.json();
+      playerIGN = riotIGN;
+    } else {
+      playerIGN = "Player";
+    }
+  } else {
+    playerIGN = decodeURIComponent(player);
+  }
+  return {
+    title: `VDC | ${playerIGN}'s Player Page`,
+    description: `${playerIGN} information`,
+  };
+}
+
 export default async function Page({
   params,
 }: {
   params: Promise<{ player: string }>;
 }) {
-  const ENCODED_DIVIDER = encodeURIComponent("#");
-  const NUMBER_REGEX = /^\d+$/;
-  const tabElements: TabElements[] = [
-    {
-      query: "Summary",
-      color: "vdcRed",
-      name: "Summary",
-      content: <PlayerSummary />,
-    },
-    {
-      query: "Agents",
-      color: "vdcRed",
-      name: "Agents",
-      content: <PlayerAgents />,
-    },
-    {
-      query: "Maps",
-      color: "vdcRed",
-      name: "Maps",
-      content: <PlayerMaps />,
-    },
-  ];
-  const currentSeason = await getSeasonCached();
-  const listOfAllSeasons = listAllSeasons(currentSeason);
+  // const currentSeason = await getSeasonCached();
+  const listOfAllSeasons = listAllSeasons(8);
   const menuElements = listOfAllSeasons.map((season) => ({
     query: season,
     name: season,
@@ -55,20 +63,36 @@ export default async function Page({
   } else {
     return <PlayerNotFound player={decodeURIComponent(player)} />;
   }
-
   playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
+  const tabElements: TabElements[] = [
+    {
+      query: "Summary",
+      color: "vdcRed",
+      name: "Summary",
+      content: <PlayerSummary playerIGN={playerIGN} />,
+    },
+    {
+      query: "Agents",
+      color: "vdcRed",
+      name: "Agents",
+      content: <PlayerAgents />,
+    },
+    {
+      query: "Maps",
+      color: "vdcRed",
+      name: "Maps",
+      content: <PlayerMaps />,
+    },
+  ];
 
   const playerInfo = await getPlayerByRiot(playerIGN.encoded);
-  const playerStats = await getPlayerStatsBySeason(playerIGN.encoded, 7);
-  if (!playerStats) {
-    console.log("no stats found");
-  }
+
   // console.log(playerInfo);
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
-        <div className="p-2 flex flex-col gap-5">
+        <div className="p-2 flex flex-col xl:gap-5">
           <ListBox params={"Season"} menuElements={menuElements} />
           <HorizontalTab tabElements={tabElements} params={"by"} />
         </div>
@@ -108,18 +132,6 @@ async function getPlayerByRiot(riotIGN) {
 //     return null;
 //   }
 // }
-
-async function getPlayerStatsBySeason(riotIGN, season) {
-  const res = await fetch(
-    `${process.env.URL}/api/player/stats/${riotIGN}?season=${season}`
-  );
-  if (res.ok) {
-    const data: string = await res.json();
-    return data;
-  } else {
-    return null;
-  }
-}
 
 function listAllSeasons(currentSeason: number) {
   const seasons: string[] = [];

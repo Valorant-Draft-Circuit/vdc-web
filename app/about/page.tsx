@@ -8,6 +8,12 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { getFaqCached } from "@/lib/common/cache";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "VDC | About",
+  description: "About Valorant Draft Circuit",
+};
 
 export default async function Page() {
   const faqs = await getFaqCached();

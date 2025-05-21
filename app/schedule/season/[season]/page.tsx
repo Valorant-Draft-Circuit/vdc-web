@@ -3,9 +3,21 @@ import SchedulePanel from "@/components/schedule/SchedulesPanel";
 import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+type Props = {
+  params: Promise<{ season: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { season } = await params;
+  return {
+    title: `VDC | Season ${season} Match History`,
+    description: `Season ${season} Match History`,
+  };
+}
 
 export default async function Page({
   params,
