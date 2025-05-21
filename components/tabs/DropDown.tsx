@@ -40,7 +40,7 @@ export default function ListBox({
           className="relative flex flex-row rounded-md py-2 pl-4 pr-8 w-full 
          dark:bg-vdcBlack text-sm text-vdcGrey dark:text-vdcWhite outline-1 -outline-offset-1 outline-gray-300 data-hover:cursor-pointer "
         >
-          <h2>{`S${selected.name}`}</h2>
+          <h2>{`Season ${selected.name}`}</h2>
           <ChevronDownIcon className="size-4 fill-gray-500 m-auto absolute inset-y-0 right-3 h-5 w-5" />
         </ListboxButton>
         <ListboxOptions

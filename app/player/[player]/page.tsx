@@ -64,12 +64,22 @@ export default async function Page({
     return <PlayerNotFound player={decodeURIComponent(player)} />;
   }
   playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
+  const playerStats = await getPlayerStatsBySeason(playerIGN.encoded, 7);
+
+  if (!playerStats) {
+    console.log("no stats found");
+  }
+  const processedPlayerStats = playerStats.map((s) => {
+    const rounds = s.Game.rounds;
+    return { ...s, rounds: rounds, totalDamage: s.damage };
+  });
+
   const tabElements: TabElements[] = [
     {
       query: "Summary",
       color: "vdcRed",
       name: "Summary",
-      content: <PlayerSummary playerIGN={playerIGN} />,
+      content: <PlayerSummary stats={processedPlayerStats} />,
     },
     {
       query: "Agents",
@@ -132,6 +142,17 @@ async function getPlayerByRiot(riotIGN) {
 //     return null;
 //   }
 // }
+async function getPlayerStatsBySeason(riotIGN, season) {
+  const res = await fetch(
+    `${process.env.URL}/api/player/stats/${riotIGN}?season=${season}`
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  } else {
+    return null;
+  }
+}
 
 function listAllSeasons(currentSeason: number) {
   const seasons: string[] = [];

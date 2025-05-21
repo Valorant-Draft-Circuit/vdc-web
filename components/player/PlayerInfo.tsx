@@ -124,7 +124,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
           </div>
         </div>
         <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-20">
-          <TierBadge tier={playerTeam.tier} />
+          {playerTeam.tier && <TierBadge tier={playerTeam.tier} />}
           {playerAccolades.map((accolade, id) => (
             <span key={id}>{accolade.symbol}</span>
           ))}
