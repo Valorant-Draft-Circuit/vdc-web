@@ -97,7 +97,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               <h2 className="text-vdcWhite text-sm">
                 {isPlayerSigned ? (
                   <Link
-                    href={`/about/franchise/${playerTeam.Franchise.slug}?team=${playerTeam.tier}`}
+                    href={`/about/franchises/${playerTeam.Franchise.slug}?team=${playerTeam.tier}`}
                     className="hover:text-vdcRed hover:underline"
                   >
                     {playerTeam.Franchise.slug} | {playerTeam.name}

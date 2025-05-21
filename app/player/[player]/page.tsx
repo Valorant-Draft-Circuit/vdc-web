@@ -2,7 +2,7 @@ import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
 import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
-import PlayerSummary from "@/components/player/PlayerSummary";
+import PlayerSummary from "@/components/player/summary/PlayerSummary";
 import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
@@ -46,8 +46,8 @@ export default async function Page({
 }: {
   params: Promise<{ player: string }>;
 }) {
-  // const currentSeason = await getSeasonCached();
-  const listOfAllSeasons = listAllSeasons(8);
+  const currentSeason = await getSeasonCached();
+  const listOfAllSeasons = listAllSeasons(currentSeason);
   const menuElements = listOfAllSeasons.map((season) => ({
     query: season,
     name: season,
@@ -64,22 +64,13 @@ export default async function Page({
     return <PlayerNotFound player={decodeURIComponent(player)} />;
   }
   playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
-  const playerStats = await getPlayerStatsBySeason(playerIGN.encoded, 7);
-
-  if (!playerStats) {
-    console.log("no stats found");
-  }
-  const processedPlayerStats = playerStats.map((s) => {
-    const rounds = s.Game.rounds;
-    return { ...s, rounds: rounds, totalDamage: s.damage };
-  });
 
   const tabElements: TabElements[] = [
     {
       query: "Summary",
       color: "vdcRed",
       name: "Summary",
-      content: <PlayerSummary stats={processedPlayerStats} />,
+      content: <PlayerSummary />,
     },
     {
       query: "Agents",
@@ -142,17 +133,6 @@ async function getPlayerByRiot(riotIGN) {
 //     return null;
 //   }
 // }
-async function getPlayerStatsBySeason(riotIGN, season) {
-  const res = await fetch(
-    `${process.env.URL}/api/player/stats/${riotIGN}?season=${season}`
-  );
-  if (res.ok) {
-    const data = await res.json();
-    return data;
-  } else {
-    return null;
-  }
-}
 
 function listAllSeasons(currentSeason: number) {
   const seasons: string[] = [];
