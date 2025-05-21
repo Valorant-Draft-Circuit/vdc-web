@@ -37,12 +37,12 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
 
   if (leagueStatus === LeagueStatus.SIGNED) {
     playerTeam = playerInfo.Team;
-    tierColor = TIER_COLOR_MAP[playerInfo.Team.tier];
+    tierColor = TIER_COLOR_MAP[playerTeam.tier];
     isPlayerSigned = true;
   } else if (leagueStatus === LeagueStatus.GENERAL_MANAGER) {
     if (playerInfo.Team) {
       playerTeam = playerInfo.Team;
-      tierColor = TIER_COLOR_MAP[playerInfo.Team.tier];
+      tierColor = TIER_COLOR_MAP[playerTeam.tier];
       isPlayerSigned = true;
     } else {
       playerTeam = "GM/AGM";
@@ -67,9 +67,9 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
           src={playerInfo.image}
           width={5000}
           height={5000}
-          className="absolute pointer-events-none inset-0 size-full object-contain sm:right-5 z-0 sm:object-right xl:z-10 justify-self-end brightness-70 opacity-80 drop-shadow-lg"
+          className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-70 opacity-80 drop-shadow-lg"
         />
-        <div className="flex flex-row gap-5 z-20">
+        <div className="flex flex-row gap-5 z-10">
           <span className="relative inline-block">
             <Link
               href={`https://discord.com/users/${discordAccount.providerAccountId}`}
@@ -97,7 +97,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               <h2 className="text-vdcWhite text-sm">
                 {isPlayerSigned ? (
                   <Link
-                    href={`/about/franchise/${playerTeam.Franchise.slug}?team=${playerTeam.tier}`}
+                    href={`/about/franchises/${playerTeam.Franchise.slug}?team=${playerTeam.tier}`}
                     className="hover:text-vdcRed hover:underline"
                   >
                     {playerTeam.Franchise.slug} | {playerTeam.name}
@@ -124,6 +124,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
           </div>
         </div>
         <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-20">
+          {playerTeam.tier && <TierBadge tier={playerTeam.tier} />}
           {playerAccolades.map((accolade, id) => (
             <span key={id}>{accolade.symbol}</span>
           ))}
@@ -133,6 +134,22 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   );
 }
 
+function TierBadge(tier) {
+  const tierString = tier.tier;
+  const color: string = TIER_COLOR_MAP[tierString]
+    .replace("vdc", "")
+    .toLowerCase();
+
+  return (
+    <div className="relative group">
+      <div
+        className={`flex flex-row px-2 py-1 bg-gradient-to-br from-vdcWhite to-${color}-600 rounded-md text-xs text-vdcBlack gap-1`}
+      >
+        <h1>{tierString}</h1>
+      </div>
+    </div>
+  );
+}
 function getAccolades(accolades) {
   const accoladesWithSymbol = accolades.map((accolade) => {
     let symbol;

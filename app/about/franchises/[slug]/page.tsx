@@ -19,6 +19,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import type { Metadata } from "next";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    title: `VDC | ${slug}`,
+    description: `${slug} information`,
+  };
+}
+
 export default async function Page({
   params,
 }: {
@@ -105,9 +119,7 @@ function FMLink({ name, id }: { name; id }) {
       href={`https://discord.com/users/${id}`}
       className="hover:opacity-90 z-20"
     >
-      <span className="p-1 bg-[#353543] rounded-md shadow-2xl">
-        {name}
-      </span>
+      <span className="p-1 bg-[#353543] rounded-md shadow-2xl">{name}</span>
     </Link>
   );
 }
@@ -132,7 +144,7 @@ function getActiveTeams(franchiseInfo) {
     (team) => team.active
   ).map((team) => ({
     id: team.id,
-    tier: team.tier,
+    query: team.tier,
     color: TIER_COLOR_MAP[team.tier],
     name: team.name,
     content: <TeamPanel team={team} />,

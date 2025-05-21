@@ -71,7 +71,7 @@ export default function HorizontalTab({
 
         <div className="hidden xl:block">
           <div className="flex flex-row gap-2 sticky top-26 self-start">
-            <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-xl w-full">
+            <div className="p-2 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-md w-full">
               <TabList className="flex flex-row items-start gap-5 rounded-2xl drop-shadow-2xl">
                 {tabElements.map(({ name, color }) => (
                   <Tab

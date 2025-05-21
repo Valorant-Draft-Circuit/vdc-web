@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export default function PlayerCard({ player }: { player }) {
   const discordAccount = player.Accounts[0];
   const goToProfile = () =>
-    router.push(`/player/${player.discordAccount.providerAccountId}`);
+    router.push(`/player/${discordAccount.providerAccountId}`);
   const router = useRouter();
   const isCaptain = player.Captain;
   return (

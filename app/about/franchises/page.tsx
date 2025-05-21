@@ -3,7 +3,13 @@ import {
   getAllActiveFranchisesCached,
   getSeasonCached,
 } from "@/lib/common/cache";
+import { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "VDC | Franchises",
+  description: "Franchises Competing in VDC",
+};
 
 export default async function Page() {
   const currentSeason = await getSeasonCached();

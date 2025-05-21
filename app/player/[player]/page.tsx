@@ -2,22 +2,69 @@ import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
 import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
-import PlayerSummary from "@/components/player/PlayerSummary";
+import PlayerSummary from "@/components/player/summary/PlayerSummary";
 import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+
 type PlayerIGN = {
   encoded: string;
   decoded: string;
 };
+
+type Props = {
+  params: Promise<{ player: string }>;
+};
+
+const NUMBER_REGEX = /^\d+$/;
+const ENCODED_DIVIDER = encodeURIComponent("#");
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { player } = await params;
+  let playerIGN;
+  if (NUMBER_REGEX.test(player)) {
+    const res = await fetch(`${process.env.URL}/api/users/${player}`);
+    if (res.ok) {
+      const riotIGN: string = await res.json();
+      playerIGN = riotIGN;
+    } else {
+      playerIGN = "Player";
+    }
+  } else {
+    playerIGN = decodeURIComponent(player);
+  }
+  return {
+    title: `VDC | ${playerIGN}'s Player Page`,
+    description: `${playerIGN} information`,
+  };
+}
+
 export default async function Page({
   params,
 }: {
   params: Promise<{ player: string }>;
 }) {
-  const ENCODED_DIVIDER = encodeURIComponent("#");
-  const NUMBER_REGEX = /^\d+$/;
+  const currentSeason = await getSeasonCached();
+  const listOfAllSeasons = listAllSeasons(currentSeason);
+  const menuElements = listOfAllSeasons.map((season) => ({
+    query: season,
+    name: season,
+  }));
+
+  const { player } = await params;
+  const playerIGN: PlayerIGN = { encoded: "", decoded: "" };
+  if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
+  else if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
+  else if (player.includes("-")) {
+    const playerSplit = player.split("-");
+    playerIGN.encoded = `${playerSplit[0]}${ENCODED_DIVIDER}${playerSplit[1]}`;
+  } else {
+    return <PlayerNotFound player={decodeURIComponent(player)} />;
+  }
+  playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
+
   const tabElements: TabElements[] = [
     {
       query: "Summary",
@@ -38,37 +85,15 @@ export default async function Page({
       content: <PlayerMaps />,
     },
   ];
-  const currentSeason = await getSeasonCached();
-  const listOfAllSeasons = listAllSeasons(currentSeason);
-  const menuElements = listOfAllSeasons.map((season) => ({
-    query: season,
-    name: season,
-  }));
-
-  const { player } = await params;
-  const playerIGN: PlayerIGN = { encoded: "", decoded: "" };
-  if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
-  else if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
-  else if (player.includes("-")) {
-    const playerSplit = player.split("-");
-    playerIGN.encoded = `${playerSplit[0]}${ENCODED_DIVIDER}${playerSplit[1]}`;
-  } else {
-    return <PlayerNotFound player={decodeURIComponent(player)} />;
-  }
-
-  playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
 
   const playerInfo = await getPlayerByRiot(playerIGN.encoded);
-  const playerStats = await getPlayerStatsBySeason(playerIGN.encoded, 7);
-  if (!playerStats) {
-    console.log("no stats found");
-  }
+
   // console.log(playerInfo);
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
-        <div className="p-2 flex flex-col gap-5">
+        <div className="p-2 flex flex-col xl:gap-5">
           <ListBox params={"Season"} menuElements={menuElements} />
           <HorizontalTab tabElements={tabElements} params={"by"} />
         </div>
@@ -108,18 +133,6 @@ async function getPlayerByRiot(riotIGN) {
 //     return null;
 //   }
 // }
-
-async function getPlayerStatsBySeason(riotIGN, season) {
-  const res = await fetch(
-    `${process.env.URL}/api/player/stats/${riotIGN}?season=${season}`
-  );
-  if (res.ok) {
-    const data: string = await res.json();
-    return data;
-  } else {
-    return null;
-  }
-}
 
 function listAllSeasons(currentSeason: number) {
   const seasons: string[] = [];
