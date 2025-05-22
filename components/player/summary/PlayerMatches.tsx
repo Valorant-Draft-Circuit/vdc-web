@@ -1,3 +1,4 @@
+import { AGENTS, AGENTURL } from "@/lib/common/constants";
 import Image from "next/image";
 
 export default function PlayerMatches({ stats }: { stats }) {
@@ -85,16 +86,15 @@ function IndividualOverview({ stat }: { stat }) {
   const k = stat.kills;
   const d = stat.deaths;
   const a = stat.assists;
+  const agent: string = stat.agent;
 
   const kda = ((k + a) / d).toFixed(2);
   return (
-    <div className="m-auto flex flex-row h-fit">
+    <div className="m-auto flex flex-row gap-1">
       <div className="p-1">
         <Image
-          src={
-            "https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png"
-          }
-          alt="agent"
+          src={AGENTURL(AGENTS[agent.toUpperCase()])}
+          alt={agent}
           width={500}
           height={500}
           className="size-10"
