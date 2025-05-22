@@ -7,7 +7,7 @@ import {
 import Link from "next/link";
 import { parseRiotIGN } from "@/lib/common/utils";
 import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
-import { LeagueStatus } from "@prisma/client";
+import { LeagueStatus, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 
 export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
@@ -123,7 +123,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
             )}
           </div>
         </div>
-        <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-20">
+        <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-10">
           {playerTeam.tier && <TierBadge tier={playerTeam.tier} />}
           {playerAccolades.map((accolade, id) => (
             <span key={id}>{accolade.symbol}</span>
@@ -136,14 +136,18 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
 
 function TierBadge(tier) {
   const tierString = tier.tier;
-  const color: string = TIER_COLOR_MAP[tierString]
-    .replace("vdc", "")
-    .toLowerCase();
-
   return (
     <div className="relative group">
       <div
-        className={`flex flex-row px-2 py-1 bg-gradient-to-br from-vdcWhite to-${color}-600 rounded-md text-xs text-vdcBlack gap-1`}
+        className={`${
+          tierString === Tier.PROSPECT
+            ? "to-yellow-600"
+            : tierString === Tier.APPRENTICE
+            ? "to-green-600"
+            : tierString === Tier.EXPERT
+            ? "to-blue-600"
+            : "to-purple-600"
+        } flex flex-row px-2 py-1 bg-gradient-to-br from-vdcWhite rounded-md text-xs text-vdcBlack gap-1`}
       >
         <h1>{tierString}</h1>
       </div>

@@ -137,3 +137,13 @@ export async function getFranchiseDetailsBySlugCached(
   cache.set(key, franchise, minutes(5));
   return franchise;
 }
+
+export async function getTeamByIdCached(id: number) {
+  const key = `team-${id}`;
+  const hit = cache.get<string>(key);
+  if (hit !== undefined) return hit;
+
+  const team = await Team.getBy({ id: id });
+  cache.set(key, team, Times.DAY);
+  return team;
+}

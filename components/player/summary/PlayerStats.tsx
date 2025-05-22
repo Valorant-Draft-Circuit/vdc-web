@@ -24,7 +24,7 @@ export function PlayerStats({ stats }: { stats }) {
     ACS: summedStats.acs.toFixed(2),
     ADR: (summedStats.totalDamage / summedStats.rounds || 0).toFixed(2),
     KDA: ((kpr + apr) / dpr).toFixed(2),
-    CLUTCHES: summedStats.clutches,
+    CLUT: summedStats.clutches,
     "FK%": `${(
       (summedStats.firstKills * 100) / summedStats.rounds || 0
     ).toFixed(2)}%`,
@@ -43,15 +43,18 @@ export function PlayerStats({ stats }: { stats }) {
   console.log(statsList);
 
   return (
-    <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-200 dark:bg-vdcGrey overflow-hidden rounded-lg shadow-sm">
+    <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 sm:px-6">
         <h1 className="text-sm italic">Stats</h1>
       </div>
-      <div className="px-4 py-3 sm:p-6 grid grid-cols-2 text-sm gap-1 divide-gray-200 border-vdcBlack">
+      <div className="px-4 py-3 sm:p-6 grid grid-cols-2 text-sm gap-3 divide-gray-200 border-vdcBlack">
         {statsList.map((stat, index) => (
-          <div className="flex flex-col text-center text-sm" key={index}>
-            <h1 className="text-gray-700 dark:text-gray-300">{stat.name}</h1>
-            <h2 className="">{stat.value}</h2>
+          <div
+            className="flex flex-row text-center text-sm justify-between"
+            key={index}
+          >
+            <h1 className="text-vdcRed">{stat.name}:</h1>
+            <h2>{stat.value}</h2>
           </div>
         ))}
       </div>

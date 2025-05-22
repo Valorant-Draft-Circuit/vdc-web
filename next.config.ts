@@ -21,8 +21,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "http",
-        hostname: "localhost"
-      }
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "media.valorant-api.com",
+      },
     ],
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],
