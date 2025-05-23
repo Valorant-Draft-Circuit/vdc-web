@@ -1,5 +1,9 @@
-import { AGENTS, AGENTURL } from "@/lib/common/constants";
+import { AGENTS, AGENTURL, TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { Tier } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function PlayerMatches({ stats }: { stats }) {
   return (
@@ -30,31 +34,39 @@ function Match({ stat }: { stat }) {
   if (playerTeam === stat.Game.winner) {
     result = "Victory";
   }
+  const teams = {
+    home: { id: stat.Game.Match.home },
+    away: { id: stat.Game.Match.away },
+  };
   const matchDay = stat.Game.Match.matchDay;
 
   return (
-    <li
-      key={stat.id}
-      className={`${
-        result === "Victory" ? "bg-vdcBlue/30" : "bg-vdcRed/30"
-      } p-2  rounded-md`}
-    >
-      <div className="flex flex-col divide-y-1">
-        <div className="flex flex-row gap-2">
-          <h1 className="text-xs italic">
-            {result} - {date} - MD{matchDay}
-          </h1>
+    <Link href={`/match/${stat.Game.Match.matchID}/game/${stat.Game.gameID}`}>
+      <li
+        key={stat.id}
+        className={`${
+          result === "Victory"
+            ? "bg-vdcBlue/30"
+            : "bg-vdcRed/20 dark:bg-vdcRed/30"
+        } p-2  rounded-md hover:opacity-90`}
+      >
+        <div className="flex flex-col divide-y-1">
+          <div className="flex flex-row gap-2">
+            <h1 className="text-xs italic text-vdcGrey dark:text-vdcWhite">
+              {result} - {date} - MD{matchDay}
+            </h1>
+          </div>
+          <div className="flex flex-row py-2 justify-between w-full">
+            <IndividualOverview stat={stat} />
+            <GameInfo stat={stat} />
+            <Lobby teams={teams} />
+          </div>
+          <div className="flex flex-row">
+            <IndividualStats stats={stat} />
+          </div>
         </div>
-        <div className="flex flex-row py-2 justify-between w-full">
-          <IndividualOverview stat={stat} />
-          <GameInfo stat={stat} />
-          <Lobby />
-        </div>
-        <div className="flex flex-row">
-          <IndividualStats stats={stat} />
-        </div>
-      </div>
-    </li>
+      </li>
+    </Link>
   );
 }
 
@@ -120,9 +132,7 @@ function GameInfo({ stat }: { stat }) {
   let isHome = false;
   let teamScore;
   let opponentScore;
-  if (playerTeam === game.Match.home) {
-    isHome = true;
-  }
+  if (playerTeam === game.Match.home) isHome = true;
   if (isHome) {
     teamScore = game.roundsWonHome;
     opponentScore = game.roundsWonAway;
@@ -146,41 +156,72 @@ function GameInfo({ stat }: { stat }) {
   );
 }
 
-function Lobby() {
-  const team1 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+function Lobby({ teams }: { teams }) {
+  const home = teams.home;
+  const away = teams.away;
   return (
-    <div className="m-auto flex flex-col xl:flex-row text-center gap-1">
-      <div className="flex flex-row text-xs">
-        {team1.map((player) => (
-          <Image
-            key={player.id}
-            src={
-              "https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png"
-            }
-            alt="agent"
-            width={500}
-            height={500}
-            className="size-4"
-          />
-        ))}
-      </div>
+    <div className="m-auto flex flex-row text-center gap-1 xl:gap-2">
+      <TeamLogo team={home} />
       <h1 className="text-xs my-auto italic text-vdcGrey dark:text-gray-400">
         VS
       </h1>
-      <div className="flex flex-row text-xs">
-        {team1.map((player) => (
-          <Image
-            key={player.id}
-            src={
-              "https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png"
-            }
-            alt="agent"
-            width={500}
-            height={500}
-            className="size-4"
-          />
-        ))}
+      <TeamLogo team={away} />
+    </div>
+  );
+}
+
+type TeamInfo = {
+  slug: string;
+  tier: Tier;
+};
+
+function TeamLogo({ team }: { team }) {
+  const [teamURL, setTeamURL] = useState("");
+  const [teamInfo, setTeamInfo] = useState<TeamInfo>();
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchTeam() {
+      try {
+        const res = await fetch(`/api/teams/${team.id}`, {
+          cache: "force-cache",
+        });
+        if (!res.ok) {
+          throw new Error(`Error fetching team info: ${res.status}`);
+        }
+        const data = await res.json();
+        const info = { slug: data.Franchise.slug, tier: data.tier };
+        setTeamInfo(info);
+        setTeamURL(data.Franchise.Brand.logo);
+      } catch (err) {
+        console.error(err);
+        setTeamURL("/vdc-flame.svg");
+      }
+    }
+    fetchTeam();
+  });
+
+  const goToTeamPage = () =>
+    router.push(`/about/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`);
+
+  if (!teamURL) {
+    return (
+      <div className="flex flex-row text-xs drop-shadow-md animate-pulse">
+        <div className="bg-vdcGrey size-10 rounded-full"></div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-row text-xs drop-shadow-md hover:brightness-90 hover:cursor-pointer">
+      <Image
+        src={`${TEAM_LOGOS_URL}${teamURL}`}
+        onClick={goToTeamPage}
+        alt={team.id}
+        width={500}
+        height={500}
+        className="size-10 m-auto text-center w-fit"
+      />
     </div>
   );
 }
