@@ -33,7 +33,7 @@ export default function MatchCard({ match }: { match: Match }) {
       className="flex flex-row h-22 gap-8 sm:gap-3 py-3 w-full xl:px-24 m-auto justify-evenly rounded-2xl bg-vdcWhite dark:bg-vdcGrey drop-shadow-lg hover:cursor-pointer hover:opacity-98 transition-opacity ease-in-out duration-150"
     >
       <HomeBadge home={match.Home} tier={match.tier} />
-      <MatchScore homeWins={match.homeWins} awayWins={match.awayWins} />
+      <MatchScore homeWins={match?.homeWins} awayWins={match?.awayWins} />
       <AwayBadge away={match.Away} tier={match.tier} />
     </div>
   );
@@ -93,7 +93,7 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
 function MatchScore({ homeWins, awayWins }: { homeWins?; awayWins? }) {
   const [revealed, setRevealed] = useState(false);
   let pastGame = false;
-  if (homeWins || awayWins) {
+  if (homeWins != null || awayWins != null) {
     pastGame = true;
   }
   if (!pastGame) {
