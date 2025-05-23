@@ -40,8 +40,6 @@ export function PlayerStats({ stats }: { stats }) {
     value: value,
   }));
 
-  console.log(statsList);
-
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 sm:px-6">

@@ -87,8 +87,6 @@ export default async function Page({
   ];
 
   const playerInfo = await getPlayerByRiot(playerIGN.encoded);
-
-  // console.log(playerInfo);
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
