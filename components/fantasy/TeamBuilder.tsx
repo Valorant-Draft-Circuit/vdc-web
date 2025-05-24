@@ -12,10 +12,11 @@ type Player = {
 type PlayerCost = {
   userID: string;
   averageFantasyPoints: number;
+  cost: number;
 };
 
 const PLAYERS_PER_PAGE = 35;
-const TEAM_COST_CAP = 300;
+const TEAM_COST_CAP = 1_000_000;
 
 export default function TeamBuilder() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -42,23 +43,24 @@ export default function TeamBuilder() {
   useEffect(() => {
     async function fetchPlayers() {
       const res = await fetch(
-        `/api/fantasy/players?page=${page}&search=${encodeURIComponent(debouncedSearch)}`
+        `/api/fantasy/players?page=${page}&search=${encodeURIComponent(debouncedSearch)}&sort=${sortBy}`
       );
       const data = await res.json();
       setPlayers(data.players);
       setTotalPlayers(data.total);
     }
     fetchPlayers();
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, sortBy]);
 
   useEffect(() => {
     async function fetchPlayerCosts() {
       const res = await fetch('/api/fantasy/player-costs');
       const data: PlayerCost[] = await res.json();
       const costsMap = data.reduce<Record<string, number>>((acc, player) => {
-        acc[player.userID] = player.averageFantasyPoints;
+        acc[player.userID] = player.cost;
         return acc;
       }, {});
+
       setPlayerCosts(costsMap);
     }
     fetchPlayerCosts();
@@ -116,11 +118,8 @@ export default function TeamBuilder() {
   const totalPages = Math.ceil(totalPlayers / PLAYERS_PER_PAGE);
   const remainingBudget = TEAM_COST_CAP - totalCostSelected;
 
-  const sortedPlayers = [...players].sort((a, b) => {
-    const costA = playerCosts[a.userID] ?? 0;
-    const costB = playerCosts[b.userID] ?? 0;
-    return sortBy === 'costAsc' ? costA - costB : costB - costA;
-  });
+  // Use the players as received from backend (already sorted)
+  const sortedPlayers = players;
 
   return (
     <div className="p-8 max-w-7xl mx-auto bg-vdcDark rounded-2xl shadow-xl text-vdcWhite font-montserrat">
@@ -137,7 +136,7 @@ export default function TeamBuilder() {
               Budget
             </span>
             <span className="text-white font-bold text-lg">
-              {totalCostSelected.toFixed(2)} / {TEAM_COST_CAP}
+              ${totalCostSelected.toLocaleString()} / ${TEAM_COST_CAP.toLocaleString()}
             </span>
           </div>
           <div className="flex flex-col bg-vdcGreyDark px-4 py-2 rounded-md shadow-inner">
@@ -173,7 +172,10 @@ export default function TeamBuilder() {
           <div className="border border-vdcRed rounded-md p-[2px]">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'costAsc' | 'costDesc')}
+              onChange={(e) => {
+                setSortBy(e.target.value as 'costAsc' | 'costDesc');
+                setPage(1);
+              }}
               className="bg-vdcGreyDark text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-vdcRed"
             >
               <option value="costAsc">Cost: Low to High</option>
@@ -204,7 +206,9 @@ export default function TeamBuilder() {
                 <span className="text-vdcRed text-md font-bold -mt-1">#{player.tag}</span>
               </div>
               <div className="mt-1">
-                <p className="text-white font-bold text-base">Cost: {cost.toFixed(2)}</p>
+                <p className="text-white font-bold text-base">
+                  Cost: ${cost.toLocaleString()}
+                </p>
                 <p className="text-vdcGreyLight text-sm">Points: {player.totalPoints.toFixed(2)}</p>
               </div>
             </div>
@@ -238,11 +242,7 @@ export default function TeamBuilder() {
         <button
           onClick={handleSubmit}
           disabled={selected.length !== 5}
-          className={`rounded-lg px-8 py-3 font-semibold transition border-2 border-vdcRed
-    ${selected.length === 5
-              ? 'bg-vdcRed text-white hover:bg-vdcRedDark'
-              : 'bg-vdcGreyLight text-white cursor-not-allowed'
-            }`}
+          className={`rounded-lg px-8 py-3 font-semibold text-black bg-vdcRed transition hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           Submit Team
         </button>

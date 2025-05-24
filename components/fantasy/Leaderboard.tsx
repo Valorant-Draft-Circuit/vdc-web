@@ -26,7 +26,7 @@ export default function Leaderboard({ data }: { data: LeaderboardEntry[] }) {
 
                         <div>
                             <div className="text-vdcWhite font-semibold text-xl font-montserrat tracking-wide">
-                                #{index + 1} — {entry.name}
+                                #{entry.rank} — {entry.name}
                                 <span className="text-vdcRed font-bold text-lg"> #{entry.tag}</span>
                             </div>
                         </div>
