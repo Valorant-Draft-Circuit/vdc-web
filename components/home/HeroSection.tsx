@@ -12,7 +12,7 @@ export default async function HeroSection() {
           src="/hero-section.webp"
           width={5000}
           height={5000}
-          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 xl:absolute xl:left-20 xl:top-20 brightness-75"
+          className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] xl:scale-150 xl:absolute xl:left-20 xl:top-20 brightness-65 "
         />
         <div
           aria-hidden="true"
@@ -23,7 +23,7 @@ export default async function HeroSection() {
               clipPath:
                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
             }}
-            className="relative left-[calc(50%-7rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-slate-800 to-black lg:left-[calc(50%-30rem)] lg:w-[72.1875rem]"
+            className="relative left-[calc(50%-7rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-slate-800 to-black brightness-20 lg:left-[calc(50%-30rem)] lg:w-[72.1875rem]"
           />
         </div>
         <div className="bg-vdcBlack py-8 mx-2 rounded-2xl flex flex-col space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-8/12">
@@ -68,14 +68,17 @@ function Joined({ session }: { session }) {
   const isSignedUp = false;
   if (!isSignedUp) {
     return (
-      <div>
+      <div className="flex flex-col gap-5">
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          Ready to play, {session.user?.name}?
+        </h2>
         <SignUpButton />
       </div>
     );
   }
   return (
     <>
-      <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+      <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
         {session.user?.name} has
         <br />
         Joined the Draft.
