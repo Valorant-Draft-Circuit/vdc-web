@@ -26,13 +26,15 @@ export async function GET(request: Request) {
 
   // Filter players by search
   const filtered = search
-    ? fullLeaderboard.filter((player) =>
+    ? fullLeaderboard.data.filter((player) =>
         player.name.toLowerCase().includes(search)
       )
     : fullLeaderboard;
 
+  const normalizedData = Array.isArray(filtered) ? filtered : filtered.data;
+
   // Add cost to each player object for sorting
-  const withCost = filtered.map((player) => ({
+  const withCost = normalizedData.map((player) => ({
     ...player,
     cost: costsMap[player.userID] ?? 0,
   }));

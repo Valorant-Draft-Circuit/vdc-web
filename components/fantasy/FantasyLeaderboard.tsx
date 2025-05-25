@@ -43,16 +43,19 @@ export default function FantasyLeaderboard() {
 
     return (
         <section>
-            <input
-                value={search}
-                onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(0); // Reset page when search changes
-                    setHasMore(true);
-                }}
-                className="mb-4 px-4 py-2 rounded bg-vdcGrey text-white w-full"
-                placeholder="Search IGN..."
-            />
+             <div className="border border-vdcRed rounded-md p-[1px] mb-4">
+  <input
+    value={search}
+    onChange={(e) => {
+      setSearch(e.target.value);
+      setPage(0); // Reset page when search changes
+      setHasMore(true);
+    }}
+    className="bg-vdcGreyDark text-white px-4 py-2 rounded-md w-full sm:w-full focus:outline-none focus:ring-2 focus:ring-vdcRed placeholder-vdcGreyLight"
+    placeholder="Search IGN..."
+  />
+</div>
+
 
             <Leaderboard data={data} />
 

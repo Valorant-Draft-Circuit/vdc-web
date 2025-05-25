@@ -144,7 +144,7 @@ export default function TeamBuilder() {
               Remaining
             </span>
             <span className="text-white font-bold text-lg">
-              {remainingBudget.toFixed(2)}
+              ${remainingBudget.toLocaleString()}
             </span>
           </div>
           <div className="flex flex-col bg-vdcGreyDark px-4 py-2 rounded-md shadow-inner">
@@ -157,7 +157,7 @@ export default function TeamBuilder() {
 
         {/* Search and Sort */}
         <div className="flex gap-4 mt-4 sm:mt-0 flex-wrap sm:flex-nowrap">
-          <div className="border border-vdcRed rounded-md p-[2px]">
+          <div className="border border-vdcRed rounded-md p-[1px]">
             <input
               type="text"
               placeholder="Search players..."
