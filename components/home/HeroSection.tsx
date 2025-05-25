@@ -1,9 +1,9 @@
 import { auth } from "@/lib/auth";
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
+import SignUpButton from "../buttons/SignUpButton";
 export default async function HeroSection() {
   const session = await auth();
-
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
@@ -45,27 +45,42 @@ export default async function HeroSection() {
           </div>
         </div>
         <div className="flex flex-col space-y-2 lg:my-auto lg:ml-auto">
-          {!session ? (
-            <>
-              <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
-                Join the Draft.
-              </h2>
-              <div>
-                <DiscordButton text="Sign Up with Discord" />
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
-                {session.user?.name} has
-                <br />
-                Joined the Draft.
-              </h2>
-              <div></div>
-            </>
-          )}
+          {}
+          {!session ? <Join /> : <Joined session={session} />}
         </div>
       </div>
     </div>
+  );
+}
+function Join() {
+  return (
+    <>
+      <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+        Join the Draft.
+      </h2>
+      <div>
+        <DiscordButton text="Sign Up with Discord" />
+      </div>
+    </>
+  );
+}
+function Joined({ session }: { session }) {
+  const isSignedUp = false;
+  if (!isSignedUp) {
+    return (
+      <div>
+        <SignUpButton />
+      </div>
+    );
+  }
+  return (
+    <>
+      <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+        {session.user?.name} has
+        <br />
+        Joined the Draft.
+      </h2>
+      <div></div>
+    </>
   );
 }
