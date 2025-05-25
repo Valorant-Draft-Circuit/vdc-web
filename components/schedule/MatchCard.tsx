@@ -58,7 +58,7 @@ function HomeBadge({ home, tier }: { home: Team; tier: Tier }) {
           alt={home.slug}
           width={250}
           height={250}
-          className="w-12 h-auto sm:w-15 xl:w-16 drop-shadow-md mr-0"
+          className="size-12 sm:w-15 xl:w-16 drop-shadow-md mr-0"
         />
       </div>
     </Link>
@@ -74,13 +74,13 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
       href={`/about/franchises/${away.slug}?team=${tier.toLocaleLowerCase()}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
-      <div className="flex-shrink-0 w-20 sm:w-50 flex items-center  space-x-2 xl:space-x-5">
+      <div className="flex-shrink-0 w-20 sm:w-50 flex items-center space-x-2 xl:space-x-5">
         <Image
           src={`${TEAM_LOGOS_URL}${away.logo}`}
           alt={away.slug}
           width={250}
           height={250}
-          className="w-12 h-auto sm:w-15 xl:w-16 drop-shadow-md ml-0"
+          className="size-12 sm:w-15 xl:w-16 drop-shadow-md ml-0"
         />
         <h1 className="italic hidden sm:block text-sm sm:text-md xl:text-xl break-words">
           {away.name}
@@ -92,9 +92,9 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
 
 function MatchScore({ homeWins, awayWins }: { homeWins?; awayWins? }) {
   const [revealed, setRevealed] = useState(false);
-  let pastGame = false;
-  if (homeWins != null || awayWins != null) {
-    pastGame = true;
+  let pastGame = true;
+  if (homeWins === 0 && awayWins === 0) {
+    pastGame = false;
   }
   if (!pastGame) {
     return (
