@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.valorant-api.com",
       },
+      {
+        protocol: "https",
+        hostname: "vdc-assets.nyc3.cdn.digitaloceanspaces.com",
+      },
     ],
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],

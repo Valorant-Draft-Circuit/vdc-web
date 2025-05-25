@@ -11,6 +11,9 @@ export const DISCORD_USER_HOWTO_URL =
 export const TRACKER_PROFILE_URL = "https://tracker.gg/valorant/profile/riot";
 export const WEB_ASSET_URL = BUCKET_URL + "web-assets/";
 export const TEAM_LOGOS_URL = BUCKET_URL + "team-logos/";
+export const VDC_ASSETS_URL =
+  "https://vdc-assets.nyc3.cdn.digitaloceanspaces.com";
+
 export const VDC_PURPLE = "#9b59b6";
 export const VDC_BLUE = "#3498db";
 export const VDC_GREEN = "#2ecc71";

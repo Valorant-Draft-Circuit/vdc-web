@@ -55,7 +55,7 @@ export default function PlayerSummary() {
   });
 
   return (
-    <div className="flex flex-col xl:flex-row px-7 xl:px-0 gap-2">
+    <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
       <div className="flex flex-col gap-2 xl:w-1/2">
         <>
           <PlayerRating stats={processedPlayerStats} />
@@ -81,7 +81,7 @@ export function NoStats() {
 
 function Load() {
   return (
-    <div className="flex flex-col xl:flex-row px-7 xl:px-0 gap-2">
+    <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
       <div className="flex flex-col gap-2 xl:w-1/3">
         <div className="divide-y divide-gray-200 dark:divide-vdcBlack dark:bg-vdcGrey overflow-hidden rounded-lg shadow-sm ">
           <div className="px-4 py-2 sm:px-6 animate-pulse ">

@@ -24,6 +24,7 @@ export default function PlayerMatches({ stats }: { stats }) {
 }
 
 function Match({ stat }: { stat }) {
+  const router = useRouter();
   const date = new Date(stat.Game.datePlayed).toLocaleString(`en-US`, {
     month: `short`,
     day: `2-digit`,
@@ -39,34 +40,35 @@ function Match({ stat }: { stat }) {
     away: { id: stat.Game.Match.away },
   };
   const matchDay = stat.Game.Match.matchDay;
+  const goToGame = () =>
+    router.push(`/match/${stat.Game.Match.matchID}/game/${stat.Game.gameID}`);
 
   return (
-    <Link href={`/match/${stat.Game.Match.matchID}/game/${stat.Game.gameID}`}>
-      <li
-        key={stat.id}
-        className={`${
-          result === "Victory"
-            ? "bg-vdcBlue/30"
-            : "bg-vdcRed/20 dark:bg-vdcRed/30"
-        } p-2  rounded-md hover:opacity-90`}
-      >
-        <div className="flex flex-col divide-y-1">
-          <div className="flex flex-row gap-2">
-            <h1 className="text-xs italic text-vdcGrey dark:text-vdcWhite">
-              {result} - {date} - MD{matchDay}
-            </h1>
-          </div>
-          <div className="flex flex-row py-2 justify-between w-full">
-            <IndividualOverview stat={stat} />
-            <GameInfo stat={stat} />
-            <Lobby teams={teams} />
-          </div>
-          <div className="flex flex-row">
-            <IndividualStats stats={stat} />
-          </div>
+    <li
+      key={stat.id}
+      onClick={goToGame}
+      className={`${
+        result === "Victory"
+          ? "bg-vdcBlue/30"
+          : "bg-vdcRed/20 dark:bg-vdcRed/30"
+      } p-2  rounded-md hover:opacity-90 hover:cursor-pointer`}
+    >
+      <div className="flex flex-col divide-y-1">
+        <div className="flex flex-row gap-2">
+          <h1 className="text-xs italic text-vdcGrey dark:text-vdcWhite">
+            {result} - {date} - MD{matchDay}
+          </h1>
         </div>
-      </li>
-    </Link>
+        <div className="flex flex-row py-2 justify-between w-full">
+          <IndividualOverview stat={stat} />
+          <GameInfo stat={stat} />
+          <Lobby teams={teams} />
+        </div>
+        <div className="flex flex-row">
+          <IndividualStats stats={stat} />
+        </div>
+      </div>
+    </li>
   );
 }
 
@@ -178,7 +180,6 @@ type TeamInfo = {
 function TeamLogo({ team }: { team }) {
   const [teamURL, setTeamURL] = useState("");
   const [teamInfo, setTeamInfo] = useState<TeamInfo>();
-  const router = useRouter();
 
   useEffect(() => {
     async function fetchTeam() {
@@ -201,9 +202,6 @@ function TeamLogo({ team }: { team }) {
     fetchTeam();
   });
 
-  const goToTeamPage = () =>
-    router.push(`/about/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`);
-
   if (!teamURL) {
     return (
       <div className="flex flex-row text-xs drop-shadow-md animate-pulse">
@@ -214,14 +212,20 @@ function TeamLogo({ team }: { team }) {
 
   return (
     <div className="flex flex-row text-xs drop-shadow-md hover:brightness-90 hover:cursor-pointer">
-      <Image
-        src={`${TEAM_LOGOS_URL}${teamURL}`}
-        onClick={goToTeamPage}
-        alt={team.id}
-        width={500}
-        height={500}
-        className="size-10 m-auto text-center w-fit"
-      />
+      <Link
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        href={`/about/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`}
+      >
+        <Image
+          src={`${TEAM_LOGOS_URL}${teamURL}`}
+          alt={team.id}
+          width={500}
+          height={500}
+          className="size-10 m-auto text-center w-fit"
+        />
+      </Link>
     </div>
   );
 }
