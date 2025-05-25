@@ -12,7 +12,7 @@ export default function Soon() {
         </div>
         <Image
           className="m-auto"
-          src={'/vdcTech.webp'}
+          src={"/vdcTech.webp"}
           alt="VDC Tech Logo"
           width={500}
           height={50}
