@@ -58,7 +58,7 @@ function HomeBadge({ home, tier }: { home: Team; tier: Tier }) {
           alt={home.slug}
           width={250}
           height={250}
-          className="size-12 sm:w-15 xl:w-16 drop-shadow-md mr-0"
+          className="w-12 h-auto sm:w-15 xl:w-16 drop-shadow-md mr-0"
         />
       </div>
     </Link>
@@ -80,7 +80,7 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
           alt={away.slug}
           width={250}
           height={250}
-          className="size-12 sm:w-15 xl:w-16 drop-shadow-md ml-0"
+          className="w-12 h-auto sm:w-15 xl:w-16 drop-shadow-md ml-0"
         />
         <h1 className="italic hidden sm:block text-sm sm:text-md xl:text-xl break-words">
           {away.name}
