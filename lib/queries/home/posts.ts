@@ -6,15 +6,15 @@ const api = new GhostContentAPI({
   version: "v5.0",
 });
 
-export interface NewsProps {
+export type TNews = {
   title: string | undefined;
   url: string | undefined;
   date: Nullable<string> | undefined;
   featured_image: Nullable<string> | undefined;
   featured_image_alt: Nullable<string>;
-}
+};
 
-export async function getNews(): Promise<NewsProps[]> {
+export async function getNews(): Promise<TNews[]> {
   try {
     const payload = await api.posts.browse({
       limit: 3,

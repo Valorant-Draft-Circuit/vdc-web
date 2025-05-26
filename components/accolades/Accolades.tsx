@@ -2,7 +2,7 @@
 import { FireIcon, StarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
 import { SVGProps, useState } from "react";
-type Accolade = {
+type TAccolade = {
   id: number;
   userID: string;
   season: number;
@@ -11,7 +11,7 @@ type Accolade = {
   accolade: string;
 };
 
-export function WIN({ metadata }: { metadata: Accolade }) {
+export function WIN({ metadata }: { metadata: TAccolade }) {
   const [show, setShow] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ export function WIN({ metadata }: { metadata: Accolade }) {
   );
 }
 
-export function MVP({ metadata }: { metadata: Accolade }) {
+export function MVP({ metadata }: { metadata: TAccolade }) {
   const [show, setShow] = useState(false);
 
   return (
@@ -57,7 +57,7 @@ export function MVP({ metadata }: { metadata: Accolade }) {
   );
 }
 
-export function WIN_FM({ metadata }: { metadata: Accolade }) {
+export function WIN_FM({ metadata }: { metadata: TAccolade }) {
   const [show, setShow] = useState(false);
 
   return (
@@ -82,7 +82,7 @@ export function WIN_FM({ metadata }: { metadata: Accolade }) {
   );
 }
 
-export function AST({ metadata }: { metadata: Accolade }) {
+export function AST({ metadata }: { metadata: TAccolade }) {
   const [show, setShow] = useState(false);
 
   return (

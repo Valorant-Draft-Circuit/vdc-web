@@ -17,7 +17,7 @@ export default async function AuthSection() {
   return (
     <div className="flex flex-row space-x-2">
       <div className="flex flex-col text-vdcWhite p-2 items-end text-sm ">
-        <h1 className="italic">{user.name}</h1>
+        <h1 className="italic">{user?.name}</h1>
         <h1 className="">{team}</h1>
       </div>
       <div className="flex m-auto">
@@ -41,26 +41,24 @@ export default async function AuthSection() {
 function determineTeam(user) {
   const userLeagueStatus = user.Status.leagueStatus;
   const userContractStatus = user.Status.contractStatus;
-  let team;
   if (userLeagueStatus === LeagueStatus.DRAFT_ELIGIBLE) {
-    team = "DE";
+    return "DE";
   } else if (userLeagueStatus === LeagueStatus.FREE_AGENT) {
-    team = "FA";
+    return "FA";
   } else if (userLeagueStatus === LeagueStatus.RESTRICTED_FREE_AGENT) {
-    team = "RFA";
+    return "RFA";
   } else if (userLeagueStatus === LeagueStatus.SUSPENDED) {
-    team = LeagueStatus.SUSPENDED;
+    return LeagueStatus.SUSPENDED;
   } else if (userLeagueStatus === LeagueStatus.UNREGISTERED) {
-    team = LeagueStatus.UNREGISTERED;
+    return LeagueStatus.UNREGISTERED;
   } else if (userLeagueStatus === LeagueStatus.PENDING) {
-    team = LeagueStatus.PENDING;
+    return LeagueStatus.PENDING;
   } else if (
     userLeagueStatus === LeagueStatus.GENERAL_MANAGER &&
     userContractStatus === LeagueStatus.SIGNED
   ) {
-    team = `${user.Team.Franchise.slug} | ${user.Team.name}`;
+    return `${user.Team.Franchise.slug} | ${user.Team.name}`;
   } else if (userLeagueStatus === LeagueStatus.GENERAL_MANAGER) {
-    team = `${user.Team.Franchise.name}`;
+    return `${user.Team.Franchise.name}`;
   }
-  return team;
 }

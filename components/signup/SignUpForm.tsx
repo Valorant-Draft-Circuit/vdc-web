@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
 
-export interface ISignUpInput {
+export type TSignUpInput = {
   accountID: string;
   primaryValorantAccount: string;
   role: string;
@@ -17,7 +17,7 @@ export interface ISignUpInput {
   commit: string;
   reportedAccounts: string;
   readRules: string;
-}
+};
 
 export default function SignUpForm({ user, currentSeason }) {
   if (user.Status.leagueStatus !== LeagueStatus.UNREGISTERED) {
@@ -30,8 +30,8 @@ export default function SignUpForm({ user, currentSeason }) {
       </div>
     );
   }
-  
-  const { register, handleSubmit, watch } = useForm<ISignUpInput>();
+
+  const { register, handleSubmit, watch } = useForm<TSignUpInput>();
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Divider title={"Accounts"} />
@@ -61,7 +61,7 @@ export default function SignUpForm({ user, currentSeason }) {
   );
 }
 
-const onSubmit: SubmitHandler<ISignUpInput> = (data) => {
+const onSubmit: SubmitHandler<TSignUpInput> = (data) => {
   handleRegistration(data);
 };
 
@@ -78,9 +78,9 @@ function handleRegistration(data) {
 }
 
 function SubmitSignUp() {
-  type Status = "error" | "expired" | "solved";
+  type TStatus = "error" | "expired" | "solved";
   const ref = useRef<TurnstileInstance | null>(null);
-  const [status, setStatus] = useState<Status | null>(null);
+  const [status, setStatus] = useState<TStatus | null>(null);
   return (
     <>
       <div className="flex flex-row gap-2">

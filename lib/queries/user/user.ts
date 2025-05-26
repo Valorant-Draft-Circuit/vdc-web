@@ -1,6 +1,9 @@
 import { prisma } from "@/prisma/prismadb";
-
-export async function getUser(id) {
+import { Prisma } from "@prisma/client";
+export type TUser = Prisma.UserGetPayload<{
+  include: { Accounts: true; Team: true; Status: true };
+}>[];
+export async function getUser(id: string) {
   const user = await prisma.user.findUnique({
     where: {
       id: "clu76oynz0000traw15nj9btz",

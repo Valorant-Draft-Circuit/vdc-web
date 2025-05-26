@@ -1,15 +1,15 @@
 "use client";
 
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
-import { ISignUpInput } from "./SignUpForm";
+import { TSignUpInput } from "./SignUpForm";
 
 export default function Questions({
   register,
   watch,
 }: {
   season;
-  register: UseFormRegister<ISignUpInput>;
-  watch: UseFormWatch<ISignUpInput>;
+  register: UseFormRegister<TSignUpInput>;
+  watch: UseFormWatch<TSignUpInput>;
 }) {
   const reqQuestions = [
     {

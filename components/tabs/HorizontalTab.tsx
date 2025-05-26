@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 
-export type TabElements = {
+export type TTabElements = {
   current?: boolean;
   query: string;
   color: string;
@@ -23,7 +23,7 @@ export default function HorizontalTab({
   tabElements,
   params,
 }: {
-  tabElements: TabElements[];
+  tabElements: TTabElements[];
   params: string;
 }) {
   const searchParams = useSearchParams();

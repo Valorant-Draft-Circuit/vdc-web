@@ -172,14 +172,14 @@ function Lobby({ teams }: { teams }) {
   );
 }
 
-type TeamInfo = {
+type TTeamInfo = {
   slug: string;
   tier: Tier;
 };
 
 function TeamLogo({ team }: { team }) {
   const [teamURL, setTeamURL] = useState("");
-  const [teamInfo, setTeamInfo] = useState<TeamInfo>();
+  const [teamInfo, setTeamInfo] = useState<TTeamInfo>();
 
   useEffect(() => {
     async function fetchTeam() {

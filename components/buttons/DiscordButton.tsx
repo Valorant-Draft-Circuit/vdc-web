@@ -1,11 +1,11 @@
 import { signIn } from "@/lib/auth";
 import Image from "next/image";
 
-interface DiscordButtonProps {
+type TDiscordButton = {
   text: string;
-}
+};
 
-export default function DiscordButton({ text }: DiscordButtonProps) {
+export default function DiscordButton({ text }: TDiscordButton) {
   return (
     <>
       <form

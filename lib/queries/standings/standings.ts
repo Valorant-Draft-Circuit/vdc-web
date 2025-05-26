@@ -1,29 +1,9 @@
-import { StandingProps } from "@/components/standings/StandingsCard";
-import { MatchType } from "@prisma/client";
+import { TStandingProps } from "@/components/standings/StandingsCard";
+import { MatchType, Prisma } from "@prisma/client";
 import { prisma } from "@/prisma/prismadb";
 import { GameType, Tier } from "@prisma/client";
-
-type Team = {
-  id: number;
-  name: string;
-  Franchise: {
-    slug: string;
-    Brand: {
-      logo: string | null;
-    } | null;
-  };
-};
-
-type Game = {
-  winner: number | null;
-  rounds: number;
-  roundsWonHome: number;
-  roundsWonAway: number;
-  Match: {
-    home: number | null;
-    away: number | null;
-  } | null;
-};
+import { getAllActiveTeamsIn, TActiveTeam } from "../teams/teams";
+import { getAllGamesBy, TGame } from "../games/games";
 
 export type TeamStats = {
   wins: number;
@@ -43,7 +23,7 @@ export type TeamStats = {
   };
 };
 
-export function getApexRankings(standings: StandingProps[]) {
+export function getApexRankings(standings: TStandingProps[]) {
   const highlight =
     standings.length === 4 || standings.length === 8
       ? 4
@@ -58,7 +38,7 @@ export function getApexRankings(standings: StandingProps[]) {
 export async function getStandingsByTier(
   seasonNumber: number,
   tier: Tier
-): Promise<StandingProps[]> {
+): Promise<TStandingProps[]> {
   const [games, teams] = await Promise.all([
     getAllGamesBy(tier, seasonNumber),
     getAllActiveTeamsIn(tier),
@@ -82,7 +62,7 @@ export async function getStandingsByTier(
 
 export async function getFranchiseStandings(
   seasonNumber: number
-): Promise<StandingProps[]> {
+): Promise<TStandingProps[]> {
   const [allBo2Games, franchises] = await Promise.all([
     getAllBo2Games(seasonNumber),
     getFranchises(),
@@ -100,7 +80,7 @@ export async function getFranchiseStandings(
   return sortedStandings;
 }
 
-function compareStandings(left: StandingProps, right: StandingProps): number {
+function compareStandings(left: TStandingProps, right: TStandingProps): number {
   // 1) compare RWP
   if (right.rwp > left.rwp) return 1;
   if (right.rwp < left.rwp) return -1;
@@ -161,7 +141,7 @@ function computeTeamRecord(teamId: number, games) {
 function buildFranchiseStanding(
   franchise: Awaited<ReturnType<typeof getFranchises>>[number],
   allGames
-): StandingProps {
+): TStandingProps {
   let wins = 0,
     losses = 0,
     roundsWon = 0,
@@ -176,7 +156,8 @@ function buildFranchiseStanding(
     totalRounds += record.totalRounds;
   }
 
-  const rwp = totalRounds > 0 ? Math.round((roundsWon / totalRounds) * 100) / 100 : 0;
+  const rwp =
+    totalRounds > 0 ? Math.round((roundsWon / totalRounds) * 100) / 100 : 0;
   return {
     franchiseSlug: franchise.slug,
     teamName: franchise.name,
@@ -243,7 +224,7 @@ async function getFranchises() {
   return res;
 }
 
-function calculateTeamStats(team: Team, allGames: Game[]) {
+function calculateTeamStats(team: TActiveTeam, allGames: TGame[]) {
   const gamesPlayed = allGames.filter((g) =>
     [g.Match?.home, g.Match?.away].includes(team.id)
   );
@@ -270,7 +251,7 @@ function calculateTeamStats(team: Team, allGames: Game[]) {
   };
 }
 
-function calculateRoundsWon(gamesPlayed: Game[], team: Team) {
+function calculateRoundsWon(gamesPlayed: TGame[], team: TActiveTeam) {
   return sum(
     gamesPlayed.map((game) =>
       game.Match?.home === team.id ? game.roundsWonHome : game.roundsWonAway
@@ -278,7 +259,7 @@ function calculateRoundsWon(gamesPlayed: Game[], team: Team) {
   );
 }
 
-function calculateRoundsLost(gamesPlayed: Game[], team: Team) {
+function calculateRoundsLost(gamesPlayed: TGame[], team: TActiveTeam) {
   return sum(
     gamesPlayed.map((game) =>
       game.Match?.home === team.id ? game.roundsWonAway : game.roundsWonHome
@@ -286,7 +267,7 @@ function calculateRoundsLost(gamesPlayed: Game[], team: Team) {
   );
 }
 
-function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
+function applyTiebreakers(teamStats: TeamStats[], allGames: TGame[]) {
   // sort by wins
   const sorted = [...teamStats].sort((a, b) => b.wins - a.wins);
 
@@ -322,61 +303,4 @@ function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
 
 function sum(values: number[]) {
   return values.reduce((acc, val) => acc + (val ?? 0), 0);
-}
-
-/**
- * Fetch all Games by the specified tier and season
- * @param tier
- * @param seasonNumber
- * @returns all Games by the specified tier and season
- */
-async function getAllGamesBy(
-  tier: Tier,
-  seasonNumber: number
-): Promise<Game[]> {
-  return prisma.games.findMany({
-    where: {
-      tier,
-      season: seasonNumber,
-      OR: [{ gameType: GameType.SEASON }, { gameType: GameType.FORFEIT }],
-      winner: { not: null },
-    },
-    select: {
-      winner: true,
-      rounds: true,
-      roundsWonHome: true,
-      roundsWonAway: true,
-      Match: {
-        select: {
-          home: true,
-          away: true,
-        },
-      },
-    },
-  });
-}
-
-/**
- * Fetch all active teams in a given tier
- * @param tier
- * @returns All active teams in a given tier
- */
-async function getAllActiveTeamsIn(tier: Tier): Promise<Team[]> {
-  return prisma.teams.findMany({
-    where: { tier, active: true },
-    select: {
-      id: true,
-      name: true,
-      Franchise: {
-        select: {
-          slug: true,
-          Brand: {
-            select: {
-              logo: true,
-            },
-          },
-        },
-      },
-    },
-  });
 }

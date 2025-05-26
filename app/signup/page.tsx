@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const session = await auth();
   const currentSeason = await getSeasonCached();
-  const user = await getUser(session?.user?.id);
+  const user = await getUser(session?.user?.id!);
   let isSignedIn;
   if (!session) {
     isSignedIn = false;

@@ -1,11 +1,11 @@
 import { prisma } from "@/prisma/prismadb";
 
-export type FAQ = {
+export type TFAQ = {
   question: string;
   answer: string;
 };
 
-export async function getFaq(): Promise<FAQ[]> {
+export async function getFaq(): Promise<TFAQ[]> {
   const res = await prisma.fAQ.findMany({
     where: {
       visible: true,

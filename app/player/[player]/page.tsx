@@ -4,12 +4,12 @@ import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
 import PlayerSummary from "@/components/player/summary/PlayerSummary";
 import ListBox from "@/components/tabs/DropDown";
-import HorizontalTab, { TabElements } from "@/components/tabs/HorizontalTab";
+import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
-type PlayerIGN = {
+type TPlayerIGN = {
   encoded: string;
   decoded: string;
 };
@@ -54,7 +54,7 @@ export default async function Page({
   }));
 
   const { player } = await params;
-  const playerIGN: PlayerIGN = { encoded: "", decoded: "" };
+  const playerIGN: TPlayerIGN = { encoded: "", decoded: "" };
   if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
   else if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
   else if (player.includes("-")) {
@@ -65,7 +65,7 @@ export default async function Page({
   }
   playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
 
-  const tabElements: TabElements[] = [
+  const tabElements: TTabElements[] = [
     {
       query: "Summary",
       color: "vdcRed",

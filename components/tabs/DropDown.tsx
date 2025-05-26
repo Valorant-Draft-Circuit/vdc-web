@@ -10,7 +10,7 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type MenuElement = { query: string; name: string };
+type TMenuElement = { query: string; name: string };
 
 export default function ListBox({
   params,
@@ -24,7 +24,7 @@ export default function ListBox({
   const urlSeason = searchParams.get(paramsKey) ?? menuElements[0].query;
   const router = useRouter();
   const pathname = usePathname();
-  const [selected, setSelected] = useState<MenuElement>(
+  const [selected, setSelected] = useState<TMenuElement>(
     menuElements.find((m) => m.query === urlSeason) || menuElements[0]
   );
   useEffect(() => {
