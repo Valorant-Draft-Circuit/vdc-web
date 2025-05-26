@@ -12,6 +12,7 @@ export interface ISignUpInput {
   playedBefore: string;
   commit: string;
   reportedAccounts: string;
+  readRules: string;
 }
 
 export default function SignUpForm({ user, currentSeason }) {

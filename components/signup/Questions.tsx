@@ -56,8 +56,8 @@ export default function Questions({
         </>
       ),
       options: [
-        { value: "Yes", label: "Yes" },
-        { value: "No", label: "No" },
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
       ],
       show: watch("role") === "DE",
       rules: { required: true },
@@ -78,11 +78,12 @@ export default function Questions({
         </>
       ),
       options: [
-        { value: "Yes", label: "Yes" },
-        { value: "No", label: "No" },
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
       ],
       show:
-        watch("role") && (watch("role") === "RFA" || watch("commit") === "Yes"),
+        watch("role") &&
+        (watch("role") === "RFA" || watch("commit") === "true"),
       rules: { required: true },
     },
     {
@@ -93,7 +94,7 @@ export default function Questions({
         { value: "true", label: "Yes" },
         { value: "false", label: "No" },
       ],
-      show: watch("reportedAccounts") === "Yes",
+      show: watch("reportedAccounts") === "true",
       rules: { required: true },
     },
     {
@@ -115,11 +116,11 @@ export default function Questions({
         </>
       ),
       options: [
-        { value: "Yes", label: "Yes" },
-        { value: "No", label: "No" },
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
       ],
       show:
-        watch("reportedAccounts") === "Yes" &&
+        watch("reportedAccounts") === "true" &&
         (watch("playedBefore") === "false" || watch("playedBefore") === "true"),
       rules: { required: true },
     },
