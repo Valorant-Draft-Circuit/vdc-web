@@ -7,7 +7,9 @@ import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
 export default async function HeroSection() {
   const session = await auth();
+  // TODO: replcae with session.id once auth has been linked to db
   const user = await getUserCached("clu76oynz0000traw15nj9btz");
+
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
@@ -49,7 +51,6 @@ export default async function HeroSection() {
           </div>
         </div>
         <div className="flex flex-col space-y-2 lg:my-auto lg:ml-auto">
-          {}
           {!session ? <Join /> : <Joined user={user} />}
         </div>
       </div>
@@ -83,7 +84,7 @@ function Joined({ user }) {
   } else if (
     user.Status.leagueStatus === LeagueStatus.UNREGISTERED ||
     user.Status.leagueStatus === LeagueStatus.RETIRED
-  )
+  ) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
@@ -93,7 +94,27 @@ function Joined({ user }) {
         <SignUpButton />
       </div>
     );
-
+  } else if (user.Status.leagueStatus === LeagueStatus.PENDING) {
+    return (
+      <div className="flex flex-col gap-5">
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          {user.name}, You are
+          <br />
+          pending approval.
+        </h2>
+        <div>
+          <button
+            type="button"
+            className="rounded-md bg-vdcRed px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          >
+            <Link href={"/about"}>
+              <h1>Get to know us!</h1>
+            </Link>
+          </button>
+        </div>
+      </div>
+    );
+  }
   // TODO: set button to go to wherever user specified in user settings
   return (
     <>

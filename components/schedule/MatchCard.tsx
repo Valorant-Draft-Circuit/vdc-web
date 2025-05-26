@@ -30,7 +30,7 @@ export default function MatchCard({ match }: { match: TMatch }) {
   return (
     <div
       onClick={goToMatch}
-      className="flex flex-row h-22 gap-8 sm:gap-3 py-3 w-full xl:px-24 m-auto justify-evenly rounded-2xl bg-vdcWhite dark:bg-vdcGrey drop-shadow-lg hover:cursor-pointer hover:opacity-98 transition-opacity ease-in-out duration-150"
+      className="flex flex-row h-22 gap-8 sm:gap-3 py-3 w-full xl:px-24 m-auto justify-evenly rounded-2xl bg-gray-100 dark:bg-vdcGrey drop-shadow-lg hover:cursor-pointer hover:opacity-98 transition-opacity ease-in-out duration-150"
     >
       <HomeBadge home={match.Home} tier={match.tier} />
       <MatchScore homeWins={match?.homeWins} awayWins={match?.awayWins} />

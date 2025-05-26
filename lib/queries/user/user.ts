@@ -6,7 +6,7 @@ export type TUser = Prisma.UserGetPayload<{
 export async function getUser(id: string) {
   const user = await prisma.user.findUnique({
     where: {
-      id: "clu76oynz0000traw15nj9btz",
+      id: id,
     },
     include: {
       Accounts: {

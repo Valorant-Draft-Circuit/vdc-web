@@ -2,6 +2,13 @@
 
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
 import { TSignUpInput } from "./SignUpForm";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { BEHAVIOR_GUIDELINE_URL } from "@/lib/common/constants";
 
 export default function Questions({
   register,
@@ -18,20 +25,10 @@ export default function Questions({
       label: (
         <>
           <h2>
-            Do you want to sign up to be drafted on a team?
-            <br /> Or just join the league as a sub who{" "}
-            <span className="text-vdcRed">CANNOT</span> be signed?
+            Do you want to sign up to be drafted on a team? or join the league
+            as a sub who <span className="text-vdcRed">CANNOT</span> be signed?
           </h2>
-          <p className="text-xs xl:text-sm">
-            DE: a player who can be drafted at the start of the season, and
-            later converted to a Free Agent if they get cut at any time during
-            the season.
-          </p>
-          <p className="text-xs xl:text-sm">
-            RFA: A free agent with some restrictions. This player cannot be
-            signed or drafted and cannot substitute for the same team 2 match
-            days in a row.
-          </p>
+          <RoleExplanations />
         </>
       ),
       options: [
@@ -72,10 +69,10 @@ export default function Questions({
             Have you reported <span className="text-vdcRed">EVERY</span> Riot
             account you play on?
           </h2>
-          <p className="text-xs xl:text-sm text-vdcRed">
+          <h2 className="text-xs xl:text-sm text-vdcRed">
             WARNING: If another account is found, there could be consequences.
             Please report all accounts.
-          </p>
+          </h2>
         </>
       ),
       options: [
@@ -104,16 +101,30 @@ export default function Questions({
       label: (
         <>
           <h2>
-            Have you read all the rules of the league&nbsp;
+            Have you read through all of the{" "}
             <a
               href="https://go.vdc.gg/rulebook"
               className="text-vdcRed underline hover:text-red-800"
               target="_blank"
             >
-              RULEBOOK
+              League Rulebook
+            </a>{" "}
+            and the{" "}
+            <a
+              href={BEHAVIOR_GUIDELINE_URL}
+              className="text-vdcRed underline hover:text-red-800"
+              target="_blank"
+            >
+              Behavioral Guidelines
             </a>
             ?
           </h2>
+          <p className="italic text-xs">
+            By signing up you hereby agree to abide by ALL of the
+            league&apos;s rules/behavioral guidelines and will accept the
+            consequences that come with for not adhereing to any and all of the
+            rules.
+          </p>
         </>
       ),
       options: [
@@ -165,12 +176,12 @@ const RadioGroup = ({ name, register, label, options, rules }) => {
         <div className="flex flex-col gap-1 text-sm xl:text-md">{label}</div>
       </label>
       {options.map((option) => (
-        <label key={option.value} className="flex flex-row">
+        <label key={option.value} className="flex flex-row gap-1">
           <input
             {...register(name, rules)}
             type="radio"
             value={option.value}
-            className="mr-2 checked:bg-vdcRed focus:ring-vdcRed"
+            className="relative size-4 my-auto appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-red-600 checked:bg-vdcRed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
           />
           <h1 className="text-sm">{option.label}</h1>
         </label>
@@ -178,3 +189,52 @@ const RadioGroup = ({ name, register, label, options, rules }) => {
     </div>
   );
 };
+
+function RoleExplanations() {
+  const roleExplanations = [
+    {
+      id: "DE",
+      name: "Draft Eligible",
+      explanation:
+        "a player who can be drafted at the start of the season, and later converted to a Free Agent if they get cut at any time during the season.",
+    },
+    {
+      id: "RFA",
+      name: "Restricted Free Agent",
+      explanation:
+        "A free agent with some restrictions: This player cannot be signed or drafted and cannot substitute for the same team 2 match days in a row.",
+    },
+  ];
+  return (
+    <dl className="divide-y divide-gray-900/10 dark:divide-vdcGrey">
+      <h2 className="font-roboto italic text-vdcRed">
+        &quot;Whats the difference?!&quot;
+      </h2>
+      {roleExplanations.map((role) => (
+        <Disclosure key={role.id} as="div" className="py-2">
+          <dt>
+            <DisclosureButton className="group flex w-full items-start justify-between text-left text-vdcBlack dark:text-vdcWhite hover:cursor-pointer">
+              <span className="my-auto italic">
+                <h1>{role.id}</h1>
+              </span>
+              <span className="ml-6 flex h-7 items-center">
+                <ChevronDownIcon
+                  aria-hidden="true"
+                  className="size-6 transition-transform duration-200 group-data-open:rotate-180"
+                />
+              </span>
+            </DisclosureButton>
+          </dt>
+          <DisclosurePanel
+            as="dd"
+            className="mt-2 pr-12 flex flex-row text-xs xl:text-sm"
+          >
+            <p className=" text-vdcBlack dark:text-vdcWhite">
+              <span className="font-bold">{role.name}</span>: {role.explanation}
+            </p>
+          </DisclosurePanel>
+        </Disclosure>
+      ))}
+    </dl>
+  );
+}

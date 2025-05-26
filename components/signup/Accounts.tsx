@@ -13,10 +13,20 @@ export default function Accounts({
 }) {
   return (
     <div className="text-sm flex flex-col py-2 gap-2">
-      <div>
+      <div className="flex flex-col gap-1">
         <label>
-          <h2>Discord ID</h2>
+          <h1>Discord Username</h1>
         </label>
+        <input
+          {...register("accountID", { required: true })}
+          value={user.id}
+          className="hidden"
+        />
+        <input
+          value={user.name}
+          readOnly
+          className="w-full xl:w-1/3 text-vdcRed rounded-sm border p-1 font-semibold hover:cursor-not-allowed"
+        />
         <p className="text-xs xl:text-sm">
           If this looks wrong, please create a bug report in the{" "}
           <a
@@ -30,24 +40,18 @@ export default function Accounts({
           </a>{" "}
           channel
         </p>
-        <select
-          {...register("accountID", { required: true })}
-          className="w-1/2 xl:w-1/3 text-vdcRed rounded-sm border-1 p-1 font-semibold"
-        >
-          <option value={user.id}>{user.name}</option>
-        </select>
       </div>
       <div className="flex flex-col gap-1">
         <label>
-          <h2>Primary Valorant Account</h2>
+          <h1>Primary Valorant Account</h1>
         </label>
         <select
           {...register("primaryValorantAccount", { required: true })}
-          className="w-1/2 xl:w-1/3 text-vdcRed rounded-sm border-1 p-1 font-bold"
+          className="w-full xl:w-1/3 text-vdcRed rounded-sm border p-1 font-semibold"
         >
           <ValAccounts user={user} />
         </select>
-        <GetAccountInfo user={user} />
+        <AccountHelper user={user} />
       </div>
     </div>
   );
@@ -67,11 +71,11 @@ function ValAccounts({ user }: { user }) {
   );
 }
 
-function GetAccountInfo({ user }: { user }) {
+function AccountHelper({ user }: { user }) {
   if (user.Accounts.length === 0) {
     return (
       <>
-        <p className="font-roboto mt-0">
+        <p className="font-roboto text-xs xl:text-sm">
           No Riot account linked. Please click{" "}
           <Link href="/me" className="text-vdcRed hover:text-red-800 underline">
             here{" "}
@@ -84,9 +88,12 @@ function GetAccountInfo({ user }: { user }) {
   if (user.Accounts.length === 1) {
     return (
       <>
-        <p className="font-roboto mt-0">
-          (If you want to list alternative accounts for VDC, click{" "}
-          <Link href="/me" className="text-vdcRed hover:text-red-800 underline">
+        <p className="font-roboto text-xs xl:text-sm">
+          (If you want to use an alternative account for VDC, click{" "}
+          <Link
+            href="/me"
+            className="text-vdcRed hover:text-red-800 underline font-bold"
+          >
             here
           </Link>{" "}
           to link additional Riot accounts.)

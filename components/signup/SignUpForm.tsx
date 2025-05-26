@@ -7,6 +7,7 @@ import Questions from "./Questions";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { deleteFromCache } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 
 export type TSignUpInput = {
@@ -20,6 +21,7 @@ export type TSignUpInput = {
 };
 
 export default function SignUpForm({ user, currentSeason }) {
+  const { register, handleSubmit, watch } = useForm<TSignUpInput>();
   if (user.Status.leagueStatus !== LeagueStatus.UNREGISTERED) {
     return (
       <div className="flex flex-col text-center m-auto text-6xl gap-2 pt-10">
@@ -31,32 +33,34 @@ export default function SignUpForm({ user, currentSeason }) {
     );
   }
 
-  const { register, handleSubmit, watch } = useForm<TSignUpInput>();
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Divider title={"Accounts"} />
-      <Accounts user={user} register={register} />
-      <Divider title={"Required Questions"} />
-      <Questions season={currentSeason} register={register} watch={watch} />
-      {watch("readRules") === "true" && (
-        <>
-          <Divider title={"Capcha"} />
-          <SubmitSignUp />
-        </>
-      )}
-      <h1 className="text-vdcRed my-2">
-        Please look around our&nbsp;
-        <a
-          target="_blank"
-          href={
-            "https://discord.com/channels/963274331251671071/1047026533467967549"
-          }
-          className="text-[#5865F2] underline hover:text-blue-600"
-        >
-          Help Channel
-        </a>
-        &nbsp;if you have any Questions!
-      </h1>
+      <div className="flex flex-col gap-1">
+        <Divider title={"1. Account Info"} />
+        <Accounts user={user} register={register} />
+        <Divider title={"2. Required Questions"} />
+        <Questions season={currentSeason} register={register} watch={watch} />
+        {watch("readRules") === "true" && (
+          <div>
+            <Divider title={"3. Capcha"} />
+            <SubmitSignUp />
+          </div>
+        )}
+        <Divider title={"Need Help? Have Questions?"} />
+        <h2 className="text-vdcRed">
+          Please look around our&nbsp;
+          <a
+            target="_blank"
+            href={
+              "https://discord.com/channels/963274331251671071/1047026533467967549"
+            }
+            className="text-[#5865F2] underline hover:text-blue-600"
+          >
+            Help Channel
+          </a>
+          &nbsp;if you have any Questions!
+        </h2>
+      </div>
     </form>
   );
 }
@@ -73,6 +77,7 @@ function handleRegistration(data) {
     },
     body: JSON.stringify(data),
   }).then(() => {
+    deleteFromCache(`user-${data.accountID}`);
     window.location.href = "/";
   });
 }

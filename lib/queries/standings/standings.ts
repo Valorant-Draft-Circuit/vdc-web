@@ -1,7 +1,7 @@
 import { TStandingProps } from "@/components/standings/StandingsCard";
-import { MatchType, Prisma } from "@prisma/client";
+import { MatchType } from "@prisma/client";
 import { prisma } from "@/prisma/prismadb";
-import { GameType, Tier } from "@prisma/client";
+import { Tier } from "@prisma/client";
 import { getAllActiveTeamsIn, TActiveTeam } from "../teams/teams";
 import { getAllGamesBy, TGame } from "../games/games";
 

@@ -114,16 +114,6 @@ export async function getAllActiveFranchisesCached() {
   return activeFranchises;
 }
 
-// export async function getFranchiseBySlugCached(slug: string) {
-//   const key = `${slug}-franchise`;
-//   const hit = cache.get<FranchiseInfo>(key);
-//   if (hit !== undefined) return hit;
-
-//   const franchise = await Franchise.getBy({ slug: slug });
-//   cache.set(key, franchise, Times.DAY);
-//   return franchise;
-// }
-
 export async function getFranchiseDetailsBySlugCached(
   slug: string,
   season: number
@@ -153,6 +143,13 @@ export async function getUserCached(id: string) {
   if (hit !== undefined) return hit;
 
   const user = await getUser(id);
-  cache.set(key, user, Times.DAY);
+  cache.set(key, user, minutes(5));
   return user;
+}
+
+export function deleteFromCache(key: string) {
+  if (!cache) {
+    return;
+  }
+  cache.del(key);
 }
