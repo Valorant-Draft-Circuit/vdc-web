@@ -71,7 +71,8 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
         />
         <div className="flex flex-row gap-5 z-10">
           <span className="relative inline-block">
-            <Link
+            <a
+              target="_blank"
               href={`https://discord.com/users/${discordAccount.providerAccountId}`}
             >
               <Image
@@ -81,10 +82,11 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
                 width={250}
                 height={250}
               />
-            </Link>
+            </a>
           </span>
           <div className="flex flex-col my-auto gap-1">
-            <Link
+            <a
+              target="_blank"
               href={`${TRACKER_PROFILE_URL}/${encodedIGN}`}
               className="hover:opacity-80"
             >
@@ -92,7 +94,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
                 {riotIGN}{" "}
                 <span className="text-gray-300 text-sm">{riotTag}</span>
               </h2>
-            </Link>
+            </a>
             <div className="flex flex-row gap-1">
               <h2 className="text-vdcWhite text-sm">
                 {isPlayerSigned ? (

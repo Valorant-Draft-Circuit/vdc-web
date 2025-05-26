@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
+import { ISignUpInput } from "./SignUpForm";
 
-export default function Accounts({ user }: { user }) {
-  const { register } = useForm();
+export default function Accounts({
+  user,
+  register,
+}: {
+  user;
+  register: UseFormRegister<ISignUpInput>;
+}) {
   return (
     <div className="text-sm flex flex-col py-2 gap-2">
       <div>
@@ -12,8 +18,17 @@ export default function Accounts({ user }: { user }) {
           <h2>Discord ID</h2>
         </label>
         <p className="text-xs xl:text-sm">
-          If this looks wrong, please create a bug report in the vdc-bug-reports
-          channel.
+          If this looks wrong, please create a bug report in the{" "}
+          <a
+            href={
+              "https://discord.com/channels/963274331251671071/1193322044281081876"
+            }
+            target="_blank"
+            className="text-[#5865F2] underline hover:text-blue-600"
+          >
+            #vdc-bug-reports
+          </a>{" "}
+          channel
         </p>
         <select
           {...register("discordAccount", { required: true })}
@@ -27,7 +42,7 @@ export default function Accounts({ user }: { user }) {
           <h2>Primary Valorant Account</h2>
         </label>
         <select
-          {...register("priValAcc", { required: true })}
+          {...register("primaryValorantAccount", { required: true })}
           className="w-1/3 text-vdcRed rounded-sm border-1 p-1 font-bold"
         >
           <ValAccounts user={user} />

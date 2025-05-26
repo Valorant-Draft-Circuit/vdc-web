@@ -1,7 +1,6 @@
 import { prisma } from "@/prisma/prismadb";
 
 export async function getUser(id) {
-  console.log(id);
   const user = await prisma.user.findUnique({
     where: {
       id: "clu76oynz0000traw15nj9btz",

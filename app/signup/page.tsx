@@ -1,7 +1,5 @@
 import DiscordButton from "@/components/buttons/DiscordButton";
-import Accounts from "@/components/signup/Accounts";
-import Questions from "@/components/signup/Questions";
-import Divider from "@/components/theme/Divider";
+import SignUpForm from "@/components/signup/SignUpForm";
 import { auth } from "@/lib/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { getUser } from "@/lib/queries/user/user";
@@ -13,8 +11,10 @@ export const metadata: Metadata = {
   description: "Sign Up to play for Valorant Draft Circuit!",
 };
 
-export default function Page() {
-  const session = auth();
+export default async function Page() {
+  const session = await auth();
+  const currentSeason = await getSeasonCached();
+  const user = await getUser(session?.user?.id);
   let isSignedIn;
   if (!session) {
     isSignedIn = false;
@@ -31,11 +31,15 @@ export default function Page() {
             alt="Main logo"
             width={300}
             height={300}
-            className="m-auto w-72"
+            className="m-auto w-72 xl:w-2xl"
           />
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {isSignedIn ? <SignUpForm session={session} /> : <NotSignedIn />}
+          {isSignedIn ? (
+            <SignUpForm user={user} currentSeason={currentSeason} />
+          ) : (
+            <NotSignedIn />
+          )}
         </div>
       </div>
     </div>
@@ -49,19 +53,6 @@ function NotSignedIn() {
         <h2>You are not signed in... :(</h2>
         <DiscordButton text={"Sign In"} />
       </div>
-    </>
-  );
-}
-
-async function SignUpForm({ session }) {
-  const currentSeason = await getSeasonCached();
-  const user = await getUser(session.id);
-  return (
-    <>
-      <Divider title={"Accounts"} />
-      <Accounts user={user} />
-      <Divider title={"Required Questions"} />
-      <Questions season={currentSeason} />
     </>
   );
 }

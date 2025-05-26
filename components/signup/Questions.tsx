@@ -1,17 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { Controller, useForm } from "react-hook-form";
+import { UseFormRegister, UseFormWatch } from "react-hook-form";
+import { ISignUpInput } from "./SignUpForm";
 
-export default function Questions({ season }: { season }) {
-  const {
-    register,
-    // handleSubmit,
-    control,
-    watch,
-    formState: { errors },
-  } = useForm();
-
+export default function Questions({
+  register,
+  watch,
+}: {
+  season;
+  register: UseFormRegister<ISignUpInput>;
+  watch: UseFormWatch<ISignUpInput>;
+}) {
   const reqQuestions = [
     {
       id: "role",
@@ -98,30 +97,19 @@ export default function Questions({ season }: { season }) {
       rules: { required: true },
     },
     {
-      id: "seasonsPlayed",
-      type: "checkbox",
-      label: <h2>If so, what seasons?</h2>,
-      options: Array.from({ length: season - 1 }, (_, i) => ({
-        value: `Season ${season - 1 - i}`,
-        label: `Season ${season - 1 - i}`,
-      })),
-      show:
-        watch("reportedAccounts") === "Yes" && watch("playedBefore") === "true",
-      rules: { required: watch("playedBefore") === "true" },
-    },
-    {
       id: "readRules",
       type: "radio",
       label: (
         <>
           <h2>
             Have you read all the rules of the league&nbsp;
-            <Link
+            <a
               href="https://go.vdc.gg/rulebook"
               className="text-vdcRed underline hover:text-red-800"
+              target="_blank"
             >
               RULEBOOK
-            </Link>
+            </a>
             ?
           </h2>
         </>
@@ -132,9 +120,7 @@ export default function Questions({ season }: { season }) {
       ],
       show:
         watch("reportedAccounts") === "Yes" &&
-        (watch("playedBefore") === "false" ||
-          (watch("playedBefore") === "true" &&
-            watch("seasonsPlayed")?.length > 0)),
+        (watch("playedBefore") === "false" || watch("playedBefore") === "true"),
       rules: { required: true },
     },
   ];
@@ -156,25 +142,13 @@ export default function Questions({ season }: { season }) {
         (q) =>
           q.show && (
             <div key={q.id} className="py-2">
-              {q.type === "radio" ? (
-                <RadioGroup
-                  name={q.id}
-                  control={control}
-                  label={q.label}
-                  options={q.options}
-                  rules={q.rules}
-                />
-              ) : (
-                <CheckboxGroup
-                  name={q.id}
-                  register={register}
-                  options={q.options}
-                  label={q.label}
-                />
-              )}
-              {errors[q.id] && (
-                <span className="text-red-500">This question is required</span>
-              )}
+              <RadioGroup
+                name={q.id}
+                register={register}
+                label={q.label}
+                options={q.options}
+                rules={q.rules}
+              />
             </div>
           )
       )}
@@ -182,50 +156,23 @@ export default function Questions({ season }: { season }) {
   );
 }
 
-const RadioGroup = ({ name, control, label, options, rules }) => {
+const RadioGroup = ({ name, register, label, options, rules }) => {
   return (
     <div className="flex flex-col gap-1">
       <label>
         <div className="flex flex-col gap-1 text-sm xl:text-md">{label}</div>
       </label>
-      <Controller
-        control={control}
-        name={name}
-        rules={rules}
-        render={({ field }) =>
-          options.map((opt) => (
-            <label key={opt.value} className="flex flex-row">
-              <input
-                {...field}
-                type="radio"
-                value={opt.value}
-                checked={field.value === opt.value}
-                className="mr-2 checked:bg-vdcRed focus:ring-vdcRed"
-              />
-              <h1 className="text-sm">{opt.label}</h1>
-            </label>
-          ))
-        }
-      />
+      {options.map((option) => (
+        <label key={option.value} className="flex flex-row">
+          <input
+            {...register(name, rules)}
+            type="radio"
+            value={option.value}
+            className="mr-2 checked:bg-vdcRed focus:ring-vdcRed"
+          />
+          <h1 className="text-sm">{option.label}</h1>
+        </label>
+      ))}
     </div>
   );
 };
-
-const CheckboxGroup = ({ name, register, label, options }) => (
-  <div className="flex flex-col">
-    <label>
-      <div className="flex flex-col gap-1 text-sm xl:text-md">{label}</div>
-    </label>
-    {options.map((opt) => (
-      <label key={opt.value} className="flex flex-row">
-        <input
-          {...register(name, { required: options.length > 0 })}
-          type="checkbox"
-          value={opt.value}
-          className="mr-2 checked:bg-vdcRed focus:ring-vdcRed"
-        />
-        <p className="text-sm">{opt.label}</p>
-      </label>
-    ))}
-  </div>
-);
