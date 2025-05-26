@@ -26,7 +26,8 @@ export default function Questions({
             DE: a player who can be drafted at the start of the season, and
             later converted to a Free Agent if they get cut at any time during
             the season.
-            <br />
+          </p>
+          <p className="text-xs xl:text-sm">
             RFA: A free agent with some restrictions. This player cannot be
             signed or drafted and cannot substitute for the same team 2 match
             days in a row.

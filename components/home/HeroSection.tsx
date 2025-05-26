@@ -2,8 +2,12 @@ import { auth } from "@/lib/auth";
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
 import SignUpButton from "../buttons/SignUpButton";
+import { getUserCached } from "@/lib/common/cache";
+import { LeagueStatus } from "@prisma/client";
+import Link from "next/link";
 export default async function HeroSection() {
   const session = await auth();
+  const user = await getUserCached("clu76oynz0000traw15nj9btz");
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
@@ -46,12 +50,13 @@ export default async function HeroSection() {
         </div>
         <div className="flex flex-col space-y-2 lg:my-auto lg:ml-auto">
           {}
-          {!session ? <Join /> : <Joined session={session} />}
+          {!session ? <Join /> : <Joined user={user} />}
         </div>
       </div>
     </div>
   );
 }
+
 function Join() {
   return (
     <>
@@ -64,26 +69,49 @@ function Join() {
     </>
   );
 }
-function Joined({ session }: { session }) {
-  const isSignedUp = false;
-  if (!isSignedUp) {
+function Joined({ user }) {
+  if (user.Status.leagueStatus === LeagueStatus.SUSPENDED) {
+    return (
+      <>
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          {user.name} has
+          <br />
+          been suspended.
+        </h2>
+      </>
+    );
+  } else if (
+    user.Status.leagueStatus === LeagueStatus.UNREGISTERED ||
+    user.Status.leagueStatus === LeagueStatus.RETIRED
+  )
     return (
       <div className="flex flex-col gap-5">
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-          Ready to play, {session.user?.name}?
+          Ready to play, <br />
+          {user.name}?
         </h2>
         <SignUpButton />
       </div>
     );
-  }
+
+  // TODO: set button to go to wherever user specified in user settings
   return (
     <>
       <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-        {session.user?.name} has
+        {user.name} has
         <br />
         Joined the Draft.
       </h2>
-      <div></div>
+      <div>
+        <button
+          type="button"
+          className="rounded-md bg-vdcRed px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+        >
+          <Link href={"/schedule"}>
+            <h1>View Schedule</h1>
+          </Link>
+        </button>
+      </div>
     </>
   );
 }

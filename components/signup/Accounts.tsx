@@ -31,8 +31,8 @@ export default function Accounts({
           channel
         </p>
         <select
-          {...register("discordAccount", { required: true })}
-          className="w-1/3 text-vdcRed rounded-sm border-1 p-1 font-semibold"
+          {...register("accountID", { required: true })}
+          className="w-1/2 xl:w-1/3 text-vdcRed rounded-sm border-1 p-1 font-semibold"
         >
           <option value={user.id}>{user.name}</option>
         </select>
@@ -43,7 +43,7 @@ export default function Accounts({
         </label>
         <select
           {...register("primaryValorantAccount", { required: true })}
-          className="w-1/3 text-vdcRed rounded-sm border-1 p-1 font-bold"
+          className="w-1/2 xl:w-1/3 text-vdcRed rounded-sm border-1 p-1 font-bold"
         >
           <ValAccounts user={user} />
         </select>

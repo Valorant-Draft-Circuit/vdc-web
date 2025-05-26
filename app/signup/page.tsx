@@ -31,7 +31,7 @@ export default async function Page() {
             alt="Main logo"
             width={300}
             height={300}
-            className="m-auto w-72 xl:w-2xl"
+            className="m-auto w-72 xl:w-lg"
           />
         </div>
         <div className="px-4 py-5 sm:p-6">
@@ -50,7 +50,7 @@ function NotSignedIn() {
   return (
     <>
       <div className="flex flex-col gap-2 text-center">
-        <h2>You are not signed in... :(</h2>
+        <h2 className="text-xl">You are not signed in... :(</h2>
         <DiscordButton text={"Sign In"} />
       </div>
     </>
