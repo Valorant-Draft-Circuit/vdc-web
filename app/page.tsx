@@ -13,7 +13,7 @@ export default async function Home() {
     <>
       <div className="overflow-hidden">
         <div>
-          <HeroSection session={session} />
+          <HeroSection userId={session?.user?.id} />
         </div>
       </div>
       {!session ? (
