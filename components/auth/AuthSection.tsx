@@ -11,8 +11,10 @@ export default async function AuthSection() {
   if (!session) return <SignIn />;
 
   const userAvatar = session?.user?.image;
-  // TODO: replcae with session.id once auth has been linked to db
-  const user = await getUserCached("clu76oynz0000traw15nj9btz");
+  if (!session.user?.id) {
+    throw Error("Somehow userID is null/undefined...");
+  }
+  const user = await getUserCached(session.user?.id);
   const team = determineTeam(user);
 
   return (
