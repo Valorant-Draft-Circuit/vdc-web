@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import HeroSection from "../components/home/HeroSection";
 import HowToPlay from "../components/home/HowToPlay";
 import News from "../components/home/News";
