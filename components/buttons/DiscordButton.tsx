@@ -1,4 +1,4 @@
-import { signIn } from "@/lib/auth";
+import { signIn } from "@/lib/auth/auth";
 import Image from "next/image";
 
 interface DiscordButtonProps {
