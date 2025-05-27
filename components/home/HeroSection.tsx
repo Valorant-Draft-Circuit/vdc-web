@@ -5,7 +5,6 @@ import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
 export default async function HeroSection({ session }) {
-  const user = await getUserCached(session.user.id);
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
@@ -47,7 +46,7 @@ export default async function HeroSection({ session }) {
           </div>
         </div>
         <div className="flex flex-col space-y-2 lg:my-auto lg:ml-auto">
-          {!session ? <Join /> : <Joined user={user} />}
+          {!session ? <Join /> : <Joined session={session} />}
         </div>
       </div>
     </div>
@@ -66,35 +65,37 @@ function Join() {
     </>
   );
 }
-function Joined({ user }) {
-  if (user.Status.leagueStatus === LeagueStatus.SUSPENDED) {
+async function Joined({ session }) {
+  const user = await getUserCached(session.user.id);
+
+  if (user!.Status!.leagueStatus === LeagueStatus.SUSPENDED) {
     return (
       <>
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-          {user.name} has
+          {user!.name} has
           <br />
           been suspended.
         </h2>
       </>
     );
   } else if (
-    user.Status.leagueStatus === LeagueStatus.UNREGISTERED ||
-    user.Status.leagueStatus === LeagueStatus.RETIRED
+    user!.Status!.leagueStatus === LeagueStatus.UNREGISTERED ||
+    user!.Status!.leagueStatus === LeagueStatus.RETIRED
   ) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           Ready to play, <br />
-          {user.name}?
+          {user!.name}?
         </h2>
         <SignUpButton />
       </div>
     );
-  } else if (user.Status.leagueStatus === LeagueStatus.PENDING) {
+  } else if (user!.Status!.leagueStatus === LeagueStatus.PENDING) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-          {user.name}, You are
+          {user!.name}, You are
           <br />
           pending approval.
         </h2>
@@ -115,7 +116,7 @@ function Joined({ user }) {
   return (
     <>
       <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-        {user.name} has
+        {user!.name} has
         <br />
         Joined the Draft.
       </h2>
