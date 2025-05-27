@@ -1,6 +1,6 @@
 import DiscordButton from "@/components/buttons/DiscordButton";
 import SignUpForm from "@/components/signup/SignUpForm";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { getSeasonCached, getUserCached } from "@/lib/common/cache";
 import { Metadata } from "next";
 import Image from "next/image";
