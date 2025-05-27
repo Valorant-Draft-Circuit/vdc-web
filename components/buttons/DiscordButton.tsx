@@ -1,11 +1,11 @@
 import { signIn } from "@/lib/auth/auth";
 import Image from "next/image";
 
-interface DiscordButtonProps {
+type TDiscordButton = {
   text: string;
-}
+};
 
-export default function DiscordButton({ text }: DiscordButtonProps) {
+export default function DiscordButton({ text }: TDiscordButton) {
   return (
     <>
       <form
@@ -16,7 +16,7 @@ export default function DiscordButton({ text }: DiscordButtonProps) {
       >
         <button
           type="submit"
-          className="flex flex-row m-auto space-x-5 rounded-lg bg-[#5865F2] px-3.5 py-3 text-sm font-semibold text-white hover:bg-[#626eee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:cursor-pointer shadow-2xl"
+          className="flex flex-row m-auto space-x-5 rounded-lg bg-[#5865F2] px-3.5 py-3 text-sm font-semibold text-white hover:bg-[#626eee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 hover:cursor-pointer "
         >
           <Image
             src="/external/discord-logo.svg"

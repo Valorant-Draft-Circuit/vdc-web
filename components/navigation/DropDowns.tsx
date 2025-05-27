@@ -6,15 +6,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
-interface LinkItem {
+type TLinkItem = {
   name: string;
   href: string;
   ext?: boolean;
-}
+};
 
 type DropDownProps = {
   title: string;
-  links: LinkItem[];
+  links: TLinkItem[];
 };
 
 export function DropDown({ title, links }: DropDownProps) {

@@ -1,11 +1,11 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
 import { prisma } from "@/prisma/prismadb";
 import { MatchType, Tier } from "@prisma/client";
-type PackagedMatch = ReturnType<typeof packageMatch>;
+type TPackagedMatch = ReturnType<typeof packageMatch>;
 
-export type Schedule = {
-  regularSeason: Record<string, PackagedMatch[]>;
-  preSeason: Record<string, PackagedMatch[]>;
+export type TSchedule = {
+  regularSeason: Record<string, TPackagedMatch[]>;
+  preSeason: Record<string, TPackagedMatch[]>;
 };
 
 export async function getScheduleByTier(tier: Tier, season: number) {

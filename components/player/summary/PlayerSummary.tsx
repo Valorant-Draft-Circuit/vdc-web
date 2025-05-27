@@ -6,14 +6,14 @@ import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
 import { Prisma } from "@prisma/client";
 import PlayerMatches from "./PlayerMatches";
-type StatsPayload = Prisma.PlayerStatsGetPayload<{
+type TStatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
 }>;
 export default function PlayerSummary() {
   const { player } = useParams();
   const searchParams = useSearchParams();
   const season = searchParams.get("season");
-  const [stats, setStats] = useState<StatsPayload[] | null>(null);
+  const [stats, setStats] = useState<TStatsPayload[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,9 +1,9 @@
-type FlameProps = {
+type TFlameProps = {
   color: string;
   className: string;
 };
 
-export default function FlameLogo({ className, color }: FlameProps) {
+export default function FlameLogo({ className, color }: TFlameProps) {
   return (
     <svg
       width="53"

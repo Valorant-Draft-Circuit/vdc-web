@@ -1,12 +1,12 @@
 import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
+import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
-const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
+const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
   tier: tier,
   tabName: tier,
   color: TIER_COLOR_MAP[tier],

@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 
-export type TabElements = {
+export type TTabElements = {
   current?: boolean;
   tabName: string;
   tier: string;
@@ -23,7 +23,7 @@ export default function VerticalTab({
   tabElements,
   params,
 }: {
-  tabElements: TabElements[];
+  tabElements: TTabElements[];
   params: string;
 }) {
   const searchParams = useSearchParams();

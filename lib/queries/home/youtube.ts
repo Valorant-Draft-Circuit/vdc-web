@@ -5,18 +5,18 @@ const CHANNEL_ID = "UCcNoS_eA8_cnBj4jmyHjlkQ";
 const PLACEHOLDER_URL =
   "https://www.youtube.com/embed/dQw4w9WgXcQ?si=_m6csars22cbelza";
 
-interface YouTubeSearchResponse {
+type TYouTubeSearchResponse = {
   items?: Array<{
     id: { videoId: string };
   }>;
-}
+};
 
 export async function getLatestYouTubeVideo(): Promise<string> {
   const url = `https://www.googleapis.com/youtube/v3/search?key=${process.env.GOOGLE_API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=1`;
 
   try {
     const res = await fetch(url, { next: { revalidate: Times.HOUR } });
-    const data = (await res.json()) as YouTubeSearchResponse;
+    const data = (await res.json()) as TYouTubeSearchResponse;
 
     if (data.items?.length) {
       const videoId = data.items[0].id.videoId;

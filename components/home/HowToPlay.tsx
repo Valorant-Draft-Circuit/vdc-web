@@ -20,9 +20,13 @@ const steps = [
         Lets Start easy,
         <br />
         Join our{" "}
-        <Link href={DISCORD_LINK} className="text-vdcRed underline">
+        <a
+          href={DISCORD_LINK}
+          className="text-vdcRed underline"
+          target="_blank"
+        >
           Discord!
-        </Link>
+        </a>
       </StepDesc>
     ),
     button: true,

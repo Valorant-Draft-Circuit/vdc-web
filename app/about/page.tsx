@@ -6,7 +6,6 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import Link from "next/link";
 import { getFaqCached } from "@/lib/common/cache";
 import { Metadata } from "next";
 
@@ -35,12 +34,13 @@ export default async function Page() {
             </h1>
             <h2 className="mt-4 text-base/7 text-pretty text-vdcWhite">
               Can’t find the answer you’re looking for? Join our{" "}
-              <Link
+              <a
                 href={DISCORD_LINK}
+                target="_blank"
                 className="font-semibold text-vdcRed hover:text-red-500 italic underline"
               >
                 discord
-              </Link>{" "}
+              </a>{" "}
               and reach out!
             </h2>
           </div>
