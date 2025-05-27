@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
 type Props = {
   params: Promise<{ season: string }>;
 };

@@ -90,9 +90,10 @@ export async function getScheduleByTierCached(
   tier: Tier,
   season: number
 ): Promise<TSchedule> {
-  const key = `${tier}-schedule`;
+  const key = `s${season}-${tier}-schedule`;
   const hit = cache.get<TSchedule>(key);
   if (hit !== undefined) return hit;
+  
   const scheduleByTier = await getScheduleByTier(tier, season);
   cache.set(key, scheduleByTier, minutes(30));
   return scheduleByTier;
