@@ -7,10 +7,10 @@ import {
   getFranchiseStandings,
   getStandingsByTier,
 } from "../queries/standings/standings";
-import { Prisma, Tier, User } from "@prisma/client";
+import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/about/franchises";
-import { getUser } from "../queries/user/user";
+import { getUser, TUser } from "../queries/user/user";
 
 let cache: NodeCache;
 
@@ -139,7 +139,7 @@ export async function getTeamByIdCached(id: number) {
 
 export async function getUserCached(id: string) {
   const key = `user-${id}`;
-  const hit = cache.get<User>(key);
+  const hit = cache.get<TUser>(key);
   if (hit !== undefined) return hit;
 
   const user = await getUser(id);
