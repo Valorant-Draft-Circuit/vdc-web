@@ -1,3 +1,4 @@
+
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
 import SignUpButton from "../buttons/SignUpButton";
