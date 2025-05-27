@@ -1,13 +1,11 @@
-
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
 import SignUpButton from "../buttons/SignUpButton";
 import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
-export default async function HeroSection({ userId }) {
-
-  const user = await getUserCached(userId);
+export default async function HeroSection({ session }) {
+  const user = await getUserCached(session.user.id);
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
