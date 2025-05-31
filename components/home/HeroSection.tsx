@@ -4,6 +4,8 @@ import SignUpButton from "../buttons/SignUpButton";
 import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
+import { signOutAndRedirect } from "@/lib/auth/redirect-server-logout";
+import SignOut, { SignOutButton } from "../auth/SignOut";
 export default async function HeroSection({ session }) {
   return (
     <div className="xl:p-4">
@@ -66,6 +68,19 @@ function Join() {
   );
 }
 async function Joined({ session }) {
+  if (!session.user?.id) {
+    return (
+      <div className="flex flex-col gap-5">
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          Something went wrong...
+          <br />
+          Please relog.
+        </h2>
+        <SignOutButton />
+      </div>
+    );
+  }
+
   const user = await getUserCached(session.user.id);
 
   if (user!.Status!.leagueStatus === LeagueStatus.SUSPENDED) {

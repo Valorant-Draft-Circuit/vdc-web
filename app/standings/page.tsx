@@ -19,8 +19,8 @@ const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
   content: <StandingsPanel query={tier} />,
 }));
 tabs.unshift({
-  tier: "franchises",
-  tabName: "franchises",
+  name: "franchises",
+  query: "franchises",
   color: "vdcRed",
   content: <StandingsPanel query="franchises" />,
 });
