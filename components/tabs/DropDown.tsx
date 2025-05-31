@@ -21,11 +21,11 @@ export default function ListBox({
 }) {
   const paramsKey = params.toString().toLowerCase();
   const searchParams = useSearchParams();
-  const urlSeason = searchParams.get(paramsKey) ?? menuElements[0].query;
+  const urlParam = searchParams.get(paramsKey) ?? menuElements[0].query;
   const router = useRouter();
   const pathname = usePathname();
   const [selected, setSelected] = useState<TMenuElement>(
-    menuElements.find((m) => m.query === urlSeason) || menuElements[0]
+    menuElements.find((m) => m.query === urlParam) || menuElements[0]
   );
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams.toString());
@@ -34,13 +34,13 @@ export default function ListBox({
   }, [selected, router, pathname, paramsKey, searchParams]);
 
   return (
-    <div className="xl:px-0 px-10 sm:px-12">
+    <div className="xl:px-0 sm:px-12">
       <Listbox value={selected} onChange={setSelected}>
         <ListboxButton
           className="relative flex flex-row rounded-md py-2 pl-4 pr-8 w-full 
          dark:bg-vdcBlack text-sm text-vdcGrey dark:text-vdcWhite outline-1 -outline-offset-1 outline-gray-300 data-hover:cursor-pointer "
         >
-          <h2>{`Season ${selected.name}`}</h2>
+          <h2>{selected.name}</h2>
           <ChevronDownIcon className="size-4 fill-gray-500 m-auto absolute inset-y-0 right-3 h-5 w-5" />
         </ListboxButton>
         <ListboxOptions
@@ -53,11 +53,13 @@ export default function ListBox({
               value={element}
               className="relative rounded-sm group flex cursor-default items-center gap-2 px-3 py-1.5 hover:bg-slate-200 dark:hover:bg-vdcGrey"
             >
-              <h1 className="text-sm/6 text-vdcGrey dark:text-vdcWhite italic">{`S${element.name}`}</h1>
+              <h1 className="text-sm/6 text-vdcGrey dark:text-vdcWhite italic">
+                {element.name}
+              </h1>
               <div className="absolute right-0 pr-3">
                 <CheckIcon
                   className={`${
-                    element.query === urlSeason ? "visible" : "invisible"
+                    element.query === urlParam ? "visible" : "invisible"
                   } size-4 fill-vdcRed`}
                 />
               </div>

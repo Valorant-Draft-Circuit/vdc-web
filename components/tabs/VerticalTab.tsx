@@ -46,7 +46,7 @@ export default function VerticalTab({
 
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value); // overwrite or add
+    params.set(key, value);
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
