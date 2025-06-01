@@ -13,6 +13,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 
 import { useState, useMemo, useEffect, InputHTMLAttributes } from "react";
 
@@ -83,11 +84,10 @@ export default function StatsTable({ data }) {
     debugColumns: false,
   });
 
-
   if (!data) {
     return (
       <div className="max-h-[70vh] overflow-auto rounded-2xl">
-        <table className="">
+        <table className="mx-auto w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableColSkeleton key={headerGroup.id} />
@@ -110,7 +110,7 @@ export default function StatsTable({ data }) {
 
   return (
     <div className="max-h-[70vh] overflow-auto rounded-2xl">
-      <table className="">
+      <table className="mx-auto w-full">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableCol headerGroup={headerGroup} key={headerGroup.id} />
@@ -134,7 +134,7 @@ function TableCol({ headerGroup }) {
           <th
             key={header.id}
             colSpan={header.colSpan}
-            className={`sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-10 ${
+            className={`sticky top-0 border-b italic border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm 4xl:text-md backdrop-blur-sm z-10 ${
               header.column.id === "name"
                 ? "left-0 z-30 bg-white dark:bg-vdcBlack"
                 : ""
@@ -187,18 +187,35 @@ function TableRow({ row, idx }) {
       }}
     >
       {row.getVisibleCells().map((cell) => {
-        return (
-          <td
-            key={cell.id}
-            className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm dark:text-white ${
-              cell.column.id === "name"
-                ? "sticky left-0 z-10 bg-gray-200 border-b  dark:bg-vdcGrey"
-                : ""
-            }`}
-          >
-            <h2>{flexRender(cell.column.columnDef.cell, cell.getContext())}</h2>
-          </td>
-        );
+        if (cell.column.id === "name") {
+          const encodedPlayer = encodeURIComponent(cell.getValue());
+          return (
+            <td
+              key={cell.id}
+              className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm 4xl:text-md dark:text-white sticky left-0 z-10 bg-gray-200 dark:bg-vdcGrey`}
+            >
+              <Link
+                href={`/player/${encodedPlayer}`}
+                className="hover:text-vdcRed hover:underline"
+              >
+                <h2>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </h2>
+              </Link>
+            </td>
+          );
+        } else {
+          return (
+            <td
+              key={cell.id}
+              className="border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm 4xl:text-md dark:text-white"
+            >
+              <h2>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </h2>
+            </td>
+          );
+        }
       })}
     </tr>
   );
@@ -253,12 +270,11 @@ function DebouncedInput({
 function TableColSkeleton() {
   return (
     <tr>
-      {Array.from({ length: 15 }).map((_, i) => {
+      {Array.from({ length: 21 }).map((_, i) => {
         return (
           <th
             key={i}
             className="sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-10 w-20"
-
           >
             <div className="flex flex-col">
               <div className="h-5 w-20 bg-gray-400 dark:bg-gray-600 rounded"></div>
@@ -276,7 +292,7 @@ function TableRowSkeleton({ idx }) {
         className: idx % 2 === 0 ? "bg-gray-300 dark:bg-vdcGrey" : "",
       }}
     >
-      {Array.from({ length: 15 }).map((_, i) => {
+      {Array.from({ length: 21 }).map((_, i) => {
         return (
           <td
             key={i}

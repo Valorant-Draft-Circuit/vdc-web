@@ -68,7 +68,7 @@ export async function getStandingsByCached(
   return standingByTier;
 }
 
-type TTeam = Prisma.TeamsGetPayload<{
+export type TTeam = Prisma.TeamsGetPayload<{
   include: {
     Franchise: {
       include: { Brand: true };
