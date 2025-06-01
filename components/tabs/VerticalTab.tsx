@@ -62,7 +62,7 @@ export default function VerticalTab({
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
+        <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
           <MobileTabs
             setSelected={(idx: number) => {
               setSelectedIndex(idx);
