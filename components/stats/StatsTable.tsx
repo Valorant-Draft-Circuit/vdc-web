@@ -134,7 +134,7 @@ function TableCol({ headerGroup }) {
           <th
             key={header.id}
             colSpan={header.colSpan}
-            className={`sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-20 ${
+            className={`sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-10 ${
               header.column.id === "name"
                 ? "left-0 z-30 bg-white dark:bg-vdcBlack"
                 : ""
