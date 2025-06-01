@@ -83,7 +83,7 @@ export default function StatsTable({ data }) {
     debugColumns: false,
   });
 
-  // if (!data) {
+  if (!data) {
   return (
     <div className="max-h-[70vh] overflow-auto rounded-2xl">
       <table className="">
@@ -100,7 +100,7 @@ export default function StatsTable({ data }) {
       </table>
     </div>
   );
-  // }
+   }
   if (data.length === 0) {
     return (
       <h1 className=" p-4 text-center text-vdcRed">No data to display.</h1>
