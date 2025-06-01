@@ -1,5 +1,5 @@
 import { Tier } from "@prisma/client";
-import Filter from "../standings/filter/Filter";
+// import Filter from "../standings/filter/Filter";
 import { isTier } from "@/lib/common/utils";
 import { getScheduleByTierCached, getSeasonCached } from "@/lib/common/cache";
 import ScheduleCard from "./ScheduleCard";
@@ -51,7 +51,7 @@ export default async function SchedulePanel({
   }
   return (
     <div className="flex flex-col gap-3 rounded-2xl xl:gap-5">
-      <Filter tier={tier} />
+      {/* <Filter tier={tier} /> */}
       {Object.keys(schedule.preSeason).map((matchDay, i) => (
         <ScheduleCard key={i} matchDay={matchDay} season={schedule.preSeason} />
       ))}

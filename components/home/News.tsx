@@ -19,7 +19,7 @@ export default async function News() {
                   alt={featured_image_alt ?? "Featured Image"}
                   width={2000}
                   height={1000}
-                  className="rounded-t-lg"
+                  className="rounded-t-lg w-92"
                 />
               </div>
               <div className="bg-gray-200 dark:bg-vdcGrey p-4 xl:h-36 xl:w-full rounded-b-lg my-auto">

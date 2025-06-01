@@ -8,6 +8,7 @@ import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { listAllSeasons } from "@/lib/common/utils";
 
 type TPlayerIGN = {
   encoded: string;
@@ -50,7 +51,7 @@ export default async function Page({
   const listOfAllSeasons = listAllSeasons(currentSeason);
   const menuElements = listOfAllSeasons.map((season) => ({
     query: season,
-    name: season,
+    name: `SEASON ${season}`,
   }));
 
   const { player } = await params;
@@ -131,11 +132,3 @@ async function getPlayerByRiot(riotIGN) {
 //     return null;
 //   }
 // }
-
-function listAllSeasons(currentSeason: number) {
-  const seasons: string[] = [];
-  for (let i = currentSeason; i >= 6; i--) {
-    seasons.push(String(i));
-  }
-  return seasons;
-}

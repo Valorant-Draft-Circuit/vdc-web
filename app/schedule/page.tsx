@@ -7,8 +7,8 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
-  tier: tier,
-  tabName: tier,
+  name: tier,
+  query: tier,
   color: TIER_COLOR_MAP[tier],
   content: <SchedulePanel tier={tier} />,
 }));
@@ -26,7 +26,7 @@ export default function Page() {
         Season {CURRENT_SEASON} Schedule
       </h1>
       <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params="by" />
+        <VerticalTab tabElements={tabs} params={"by"} />
       </Suspense>
     </div>
   );

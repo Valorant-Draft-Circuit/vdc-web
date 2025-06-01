@@ -12,7 +12,7 @@ export default async function AuthSection() {
 
   const userAvatar = session?.user?.image;
   if (!session.user?.id) {
-    throw Error("Somehow userID is null/undefined...");
+    return <SignOut />;
   }
   const user = await getUserCached(session.user?.id);
   const team = determineTeam(user);

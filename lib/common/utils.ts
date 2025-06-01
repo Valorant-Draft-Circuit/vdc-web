@@ -56,3 +56,11 @@ export const sum = (array) =>
   array.reduce((s, v) => (s += v == null ? 0 : v), 0);
 export const avg = (array) =>
   array.reduce((s, v) => (s += v), 0) / array.length;
+
+export function listAllSeasons(currentSeason: number) {
+  const seasons: string[] = [];
+  for (let i = currentSeason; i >= 6; i--) {
+    seasons.push(String(i));
+  }
+  return seasons;
+}

@@ -57,7 +57,6 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   )[0];
 
   const playerAccolades = getAccolades(playerInfo.Accolades);
-
   return (
     <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
       <div className="flex flex-col gap-2">
@@ -120,7 +119,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
             </div>
             {mmrShow && (
               <div className="text-sm text-gray-500">
-                <h1>MMR: {playerInfo.PrimaryRiotAccount.mmr}</h1>
+                <h1>MMR: {playerInfo.PrimaryRiotAccount.MMR.mmrEffective}</h1>
               </div>
             )}
           </div>
