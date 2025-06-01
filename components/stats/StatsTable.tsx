@@ -83,24 +83,25 @@ export default function StatsTable({ data }) {
     debugColumns: false,
   });
 
-  // if (!data) {
-  return (
-    <div className="max-h-[70vh] overflow-auto rounded-2xl">
-      <table className="">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableColSkeleton key={headerGroup.id} />
-          ))}
-        </thead>
-        <tbody>
-          {Array.from({ length: 12 }).map((_, idx) => (
-            <TableRowSkeleton idx={idx} key={idx} />
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-  // }
+
+  if (!data) {
+    return (
+      <div className="max-h-[70vh] overflow-auto rounded-2xl">
+        <table className="">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableColSkeleton key={headerGroup.id} />
+            ))}
+          </thead>
+          <tbody>
+            {Array.from({ length: 12 }).map((_, idx) => (
+              <TableRowSkeleton idx={idx} key={idx} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
   if (data.length === 0) {
     return (
       <h1 className=" p-4 text-center text-vdcRed">No data to display.</h1>
@@ -256,7 +257,8 @@ function TableColSkeleton() {
         return (
           <th
             key={i}
-            className="sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-20 w-20"
+            className="sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-10 w-20"
+
           >
             <div className="flex flex-col">
               <div className="h-5 w-20 bg-gray-400 dark:bg-gray-600 rounded"></div>
