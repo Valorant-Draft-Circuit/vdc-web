@@ -4,8 +4,7 @@ import SignUpButton from "../buttons/SignUpButton";
 import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
-import { signOutAndRedirect } from "@/lib/auth/redirect-server-logout";
-import SignOut, { SignOutButton } from "../auth/SignOut";
+import { SignOutButton } from "../auth/SignOut";
 export default async function HeroSection({ session }) {
   return (
     <div className="xl:p-4">

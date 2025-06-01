@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: `Season ${CURRENT_SEASON} Standings`,
 };
 const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
-  tier: tier,
-  tabName: tier,
+  query: tier,
+  name: tier,
   color: TIER_COLOR_MAP[tier],
   content: <StandingsPanel query={tier} />,
 }));

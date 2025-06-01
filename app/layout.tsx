@@ -5,7 +5,6 @@ import ThemeProvider from "../components/theme/ThemeProvider";
 import NavBar from "../components/navigation/NavBar";
 import Footer from "../components/footer/Footer";
 import { initCache } from "@/lib/common/cache";
-import { auth } from "@/lib/auth/auth";
 
 initCache();
 

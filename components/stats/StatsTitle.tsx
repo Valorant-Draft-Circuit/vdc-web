@@ -7,10 +7,9 @@ export default function StatsTitle({ defaultQueries }) {
   const season =
     searchParams.get("season")?.toLowerCase() || defaultQueries.season;
   const tier = searchParams.get("tier")?.toLowerCase() || defaultQueries.tier;
-  const gameType = searchParams.get("type")?.toLowerCase();
 
   return (
-    <div className="text-vdcRed italic text-2xl xl:text-3xl text-center">
+    <div className="text-vdcRed flex flex-col xl:flex-row xl:gap-2 italic text-2xl xl:text-3xl text-center">
       <h1>Season {season}</h1>
       <h1>{tier} Stats</h1>
     </div>

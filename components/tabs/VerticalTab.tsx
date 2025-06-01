@@ -74,7 +74,7 @@ export default function VerticalTab({
         </div>
 
         <div className="hidden xl:block">
-          <div className="flex flex-row gap-2  sticky top-26 self-start">
+          <div className="flex flex-row gap-2 sticky top-26 self-start">
             <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl">
               <TabList className="flex flex-col items-start gap-1 rounded-2xl drop-shadow-2xl">
                 {tabElements.map(({ name, color }) => (

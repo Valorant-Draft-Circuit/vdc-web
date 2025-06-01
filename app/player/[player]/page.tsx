@@ -51,7 +51,7 @@ export default async function Page({
   const listOfAllSeasons = listAllSeasons(currentSeason);
   const menuElements = listOfAllSeasons.map((season) => ({
     query: season,
-    name: season,
+    name: `SEASON ${season}`,
   }));
 
   const { player } = await params;

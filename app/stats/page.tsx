@@ -1,7 +1,7 @@
 import StatsPanel from "@/components/stats/StatsPanel";
 import StatsTitle from "@/components/stats/StatsTitle";
 import ListBox from "@/components/tabs/DropDown";
-import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
+import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
 import Soon from "@/components/theme/Soon";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
@@ -15,11 +15,12 @@ export default async function Page() {
     query: season,
     name: `SEASON ${season}`,
   }));
-  const gameTypes = [GameType.COMBINE, GameType.SEASON];
+  const gameTypes = [GameType.SEASON, GameType.PRE_SEASON, GameType.COMBINE];
   const gameTypeList = gameTypes.map((game) => ({
     query: game.toLocaleLowerCase(),
-    name: `${game} STATS`,
+    name: `${game.replace("_", "")} STATS`,
   }));
+
   const defaultQueries = {
     season: currentSeason,
     tier: Tier.MYTHIC,
@@ -37,9 +38,9 @@ export default async function Page() {
   }
 
   return (
-    <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-2 xl:gap-10">
+    <div className="mx-auto py-10 xl:py-12 flex flex-col gap-1 xl:gap-2">
       <StatsTitle defaultQueries={defaultQueries} />
-      <div className="flex flex-row gap-5 px-5 sm:px-0 py-2 xl:py-0">
+      <div className="flex flex-row gap-2 px-5 sm:px-0 py-1 xl:py-0">
         <div className="w-full">
           <ListBox params={"season"} menuElements={seasonList} />
         </div>
@@ -48,7 +49,7 @@ export default async function Page() {
         </div>
       </div>
       <div>
-        <VerticalTab tabElements={tabs} params="tier" />
+        <HorizontalTab tabElements={tabs} params="tier" />
       </div>
     </div>
   );

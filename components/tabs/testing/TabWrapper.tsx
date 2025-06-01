@@ -38,7 +38,7 @@ export default function TabWrapper({
     if (initialIndex !== selectedIndex && initialIndex >= 0) {
       setSelectedIndex(initialIndex);
     }
-  }, [initialIndex]);
+  }, [initialIndex, selectedIndex]);
 
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

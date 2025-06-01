@@ -29,8 +29,8 @@ export default async function Page({
   const { season } = await params;
   const seasonNumber = Number(season);
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
-    tier: tier,
-    tabName: tier,
+    query: tier,
+    name: tier,
     color: TIER_COLOR_MAP[tier],
     content: <SchedulePanel tier={tier} season={seasonNumber} />,
   }));
