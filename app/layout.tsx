@@ -33,7 +33,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NavBar />
-          <div className="mx-auto max-w-7xl xl:max-w-11/12 4xl:max-w-1/2 xl:px-2">
+          <div className="mx-auto max-w-7xl xl:max-w-11/12 4xl:max-w-3/4 xl:px-2">
             <div className="min-h-screen">{children}</div>
           </div>
           <Footer />
