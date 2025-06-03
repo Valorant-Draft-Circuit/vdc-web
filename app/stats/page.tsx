@@ -2,11 +2,11 @@ import StatsPanel from "@/components/stats/StatsPanel";
 import StatsTitle from "@/components/stats/StatsTitle";
 import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
-import Soon from "@/components/theme/Soon";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { listAllSeasons } from "@/lib/common/utils";
 import { GameType, Tier } from "@prisma/client";
+import { Suspense } from "react";
 
 export default async function Page() {
   const currentSeason = await getSeasonCached();
@@ -32,24 +32,27 @@ export default async function Page() {
     content: <StatsPanel defaultQueries={defaultQueries} />,
   }));
 
-  const wip = false;
-  if (wip) {
-    return <Soon />;
-  }
-
   return (
     <div className="mx-auto py-10 xl:py-12 flex flex-col gap-1 xl:gap-2">
-      <StatsTitle defaultQueries={defaultQueries} />
+      <Suspense>
+        <StatsTitle defaultQueries={defaultQueries} />
+      </Suspense>
       <div className="flex flex-row gap-2 px-5 sm:px-0 py-1 xl:py-0">
         <div className="w-full">
-          <ListBox params={"season"} menuElements={seasonList} />
+          <Suspense>
+            <ListBox params={"season"} menuElements={seasonList} />
+          </Suspense>
         </div>
         <div className="w-full">
-          <ListBox params={"type"} menuElements={gameTypeList} />
+          <Suspense>
+            <ListBox params={"type"} menuElements={gameTypeList} />
+          </Suspense>
         </div>
       </div>
       <div>
-        <HorizontalTab tabElements={tabs} params="tier" />
+        <Suspense>
+          <HorizontalTab tabElements={tabs} params="tier" />
+        </Suspense>
       </div>
     </div>
   );

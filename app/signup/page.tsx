@@ -53,7 +53,7 @@ function NotSignedIn() {
     <>
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-xl">You are not signed in... :(</h2>
-        <DiscordButton text={"Sign In"} />
+        <DiscordButton text={"Sign In"} signInButton={true} />
       </div>
     </>
   );

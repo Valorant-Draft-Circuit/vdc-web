@@ -5,6 +5,8 @@ import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
+const PREVIEW = Boolean(process.env.PREVIEW);
+
 export default async function HeroSection({ session }) {
   return (
     <div className="xl:p-4">
@@ -58,11 +60,13 @@ function Join() {
   return (
     <>
       <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
-        Join the Draft.
+        Join the Fight.
       </h2>
-      <div>
-        <DiscordButton text="Sign Up with Discord" />
-      </div>
+      {!PREVIEW && (
+        <div>
+          <DiscordButton text="Sign Up with Discord" signInButton={true} />
+        </div>
+      )}
     </>
   );
 }

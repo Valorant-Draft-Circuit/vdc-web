@@ -12,7 +12,7 @@ import { navLinks } from "../NavBar";
 import MobileAuth from "../../auth/MobileAuth";
 import { SessionProvider } from "next-auth/react";
 
-export default function SideLinks() {
+export default function SideLinks({ preview }) {
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 
@@ -25,7 +25,6 @@ export default function SideLinks() {
       }
     });
   }, []);
-
   return (
     <>
       <InactivityWrapper>
@@ -72,11 +71,13 @@ export default function SideLinks() {
             />
           ))}
         </div>
-        <div className="mx-auto">
-          <SessionProvider>
-            <MobileAuth />
-          </SessionProvider>
-        </div>
+        {!preview && (
+          <div className="mx-auto">
+            <SessionProvider>
+              <MobileAuth />
+            </SessionProvider>
+          </div>
+        )}
       </div>
     </>
   );
