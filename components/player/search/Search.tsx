@@ -1,79 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@headlessui/react";
-import { useState } from "react";
-enum SearchType {
-  DISCORD_ID = "Discord User ID",
-  //   RIOT_IGN = "Riot IGN", TODO: Implement RiotIGN search as well
-}
-export default function PlayerSearch() {
-  const [searchType, setSearchType] = useState<SearchType>(
-    SearchType.DISCORD_ID
-  );
-
-  return (
-    <div className="flex xl:flex-row flex-col-reverse gap-2 justify-end">
-      {searchType && <InputTypes searchType={searchType} />}
-      <div className="self-end xl:self-auto">
-        <SelectSearch searchType={searchType} setSearchType={setSearchType} />
-      </div>
-    </div>
-  );
-}
-
-function InputTypes({ searchType }) {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
-
-  const handleSearch = useDebouncedCallback((term) => {
-    console.log(`Searching... ${term}`);
-
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("user", term);
-    } else {
-      params.delete("user");
-    }
-    replace(`${pathname}?${params.toString()}`);
-  }, 300);
-  //  TODO: Implement RiotIGN search as well
-  //   if (searchType === SearchType.RIOT_IGN) {
-  //     return (
-  //       <div className="flex flex-row text-sm my-auto gap-1">
-  //         <Input
-  //           id="ign"
-  //           placeholder={searchType}
-  //           value={ign}
-  //           onChange={(e) => setIgn(e.target.value)}
-  //           className="block w-full rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
-  //         />
-  //         <div className="m-auto text-center">
-  //           <h1 className="text-2xl">#</h1>
-  //         </div>
-  //         <Input
-  //           id="tag"
-  //           placeholder={"NA1"}
-  //           value={tag}
-  //           onChange={(e) => setTag(e.target.value)}
-  //           className="block w-1/3 rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
-  //         />
-  //       </div>
-  //     );
-  //   }
-  return (
-    <div className="flex flex-row text-sm my-auto gap-2">
-      <Input
-        id="discordId"
-        placeholder={`${searchType}`}
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get("name")?.toString()}
-        className="block w-full rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
-      />
-    </div>
-  );
-}
-
+import { useDebouncedCallback } from "use-debounce";
 import {
   Listbox,
   ListboxButton,
@@ -81,8 +11,133 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
+import { SearchType } from "@/app/player/page";
+
+export default function PlayerSearch() {
+  const [searchType, setSearchType] = useState<SearchType>(SearchType.RIOT_IGN);
+  const [ign, setIgn] = useState("");
+  const [tag, setTag] = useState("");
+  const [discordId, setDiscordId] = useState("");
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    setIgn("");
+    setTag("");
+    setDiscordId("");
+
+    const params = new URLSearchParams(searchParams);
+    params.delete("user");
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [searchType]);
+
+  return (
+    <div className="flex xl:flex-row flex-col-reverse gap-2 justify-end">
+      <InputTypes
+        searchType={searchType}
+        ign={ign}
+        setIgn={setIgn}
+        tag={tag}
+        setTag={setTag}
+        discordId={discordId}
+        setDiscordId={setDiscordId}
+      />
+      <div className="self-end xl:self-auto">
+        <SelectSearch searchType={searchType} setSearchType={setSearchType} />
+      </div>
+    </div>
+  );
+}
+
+function InputTypes({
+  searchType,
+  ign,
+  setIgn,
+  tag,
+  setTag,
+  discordId,
+  setDiscordId,
+}: {
+  searchType: SearchType;
+  ign: string;
+  setIgn: (val: string) => void;
+  tag: string;
+  setTag: (val: string) => void;
+  discordId: string;
+  setDiscordId: (val: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const params = new URLSearchParams(searchParams);
+
+  useEffect(() => {
+    if (searchType !== SearchType.RIOT_IGN) return;
+    let riotIgn = ign;
+    if (tag) riotIgn = `${ign}#${tag}`;
+
+    if (riotIgn) {
+      params.set("user", riotIgn);
+    } else {
+      params.delete("user");
+    }
+
+    replace(`${pathname}?${params.toString()}`);
+  }, [ign, tag, searchType]);
+
+  const updateUrl = useDebouncedCallback((id: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (id.trim()) {
+      params.set("user", id.trim());
+    } else {
+      params.delete("user");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
+
+  if (searchType === SearchType.RIOT_IGN) {
+    return (
+      <div className="flex flex-row text-sm my-auto gap-1">
+        <Input
+          id="ign"
+          placeholder={searchType}
+          value={ign}
+          onChange={(e) => setIgn(e.target.value)}
+          className="block w-full rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
+        />
+        <div className="m-auto text-center">
+          <h1 className="text-2xl">#</h1>
+        </div>
+        <Input
+          id="tag"
+          placeholder={"NA1"}
+          value={tag}
+          onChange={(e) => setTag(e.target.value)}
+          className="block w-1/3 rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-row text-sm my-auto gap-2">
+      <Input
+        id="discordId"
+        placeholder={searchType}
+        onChange={(e) => {
+          const val = e.target.value;
+          setDiscordId(val);
+          updateUrl(val);
+        }}
+        value={discordId}
+        className="block w-full rounded-md border px-3 py-2 text-vdcGrey outline-none focus:ring-2 focus:ring-vdcRed bg-white"
+      />
+    </div>
+  );
+}
 
 function SelectSearch({
   searchType,
