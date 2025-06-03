@@ -26,7 +26,7 @@ export default function Page() {
         Season {CURRENT_SEASON} Schedule
       </h1>
       <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params={"by"} />
+        <VerticalTab tabElements={tabs} params={"tier"} />
       </Suspense>
     </div>
   );

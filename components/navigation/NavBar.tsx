@@ -68,6 +68,7 @@ export const staffDropDown = {
 };
 
 export default function NavBar() {
+  const preview = Boolean(process.env.PREVIEW);
   return (
     <>
       <Disclosure
@@ -90,7 +91,7 @@ export default function NavBar() {
             <NavLinks />
           </div>
           <div className="flex flex-row space-x-5 items-center 4xl:space-x-10">
-            <AuthSection />
+            {!preview && <AuthSection />}
             <ThemeSwitch />
           </div>
         </div>
