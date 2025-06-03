@@ -24,6 +24,7 @@ const steps = [
           href={DISCORD_LINK}
           className="text-vdcRed underline"
           target="_blank"
+          rel="noopener noreferrer"
         >
           Discord!
         </a>
@@ -116,7 +117,7 @@ export default function HowToPlay() {
                 )}
                 {button && (
                   <div className="mt-2">
-                    <DiscordButton text="Discord" />
+                    <DiscordButton text="Discord" signInButton={false} />
                   </div>
                 )}
               </div>
