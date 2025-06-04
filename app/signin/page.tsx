@@ -9,8 +9,8 @@ export default function SignInPage() {
     }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-vdcBlack">
-      <div className="bg-vdcGrey shadow-lg rounded-xl p-10 text-center max-w-sm w-full">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-vdcWhite dark:bg-vdcBlack">
+      <div className="bg-vdcLtGrey dark:bg-vdcGray shadow-lg rounded-xl p-10 text-center max-w-sm w-full">
         <div className="flex justify-center mb-6">
           <Image
                 alt="vdc fl"
