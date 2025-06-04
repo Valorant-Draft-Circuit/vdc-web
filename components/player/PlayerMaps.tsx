@@ -1,7 +1,8 @@
+import Soon from "../theme/Soon";
+
 export default function PlayerMaps() {
-  return (
-    <div>
-      <h1>Player Maps</h1>
-    </div>
-  );
+  const wip = true;
+  if (wip) {
+    return <Soon />;
+  }
 }

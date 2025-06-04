@@ -1,5 +1,4 @@
 import { DISCORD_USER_HOWTO_URL } from "@/lib/common/constants";
-import Link from "next/link";
 
 export default function PlayerNotFound({ player }: { player }) {
   return (
@@ -16,12 +15,13 @@ export default function PlayerNotFound({ player }: { player }) {
           <h2 className="text-xl">Player Discord IDs</h2>
           <h3>
             (Not sure how to get a player&apos;s Discord ID? click{" "}
-            <Link
+            <a
+              target="_blank"
               href={DISCORD_USER_HOWTO_URL}
               className="text-vdcRed hover:underline"
             >
               here!
-            </Link>
+            </a>
             )
           </h3>
         </div>

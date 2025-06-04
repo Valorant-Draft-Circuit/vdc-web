@@ -1,5 +1,5 @@
 import StandingsPanel from "@/components/standings/StandingsPanel";
-import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
+import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import React, { Suspense } from "react";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
@@ -12,15 +12,15 @@ export const metadata: Metadata = {
   title: `VDC | Season ${CURRENT_SEASON} Standings`,
   description: `Season ${CURRENT_SEASON} Standings`,
 };
-const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
-  tier: tier,
-  tabName: tier,
+const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+  query: tier,
+  name: tier,
   color: TIER_COLOR_MAP[tier],
   content: <StandingsPanel query={tier} />,
 }));
 tabs.unshift({
-  tier: "franchises",
-  tabName: "franchises",
+  name: "franchises",
+  query: "franchises",
   color: "vdcRed",
   content: <StandingsPanel query="franchises" />,
 });

@@ -1,9 +1,8 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import HeroSection from "../components/home/HeroSection";
 import HowToPlay from "../components/home/HowToPlay";
 import News from "../components/home/News";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/queries/home/youtube";
-import Link from "next/link";
 import { Suspense } from "react";
 import NewsSkeleton from "../components/home/NewsSkeleton";
 
@@ -14,7 +13,7 @@ export default async function Home() {
     <>
       <div className="overflow-hidden">
         <div>
-          <HeroSection />
+          <HeroSection session={session} />
         </div>
       </div>
       {!session ? (
@@ -51,9 +50,13 @@ export default async function Home() {
         <div className="overflow-hidden xl:w-1/2 4xl:w-full">
           <div className="px-4 py-2 sm:px-6">
             <h1 className="italic text-lg lg:text-xl">
-              <Link href={CHANNEL_URL} className="hover:text-vdcRed">
+              <a
+                href={CHANNEL_URL}
+                className="hover:text-vdcRed"
+                target="_blank"
+              >
                 Latest Media
-              </Link>
+              </a>
               <span className="text-vdcWhite dark:text-vdcBlack">
                 (Hi GumbaYum!)
               </span>

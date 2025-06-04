@@ -2,7 +2,7 @@ import TeamPanel, {
   TeamPanelSkeleton,
 } from "@/components/franchises/teams/TeamPanel";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
-import { TabElements } from "@/components/tabs/HorizontalTab";
+import { TTabElements } from "@/components/tabs/HorizontalTab";
 import FlameLogo from "@/components/theme/FlameLogo";
 import {
   getFranchiseDetailsBySlugCached,
@@ -140,7 +140,7 @@ function getAgms(franchiseInfo) {
 }
 
 function getActiveTeams(franchiseInfo) {
-  const activeFranchiseTeams: TabElements[] = franchiseInfo.Teams.filter(
+  const activeFranchiseTeams: TTabElements[] = franchiseInfo.Teams.filter(
     (team) => team.active
   ).map((team) => ({
     id: team.id,

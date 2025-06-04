@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 
-export type TabElements = {
+export type TTabElements = {
   current?: boolean;
   query: string;
   color: string;
@@ -23,7 +23,7 @@ export default function HorizontalTab({
   tabElements,
   params,
 }: {
-  tabElements: TabElements[];
+  tabElements: TTabElements[];
   params: string;
 }) {
   const searchParams = useSearchParams();
@@ -61,9 +61,12 @@ export default function HorizontalTab({
         }}
         className="flex flex-col xl:flex"
       >
-        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
+        <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
           <MobileTabs
-            setSelected={setSelectedIndex}
+            setSelected={(idx: number) => {
+              setSelectedIndex(idx);
+              updateParam(params, tabElements[idx].query.toLowerCase());
+            }}
             selected={selectedIndex}
             tabElements={tabElements}
           />

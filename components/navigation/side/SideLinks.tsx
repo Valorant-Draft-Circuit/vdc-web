@@ -12,7 +12,7 @@ import { navLinks } from "../NavBar";
 import MobileAuth from "../../auth/MobileAuth";
 import { SessionProvider } from "next-auth/react";
 
-export default function SideLinks() {
+export default function SideLinks({ preview }) {
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 
@@ -25,12 +25,11 @@ export default function SideLinks() {
       }
     });
   }, []);
-
   return (
     <>
       <InactivityWrapper>
         <ArrowRightIcon
-          className={`z-40 w-12 h-12 p-1 mt-10 ml-5 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer absolute shadow-2xl transition-transform duration-100 ${
+          className={`z-50 w-12 h-12 p-1 mt-10 ml-5 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer absolute shadow-2xl transition-transform duration-100 ${
             open && "rotate-180 translate-x-72"
           }`}
           onClick={() => setOpen(!open)}
@@ -72,11 +71,13 @@ export default function SideLinks() {
             />
           ))}
         </div>
-        <div className="mx-auto">
-          <SessionProvider>
-            <MobileAuth />
-          </SessionProvider>
-        </div>
+        {!preview && (
+          <div className="mx-auto">
+            <SessionProvider>
+              <MobileAuth />
+            </SessionProvider>
+          </div>
+        )}
       </div>
     </>
   );

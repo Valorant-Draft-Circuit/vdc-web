@@ -11,10 +11,10 @@ import {
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 
-export type TabElements = {
+export type TTabElements = {
   current?: boolean;
-  tabName: string;
-  tier: string;
+  query: string;
+  name: string;
   color: string;
   content: React.ReactNode;
 };
@@ -23,13 +23,13 @@ export default function VerticalTab({
   tabElements,
   params,
 }: {
-  tabElements: TabElements[];
+  tabElements: TTabElements[];
   params: string;
 }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get(params)?.toLowerCase();
   const initialIndex = tabElements.findIndex(
-    (t) => t.tier.toLowerCase() === queryParam
+    (t) => t.query.toLowerCase() === queryParam
   );
   const [selectedIndex, setSelectedIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
@@ -44,37 +44,45 @@ export default function VerticalTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
+  const updateParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <>
       <TabGroup
         selectedIndex={selectedIndex}
         onChange={(index) => {
           setSelectedIndex(index);
-          const newTier = tabElements[index].tier.toLowerCase();
-          const newUrl = `${pathname}?${params}=${newTier}`;
-          router.push(newUrl, { scroll: false });
+          const newQuery = tabElements[index].query.toLowerCase();
+          updateParam(params, newQuery);
         }}
         vertical
         className="flex flex-col xl:flex-row"
       >
-        <div className="xl:hidden sticky top-0 z-10 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
+        <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
           <MobileTabs
-            setSelected={setSelectedIndex}
+            setSelected={(idx: number) => {
+              setSelectedIndex(idx);
+              updateParam(params, tabElements[idx].query.toLowerCase());
+            }}
             selected={selectedIndex}
             tabElements={tabElements}
           />
         </div>
 
         <div className="hidden xl:block">
-          <div className="flex flex-row gap-2  sticky top-26 self-start">
+          <div className="flex flex-row gap-2 sticky top-26 self-start">
             <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl">
               <TabList className="flex flex-col items-start gap-1 rounded-2xl drop-shadow-2xl">
-                {tabElements.map(({ tier, tabName, color }) => (
+                {tabElements.map(({ name, color }) => (
                   <Tab
-                    key={tier}
+                    key={name}
                     className={`rounded-lg text-xl text-vdcBlack dark:text-vdcWhite py-1 text-start w-42 px-2 data-hover:bg-gray-300 dark:data-hover:bg-vdcBlack focus:not-data-focus:outline-none data-hover:text-${color} data-hover:cursor-pointer data-selected:bg-gray-300 dark:data-selected:bg-vdcBlack data-selected:text-${color}`}
                   >
-                    <h1 className="italic">{tabName}</h1>
+                    <h1 className="italic">{name}</h1>
                   </Tab>
                 ))}
               </TabList>
@@ -83,8 +91,8 @@ export default function VerticalTab({
         </div>
 
         <TabPanels className="w-auto sm:w-xl md:w-2xl xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
-          {tabElements.map(({ content, tier }) => (
-            <TabPanel key={tier}>{content}</TabPanel>
+          {tabElements.map(({ content, query: query }) => (
+            <TabPanel key={query}>{content}</TabPanel>
           ))}
         </TabPanels>
       </TabGroup>
@@ -97,18 +105,18 @@ function MobileTabs({
   setSelected,
   selected,
 }: {
-  tabElements;
+  tabElements: TTabElements[];
   setSelected;
   selected;
 }) {
-  const selectedTab = tabElements[selected];
+  const selectedTab: TTabElements = tabElements[selected];
 
   return (
     <div className="grid grid-cols-1 xl:hidden w-full">
       <Listbox
         value={selectedTab}
         onChange={(tab) => {
-          const idx = tabElements.findIndex((t) => t.tier === tab.tier);
+          const idx = tabElements.findIndex((t) => t.query === tab.query);
           if (idx >= 0) setSelected(idx);
         }}
       >
@@ -116,7 +124,7 @@ function MobileTabs({
           <ListboxButton
             className={`w-full italic rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl  text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
-            <h1 className="truncate">{selectedTab.tabName}</h1>
+            <h1 className="truncate">{selectedTab.name}</h1>
             <ChevronUpDownIcon
               aria-hidden="true"
               className="my-auto pointer-events-none absolute inset-y-0 right-3 h-5 w-5 fill-gray-500"
@@ -126,7 +134,7 @@ function MobileTabs({
           <ListboxOptions className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
             {tabElements.map((tab) => (
               <ListboxOption
-                key={tab.tier}
+                key={tab.query}
                 value={tab}
                 className={({ selected }) =>
                   `relative cursor-pointer select-none py-2 pl-3 pr-9 sm:text-xl hover:text-${
@@ -143,7 +151,7 @@ function MobileTabs({
                         selected ? "font-semibold" : "font-normal"
                       }`}
                     >
-                      {tab.tabName}
+                      {tab.name}
                     </h1>
                     {selected && (
                       <span

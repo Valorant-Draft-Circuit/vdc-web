@@ -45,12 +45,12 @@ export default async function TeamPanel({ team }: { team }) {
         <MatchSection
           title="Match History"
           matches={pastGames}
-          emptyText="No games played yet"
+          emptyText="No matches played yet"
         />
         <MatchSection
-          title="Upcoming Games"
+          title="Upcoming Matches"
           matches={futureGames}
-          emptyText="No games scheduled"
+          emptyText="No matches scheduled"
         />
       </div>
     </div>
@@ -166,7 +166,7 @@ export function TeamPanelSkeleton() {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        {["Match History", "Upcoming Games"].map((section) => (
+        {["Match History", "Upcoming Matches"].map((section) => (
           <div key={section} className="flex flex-col">
             <Divider title={section} />
             <div className="grid grid-cols-1 gap-2 p-2">

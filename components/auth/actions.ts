@@ -1,6 +1,6 @@
 'use server';
 
-import { signIn, signOut } from '@/lib/auth';
+import { signIn, signOut } from '@/lib/auth/auth';
 
 export async function signInAction() {
   await signIn();

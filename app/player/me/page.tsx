@@ -1,4 +1,5 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
+import { Player } from "@/prisma/_Player";
 import { redirect } from "next/navigation";
 
 /**
@@ -8,8 +9,9 @@ import { redirect } from "next/navigation";
 export default async function Page() {
   const session = await auth();
   if (session) {
-    const riotIGN = session.user?.name;
-    redirect(`/player/${riotIGN}`);
+    const player = await Player.getBy({ userID: session.user?.id as string });
+    const discordAccount = player?.Accounts[0].providerAccountId;
+    redirect(`/player/${discordAccount}`);
   }
   return redirect("/player");
 }

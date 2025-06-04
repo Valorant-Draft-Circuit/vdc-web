@@ -5,6 +5,7 @@ import ThemeProvider from "../components/theme/ThemeProvider";
 import NavBar from "../components/navigation/NavBar";
 import Footer from "../components/footer/Footer";
 import { initCache } from "@/lib/common/cache";
+import Banner from "@/components/theme/Banner";
 
 initCache();
 
@@ -23,6 +24,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const preview = Boolean(process.env.PREVIEW);
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${montserrat.variable} antialiased`}>
@@ -33,7 +35,8 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NavBar />
-          <div className="mx-auto max-w-7xl xl:max-w-11/12 4xl:max-w-1/2 xl:px-2">
+          {preview && <Banner />}
+          <div className="mx-auto max-w-7xl xl:max-w-11/12 4xl:max-w-3/4 xl:px-2">
             <div className="min-h-screen">{children}</div>
           </div>
           <Footer />

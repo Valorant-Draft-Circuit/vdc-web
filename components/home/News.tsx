@@ -1,6 +1,5 @@
 import { getNews } from "@/lib/queries/home/posts";
 import Image from "next/image";
-import Link from "next/link";
 
 export default async function News() {
   const newsList = await getNews();
@@ -13,14 +12,14 @@ export default async function News() {
             className="xl:w-full hover:scale-105 transition duration-150 ease-in-out 4xl:hover:scale-102"
             key={date}
           >
-            <Link href={url ?? ""}>
+            <a href={url ?? ""} target="_blank">
               <div className="shrink-0 ">
                 <Image
                   src={featured_image ?? "/vdc-flame.svg"}
                   alt={featured_image_alt ?? "Featured Image"}
                   width={2000}
                   height={1000}
-                  className="rounded-t-lg"
+                  className="rounded-t-lg w-92"
                 />
               </div>
               <div className="bg-gray-200 dark:bg-vdcGrey p-4 xl:h-36 xl:w-full rounded-b-lg my-auto">
@@ -29,7 +28,7 @@ export default async function News() {
                   {title}
                 </h1>
               </div>
-            </Link>
+            </a>
           </div>
         )
       )}

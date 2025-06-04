@@ -1,12 +1,13 @@
 import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import VerticalTab, { TabElements } from "@/components/tabs/VerticalTab";
+import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
 type Props = {
   params: Promise<{ season: string }>;
 };
@@ -27,9 +28,9 @@ export default async function Page({
   const currentSeason = await getSeasonCached();
   const { season } = await params;
   const seasonNumber = Number(season);
-  const tabs: TabElements[] = TIERS_LIST.map((tier) => ({
-    tier: tier,
-    tabName: tier,
+  const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+    query: tier,
+    name: tier,
     color: TIER_COLOR_MAP[tier],
     content: <SchedulePanel tier={tier} season={seasonNumber} />,
   }));

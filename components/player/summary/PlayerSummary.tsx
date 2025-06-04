@@ -6,14 +6,14 @@ import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
 import { Prisma } from "@prisma/client";
 import PlayerMatches from "./PlayerMatches";
-type StatsPayload = Prisma.PlayerStatsGetPayload<{
+type TStatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
 }>;
 export default function PlayerSummary() {
   const { player } = useParams();
   const searchParams = useSearchParams();
   const season = searchParams.get("season");
-  const [stats, setStats] = useState<StatsPayload[] | null>(null);
+  const [stats, setStats] = useState<TStatsPayload[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,7 +48,6 @@ export default function PlayerSummary() {
   if (!stats || stats.length === 0) {
     return <NoStats />;
   }
-  console.log(stats);
 
   const processedPlayerStats = stats.map((s) => {
     const rounds = s.Game.rounds;
@@ -56,7 +55,7 @@ export default function PlayerSummary() {
   });
 
   return (
-    <div className="flex flex-col xl:flex-row px-7 xl:px-0 gap-2">
+    <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
       <div className="flex flex-col gap-2 xl:w-1/2">
         <>
           <PlayerRating stats={processedPlayerStats} />
@@ -82,8 +81,8 @@ export function NoStats() {
 
 function Load() {
   return (
-    <div className="flex flex-col xl:flex-row px-7 xl:px-0 gap-2">
-      <div className="flex flex-col gap-2 w-1/3">
+    <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
+      <div className="flex flex-col gap-2 xl:w-1/3">
         <div className="divide-y divide-gray-200 dark:divide-vdcBlack dark:bg-vdcGrey overflow-hidden rounded-lg shadow-sm ">
           <div className="px-4 py-2 sm:px-6 animate-pulse ">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
@@ -103,7 +102,7 @@ function Load() {
           <div className="px-4 py-3 sm:p-6 grid grid-cols-3 italic text-center gap-2 animate-pulse">
             {Array.from({ length: 3 }).map((_, i) => (
               <div className="flex flex-col" key={i}>
-                <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded " />
+                <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded " />
               </div>
             ))}
           </div>
