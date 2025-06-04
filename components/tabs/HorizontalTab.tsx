@@ -63,7 +63,10 @@ export default function HorizontalTab({
       >
         <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
           <MobileTabs
-            setSelected={setSelectedIndex}
+            setSelected={(idx: number) => {
+              setSelectedIndex(idx);
+              updateParam(params, tabElements[idx].query.toLowerCase());
+            }}
             selected={selectedIndex}
             tabElements={tabElements}
           />
