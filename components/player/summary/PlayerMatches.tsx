@@ -51,7 +51,7 @@ function Match({ stat }: { stat }) {
         result === "Victory"
           ? "bg-vdcBlue/30"
           : "bg-vdcRed/20 dark:bg-vdcRed/30"
-      } p-2  rounded-md hover:opacity-90 hover:cursor-pointer`}
+      } p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
     >
       <div className="flex flex-col divide-y-1">
         <div className="flex flex-row gap-2">
