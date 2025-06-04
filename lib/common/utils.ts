@@ -10,7 +10,11 @@ export function toTailwindCustomHexCode(color) {
 }
 
 export function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", {
+  // TODO: remove this when we figure out whats going on with date issue
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() - 1);
+
+  return newDate.toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",

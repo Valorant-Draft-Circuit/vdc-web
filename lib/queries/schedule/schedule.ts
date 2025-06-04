@@ -40,7 +40,7 @@ export async function getScheduleByTier(tier: Tier, season: number) {
       );
       preseasonDatesToMatches[formattedDate].push(packagedMatch);
     } else {
-      formattedDate = `${formattedDate} - MD`;
+      formattedDate = `${formattedDate} - MD ${match.matchDay}`;
       if (!regularSeasonDatesToMatches[formattedDate]) {
         regularSeasonDatesToMatches[formattedDate] = [];
       }
@@ -102,6 +102,5 @@ async function getUpcomingMatchesDates(tier: Tier, season: number) {
   upcomingMatches.sort((a, b) =>
     a.dateScheduled.toISOString().localeCompare(b.dateScheduled.toISOString())
   );
-
   return upcomingMatches;
 }
