@@ -27,7 +27,7 @@ export default function StandingsCard({
     query !== "franchises"
       ? `/about/franchises/${standing.franchiseSlug}?team=${tier}`
       : `/about/franchises/${standing.franchiseSlug}`;
-  const rwpFormatted = `${(standing.rwp * 100).toFixed(0)}`;
+  const rwpFormatted = (standing.rwp * 100).toFixed(0);
   return (
     <>
       <Link href={link}>
