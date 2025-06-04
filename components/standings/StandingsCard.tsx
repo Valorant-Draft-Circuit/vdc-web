@@ -59,7 +59,7 @@ export default function StandingsCard({
             <h1 className="italic text-sm xl:text-sm">
               {standing.wins}W {standing.losses}L
             </h1>
-            <h1 className="italic text-sm xl:text-sm">RWP: {standing.rwp}%</h1>
+            <h1 className="italic text-sm xl:text-sm">RWP: {(standing.rwp * 100).toFixed(0)}%</h1>
           </div>
         </div>
       </Link>
