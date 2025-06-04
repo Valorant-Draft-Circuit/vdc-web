@@ -22,6 +22,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         "https://discord.com/api/oauth2/authorize?scope=identify+guilds.join",
     }),
   ],
+  pages: {
+    signIn: "/signin"
+  },
   adapter: CustomPrismaAdapter as Adapter,
   session: {
     strategy: "jwt",
