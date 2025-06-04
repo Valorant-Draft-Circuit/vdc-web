@@ -11,7 +11,7 @@ export default function DiscordButton({ text }: DiscordButtonProps) {
       <form
         action={async () => {
           "use server";
-          await signIn();
+          await signIn('discord');
         }}
       >
         <button
