@@ -56,6 +56,11 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
     (account) => account.provider === "discord"
   )[0];
 
+  let showMmr = mmrShow;
+  if (!playerInfo.PrimaryRiotAccount.MMR) {
+    showMmr = false;
+  }
+  console.log(showMmr);
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
     <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
@@ -117,7 +122,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
                 />
               )}
             </div>
-            {mmrShow && (
+            {showMmr && (
               <div className="text-sm text-gray-500">
                 <h1>MMR: {playerInfo.PrimaryRiotAccount.MMR.mmrEffective}</h1>
               </div>
