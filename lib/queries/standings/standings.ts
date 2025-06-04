@@ -121,11 +121,9 @@ function computeTeamRecord(teamId: number, games) {
     losses += didWin ? 0 : 1;
 
     // if they won, add their side’s rounds
-    const thisMatchWonRounds = didWin
-      ? g.Match.home === teamId
-        ? g.roundsWonHome
-        : g.roundsWonAway
-      : 0;
+    const thisMatchWonRounds = g.Match.home === teamId
+  ? g.roundsWonHome
+  : g.roundsWonAway;
 
     roundsWon += thisMatchWonRounds;
     totalRounds += g.rounds;
