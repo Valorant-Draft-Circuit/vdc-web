@@ -27,6 +27,7 @@ export default function StandingsCard({
     query !== "franchises"
       ? `/about/franchises/${standing.franchiseSlug}?team=${tier}`
       : `/about/franchises/${standing.franchiseSlug}`;
+  const rwpFormatted = `${(standing.rwp * 100).toFixed(0)}`;
   return (
     <>
       <Link href={link}>
@@ -59,7 +60,7 @@ export default function StandingsCard({
             <h1 className="italic text-sm xl:text-sm">
               {standing.wins}W {standing.losses}L
             </h1>
-            <h1 className="italic text-sm xl:text-sm">RWP: {(standing.rwp * 100).toFixed(0)}%</h1>
+            <h1 className="italic text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
           </div>
         </div>
       </Link>
