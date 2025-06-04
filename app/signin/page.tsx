@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { signIn } from '@/lib/auth'
+import { signIn } from '@/lib/auth/auth'
 
 
 export default function SignInPage() {
