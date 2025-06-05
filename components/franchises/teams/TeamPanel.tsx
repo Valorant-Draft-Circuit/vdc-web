@@ -116,7 +116,7 @@ function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
     { label: "RANK: ", value: rank >= 0 ? rank + 1 : "N/A" },
     { label: "W: ", value: stats?.wins || 0 },
     { label: "L: ", value: stats?.losses || 0 },
-    { label: "RWP: ", value: `${stats?.rwp || 0}%` },
+    { label: "RWP: ", value: `${(stats?.rwp *100).toFixed(0) || 0}%` },
   ];
 
   return (

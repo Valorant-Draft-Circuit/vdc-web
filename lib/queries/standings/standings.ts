@@ -81,17 +81,19 @@ export async function getFranchiseStandings(
 }
 
 function compareStandings(left: TStandingProps, right: TStandingProps): number {
-  // 1) compare RWP
-  if (right.rwp > left.rwp) return 1;
-  if (right.rwp < left.rwp) return -1;
+  
 
-  // 2) then wins (more is good!)
+  // 1) compare wins (more is good!)
   if (right.wins > left.wins) return 1;
   if (right.wins < left.wins) return -1;
 
-  // 3) then losses (less is good!)
-  if (left.losses < right.losses) return 1;
-  if (left.losses > right.losses) return -1;
+  // 2) then losses (less is good!)
+  if (left.losses < right.losses) return -1;
+  if (left.losses > right.losses) return 1;
+
+  // 3) then compare RWP (higher is better!)
+  if (right.rwp > left.rwp) return 1;
+  if (right.rwp < left.rwp) return -1;
 
   // 4) alphabetical (if it somehow gets to this...)
   return left.franchiseSlug.localeCompare(right.franchiseSlug);
