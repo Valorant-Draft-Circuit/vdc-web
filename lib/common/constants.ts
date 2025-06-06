@@ -74,3 +74,5 @@ export const AGENTS = {
 export const AGENTURL = (UUID) => {
   return `https://media.valorant-api.com/agents/${UUID}/displayicon.png`;
 };
+
+export const DISCORD_API_ENDPOINT = "https://discord.com/api/v10";
