@@ -60,7 +60,6 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   if (!playerInfo.PrimaryRiotAccount.MMR) {
     showMmr = false;
   }
-  console.log(showMmr);
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
     <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">

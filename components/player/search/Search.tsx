@@ -36,7 +36,6 @@ export default function Search() {
     return await index
       .search(truncate(query, 50))
       .then((res) => {
-        console.log("res:", res);
         return res.hits;
       })
       .catch((err) => {
@@ -49,18 +48,8 @@ export default function Search() {
     (async () => setSearchResults(await search()))();
   }, []);
 
-  const importPlayers = async () => {
-    const res = await fetch("/api/meilisearch/documents/players");
-    console.log(res);
-  };
-
   return (
     <div>
-      <button onClick={importPlayers}>
-        <div className="p-3 bg-vdcRed rounded-2xl">
-          <h1 className="text-sm">fetch players</h1>
-        </div>
-      </button>
       <div className="flex items-center justify-between mb-2 py-4">
         <Input
           placeholder="Search players..."
