@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth/auth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { ControlPanel } from "@/prisma";
 import { prisma } from "@/prisma/prismadb";
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus, Prisma, Tier } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -45,6 +45,19 @@ export async function GET(
   }
 }
 
+export type TMeiliPlayer = {
+  id: string;
+  discordId: string;
+  discordName: string;
+  riotIGN: string;
+  tier: string;
+  mmrEffective: string;
+  teamName: string;
+  franchiseSlug: string;
+  franchiseLogo: string;
+  leagueStatus: string;
+  image: string;
+};
 async function getPlayers() {
   const users = await prisma.user.findMany({
     select: {
@@ -63,6 +76,7 @@ async function getPlayers() {
           tier: true,
           Franchise: {
             select: {
+              slug: true,
               Brand: {
                 select: {
                   logo: true,
@@ -131,6 +145,7 @@ async function getPlayers() {
       tier: user.Team?.tier || null,
       mmrEffective: mmr,
       teamName: user.Team?.name || null,
+      franchiseSlug: user.Team?.Franchise.slug || null,
       franchiseLogo: user.Team?.Franchise?.Brand?.logo || null,
       leagueStatus: user.Status?.leagueStatus || null,
       image: user.image || null,
