@@ -3,13 +3,10 @@ import { auth } from "@/lib/auth/auth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { ControlPanel } from "@/prisma";
 import { prisma } from "@/prisma/prismadb";
-import { LeagueStatus, Prisma, Tier } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { LeagueStatus, Tier } from "@prisma/client";
+import { NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ name: string }> }
-) {
+export async function GET() {
   const session = await auth();
 
   if (!session || !isAuthorizedForMeilisearch(session.user?.roles)) {
@@ -37,9 +34,9 @@ export async function GET(
       task: result,
       status: 200,
     });
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { message: err.message || "Failed to add player documents", status: 400 },
+      { message: err || "Failed to add player documents", status: 400 },
       { status: 400 }
     );
   }
@@ -97,6 +94,13 @@ async function getPlayers() {
         },
       },
       Status: {
+        where: {
+          AND: [
+            { leagueStatus: { not: LeagueStatus.UNREGISTERED } },
+            { leagueStatus: { not: LeagueStatus.RETIRED } },
+            { leagueStatus: { not: LeagueStatus.PENDING } },
+          ],
+        },
         select: {
           leagueStatus: true,
         },

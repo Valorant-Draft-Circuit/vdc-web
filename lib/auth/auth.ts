@@ -3,7 +3,6 @@ import Discord from "next-auth/providers/discord";
 import { CustomPrismaAdapter } from "./adapter";
 import { Adapter } from "next-auth/adapters";
 import { prisma } from "@/prisma/prismadb";
-import { DISCORD_API_ENDPOINT } from "../common/constants";
 
 declare module "next-auth" {
   interface User {
