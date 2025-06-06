@@ -7,17 +7,27 @@ import { LeagueStatus, Tier } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
   const url = request.nextUrl;
-  const meiliAuthFromUrl = url.searchParams.get("meiliauth");
+  const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
   const bypass =
     meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY;
 
-  if (!session || !isAuthorizedForMeilisearch(session.user?.roles) || !bypass) {
-    return NextResponse.json({
-      message: "Forbidden",
-      status: 403,
-    });
+  if (!bypass) {
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json(
+        { message: "Unauthorized: no valid session" },
+        { status: 401 }
+      );
+    }
+
+    const roles = session.user?.roles ?? "";
+    if (!isAuthorizedForMeilisearch(roles)) {
+      return NextResponse.json(
+        { message: "Forbidden: insufficient permissions" },
+        { status: 403 }
+      );
+    }
   }
 
   const players = await getPlayers();
