@@ -8,20 +8,17 @@ export async function GET(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const session = await auth();
-  const req = await request.json();
-  let bypass = false;
-  if (req.meiliauth === process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY) {
-    bypass = true;
-  }
+  const url = request.nextUrl;
+  const meiliAuthFromUrl = url.searchParams.get("meiliauth");
+  const bypass =
+    meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY;
 
   if (!session || !isAuthorizedForMeilisearch(session.user?.roles) || !bypass) {
-
     return NextResponse.json({
       message: "Forbidden",
       status: 403,
     });
   }
-
 
   const indexName = (await params).name;
 
