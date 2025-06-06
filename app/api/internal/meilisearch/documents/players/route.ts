@@ -4,12 +4,18 @@ import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { ControlPanel } from "@/prisma";
 import { prisma } from "@/prisma/prismadb";
 import { LeagueStatus, Tier } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await auth();
 
-  if (!session || !isAuthorizedForMeilisearch(session.user?.roles)) {
+  const req = await request.json();
+  let bypass = false;
+  if (req.meiliauth === process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY) {
+    bypass = true;
+  }
+
+  if (!session || !isAuthorizedForMeilisearch(session.user?.roles) || !bypass) {
     return NextResponse.json({
       message: "Forbidden",
       status: 403,
