@@ -1,4 +1,4 @@
-import { Tier } from "@prisma/client";
+import { LeagueStatus, Tier } from "@prisma/client";
 
 const BUCKET_URL = "https://uni-objects.nyc3.cdn.digitaloceanspaces.com/vdc/";
 export const DISCORD_LINK = "https://go.vdc.gg/discord";
@@ -75,4 +75,15 @@ export const AGENTURL = (UUID) => {
   return `https://media.valorant-api.com/agents/${UUID}/displayicon.png`;
 };
 
-export const DISCORD_API_ENDPOINT = "https://discord.com/api/v10";
+export const STATUS_LABELS: Record<LeagueStatus, string> = {
+  [LeagueStatus.SIGNED]: "",
+  [LeagueStatus.GENERAL_MANAGER]: "",
+  [LeagueStatus.UNREGISTERED]: "Viewer",
+  [LeagueStatus.DRAFT_ELIGIBLE]: "DE",
+  [LeagueStatus.FREE_AGENT]: "FA",
+  [LeagueStatus.RESTRICTED_FREE_AGENT]: "RFA",
+  [LeagueStatus.SUSPENDED]: "SUSPENDED",
+  [LeagueStatus.RETIRED]: "RETIRED",
+  [LeagueStatus.PENDING]: "PENDING",
+  [LeagueStatus.APPROVED]: "RETIRED",
+};

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import {
+  STATUS_LABELS,
   TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
   TRACKER_PROFILE_URL,
@@ -16,18 +17,6 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
     playerInfo.PrimaryRiotAccount.riotIGN
   );
   const mmrShow = await ControlPanel.getMMRDisplayState();
-  const STATUS_LABELS: Record<LeagueStatus, string> = {
-    [LeagueStatus.SIGNED]: "",
-    [LeagueStatus.GENERAL_MANAGER]: "",
-    [LeagueStatus.UNREGISTERED]: "Viewer",
-    [LeagueStatus.DRAFT_ELIGIBLE]: "DE",
-    [LeagueStatus.FREE_AGENT]: "FA",
-    [LeagueStatus.RESTRICTED_FREE_AGENT]: "RFA",
-    [LeagueStatus.SUSPENDED]: "SUSPENDED",
-    [LeagueStatus.RETIRED]: "RETIRED",
-    [LeagueStatus.PENDING]: "PENDING",
-    [LeagueStatus.APPROVED]: "RETIRED",
-  };
 
   let isPlayerSigned = false;
   let playerTeam;
@@ -60,7 +49,6 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   if (!playerInfo.PrimaryRiotAccount.MMR) {
     showMmr = false;
   }
-  console.log(showMmr);
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
     <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
