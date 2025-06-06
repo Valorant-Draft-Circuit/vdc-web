@@ -15,12 +15,13 @@ export async function GET(
   }
 
   if (!session || !isAuthorizedForMeilisearch(session.user?.roles) || !bypass) {
+
     return NextResponse.json({
       message: "Forbidden",
       status: 403,
     });
   }
-  
+
 
   const indexName = (await params).name;
 
