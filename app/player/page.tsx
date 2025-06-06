@@ -1,5 +1,5 @@
+import Search from "@/components/player/search/Search";
 import { auth } from "@/lib/auth/auth";
-import { redirect } from "next/navigation";
 
 /**
  * TODO: make a user search page.
@@ -8,7 +8,14 @@ import { redirect } from "next/navigation";
 export default async function Page() {
   const session = await auth();
   if (session) {
-    redirect(`/player/me`);
+    // redirect(`/player/me`);
   }
-  return redirect("/");
+
+  // return redirect("/");
+  return (
+    <div className="grid grid-cols-3">
+      
+      <Search />
+    </div>
+  );
 }

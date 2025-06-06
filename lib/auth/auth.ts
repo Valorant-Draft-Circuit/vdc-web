@@ -43,41 +43,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user && token.access_token) {
-        const freshProfile = await fetch(`${DISCORD_API_ENDPOINT}/users/@me`, {
-          headers: {
-            Authorization: `Bearer ${token.access_token}`,
-          },
-        }).then((res) => res.json());
-
-        const { avatar, id } = freshProfile;
-        const format = avatar?.startsWith("a_") ? "gif" : "png";
-        const newImage = avatar
-          ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.${format}`
-          : session.user.image;
-
+    session: async ({ session, token }) => {
+      if (session.user) {
         session.user.id = token.id as string;
         session.user.roles = token.roles as string;
-        session.user.image = newImage;
-
-        const existingUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { image: true },
-        });
-
-        if (existingUser?.image !== newImage) {
-          await prisma.user.update({
-            where: { id: token.id as string },
-            data: { image: newImage },
-          });
-        }
       }
       return session;
     },
   },
   events: {
-    async signIn({ user, isNewUser }) {
+    async signIn({ user, account, isNewUser }) {
       if (isNewUser) {
         await prisma.status.create({
           data: {
@@ -86,6 +61,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             contractRemaining: null,
           },
         });
+      }
+
+      if (account?.access_token) {
+        const freshProfile = await fetch(
+          "https://discord.com/api/v10/users/@me",
+          {
+            headers: {
+              Authorization: `Bearer ${account.access_token}`,
+            },
+          }
+        ).then((res) => res.json());
+
+        const { avatar, id } = freshProfile;
+        if (avatar) {
+          const format = avatar.startsWith("a_") ? "gif" : "png";
+          const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${format}`;
+
+          const existingUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { image: true },
+          });
+
+          if (existingUser?.image !== newImage) {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { image: newImage },
+            });
+          }
+        }
       }
     },
   },
