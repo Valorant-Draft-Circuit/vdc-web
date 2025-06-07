@@ -14,7 +14,7 @@ export default function DiscordButton({ text, signInButton }: TDiscordButton) {
         <form
           action={async () => {
             "use server";
-            await signIn();
+            await signIn('discord', { redirectTo: '/'});
           }}
         >
           <button
