@@ -21,13 +21,18 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
-      <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
-        Season {CURRENT_SEASON} Schedule
-      </h1>
-      <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params={"tier"} />
-      </Suspense>
+  <div className="h-screen overflow-hidden flex flex-col">
+    <div className="mx-auto py-16 max-w-7xl xl:py-12 flex flex-col gap-12 overflow-hidden">
+          <h1 className="text-vdcRed italic text-5xl text-center xl:ml-30">
+            Season {CURRENT_SEASON} Schedule
+          </h1>
+       <div className="flex-1 ">
+          <Suspense fallback={<SchedulePanelSkeleton />}>
+            <VerticalTab tabElements={tabs} params={"tier"} />
+          </Suspense>
+        </div>
+      </div>
     </div>
+    
   );
 }
