@@ -102,9 +102,9 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
     };
 
     container.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll); // optional but helpful
+    window.addEventListener("resize", handleScroll); 
 
-    // Call initially
+
     handleScroll();
 
     return () => {
