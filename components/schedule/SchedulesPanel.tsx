@@ -121,7 +121,7 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex justify-center gap-4 sticky top-0 z-20 bg-white dark:bg-black py-2">
+      <div className="flex justify-center gap-4 sticky top-0 z-20 py-2">
         <button
           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
           onClick={() => {
