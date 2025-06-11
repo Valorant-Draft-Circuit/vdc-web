@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/signin"
+    signIn: "/signin",
   },
   adapter: CustomPrismaAdapter as Adapter,
   session: {
@@ -64,7 +64,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
       }
-
+      const res = await fetch(
+        `${process.env.URL}/api/meilisearch/player/${user.id}`
+      );
+      if (!res.ok) {
+        console.warn("Unable to update meilisearch player document ");
+      }
+      
       if (account?.access_token) {
         const freshProfile = await fetch(
           "https://discord.com/api/v10/users/@me",

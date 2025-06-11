@@ -39,7 +39,6 @@ export default function Search({ mmrShow }) {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const index = meilisearchClient.getIndex("players");
   const LIMIT = 30;
   async function fetchPage(q: string, pageNumber: number) {
