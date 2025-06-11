@@ -6,10 +6,8 @@ import NavBar from "../components/navigation/NavBar";
 import Footer from "../components/footer/Footer";
 import { initCache } from "@/lib/common/cache";
 import Banner from "@/components/theme/Banner";
-import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 
 initCache();
-meilisearchClient;
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
