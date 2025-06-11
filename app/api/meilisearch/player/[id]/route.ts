@@ -12,7 +12,6 @@ export async function GET(
 
   try {
     const player = await getPlayer(playerId);
-    console.log(player);
     if (!player) {
       throw Error();
     }

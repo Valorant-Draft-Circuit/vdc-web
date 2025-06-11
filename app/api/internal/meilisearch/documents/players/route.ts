@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
   const bypass =
-    meiliAuthFromUrl === process.env.ELEVATED_KEY;
+    meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY;
 
   if (!bypass) {
     const session = await auth();

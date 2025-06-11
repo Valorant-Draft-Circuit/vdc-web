@@ -64,7 +64,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
       }
-
+      const res = await fetch(
+        `${process.env.URL}/api/meilisearch/player/${user.id}`
+      );
+      if (!res.ok) {
+        console.warn("Unable to update meilisearch player document ");
+      }
+      
       if (account?.access_token) {
         const freshProfile = await fetch(
           "https://discord.com/api/v10/users/@me",
@@ -84,11 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             where: { id: user.id },
             select: { image: true },
           });
-          const res = await fetch(`${process.env.URL}/api/meilisearch/player/${user.id}`);
-          console.log(res.json())
-          if (!res.ok) {
-            console.warn("Unable to update meilisearch player document ");
-          }
+
           if (existingUser?.image !== newImage) {
             await prisma.user.update({
               where: { id: user.id },
