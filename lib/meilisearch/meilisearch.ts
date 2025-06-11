@@ -6,12 +6,11 @@ class MeilisearchClient {
 
   private constructor() {
     const host = process.env.NEXT_PUBLIC_MEILISEARCH_URL;
-    const apiKey = process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY;
 
     if (!host) {
       throw new Error("MEILISEARCH_URL is not defined");
     }
-
     this.client = new MeiliSearch({ host, apiKey });
   }
 
@@ -45,11 +44,3 @@ class MeilisearchClient {
 }
 
 export const meilisearchClient = MeilisearchClient.getInstance();
-
-// userpfp
-// discord name
-// riot ign
-// tier
-// status
-// franchise | team
-// mmr

@@ -1,0 +1,139 @@
+import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
+import { ControlPanel } from "@/prisma";
+import { prisma } from "@/prisma/prismadb";
+import { LeagueStatus, Tier } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const playerId = (await params).id;
+
+  try {
+    const player = await getPlayer(playerId);
+    if (!player) {
+      throw Error();
+    }
+    const index = meilisearchClient.getIndex("players");
+    const task = await index.addDocuments([ player ]);
+    const result = await meilisearchClient.waitForTaskCompletion(task.taskUid);
+
+    return NextResponse.json({
+      message: "Player documents added",
+      task: result,
+      status: 200,
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { message: err || "Failed to add player documents", status: 400 },
+      { status: 400 }
+    );
+  }
+}
+
+async function getPlayer(userId: string) {
+  const player = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      Accounts: {
+        where: { provider: "discord" },
+        select: {
+          providerAccountId: true,
+        },
+      },
+      Team: {
+        select: {
+          name: true,
+          tier: true,
+          Franchise: {
+            select: {
+              slug: true,
+              Brand: {
+                select: {
+                  logo: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      PrimaryRiotAccount: {
+        select: {
+          riotIGN: true,
+          MMR: {
+            select: {
+              mmrEffective: true,
+            },
+          },
+        },
+      },
+      Status: {
+        select: {
+          leagueStatus: true,
+        },
+      },
+    },
+  });
+
+  const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
+    PROSPECT: { min: number; max: number };
+    APPRENTICE: { min: number; max: number };
+    EXPERT: { min: number; max: number };
+    MYTHIC: { min: number; max: number };
+  };
+
+  const isFreeAgent = player?.PrimaryRiotAccount?.MMR && !player.Team;
+  const isUnregistered =
+    player?.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
+  const mmr = player?.PrimaryRiotAccount?.MMR?.mmrEffective ?? null;
+
+  if (isFreeAgent) {
+    return {
+      id: player.id,
+      discordId: player.Accounts[0]?.providerAccountId || null,
+      discordName: player.name,
+      riotIGN: player.PrimaryRiotAccount?.riotIGN || null,
+      tier: determineTier(mmr),
+      mmrEffective: mmr,
+      leagueStatus: player.Status?.leagueStatus || null,
+      image: player.image,
+    };
+  } else if (isUnregistered) {
+    return {
+      id: player?.id,
+      discordId: player?.Accounts[0]?.providerAccountId || null,
+      discordName: player?.name,
+      riotIGN: player?.PrimaryRiotAccount?.riotIGN || null,
+      leagueStatus: player?.Status?.leagueStatus || null,
+      image: player?.image,
+    };
+  }
+  return {
+    id: player?.id,
+    discordId: player?.Accounts[0]?.providerAccountId || null,
+    discordName: player?.name,
+    riotIGN: player?.PrimaryRiotAccount?.riotIGN || null,
+    tier: player?.Team?.tier || null,
+    mmrEffective: mmr,
+    teamName: player?.Team?.name || null,
+    franchiseSlug: player?.Team?.Franchise.slug || null,
+    franchiseLogo: player?.Team?.Franchise?.Brand?.logo || null,
+    leagueStatus: player?.Status?.leagueStatus || null,
+    image: player?.image || null,
+  };
+
+  function determineTier(mmr: number | null) {
+    if (mmr === null) return null;
+
+    const { PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
+
+    if (mmr <= PROSPECT.max) return Tier.PROSPECT;
+    if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
+    if (mmr <= EXPERT.max) return Tier.EXPERT;
+    return Tier.MYTHIC;
+  }
+}
