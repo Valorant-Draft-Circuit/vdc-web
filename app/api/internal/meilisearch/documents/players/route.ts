@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
   const bypass =
-    meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_SEARCH_KEY;
+    meiliAuthFromUrl === process.env.ELEVATED_KEY;
 
   if (!bypass) {
     const session = await auth();
@@ -181,3 +181,41 @@ async function getPlayers() {
     return Tier.MYTHIC;
   }
 }
+
+
+// curl -X GET 'https://meilisearch.vdc.gg//keys' \
+// -H 'Authorization: Bearer xxMhWMLghejzExnXqGqCnZKHdpEHUDcahkodsJwW'
+
+
+// curl \
+//   -X POST 'https://meilisearch.vdc.gg/keys' \
+//   -H 'Authorization: Bearer xxMhWMLghejzExnXqGqCnZKHdpEHUDcahkodsJwW' \
+//   -H 'Content-Type: application/json' \
+//   --data-binary '{
+//     "description": "Elevated VDC Web API key",
+//     "actions": ["documents.add"],
+//     "indexes": ["players"],
+//     "expiresAt": null 
+//   }'
+
+// curl \
+//   -X POST 'https://meilisearch.vdc.gg/keys' \
+//   -H 'Authorization: Bearer xxMhWMLghejzExnXqGqCnZKHdpEHUDcahkodsJwW' \
+//   -H 'Content-Type: application/json' \
+//   --data-binary '{
+//     "description": "API Key for VDC Web",
+//     "actions": ["documents.get"],
+//     "indexes": ["players"],
+//     "expiresAt": null 
+//   }'
+
+// curl \
+//   -X POST 'https://meilisearch.vdc.gg/keys' \
+//   -H 'Authorization: Bearer xxMhWMLghejzExnXqGqCnZKHdpEHUDcahkodsJwW' \
+//   -H 'Content-Type: application/json' \
+//   --data-binary '{
+//     "description": "API Key for VDC Bot",
+//     "actions": ["documents.add", "documents.get"],
+//     "indexes": ["players"],
+//     "expiresAt": null 
+//   }'

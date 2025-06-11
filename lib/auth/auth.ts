@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/signin"
+    signIn: "/signin",
   },
   adapter: CustomPrismaAdapter as Adapter,
   session: {
@@ -84,7 +84,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             where: { id: user.id },
             select: { image: true },
           });
-
+          const res = await fetch(`${process.env.URL}/api/meilisearch/player/${user.id}`);
+          console.log(res.json())
+          if (!res.ok) {
+            console.warn("Unable to update meilisearch player document ");
+          }
           if (existingUser?.image !== newImage) {
             await prisma.user.update({
               where: { id: user.id },
