@@ -28,7 +28,7 @@ export async function getScheduleByTier(tier: Tier, season: number) {
 
     let formattedDate = formatDate(match.dateScheduled);
     if (match.matchType === MatchType.PRE_SEASON) {
-      formattedDate = `${formattedDate} - Preseason`;
+      formattedDate = `${formattedDate} - Preseason|${match.dateScheduled}`;
       if (!preseasonDatesToMatches[formattedDate]) {
         preseasonDatesToMatches[formattedDate] = [];
       }
@@ -40,7 +40,7 @@ export async function getScheduleByTier(tier: Tier, season: number) {
       );
       preseasonDatesToMatches[formattedDate].push(packagedMatch);
     } else {
-      formattedDate = `${formattedDate} - MD ${match.matchDay}`;
+      formattedDate = `${formattedDate} - MD ${match.matchDay}|${match.dateScheduled}`;
       if (!regularSeasonDatesToMatches[formattedDate]) {
         regularSeasonDatesToMatches[formattedDate] = [];
       }
