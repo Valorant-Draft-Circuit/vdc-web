@@ -3,23 +3,29 @@ import { Tier } from "@prisma/client";
 // import Filter from "../standings/filter/Filter";
 import ScheduleCard from "./ScheduleCard";
 import { useEffect, useState, useRef } from "react";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 
-
-export default function SchedulePanel({ tier, season }: { tier: Tier; season?: number }) {
+export default function SchedulePanel({
+  tier,
+  season,
+}: {
+  tier: Tier;
+  season?: number;
+}) {
   const [matchDays, setMatchDays] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<any>(null);
+  const [nearestDay, setNearestDay] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const todaysMatchDateRef = useRef<string | null>(null);
 
-
-
-
   useEffect(() => {
-
     const fetchSchedule = async () => {
-      const res = await fetch(`/api/schedule?tier=${tier}&season=${season || ""}`);
+      const res = await fetch(
+        `/api/schedule?tier=${tier}&season=${season || ""}`,
+        { cache: "force-cache" }
+      );
       const data = await res.json();
       const allDays = [
         ...Object.keys(data.schedule.preSeason || {}),
@@ -32,45 +38,41 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
     fetchSchedule();
   }, [tier, season]);
 
-
   useEffect(() => {
     if (!schedule || matchDays.length === 0) return;
 
     const today = new Date();
     const todayMMDD = (today.getMonth() + 1) * 100 + today.getDate();
-    const futureMatch = matchDays.find((day) => {
-      const matchDate = new Date(day.split(" - ")[0]);
-      const matchDateMMDD = (matchDate.getMonth() + 1) * 100 + matchDate.getDate();
+
+    const nearestMatch = matchDays.find((day) => {
+      const matchDate = new Date(day.split("|")[1]);
+      const matchDateMMDD =
+        (matchDate.getMonth() + 1) * 100 + matchDate.getDate();
       return matchDateMMDD >= todayMMDD;
     });
 
-    if (futureMatch) {
-      todaysMatchDateRef.current = futureMatch;
-      scrollToDay(futureMatch);
+    setNearestDay(nearestMatch ?? matchDays[matchDays.length - 1]);
+
+    if (nearestMatch) {
+      todaysMatchDateRef.current = nearestMatch;
+      scrollToDay(nearestMatch);
     } else {
       scrollToDay(matchDays[matchDays.length - 1]);
     }
   }, [schedule, matchDays]);
 
-
-
-
-
   const scrollToDay = (day: string) => {
     const el = cardRefs.current[day];
     const container = scrollContainerRef.current;
-
     if (el && container) {
-      const scrollTarget = el.offsetTop - container.offsetTop;
-
       container.scrollTo({
-        top: scrollTarget,
+        top: el.offsetTop,
+        left: 0,
         behavior: "smooth",
       });
       setActiveDay(day);
     }
   };
-
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -84,7 +86,8 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
         const el = cardRefs.current[day];
         if (el) {
           const rect = el.getBoundingClientRect();
-          const isVisible = rect.bottom > containerTop && rect.top < window.innerHeight;
+          const isVisible =
+            rect.bottom > containerTop && rect.top < window.innerHeight;
 
           if (isVisible) {
             const distance = Math.abs(rect.top - containerTop);
@@ -94,7 +97,9 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
       });
 
       if (visibleDays.length > 0) {
-        const closest = visibleDays.sort((a, b) => a.distanceToTop - b.distanceToTop)[0];
+        const closest = visibleDays.sort(
+          (a, b) => a.distanceToTop - b.distanceToTop
+        )[0];
         if (closest.day !== activeDay) {
           setActiveDay(closest.day);
         }
@@ -102,8 +107,7 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
     };
 
     container.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll); 
-
+    window.addEventListener("resize", handleScroll);
 
     handleScroll();
 
@@ -113,69 +117,100 @@ export default function SchedulePanel({ tier, season }: { tier: Tier; season?: n
     };
   }, [matchDays, activeDay]);
 
-
-
   if (matchDays.length === 0) return;
-
-
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex justify-center gap-4 sticky top-0 z-20 py-2">
-        <button
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
-          onClick={() => {
-            const idx = matchDays.indexOf(activeDay!);
-
-            if (idx > 0) scrollToDay(matchDays[idx - 1]);
-          }}
-          disabled={!activeDay || matchDays.indexOf(activeDay) === 0}
-        >
-          {"<"}
-        </button>
-
-        <button
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
-          onClick={() => {
-            if (todaysMatchDateRef.current) scrollToDay(todaysMatchDateRef.current);
-          }}
-        >
-          Today
-        </button>
-
-
-        <button
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
-          onClick={() => {
-            const idx = matchDays.indexOf(activeDay!);
-            if (idx < matchDays.length - 1) scrollToDay(matchDays[idx + 1]);
-          }}
-          disabled={!activeDay || matchDays.indexOf(activeDay) === matchDays.length - 1}
-        >
-           {">"}
-        </button>
+      <div className="flex flex-col md:flex-row gap-4 sticky top-0 z-20 justify-between">
+        <h1 className="text-vdcRed italic text-3xl md:text-2xl xl:text-3xl text-center my-auto">
+          Season {season} Schedule
+        </h1>
+        <div className="flex flex-row m-auto md:m-0 gap-5">
+          <PreviousDayButton
+            matchDays={matchDays}
+            activeDay={activeDay}
+            scrollToDay={scrollToDay}
+          />
+          <NearestButton
+            activeDay={activeDay}
+            nearestDay={nearestDay}
+            scrollToDay={scrollToDay}
+          />
+          <NextDayButton
+            matchDays={matchDays}
+            activeDay={activeDay}
+            scrollToDay={scrollToDay}
+          />
+        </div>
       </div>
-
-
-
-      {/*Each Match Day*/}
-      <div ref={scrollContainerRef} className="h-[calc(100vh-12rem)] overflow-y-auto px-4 py-4 space-y-6 scrollbar-hidden">
+      <div
+        ref={scrollContainerRef}
+        className="relative h-[calc(100vh-12rem)] overflow-y-auto space-y-5 scrollbar-hidden"
+      >
         {matchDays.map((day) => {
           const seasonData = schedule.preSeason[day]
             ? schedule.preSeason
             : schedule.regularSeason;
 
           return (
-            <div key={day} data-day={day} ref={(el) => {
-              if (el) cardRefs.current[day] = el;
-            }} className="w-full">
+            <div
+              key={day}
+              data-day={day}
+              ref={(el) => {
+                if (el) cardRefs.current[day] = el;
+              }}
+              className="w-full"
+            >
               <ScheduleCard matchDay={day} season={seasonData} />
             </div>
           );
         })}
       </div>
-
-
     </div>
+  );
+}
+
+function PreviousDayButton({ matchDays, activeDay, scrollToDay }) {
+  return (
+    <button
+      className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
+      onClick={() => {
+        const idx = matchDays.indexOf(activeDay!);
+
+        if (idx > 0) scrollToDay(matchDays[idx - 1]);
+      }}
+      disabled={!activeDay || matchDays.indexOf(activeDay) === 0}
+    >
+      <ArrowLeftIcon className="size-5" />
+    </button>
+  );
+}
+function NearestButton({ activeDay, nearestDay, scrollToDay }) {
+  return (
+    <button
+      className="px-4 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
+      onClick={() => {
+        if (nearestDay) scrollToDay(nearestDay);
+      }}
+      disabled={activeDay === nearestDay}
+    >
+      <h1>Nearest</h1>
+    </button>
+  );
+}
+function NextDayButton({ matchDays, activeDay, scrollToDay }) {
+  return (
+    <button
+      className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
+      onClick={() => {
+        const idx = matchDays.indexOf(activeDay!);
+        if (idx < matchDays.length - 1) scrollToDay(matchDays[idx + 1]);
+      }}
+      disabled={
+        !activeDay || matchDays.indexOf(activeDay) === matchDays.length - 1
+      }
+    >
+      <ArrowRightIcon className="size-5" />
+    </button>
   );
 }

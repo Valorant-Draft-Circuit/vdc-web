@@ -1,9 +1,11 @@
-
-
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { initCache, getSeasonCached, getScheduleByTierCached } from "@/lib/common/cache";
+import {
+  initCache,
+  getSeasonCached,
+  getScheduleByTierCached,
+} from "@/lib/common/cache";
 
 initCache();
 
