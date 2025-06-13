@@ -1,11 +1,10 @@
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
 import {
   initCache,
   getSeasonCached,
   getScheduleByTierCached,
 } from "@/lib/common/cache";
+import { Tier } from "@prisma/client";
 
 initCache();
 
@@ -19,7 +18,7 @@ export async function GET(req: Request) {
   }
 
   const season = seasonParam ? parseInt(seasonParam) : await getSeasonCached();
-  const schedule = await getScheduleByTierCached(tier as any, season);
+  const schedule = await getScheduleByTierCached(tier as Tier, season);
 
   return NextResponse.json({ schedule, season });
 }

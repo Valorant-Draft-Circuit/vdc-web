@@ -4,6 +4,7 @@ import { Tier } from "@prisma/client";
 import ScheduleCard from "./ScheduleCard";
 import { useEffect, useState, useRef } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
+import { TSchedule } from "@/lib/queries/schedule/schedule";
 
 export default function SchedulePanel({
   tier,
@@ -13,7 +14,7 @@ export default function SchedulePanel({
   season?: number;
 }) {
   const [matchDays, setMatchDays] = useState<string[]>([]);
-  const [schedule, setSchedule] = useState<any>(null);
+  const [schedule, setSchedule] = useState<TSchedule>();
   const [nearestDay, setNearestDay] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -24,7 +25,7 @@ export default function SchedulePanel({
     const fetchSchedule = async () => {
       const res = await fetch(
         `/api/schedule?tier=${tier}&season=${season || ""}`,
-        { cache: "force-cache" }
+        { next: { revalidate: 3600 } }
       );
       const data = await res.json();
       const allDays = [
@@ -117,7 +118,8 @@ export default function SchedulePanel({
     };
   }, [matchDays, activeDay]);
 
-  if (matchDays.length === 0) return;
+  if (matchDays.length === 0)
+    return <h1 className="text-center">loading...</h1>;
 
   return (
     <div className="flex flex-col gap-5">
@@ -148,9 +150,9 @@ export default function SchedulePanel({
         className="relative h-[calc(100vh-12rem)] overflow-y-auto space-y-5 scrollbar-hidden"
       >
         {matchDays.map((day) => {
-          const seasonData = schedule.preSeason[day]
+          const seasonData = schedule?.preSeason[day]
             ? schedule.preSeason
-            : schedule.regularSeason;
+            : schedule?.regularSeason;
 
           return (
             <div
