@@ -1,4 +1,4 @@
-import { Tier } from "@prisma/client";
+import { LeagueStatus, Tier } from "@prisma/client";
 
 export const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
@@ -67,4 +67,20 @@ export function listAllSeasons(currentSeason: number) {
     seasons.push(String(i));
   }
   return seasons;
+}
+
+export function isUserPlaying(player) {
+  if (
+    player.leagueStatus === LeagueStatus.SIGNED ||
+    player.leagueStatus === LeagueStatus.FREE_AGENT ||
+    player.leagueStatus === LeagueStatus.RESTRICTED_FREE_AGENT
+  ) {
+    return true;
+  } else if (
+    player.leagueStatus === LeagueStatus.GENERAL_MANAGER &&
+    player.teamName
+  ) {
+    return true;
+  }
+  return false;
 }
