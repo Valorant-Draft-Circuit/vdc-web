@@ -93,6 +93,7 @@ async function getFranchise(slug) {
               PrimaryRiotAccount: true,
               Accounts: { where: { provider: "discord" } },
               Captain: true,
+              Status: true,
             },
           },
         },
