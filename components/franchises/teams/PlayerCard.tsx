@@ -1,8 +1,7 @@
 "use client";
 
 import DiscordBadge from "@/components/buttons/DiscordBadge";
-import { ShieldCheckIcon, UserMinusIcon, UserPlusIcon, } from "@heroicons/react/24/solid";
-import { ShieldExclamationIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon, UserMinusIcon, UserPlusIcon, ShieldExclamationIcon, } from "@heroicons/react/24/solid";
 import { ContractStatus } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,9 +17,9 @@ export default function PlayerCard({ player }: { player }) {
     if (pStatus === ContractStatus.INACTIVE_RESERVE) {
       return (
         <div className="group relative">
-          <ShieldExclamationIcon className="absolute size-6 text-amber-400 z-0 -right-3 -top-1" />
+          <ShieldExclamationIcon className="absolute size-6 text-red-400 z-0 -right-3 -top-1" />
           <div className="absolute -top-10 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out dark:bg-[#3d3d49] dark:text-gray-300 px-3 py-1 rounded-md drop-shadow-lg pointer-events-none whitespace-nowrap z-10 outline outline:dark:text-gray-300">
-            IR
+            <h2>IR</h2>
           </div>
         </div>
       );
@@ -30,7 +29,7 @@ export default function PlayerCard({ player }: { player }) {
         <div className="group relative">
           <UserPlusIcon className="absolute size-6 text-amber-400 z-0 -right-3 -top-1" />
           <div className="absolute -top-10 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out dark:bg-[#3d3d49] dark:text-gray-300 px-3 py-1 rounded-md drop-shadow-lg pointer-events-none whitespace-nowrap z-10 outline outline:dark:text-gray-300">
-            Subbed In
+            <h2>Subbed In</h2>
           </div>
         </div>
       );
@@ -40,7 +39,7 @@ export default function PlayerCard({ player }: { player }) {
         <div className="group relative">
           <UserMinusIcon className="absolute size-6 text-amber-400 z-0 -right-3 -top-1" />
           <div className="absolute -top-10 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out dark:bg-[#3d3d49] dark:text-gray-300 px-3 py-1 rounded-md drop-shadow-lg pointer-events-none whitespace-nowrap z-10 outline outline:dark:text-gray-300">
-            Subbed Out
+            <h2>Subbed Out</h2>
           </div>
         </div>
       );
@@ -50,7 +49,7 @@ export default function PlayerCard({ player }: { player }) {
         <div className="group relative">
           <ShieldCheckIcon className="absolute size-6 text-amber-400 z-0 -right-3 -top-1" />
           <div className="absolute -top-10 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out dark:bg-[#3d3d49] dark:text-gray-300 px-3 py-1 rounded-md drop-shadow-lg pointer-events-none whitespace-nowrap z-10 outline outline:dark:text-gray-300">
-            Captain
+            <h2>Captain</h2>
           </div>
         </div>
       );
