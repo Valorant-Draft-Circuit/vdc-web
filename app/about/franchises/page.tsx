@@ -21,7 +21,7 @@ export default async function Page() {
         <div className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl">
           <Image
             alt="hero image"
-            src="/about-hero-image.webp"
+            src="/franchise-hero.webp"
             width={5000}
             height={5000}
             className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] brightness-20"

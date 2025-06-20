@@ -76,14 +76,14 @@ export const AGENTURL = (UUID) => {
 };
 
 export const STATUS_LABELS: Record<LeagueStatus, string> = {
-  [LeagueStatus.SIGNED]: "",
   [LeagueStatus.GENERAL_MANAGER]: "GM/AGM",
-  [LeagueStatus.UNREGISTERED]: "Viewer",
-  [LeagueStatus.DRAFT_ELIGIBLE]: "DE",
   [LeagueStatus.FREE_AGENT]: "FA",
   [LeagueStatus.RESTRICTED_FREE_AGENT]: "RFA",
+  [LeagueStatus.SIGNED]: "SIGNED",
+  [LeagueStatus.UNREGISTERED]: "Viewer",
+  [LeagueStatus.DRAFT_ELIGIBLE]: "DE",
   [LeagueStatus.SUSPENDED]: "SUSPENDED",
   [LeagueStatus.RETIRED]: "RETIRED",
   [LeagueStatus.PENDING]: "PENDING",
-  [LeagueStatus.APPROVED]: "RETIRED",
+  [LeagueStatus.APPROVED]: "APPROVED",
 };
