@@ -25,6 +25,7 @@ export default function PlayerSearch({ mmrShow }) {
     LeagueStatus.FREE_AGENT,
     LeagueStatus.RESTRICTED_FREE_AGENT,
   ];
+
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<TMeiliPlayer[]>([]);
   const [page, setPage] = useState(0);
