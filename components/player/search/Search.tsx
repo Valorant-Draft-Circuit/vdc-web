@@ -16,15 +16,23 @@ import { useEffect, useState } from "react";
 import PlayerCard from "./PlayerCard";
 import { STATUS_LABELS, TIERS_LIST } from "@/lib/common/constants";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { LeagueStatus } from "@prisma/client";
 
 export default function PlayerSearch({ mmrShow }) {
+  const defaultStatus = [
+    LeagueStatus.GENERAL_MANAGER,
+    LeagueStatus.SIGNED,
+    LeagueStatus.FREE_AGENT,
+    LeagueStatus.RESTRICTED_FREE_AGENT,
+  ];
+
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<TMeiliPlayer[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [tierFilter, setTierFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string[]>(defaultStatus);
 
   const index = meilisearchClient.getIndex("players");
   const LIMIT = 30;
