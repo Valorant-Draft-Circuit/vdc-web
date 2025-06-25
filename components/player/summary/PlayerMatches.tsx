@@ -1,4 +1,10 @@
-import { AGENTS, AGENTURL, TEAM_LOGOS_URL } from "@/lib/common/constants";
+import {
+  AGENTS,
+  AGENTURL,
+  MAP_LIST_URL,
+  MAPS,
+  TEAM_LOGOS_URL,
+} from "@/lib/common/constants";
 import { Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,18 +13,17 @@ import { useEffect, useState } from "react";
 
 export default function PlayerMatches({ stats }: { stats }) {
   return (
-    <div className="divide-y divide-gray-200 overflow-hidden">
+    <div className="divide-y">
       <div className="px-4 py-2 xl:px-6">
         <h1 className="text-sm italic">Match History</h1>
       </div>
       <div>
-        <ul role="list" className="flex flex-col gap-2 divide-gray-200 pt-2">
+        <ul role="list" className="flex flex-col gap-2 pt-2">
           {[...stats].reverse().map((stat) => (
             <Match stat={stat} key={stat.id} />
           ))}
         </ul>
       </div>
-      <div></div>
     </div>
   );
 }
@@ -40,39 +45,61 @@ function Match({ stat }: { stat }) {
     away: { id: stat.Game.Match.away },
   };
   const matchDay = stat.Game.Match.matchDay;
+  const map: string = stat.Game.map;
+  let mapUrl;
+  if (map) {
+    mapUrl = MAP_LIST_URL(MAPS[map.toUpperCase()]);
+  }
   const goToGame = () =>
     router.push(`/match/${stat.Game.Match.matchID}/game/${stat.Game.gameID}`);
 
   return (
-    <li
-      key={stat.id}
-      onClick={goToGame}
-      className={`${
-        result === "Victory"
-          ? "bg-vdcBlue/30"
-          : "bg-vdcRed/20 dark:bg-vdcRed/30"
-      } p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
-    >
-      <div className="flex flex-col divide-y-1">
-        <div className="flex flex-row gap-2">
-          <h1 className="text-xs italic text-vdcGrey dark:text-vdcWhite">
-            {result} - {date} - MD{matchDay}
-          </h1>
+    <div className="relative rounded-md">
+      <Image
+        alt=""
+        src={mapUrl}
+        width={5000}
+        height={5000}
+        className="absolute inset-0 -z-10 size-full object-cover brightness-30 rounded-md"
+      />
+      <li
+        key={stat.id}
+        onClick={goToGame}
+        className={`${
+          result === "Victory" ? "bg-vdcBlue/30" : "bg-vdcRed/30"
+        } p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
+      >
+        <div
+          className={`${
+            mapUrl
+              ? "text-vdcWhite divide-vdcWhite"
+              : "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite"
+          } flex flex-col divide-y-1`}
+        >
+          <div className="flex flex-row gap-2">
+            <h1
+              className={`${
+                mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
+              } text-xs italic`}
+            >
+              {result} - {date} - MD{matchDay}
+            </h1>
+          </div>
+          <div className="flex flex-row py-2 justify-between w-full">
+            <IndividualOverview stat={stat} mapUrl={mapUrl} />
+            <GameInfo stat={stat} />
+            <Lobby teams={teams} />
+          </div>
+          <div className="flex flex-row">
+            <IndividualStats stats={stat} mapUrl={mapUrl} />
+          </div>
         </div>
-        <div className="flex flex-row py-2 justify-between w-full">
-          <IndividualOverview stat={stat} />
-          <GameInfo stat={stat} />
-          <Lobby teams={teams} />
-        </div>
-        <div className="flex flex-row">
-          <IndividualStats stats={stat} />
-        </div>
-      </div>
-    </li>
+      </li>
+    </div>
   );
 }
 
-function IndividualStats({ stats }: { stats }) {
+function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
   const atk = stats.ratingAttack;
   const def = stats.ratingDefense;
   const rating = ((atk + def) / 2).toFixed(2);
@@ -88,15 +115,19 @@ function IndividualStats({ stats }: { stats }) {
     <div className="grid grid-cols-4 gap-2 w-full px-2 pt-1 mx-auto">
       {statsList.map((stat, index) => (
         <div key={index} className="flex flex-col text-xs text-center italic">
-          <h1 className="text-vdcBlack dark:text-gray-200">{stat.name}</h1>
-          <h1 className="text-gray-500 dark:text-gray-400">{stat.value}</h1>
+          <h1 className={`${mapUrl ? "text-gray-200" : "dark:text-gray-200"}`}>
+            {stat.name}
+          </h1>
+          <h1 className={`${mapUrl ? "text-gray-400" : "dark:text-gray-400"}`}>
+            {stat.value}
+          </h1>
         </div>
       ))}
     </div>
   );
 }
 
-function IndividualOverview({ stat }: { stat }) {
+function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
   const k = stat.kills;
   const d = stat.deaths;
   const a = stat.assists;
@@ -115,12 +146,18 @@ function IndividualOverview({ stat }: { stat }) {
         />
       </div>
       <div className="flex flex-col gap-1 my-auto text-center">
-        <h1 className="text-sm">
+        <h1 className={`${mapUrl ? "text-vdcWhite" : ""} text-sm`}>
           <span className="text-vdcGreen">{k}</span> /{" "}
           <span className="text-vdcRed">{d}</span> /{" "}
           <span className="text-vdcBlue">{a}</span>
         </h1>
-        <h1 className="text-xs text-vdcGrey dark:text-gray-400">{kda} KDA</h1>
+        <h1
+          className={`${
+            mapUrl ? "text-gray-400" : "text-vdcGrey dark:text-gray-400"
+          } text-xs`}
+        >
+          {kda} KDA
+        </h1>
       </div>
     </div>
   );
@@ -145,12 +182,8 @@ function GameInfo({ stat }: { stat }) {
 
   return (
     <div className="m-auto flex flex-col text-center">
-      {map && (
-        <h1 className="text-xs text-vdcGrey dark:text-gray-400 text-center">
-          {map}
-        </h1>
-      )}
-      <h1 className="text-xl">
+      {map && <h1 className="text-xs text-gray-400 text-center">{map}</h1>}
+      <h1 className="text-xl text-gray-400">
         <span className="text-vdcGreen">{teamScore}</span> :{" "}
         <span className="text-vdcRed">{opponentScore}</span>
       </h1>
@@ -164,9 +197,7 @@ function Lobby({ teams }: { teams }) {
   return (
     <div className="m-auto flex flex-row text-center gap-1 xl:gap-2">
       <TeamLogo team={home} />
-      <h1 className="text-xs my-auto italic text-vdcGrey dark:text-gray-400">
-        VS
-      </h1>
+      <h1 className="text-xs my-auto italic text-gray-400">VS</h1>
       <TeamLogo team={away} />
     </div>
   );
