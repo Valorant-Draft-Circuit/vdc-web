@@ -92,8 +92,8 @@ export default function PlayerSearch({ mmrShow }) {
   };
 
   return (
-    <div className="flex flex-col m-auto">
-      <div className="flex flex-col xl:flex-col items-center justify-between mb-4 pt-8 pb-2 px-10 xl:px-0 sticky top-0 z-10 gap-2">
+    <div className="flex flex-col m-auto pt-1">
+      <div className="flex flex-col xl:flex-col items-center justify-between bg-vdcWhite dark:bg-vdcBlack mb-4 pt-8 pb-2 px-10 xl:px-0 sticky top-0 z-10 gap-2">
         <div className="flex flex-row pb-5 w-full">
           <Filters
             tierFilter={tierFilter}
