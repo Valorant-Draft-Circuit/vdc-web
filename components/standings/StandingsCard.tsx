@@ -25,8 +25,8 @@ export default function StandingsCard({
   const tier = query.toLocaleLowerCase();
   const link =
     query !== "franchises"
-      ? `/about/franchises/${standing.franchiseSlug}?team=${tier}`
-      : `/about/franchises/${standing.franchiseSlug}`;
+      ? `/franchises/${standing.franchiseSlug}?team=${tier}`
+      : `/franchises/${standing.franchiseSlug}`;
   const rwpFormatted = (standing.rwp * 100).toFixed(0);
   return (
     <>

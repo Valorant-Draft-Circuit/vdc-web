@@ -7,7 +7,7 @@ export default async function Page() {
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-7xl">
-        <div className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl">
+        <div className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-md">
           <Image
             alt="hero image"
             src="/player-search-hero.webp"

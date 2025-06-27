@@ -8,7 +8,7 @@ export default function FranchiseCard({ franchise }: { franchise }) {
   const secondary = toTailwindCustomHexCode(franchise.Brand.colorSecondary);
 
   return (
-    <Link href={`/about/franchises/${franchise.slug}`}>
+    <Link href={`/franchises/${franchise.slug}`}>
       <div
         style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
         className="relative flex flex-row py-4 px-5 rounded-2xl h-28 xl:m-auto xl:h-32 xl:w-68 xl:justify-center items-center drop-shadow-xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)] hover:from-[var(--s)] hover:to-[var(--p)] transition-colors duration-800 ease-in-out"

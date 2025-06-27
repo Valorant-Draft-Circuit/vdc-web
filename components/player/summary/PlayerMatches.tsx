@@ -247,7 +247,7 @@ function TeamLogo({ team }: { team }) {
         onClick={(e) => {
           e.stopPropagation();
         }}
-        href={`/about/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`}
+        href={`/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`}
       >
         <Image
           src={`${TEAM_LOGOS_URL}${teamURL}`}
