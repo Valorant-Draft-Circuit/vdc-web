@@ -9,7 +9,7 @@ import {
 } from "../queries/standings/standings";
 import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
-import getFranchiseDetails from "../queries/about/franchises";
+import getFranchiseDetails from "../queries/franchises/franchises";
 import { getUser, TUser } from "../queries/user/user";
 
 let cache: NodeCache;

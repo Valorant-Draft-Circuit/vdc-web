@@ -45,7 +45,7 @@ function HomeBadge({ home, tier }: { home: TTeam; tier: Tier }) {
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/about/franchises/${home.slug}?team=${tier.toLocaleLowerCase()}`}
+      href={`/franchises/${home.slug}?team=${tier.toLocaleLowerCase()}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center justify-end space-x-2 xl:space-x-5">
@@ -71,7 +71,7 @@ function AwayBadge({ away, tier }: { away: TTeam; tier: Tier }) {
       onClick={(e) => {
         e.stopPropagation();
       }}
-      href={`/about/franchises/${away.slug}?team=${tier.toLocaleLowerCase()}`}
+      href={`/franchises/${away.slug}?team=${tier.toLocaleLowerCase()}`}
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center space-x-2 xl:space-x-5">

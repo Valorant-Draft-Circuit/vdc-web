@@ -1,7 +1,12 @@
 "use client";
 
 import DiscordBadge from "@/components/buttons/DiscordBadge";
-import { ShieldCheckIcon, UserMinusIcon, UserPlusIcon, ShieldExclamationIcon, } from "@heroicons/react/24/solid";
+import {
+  ShieldCheckIcon,
+  UserMinusIcon,
+  UserPlusIcon,
+  ShieldExclamationIcon,
+} from "@heroicons/react/24/solid";
 import { ContractStatus } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -85,6 +90,8 @@ export default function PlayerCard({ player }: { player }) {
           <Link
             href={`https://discord.com/users/${discordAccount.providerAccountId}`}
             className="hover:opacity-80"
+            target="_blank"
+            rel="noreferrer"
             onClick={(e) => {
               e.stopPropagation();
             }}

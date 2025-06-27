@@ -21,13 +21,13 @@ export const navLinks = [
       { name: "Standings", href: "/standings" },
       { name: "Stats", href: "/stats" },
       { name: "Players", href: "/player" },
+      { name: "Franchises", href: "/franchises" },
     ],
   },
   {
     name: "About",
     icon: <InformationCircleIcon />,
     links: [
-      { name: "Franchises", href: "/about/franchises" },
       { name: "FAQ", href: "/about" },
       { name: "Rulebook", href: RULEBOOK_URL, ext: true },
       { name: "Guidelines", href: BEHAVIOR_GUIDELINE_URL, ext: true },
