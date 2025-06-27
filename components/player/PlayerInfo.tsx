@@ -41,9 +41,9 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
     playerTeam = STATUS_LABELS[leagueStatus] || "UNKNOWN";
     tierColor = "vdcBlack";
   }
-  const discordAccount = playerInfo.Accounts.filter(
+  const discordAccountId = playerInfo.Accounts.filter(
     (account) => account.provider === "discord"
-  )[0];
+  )[0].providerAccountId;
 
   let showMmr = mmrShow;
   if (!playerInfo.PrimaryRiotAccount.MMR) {
@@ -59,13 +59,13 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
           src={playerInfo.image}
           width={5000}
           height={5000}
-          className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-70 opacity-80 drop-shadow-lg"
+          className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-50 opacity-80 drop-shadow-lg"
         />
         <div className="flex flex-row gap-5 z-10">
           <span className="relative inline-block">
             <a
               target="_blank"
-              href={`https://discord.com/users/${discordAccount.providerAccountId}`}
+              href={`https://discord.com/users/${discordAccountId}`}
             >
               <Image
                 alt={playerInfo.name}
@@ -111,13 +111,14 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               )}
             </div>
             {showMmr && (
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-300">
                 <h1>MMR: {playerInfo.PrimaryRiotAccount.MMR.mmrEffective}</h1>
               </div>
             )}
           </div>
         </div>
         <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-10">
+          <QuickLinks ign={encodedIGN} discordId={discordAccountId}/>
           {playerTeam.tier && <TierBadge tier={playerTeam.tier} />}
           {playerAccolades.map((accolade, id) => (
             <span key={id}>{accolade.symbol}</span>
@@ -125,6 +126,39 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function QuickLinks({ ign, discordId }) {
+  return (
+    <>
+      <a target="_blank" href={`${TRACKER_PROFILE_URL}/${ign}`}>
+        <div
+          className={`flex flex-row px-3 py-2 bg-gradient-to-br bg-[#e2273c] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
+        >
+          <Image
+            src="/external/trn-logo.svg"
+            width={1000}
+            height={1000}
+            alt="TRN"
+            className="h-2 w-auto m-auto"
+          />
+        </div>
+      </a>
+      <a target="_blank" href={`https://discord.com/users/${discordId}`}>
+        <div
+          className={`flex flex-row px-4 py-2 bg-gradient-to-br bg-[#5865F2] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
+        >
+          <Image
+            src="/external/discord-logo.svg"
+            width={1000}
+            height={1000}
+            alt="TRN"
+            className="h-2 w-auto m-auto"
+          />
+        </div>
+      </a>
+    </>
   );
 }
 
