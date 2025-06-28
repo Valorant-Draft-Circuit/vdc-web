@@ -11,6 +11,8 @@ import {
   LinkIcon,
 } from "@heroicons/react/24/solid";
 import { BEHAVIOR_GUIDELINE_URL, RULEBOOK_URL } from "@/lib/common/constants";
+import { Roles } from "@/prisma";
+import { FM_ACCESS_LIST } from "@/app/staff/franchise-management/layout";
 
 export const navLinks = [
   {
@@ -52,18 +54,16 @@ export const navLinks = [
   },
 ];
 
-export const staffDropDown = {
+export const staffLinks = {
   name: "Staff",
-
   links: [
+    { name: "Admin", href: "/staff/admin", roles: [Roles.ADMIN] },
     {
-      name: "Dashboard",
-      href: "/staff/dashboard",
+      name: "Franchise Management",
+      href: "/staff/franchise-management",
+      roles: FM_ACCESS_LIST,
     },
-    {
-      name: "Management",
-      href: "/staff/management",
-    },
+    { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
   ],
 };
 
