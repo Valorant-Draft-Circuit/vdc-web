@@ -231,7 +231,7 @@ function TeamLogo({ team }: { team }) {
       }
     }
     fetchTeam();
-  });
+  }, [team.id]);
 
   if (!teamURL) {
     return (
