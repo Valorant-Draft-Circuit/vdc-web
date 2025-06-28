@@ -288,13 +288,8 @@ export function calculateTeamTotalMmr(roster) {
 
 function isPlayerOnTeam(player) {
   const contractStatus = player.Status.contractStatus;
-  if (
-    contractStatus === ContractStatus.ACTIVE_SUB ||
-    contractStatus === ContractStatus.SIGNED
-  ) {
+  if (contractStatus === ContractStatus.SIGNED) {
     return true;
-  } else if (contractStatus === ContractStatus.SUBBED_OUT) {
-    return false;
   }
   return false;
 }
