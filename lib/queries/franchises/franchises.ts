@@ -293,6 +293,8 @@ function isPlayerOnTeam(player) {
     contractStatus === ContractStatus.SIGNED
   ) {
     return true;
+  } else if (contractStatus === ContractStatus.SUBBED_OUT) {
+    return false;
   }
   return false;
 }

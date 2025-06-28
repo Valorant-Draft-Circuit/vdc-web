@@ -15,7 +15,7 @@ export default async function Page() {
     query: season,
     name: `SEASON ${season}`,
   }));
-  const gameTypes = [GameType.SEASON, GameType.PRE_SEASON, GameType.COMBINE];
+  const gameTypes = [GameType.SEASON, GameType.COMBINE];
   const gameTypeList = gameTypes.map((game) => ({
     query: game.toLocaleLowerCase(),
     name: `${game.replace("_", "")} STATS`,
