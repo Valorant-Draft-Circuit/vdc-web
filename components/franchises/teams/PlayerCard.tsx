@@ -12,11 +12,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function PlayerCard({ player }: { player }) {
+export default function PlayerCard({ player, mmrShow }: { player; mmrShow }) {
   const discordAccount = player.Accounts[0];
   const goToProfile = () =>
     router.push(`/player/${discordAccount.providerAccountId}`);
   const router = useRouter();
+  const playerMmr = player.PrimaryRiotAccount.MMR.mmrEffective;
 
   function ContextIcons({ pStatus, captain }) {
     if (pStatus === ContractStatus.INACTIVE_RESERVE) {
@@ -85,6 +86,7 @@ export default function PlayerCard({ player }: { player }) {
           >
             {player.riotName}
           </h2>
+          {mmrShow && <h1 className="text-xs">{playerMmr} MMR</h1>}
         </div>
         <div>
           <Link

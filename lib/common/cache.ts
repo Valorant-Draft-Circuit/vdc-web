@@ -51,7 +51,7 @@ export async function getFranchiseStandingsCached(
   if (hit !== undefined) return hit;
 
   const franchiseStandings = await getFranchiseStandings(season);
-  cache.set(key, franchiseStandings, Times.MINUTE);
+  cache.set(key, franchiseStandings, minutes(1));
   return franchiseStandings;
 }
 
@@ -59,12 +59,12 @@ export async function getStandingsByCached(
   season: number,
   tier: Tier
 ): Promise<TStandingProps[]> {
-  const key = `s${season}-${tier}-standing`;
+  const key = `s${season}-${tier.toLocaleLowerCase()}-standing`;
   const hit = cache.get<TStandingProps[]>(key);
   if (hit !== undefined) return hit;
 
   const standingByTier = await getStandingsByTier(season, tier);
-  cache.set(key, standingByTier, Times.MINUTE);
+  cache.set(key, standingByTier, minutes(1));
   return standingByTier;
 }
 
@@ -93,7 +93,7 @@ export async function getScheduleByTierCached(
   const key = `s${season}-${tier}-schedule`;
   const hit = cache.get<TSchedule>(key);
   if (hit !== undefined) return hit;
-  
+
   const scheduleByTier = await getScheduleByTier(tier, season);
   cache.set(key, scheduleByTier, minutes(30));
   return scheduleByTier;

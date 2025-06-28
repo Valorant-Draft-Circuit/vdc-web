@@ -1,6 +1,6 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
 import { prisma } from "@/prisma/prismadb";
-import { GameType, MatchType } from "@prisma/client";
+import { ContractStatus, GameType, MatchType } from "@prisma/client";
 
 export default async function getFranchiseDetails(slug, season) {
   const franchise = await getFranchise(slug);
@@ -90,7 +90,7 @@ async function getFranchise(slug) {
         include: {
           Roster: {
             include: {
-              PrimaryRiotAccount: true,
+              PrimaryRiotAccount: { include: { MMR: true } },
               Accounts: { where: { provider: "discord" } },
               Captain: true,
               Status: true,
@@ -274,4 +274,25 @@ async function getPastGames(franchise, season) {
       Games: true,
     },
   });
+}
+
+export function calculateTeamTotalMmr(roster) {
+  let sum = 0;
+  roster.forEach((player) => {
+    if (isPlayerOnTeam(player)) {
+      sum += player.PrimaryRiotAccount.MMR.mmrEffective;
+    }
+  });
+  return sum;
+}
+
+function isPlayerOnTeam(player) {
+  const contractStatus = player.Status.contractStatus;
+  if (
+    contractStatus === ContractStatus.ACTIVE_SUB ||
+    contractStatus === ContractStatus.SIGNED
+  ) {
+    return true;
+  }
+  return false;
 }

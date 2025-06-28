@@ -3,16 +3,26 @@ import { getApexRankings } from "@/lib/queries/standings/standings";
 import PlayerCard from "./PlayerCard";
 import MatchCard from "@/components/schedule/MatchCard";
 import Divider from "@/components/theme/Divider";
+import { ControlPanel } from "@/prisma";
+import { calculateTeamTotalMmr } from "@/lib/queries/franchises/franchises";
 
 export default async function TeamPanel({ team }: { team }) {
   const season = await getSeasonCached();
+  console.log(team.tier);
+
   const standings = await getStandingsByCached(season, team.tier);
   const idx = standings.findIndex((s) => s.teamName === team.name);
   const [teamStats, rank] = [standings[idx], idx];
-
+  const mmrShow = await ControlPanel.getMMRDisplayState();
   const isApexRank =
     typeof rank === "number" && rank < getApexRankings(standings);
   const { futureGames, pastGames, Roster } = team;
+
+  const teamTotalMmr = calculateTeamTotalMmr(Roster);
+  let rosterPanelTitle = "Roster";
+  if (mmrShow) {
+    rosterPanelTitle = `Roster (MMR Σ: ${teamTotalMmr})`;
+  }
 
   return (
     <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-5">
@@ -21,12 +31,16 @@ export default async function TeamPanel({ team }: { team }) {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 text-md">
-        <PanelSection title="Roster">
+        <PanelSection title={rosterPanelTitle}>
           <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
             {Roster.length > 0 ? (
               <>
                 {Roster.map((player, i: number) => (
-                  <PlayerCard key={player.id ?? i} player={player} />
+                  <PlayerCard
+                    key={player.id ?? i}
+                    player={player}
+                    mmrShow={mmrShow}
+                  />
                 ))}
               </>
             ) : (
@@ -116,7 +130,7 @@ function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
     { label: "RANK: ", value: rank >= 0 ? rank + 1 : "N/A" },
     { label: "W: ", value: stats?.wins || 0 },
     { label: "L: ", value: stats?.losses || 0 },
-    { label: "RWP: ", value: `${(stats?.rwp *100).toFixed(0) || 0}%` },
+    { label: "RWP: ", value: `${(stats?.rwp * 100).toFixed(0) || 0}%` },
   ];
 
   return (
