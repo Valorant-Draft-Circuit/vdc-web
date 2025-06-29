@@ -6,7 +6,7 @@ import {
   getTotalFreeAgentCount,
 } from "@/lib/queries/staff/admin";
 import { LeagueStatus } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export type TTierCount = {
   Tier: number;
@@ -20,7 +20,7 @@ export type TSummary = {
   rfaCountByTier: TTierCount;
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const signedPlayerCount = await getSignedPlayerCount();
   const freeAgentCount = await getTotalFreeAgentCount();
   const signedCountByTier = await Promise.all(
