@@ -1,4 +1,4 @@
-import { Roles } from "@/prisma";
+import { ControlPanel, Roles } from "@/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 
 const BUCKET_URL = "https://uni-objects.nyc3.cdn.digitaloceanspaces.com/vdc/";
@@ -109,3 +109,4 @@ export const STATUS_LABELS: Record<LeagueStatus, string> = {
 };
 
 export const SUPERUSER_ROLES = [Roles.ADMIN, Roles.OWNER];
+
