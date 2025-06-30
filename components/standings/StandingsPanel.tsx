@@ -1,11 +1,11 @@
 import { Tier } from "@prisma/client";
 import StandingsCard from "./StandingsCard";
+import { getSeasonCached } from "@/lib/common/cache";
 import {
-  getFranchiseStandingsCached,
-  getSeasonCached,
-  getStandingsByCached,
-} from "@/lib/common/cache";
-import { getApexRankings } from "@/lib/queries/standings/standings";
+  getApexRankings,
+  getFranchiseStandings,
+  getStandingsByTier,
+} from "@/lib/queries/standings/standings";
 import { isTier } from "@/lib/common/utils";
 
 export default async function StandingsPanel({
@@ -18,10 +18,10 @@ export default async function StandingsPanel({
   let apexRanks;
 
   if (query === "franchises") {
-    standings = await getFranchiseStandingsCached(currentSeason);
+    standings = await getFranchiseStandings(currentSeason);
     apexRanks = 3;
   } else if (isTier(query)) {
-    standings = await getStandingsByCached(currentSeason, query);
+    standings = await getStandingsByTier(currentSeason, query);
     apexRanks = getApexRankings(standings);
   }
 
