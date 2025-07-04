@@ -17,8 +17,7 @@ export function hasAnyRole(userRoleValue, requiredRoles: number[]) {
   );
 }
 
-
-export function hasAccessToLink(
+export function hasAccess(
   userRoleValue: string,
   requiredRoles: number[]
 ): boolean {
