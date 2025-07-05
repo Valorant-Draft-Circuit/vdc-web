@@ -2,9 +2,9 @@ import { hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { Roles } from "@/prisma";
 import { prisma } from "@/prisma/prismadb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET() {
   const session = await auth();
   if (!session) {
     return NextResponse.json({
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     });
   }
 
-  let controlPanel = await prisma.controlPanel.findMany();
+  const controlPanel = await prisma.controlPanel.findMany();
   const controlPanelMap = controlPanel.map((item) => ({
     label: item.name,
     value: item.value,
@@ -29,4 +29,14 @@ export async function GET(req: Request) {
   }));
 
   return NextResponse.json({ controlPanelMap });
+}
+
+export async function POST(request: NextRequest) {
+  const req = await request.json();
+
+  console.log(req);
+  return NextResponse.json({
+    message: "Test",
+    status: 200,
+  });
 }
