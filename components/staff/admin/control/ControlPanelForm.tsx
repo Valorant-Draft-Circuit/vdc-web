@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  BAN_CONTROL,
-  CONTROL_GROUPS,
-  DRAFT_CONTROL,
-  GENERAL_CONTROL,
-  MMR_CONTROL,
-} from "@/lib/common/constants";
+import { CONTROL_GROUPS } from "@/lib/common/constants";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import GeneralControlPanel from "./GeneralControls";
 
 type ConfigItem = {
   label: string;
@@ -64,7 +59,7 @@ export default function ControlPanelForm() {
 
     fetchControlPanel();
   }, [reset]);
-  
+
   const onSubmit = async (formData: { [key: string]: string }) => {
     setIsSaving(true);
     try {
@@ -88,9 +83,13 @@ export default function ControlPanelForm() {
   console.log("ban:", banControls);
 
   return (
-    <div className="space-y-6 flex flex-col max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl">GENERAL</h1>
-      <GeneralControlPanel generalConfig={generalControls} />
+    <div className="space-y-6 flex flex-col max-w-4xl mx-auto">
+      <GeneralControlPanel
+        generalControls={generalControls}
+        onSubmit={onSubmit}
+        handleSubmit={handleSubmit}
+        control={control}
+      />
     </div>
     // <form
     //   onSubmit={handleSubmit(onSubmit)}
@@ -130,10 +129,11 @@ export default function ControlPanelForm() {
   );
 }
 
-function GeneralControlPanel({ generalConfig }) {
-  return (
-    <div>
-      <h1>this is general</h1>
-    </div>
-  );
+export function parseOptions(notes: string): string[] | null {
+  const match = notes?.match(/options:\s*["']?(.+?)["']?$/i);
+  if (!match) return null;
+
+  return match[1]
+    .split(",")
+    .map((opt) => opt.trim().replace(/^["']|["']$/g, ""));
 }
