@@ -1,31 +1,20 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { DropDown } from "./DropDowns";
-// import { auth } from "@/lib/auth";
-import { navLinks, staffDropDown } from "./NavBar";
+import { navLinks, staffLinks } from "./NavBar";
+import HomeLink from "./HomeLink";
+import { auth } from "@/lib/auth/auth";
+import { hasAccess } from "@/lib/auth/access";
 
-export default function NavLinks() {
-  const staff = false;
-  // const session = auth(); // todo: check if user is staff
-  const currentPath = usePathname();
+export default async function NavLinks() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
+  const userRole = session?.user?.roles ?? "";
+  const filteredStaffLinks = staffLinks.links.filter((link) =>
+    hasAccess(userRole, link.roles)
+  );
 
   return (
     <div className="flex flex-col text-xl sm:ml-24 space-y-1 ">
-      <div className="text-white italic">
-        <Link
-          href="/"
-          className={
-            currentPath === "/"
-              ? "text-vdcRed"
-              : "text-vdcWhite hover:text-vdcRed"
-          }
-        >
-          <h1 className="4xl:text-3xl">VALORANT DRAFT CIRCUIT</h1>
-        </Link>
-      </div>
-
+      <HomeLink />
       <div className="hidden sm:flex space-x-10">
         {navLinks.map((navItem) => (
           <DropDown
@@ -34,13 +23,13 @@ export default function NavLinks() {
             links={navItem.links}
           />
         ))}
-        {staff ? (
+        {isLoggedIn && filteredStaffLinks.length > 0 && (
           <DropDown
-            key={staffDropDown.name}
-            title={staffDropDown.name}
-            links={staffDropDown.links}
+            key={staffLinks.name}
+            title={staffLinks.name}
+            links={filteredStaffLinks}
           />
-        ) : null}
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { LeagueStatus, Tier } from "@prisma/client";
+import { ControlPanel } from "@/prisma";
 
 export const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
@@ -83,4 +84,26 @@ export function isUserPlaying(player) {
     return true;
   }
   return false;
+}
+
+export async function determineTier(mmr: number | null) {
+  if (mmr === null) return null;
+
+  const { PROSPECT, APPRENTICE, EXPERT } = await getMMRTierLines();
+
+  if (mmr <= PROSPECT.max) return Tier.PROSPECT;
+  if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
+  if (mmr <= EXPERT.max) return Tier.EXPERT;
+  return Tier.MYTHIC;
+}
+
+export async function getMMRTierLines() {
+  const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
+    PROSPECT: { min: number; max: number };
+    APPRENTICE: { min: number; max: number };
+    EXPERT: { min: number; max: number };
+    MYTHIC: { min: number; max: number };
+  };
+
+  return mmrTierLines;
 }

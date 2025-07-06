@@ -8,7 +8,6 @@ import { calculateTeamTotalMmr } from "@/lib/queries/franchises/franchises";
 
 export default async function TeamPanel({ team }: { team }) {
   const season = await getSeasonCached();
-  console.log(team.tier);
 
   const standings = await getStandingsByCached(season, team.tier);
   const idx = standings.findIndex((s) => s.teamName === team.name);

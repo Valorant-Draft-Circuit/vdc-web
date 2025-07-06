@@ -1,7 +1,7 @@
+import { determineTier } from "@/lib/common/utils";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
-import { ControlPanel } from "@/prisma";
 import { prisma } from "@/prisma/prismadb";
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -16,7 +16,7 @@ export async function GET(
       throw Error();
     }
     const index = meilisearchClient.getIndex("players");
-    const task = await index.addDocuments([ player ]);
+    const task = await index.addDocuments([player]);
     const result = await meilisearchClient.waitForTaskCompletion(task.taskUid);
 
     return NextResponse.json({
@@ -79,13 +79,6 @@ async function getPlayer(userId: string) {
     },
   });
 
-  const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
-    PROSPECT: { min: number; max: number };
-    APPRENTICE: { min: number; max: number };
-    EXPERT: { min: number; max: number };
-    MYTHIC: { min: number; max: number };
-  };
-
   const isFreeAgent = player?.PrimaryRiotAccount?.MMR && !player.Team;
   const isUnregistered =
     player?.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
@@ -125,15 +118,4 @@ async function getPlayer(userId: string) {
     leagueStatus: player?.Status?.leagueStatus || null,
     image: player?.image || null,
   };
-
-  function determineTier(mmr: number | null) {
-    if (mmr === null) return null;
-
-    const { PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
-
-    if (mmr <= PROSPECT.max) return Tier.PROSPECT;
-    if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
-    if (mmr <= EXPERT.max) return Tier.EXPERT;
-    return Tier.MYTHIC;
-  }
 }
