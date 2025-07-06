@@ -7,8 +7,6 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-
-    
   return (
     <div className="min-h-full">
       <div className="flex flex-col gap-5 py-10">
@@ -20,7 +18,7 @@ export default function Page() {
           </div>
         </header>
         <main>
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-4 bg-white dark:bg-vdcGrey rounded-lg">
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-4rounded-lg">
             <div>
               <ControlPanelForm />
             </div>

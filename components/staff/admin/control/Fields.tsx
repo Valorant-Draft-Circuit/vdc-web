@@ -8,11 +8,33 @@ import {
   ListboxOption,
   ListboxOptions,
   Select,
+  Switch,
   Textarea,
 } from "@headlessui/react";
 import { ChevronDownIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+
+export function SwitchField({ field, label }) {
+  return (
+    <Field>
+      <Label className={"mb-2 uppercase text-vdcRed"}>
+        <h1>{label.replaceAll("_", " ")}</h1>
+      </Label>
+      <div className="flex flex-row gap-2 text-xs">
+        <h1 className="my-auto">F</h1>
+        <Switch
+          onChange={(val: boolean) => field.onChange(val)}
+          {...field}
+          className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-vdcGrey transition data-checked:bg-vdcRed data-hover:cursor-pointer"
+        >
+          <span className="size-4 translate-x-1 rounded-full bg-vdcWhite transition group-data-checked:translate-x-6" />
+        </Switch>
+        <h1 className="my-auto">T</h1>
+      </div>
+    </Field>
+  );
+}
 
 export function TextAreaField({ field, label }) {
   return (
@@ -24,7 +46,7 @@ export function TextAreaField({ field, label }) {
         <Textarea
           {...field}
           className={
-            "w-full rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcBlack dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
+            "w-full rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcGrey dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
           }
         ></Textarea>
       </div>
@@ -41,7 +63,7 @@ export function SelectField({ field, label, options }) {
       <div>
         <Select
           className={
-            "w-full uppercase rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcBlack dark:text-vdcWhite px-3 py-2 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
+            "w-full uppercase rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcGrey dark:text-vdcWhite px-3 py-2 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
           }
           {...field}
         >
@@ -66,7 +88,7 @@ export function InputField({ field, label }) {
         <Input
           {...field}
           className={
-            "w-full rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcBlack dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
+            "w-full rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcGrey dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
           }
         ></Input>
       </div>
@@ -111,12 +133,12 @@ export function MapPoolSelect({ field, label }) {
         onChange={setActiveMaps}
         multiple
       >
-        <ListboxButton className="flex justify-between w-full rounded-lg bg-gray-100 dark:bg-vdcBlack px-3 py-2 font-semibold uppercase text-vdcBlack dark:text-vdcWhite">
+        <ListboxButton className="flex justify-between w-full rounded-lg bg-gray-100 dark:bg-vdcGrey px-3 py-2 font-semibold uppercase text-vdcBlack dark:text-vdcWhite">
           <h1 className="text-xs my-auto">{activeMaps.join(", ")}</h1>
           <ChevronDownIcon className="w-5 h-5 ml-2" />
         </ListboxButton>
 
-        <ListboxOptions className="mt-3 w-full rounded-lg bg-gray-100 dark:bg-vdcBlack max-h-96 overflow-auto z-10 drop-shadow-lg">
+        <ListboxOptions className="mt-3 w-full rounded-lg bg-gray-100 dark:bg-vdcGrey max-h-96 overflow-auto z-10 drop-shadow-lg">
           {mapList.map((map) => (
             <ListboxOption
               key={map}
