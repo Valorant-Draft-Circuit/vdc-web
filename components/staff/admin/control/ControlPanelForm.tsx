@@ -70,12 +70,13 @@ export default function ControlPanelForm() {
   const onSubmit = async (formData: { [key: string]: string }) => {
     setIsSaving(true);
     try {
-      await fetch("/api/internal/control", {
+      const res = await fetch("/api/internal/control", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      alert("Settings saved successfully!");
+      const { message } = await res.json();
+      alert(message);
     } catch (err) {
       console.error("Failed to save:", err);
       alert("Failed to save settings.");
