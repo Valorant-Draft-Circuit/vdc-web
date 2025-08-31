@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import DashboardPanel from "@/components/me/DashboardPanel";
 import ConnectedAccounts from "@/components/me/ConnectedAccounts"
-import Settings from "@/components/me/Settings";
+import SettingsPanel from "@/components/me/SettingsPanel";
 
 
 const tabs: TTabElements[]  = [
@@ -16,7 +16,7 @@ const tabs: TTabElements[]  = [
     name: "Settings",
     query: "settings",
     color: "vdcRed",
-    content: <Settings />,
+    content: <SettingsPanel />,
   },
   {
     name: "Connected Accounts",

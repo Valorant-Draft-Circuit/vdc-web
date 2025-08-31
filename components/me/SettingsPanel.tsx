@@ -1,22 +1,14 @@
-import MyTeamCard from "./MyTeamCard"
-import StatsCard from "./StatsCard"
-import UpcomingMatchCard from "./UpcomingMatchCard"
-import Image from "next/image";
 
-// bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50%
-
-
-
-export default async function DashboardPanel() {
+export default async function SettingsPanel() {
     return(
         <div className="bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50% py-8 mx-2 rounded-2xl flex flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
             <div className="flex flex-col w-full"> 
                 <div className="items-end mx-10 text-start ">
                     <h1 className="italic text-3xl text-vdcBlack"> 
-                        Dashboard 
+                        Settings 
                     </h1>
                     <p className="text-vdcWhite text-md italic px-10 text-wrap"> 
-                        Everything you've ever wanted to know about yourself in VDC. 
+                        Customize your VDC website experience 
                     </p>
                 </div>
                 <div className="mx-10">
@@ -29,20 +21,6 @@ export default async function DashboardPanel() {
                     /> */}
                 </div>
                     
-            </div>
-            <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic text-vdcRed">
-                <div>
-                    <h1> My Stats </h1>
-                     <StatsCard /> 
-                </div>
-                <div> 
-                    <h1> My Upcoming Matches </h1>
-                    <UpcomingMatchCard /> 
-                </div>
-                <div> 
-                    <h1> My Team </h1>
-                    <MyTeamCard /> 
-                </div>
             </div>
         </div>
     )
