@@ -2,6 +2,7 @@ import LeagueDashboard from "@/components/staff/admin/PlayerDashboard";
 import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 
+
 export default async function Page() {
   const currentSeason = await ControlPanel.getSeason();
   const leagueState = await ControlPanel.getLeagueState();
@@ -29,6 +30,7 @@ export default async function Page() {
           <h1 className="text-vdcRed py-2 mx-auto max-w-7xl">
             League Dashboard
           </h1>
+
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-white dark:bg-vdcGrey rounded-lg">
             <div>
               <LeagueDashboard />
