@@ -24,7 +24,7 @@ export default function LeagueDashboard() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-5">
+    <div className="grid lg:grid-cols-3 grid-row-1 gap-5">
       <OverallSummary summary={summary} />
       <SignedPlayersSummary summary={summary} />
       <FreeAgentSummary summary={summary} />
@@ -41,7 +41,7 @@ function OverallSummary({ summary }) {
     <div className="flex flex-col rounded-xl bg-indigo-50">
       <div className="px-8 sm:px-10 py-10">
         <h2 className="mt-2 text-md text-vdcBlack">Active Players</h2>
-        <h1 className="mt-2 max-w-lg text-3xl text-gray-600 max-lg:text-center">
+        <h1 className="mt-2 max-w-lg text-3xl text-gray-600 lg">
           {sum}
         </h1>
       </div>
