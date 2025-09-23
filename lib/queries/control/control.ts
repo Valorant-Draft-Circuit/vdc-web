@@ -6,6 +6,11 @@ export async function getSignupState() {
     where: { id: ControlPanelID.SIGNUP_STATE },
   });
 
-  if (!response) throw new Error(`Didn't get a response from the database!`);
+  if (!response) {
+    console.error(
+      "Failed to fetch value from database. If you are seeing this message, please contact VDC Tech/Admins"
+    );
+    return "CLOSED";
+  }
   return response.value;
 }
