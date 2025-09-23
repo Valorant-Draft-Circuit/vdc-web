@@ -57,7 +57,7 @@ export default async function HeroSection({ session }) {
   );
 }
 
-async function Join() {
+function Join() {
   return (
     <>
       <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
@@ -71,6 +71,7 @@ async function Join() {
     </>
   );
 }
+
 async function Joined({ session }) {
   if (!session.user?.id) {
     return (
