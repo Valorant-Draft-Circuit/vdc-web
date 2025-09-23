@@ -1,10 +1,11 @@
 import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
 import SignUpButton from "../buttons/SignUpButton";
-import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
+import { getUser } from "@/lib/queries/user/user";
+import { getSignupState } from "@/lib/queries/control/control";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
 export default async function HeroSection({ session }) {
@@ -70,6 +71,7 @@ function Join() {
     </>
   );
 }
+
 async function Joined({ session }) {
   if (!session.user?.id) {
     return (
@@ -84,8 +86,19 @@ async function Joined({ session }) {
     );
   }
 
-  const user = await getUserCached(session.user.id);
-
+  const user = await getUser(session.user.id);
+  const signupState = await getSignupState();
+  if (signupState === "CLOSED") {
+    return (
+      <>
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          Sign ups are <br />
+          not yet open. <br />
+          Check Back later!
+        </h2>
+      </>
+    );
+  }
   if (user!.Status!.leagueStatus === LeagueStatus.SUSPENDED) {
     return (
       <>
@@ -115,7 +128,7 @@ async function Joined({ session }) {
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           {user!.name}, You are
           <br />
-          pending approval.
+          pending approval!
         </h2>
         <div>
           <button

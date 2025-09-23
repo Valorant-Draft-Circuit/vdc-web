@@ -9,6 +9,7 @@ import NewsSkeleton from "../components/home/NewsSkeleton";
 export default async function Home() {
   const session = await auth();
   const mostRecentVideo = await getLatestYouTubeVideo();
+
   return (
     <>
       <div className="overflow-hidden">
@@ -30,7 +31,7 @@ export default async function Home() {
       ) : null}
       <div className="flex flex-col xl:flex-row 4xl:flex-col">
         <div className="overflow-hidden xl:w-3/4 4xl:w-full">
-          <div className="px-4 py-2 sm:px-6 text-lg lg:text-xl">
+          <div className="px-4 py-2 mt-5 sm:px-6 text-lg lg:text-xl">
             <h1 className="italic">Latest News</h1>
           </div>
           <div className="px-4 py-2 sm:p-6">

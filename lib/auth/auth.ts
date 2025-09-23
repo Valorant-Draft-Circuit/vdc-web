@@ -10,11 +10,11 @@ declare module "next-auth" {
   }
 }
 
-declare module "@auth/core/adapters" {
-  interface AdapterUser {
-    roles: string;
-  }
-}
+// declare module "@auth/core/adapters" {
+//   interface AdapterUser {
+//     roles: string;
+//   }
+// }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
