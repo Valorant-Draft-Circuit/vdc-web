@@ -5,6 +5,7 @@ import { LeagueStatus } from "@prisma/client";
 import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
 import { getUser } from "@/lib/queries/user/user";
+import { getSignupState } from "@/lib/queries/control/control";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
 export default async function HeroSection({ session }) {
@@ -56,7 +57,7 @@ export default async function HeroSection({ session }) {
   );
 }
 
-function Join() {
+async function Join() {
   return (
     <>
       <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
@@ -85,7 +86,18 @@ async function Joined({ session }) {
   }
 
   const user = await getUser(session.user.id);
-
+  const signupState = await getSignupState();
+  if (signupState === "CLOSED") {
+    return (
+      <>
+        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          Sign ups are <br />
+          not yet open. <br />
+          Check Back later!
+        </h2>
+      </>
+    );
+  }
   if (user!.Status!.leagueStatus === LeagueStatus.SUSPENDED) {
     return (
       <>

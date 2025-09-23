@@ -2,6 +2,7 @@ import DiscordButton from "@/components/buttons/DiscordButton";
 import SignUpForm from "@/components/signup/SignUpForm";
 import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
+import { getSignupState } from "@/lib/queries/control/control";
 import { getUser } from "@/lib/queries/user/user";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 export default async function Page() {
   const session = await auth();
   const currentSeason = await getSeasonCached();
+  const signupState = await getSignupState();
+
   let user;
   if (session?.user?.id) {
     user = await getUser(session.user.id);
@@ -38,7 +41,10 @@ export default async function Page() {
           />
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {isSignedIn ? (
+          {/* TODO: we need enums for signup states */}
+          {signupState === "CLOSED" ? (
+            <SignUpsClosed />
+          ) : isSignedIn ? (
             <SignUpForm user={user} currentSeason={currentSeason} />
           ) : (
             <NotSignedIn />
@@ -55,6 +61,16 @@ function NotSignedIn() {
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-xl">You are not signed in... :(</h2>
         <DiscordButton text={"Sign In"} signInButton={true} />
+      </div>
+    </>
+  );
+}
+
+function SignUpsClosed() {
+  return (
+    <>
+      <div className="flex flex-col gap-2 text-center">
+        <h2 className="text-xl">Sign ups are not open right now... :(</h2>
       </div>
     </>
   );

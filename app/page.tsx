@@ -9,6 +9,7 @@ import NewsSkeleton from "../components/home/NewsSkeleton";
 export default async function Home() {
   const session = await auth();
   const mostRecentVideo = await getLatestYouTubeVideo();
+
   return (
     <>
       <div className="overflow-hidden">
