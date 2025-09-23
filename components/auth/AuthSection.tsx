@@ -3,8 +3,8 @@ import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
-import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
+import { getUser } from "@/lib/queries/user/user";
 
 export default async function AuthSection() {
   const session = await auth();
@@ -14,7 +14,7 @@ export default async function AuthSection() {
   if (!session.user?.id) {
     return <SignOut />;
   }
-  const user = await getUserCached(session.user?.id);
+  const user = await getUser(session.user?.id);
   const team = determineTeam(user);
 
   return (

@@ -10,7 +10,6 @@ import {
 import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
-import { getUser, TUser } from "../queries/user/user";
 
 let cache: NodeCache;
 
@@ -136,21 +135,4 @@ export async function getTeamByIdCached(id: number) {
   const team = await Team.getBy({ id: id });
   cache.set(key, team, Times.DAY);
   return team;
-}
-
-export async function getUserCached(id: string) {
-  const key = `user-${id}`;
-  const hit = cache.get<TUser>(key);
-  if (hit !== undefined) return hit;
-
-  const user = await getUser(id);
-  cache.set(key, user, minutes(5));
-  return user;
-}
-
-export function deleteFromCache(key: string) {
-  if (!cache) {
-    return;
-  }
-  cache.del(key);
 }

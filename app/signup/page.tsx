@@ -1,7 +1,8 @@
 import DiscordButton from "@/components/buttons/DiscordButton";
 import SignUpForm from "@/components/signup/SignUpForm";
 import { auth } from "@/lib/auth/auth";
-import { getSeasonCached, getUserCached } from "@/lib/common/cache";
+import { getSeasonCached } from "@/lib/common/cache";
+import { getUser } from "@/lib/queries/user/user";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -15,7 +16,7 @@ export default async function Page() {
   const currentSeason = await getSeasonCached();
   let user;
   if (session?.user?.id) {
-    user = await getUserCached(session?.user?.id);
+    user = await getUser(session.user.id);
   }
   let isSignedIn;
   if (!session) {

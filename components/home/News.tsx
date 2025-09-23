@@ -9,7 +9,7 @@ export default async function News() {
       {newsList.map(
         ({ title, date, featured_image, url, featured_image_alt }) => (
           <div
-            className="xl:w-full hover:scale-105 transition duration-150 ease-in-out 4xl:hover:scale-102"
+            className="xl:w-full hover:scale-101 transition duration-150 ease-in-out"
             key={date}
           >
             <a href={url ?? ""} target="_blank">
@@ -19,7 +19,7 @@ export default async function News() {
                   alt={featured_image_alt ?? "Featured Image"}
                   width={2000}
                   height={1000}
-                  className="rounded-t-lg w-92"
+                  className="rounded-t-lg w-fit"
                 />
               </div>
               <div className="bg-gray-200 dark:bg-vdcGrey p-4 xl:h-36 xl:w-full rounded-b-lg my-auto">
