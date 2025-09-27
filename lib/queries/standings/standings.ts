@@ -25,13 +25,13 @@ export type TeamStats = {
 
 export function getApexRankings(standings: TStandingProps[]) {
   const highlight =
-    standings.length === 4 || standings.length === 8
+    standings.length === 4 || standings.length === 6
       ? 4
-      : standings.length === 10 || standings.length === 12
+      : standings.length === 8 || standings.length === 10
       ? 6
-      : standings.length === 14 || standings.length === 16
+      : standings.length === 12 || standings.length === 14
       ? 8
-      : 4;
+      : 10;
   return highlight;
 }
 
