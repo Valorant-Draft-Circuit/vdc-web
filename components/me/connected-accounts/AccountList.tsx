@@ -147,17 +147,19 @@ function Account({
       <h1 className="flex-1 text-center text-md break-all font-semibold text-vdcBlack dark:text-vdcWhite">
         {account.riotIGN}
       </h1>
-      {isPrimaryAccount ? (
-        <Image src="vdc-flame.svg" width={25} height={25} alt="vdcFlame" />
-      ) : (
-        <button disabled={removing} onClick={removeAccount}>
-          {removing ? (
-            <LoadingSpinner />
-          ) : (
-            <TrashIcon className="w-7 text-vdcBlack dark:text-vdcWhite hover:cursor-pointer hover:scale-110" />
-          )}
-        </button>
-      )}
+      {
+        isPrimaryAccount && (
+          <Image src="vdc-flame.svg" width={25} height={25} alt="vdcFlame" />
+        )
+        // TODO: extract this to Admin page in the future where admins can manually delete accounts
+        // <button disabled={removing} onClick={removeAccount}>
+        //   {removing ? (
+        //     <LoadingSpinner />
+        //   ) : (
+        //     <TrashIcon className="w-7 text-vdcBlack dark:text-vdcWhite hover:cursor-pointer hover:scale-110" />
+        //   )}
+        // </button>
+      }
     </div>
   );
 }
