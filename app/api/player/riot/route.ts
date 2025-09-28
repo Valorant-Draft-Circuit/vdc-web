@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/prisma/prismadb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   const session = await auth();
@@ -30,6 +30,30 @@ export async function GET() {
     },
   });
   await prisma.$disconnect();
-  console.log(playerRiotAccounts);
   return NextResponse.json(playerRiotAccounts);
+}
+
+export async function POST(request: NextRequest) {
+  const req = await request.json();
+
+  if (req.method !== "POST") {
+    return NextResponse.json({
+      message: "Only POST requests allowed",
+      status: 405,
+    });
+  }
+  const body = req.body;
+  if (body.job === "removeAccount") {
+    await prisma.account.delete({
+      where: {
+        id: body.id,
+      },
+    });
+    await prisma.$disconnect();
+    return NextResponse.json({ message: `Successfully removed ${body.id}` });
+  } else
+    return NextResponse.json({
+      message: `${req.job} is not a valid request!`,
+      status: 400,
+    });
 }

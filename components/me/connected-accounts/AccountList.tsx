@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -41,7 +42,7 @@ export default function AccountList() {
   if (loading) {
     return (
       <div className="flex m-auto">
-        <h1 className="text-xl">Fetching Your Acocunts...</h1>
+        <h1 className="text-xl">Fetching Your Accounts...</h1>
       </div>
     );
   }
@@ -97,8 +98,10 @@ function Account({ account, primaryRiotAccount }) {
 
 function LinkAccount() {
   return (
-    <div className="flex items-center justify-center rounded-3xl px-8 py-8 shadow-lg dark:bg-vdcBlack hover:cursor-pointer hover:brightness-90 hover:scale-101 hover:text-vdcRed w-full max-w-xl mx-auto">
-      <PlusIcon className="w-7 text-vdcBlack dark:text-vdcWhite" />
-    </div>
+    <button onClick={() => signIn("riot")}>
+      <div className="flex items-center justify-center rounded-3xl px-8 py-8 shadow-lg dark:bg-vdcBlack hover:cursor-pointer hover:brightness-90 hover:scale-101 hover:text-vdcRed w-full max-w-xl mx-auto">
+        <PlusIcon className="w-7 text-vdcBlack dark:text-vdcWhite" />
+      </div>
+    </button>
   );
 }
