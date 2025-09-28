@@ -24,15 +24,19 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   authorization: {
     url: "https://auth.riotgames.com/authorize",
     params: {
-      scope: "openid offline_access",
+      scope: "openid profile offline_access",
       response_type: "code",
     },
   },
-  token: "https://auth.riotgames.com/token",
-  userinfo: "https://auth.riotgames.com/userinfo",
+  token: {
+    url: "https://auth.riotgames.com/token",
+  },
+  userinfo: {
+    url: "https://auth.riotgames.com/userinfo",
+  },
   clientId: process.env.RIOT_CLIENT_ID!,
   clientSecret: process.env.RIOT_CLIENT_SECRET!,
-  profile(profile) {
+  async profile(profile) {
     return {
       id: profile.sub,
       name: profile.name ?? null,
