@@ -15,21 +15,27 @@ export interface RiotProfile {
   sub: string;
   name?: string;
   email?: string;
-  preferred_username?: string;
 }
 
 export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   id: "riot",
   name: "Riot",
-  type: "oidc",
-  wellKnown: "https://auth.riotgames.com/.well-known/openid-configuration",
+  type: "oauth",
+  authorization: {
+    url: "https://auth.riotgames.com/authorize",
+    params: {
+      scope: "openid offline_access",
+      response_type: "code",
+    },
+  },
+  token: "https://auth.riotgames.com/token",
+  userinfo: "https://auth.riotgames.com/userinfo",
   clientId: process.env.RIOT_CLIENT_ID!,
   clientSecret: process.env.RIOT_CLIENT_SECRET!,
-  issuer: "https://auth.riotgames.com",
   profile(profile) {
     return {
       id: profile.sub,
-      name: profile.preferred_username ?? profile.name ?? null,
+      name: profile.name ?? null,
       email: profile.email ?? null,
       image: null,
     };
