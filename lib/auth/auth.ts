@@ -32,6 +32,7 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   userinfo: {
     url: "https://auth.riotgames.com/userinfo",
   },
+  checks: ["state"], 
   async profile(_, tokens) {
     const res = await fetch(
       "https://americas.api.riotgames.com/riot/account/v1/accounts/me",
