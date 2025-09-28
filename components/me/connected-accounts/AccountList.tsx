@@ -1,14 +1,9 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import {
-  ArrowPathIcon,
-  PlusIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import LoadingSpinner from "@/components/theme/LoadingSpinner";
 
 type TRiotAccount = {
   providerAccountId: string;
@@ -26,15 +21,15 @@ async function fetchPlayerRiotAccounts() {
   return res.json();
 }
 
-async function handleRemoveAccount(id: string) {
-  const payload = { job: "remove", id };
-  const res = await fetch("/api/player/riot", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  return res.ok;
-}
+// async function handleRemoveAccount(id: string) {
+//   const payload = { job: "remove", id };
+//   const res = await fetch("/api/player/riot", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(payload),
+//   });
+//   return res.ok;
+// }
 
 function sortAccounts(accounts: TRiotAccount[], primaryRiotAccount: string) {
   return accounts
@@ -99,7 +94,7 @@ export default function AccountList() {
               key={account.providerAccountId}
               account={account}
               primaryRiotAccount={primaryRiotAccount}
-              onRemoved={getPlayerRiotAccounts}
+              // onRemoved={getPlayerRiotAccounts}
             />
           )
         )}
@@ -112,29 +107,29 @@ export default function AccountList() {
 function Account({
   account,
   primaryRiotAccount,
-  onRemoved,
-}: {
+}: // onRemoved,
+{
   account: TRiotAccount;
   primaryRiotAccount: string;
-  onRemoved: () => Promise<void>;
+  // onRemoved: () => Promise<void>;
 }) {
-  const [removing, setRemoving] = useState(false);
+  // const [removing, setRemoving] = useState(false);
   const isPrimaryAccount = primaryRiotAccount === account.providerAccountId;
 
-  async function removeAccount() {
-    setRemoving(true);
-    const ok = await handleRemoveAccount(account.providerAccountId);
-    setRemoving(false);
+  // async function removeAccount() {
+  //   setRemoving(true);
+  //   const ok = await handleRemoveAccount(account.providerAccountId);
+  //   setRemoving(false);
 
-    if (ok) {
-      alert(`Successfully removed ${account.riotIGN}.`);
-      await onRemoved();
-    } else {
-      alert(
-        "Something went wrong :( Please try again or contact the VDC Admins/Tech."
-      );
-    }
-  }
+  //   if (ok) {
+  //     alert(`Successfully removed ${account.riotIGN}.`);
+  //     await onRemoved();
+  //   } else {
+  //     alert(
+  //       "Something went wrong :( Please try again or contact the VDC Admins/Tech."
+  //     );
+  //   }
+  // }
 
   return (
     <div className="flex items-center justify-between rounded-3xl px-8 py-6 shadow-lg bg-vdcWhite dark:bg-vdcBlack hover:text-vdcRed w-full max-w-xl mx-auto">
@@ -147,17 +142,19 @@ function Account({
       <h1 className="flex-1 text-center text-md break-all font-semibold text-vdcBlack dark:text-vdcWhite">
         {account.riotIGN}
       </h1>
-      {isPrimaryAccount ? (
-        <Image src="vdc-flame.svg" width={25} height={25} alt="vdcFlame" />
-      ) : (
-        <button disabled={removing} onClick={removeAccount}>
-          {removing ? (
-            <LoadingSpinner />
-          ) : (
-            <TrashIcon className="w-7 text-vdcBlack dark:text-vdcWhite hover:cursor-pointer hover:scale-110" />
-          )}
-        </button>
-      )}
+      {
+        isPrimaryAccount && (
+          <Image src="vdc-flame.svg" width={25} height={25} alt="vdcFlame" />
+        )
+        // TODO: extract this to Admin page in the future where admins can manually delete accounts
+        // <button disabled={removing} onClick={removeAccount}>
+        //   {removing ? (
+        //     <LoadingSpinner />
+        //   ) : (
+        //     <TrashIcon className="w-7 text-vdcBlack dark:text-vdcWhite hover:cursor-pointer hover:scale-110" />
+        //   )}
+        // </button>
+      }
     </div>
   );
 }
