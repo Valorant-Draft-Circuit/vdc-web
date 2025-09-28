@@ -1,23 +1,23 @@
 // import { auth } from "@/lib/auth";
 import { connection } from "next/server";
 import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
-import DashboardPanel from "@/components/me/DashboardPanel";
-import ConnectedAccounts from "@/components/me/ConnectedAccounts";
-import SettingsPanel from "@/components/me/SettingsPanel";
+import ConnectedAccounts from "@/components/me/connected-accounts/ConnectedAccounts";
+// import DashboardPanel from "@/components/me/DashboardPanel";
+// import SettingsPanel from "@/components/me/SettingsPanel";
 
 const tabs: TTabElements[] = [
-  {
-    name: "Dashboard",
-    query: "dashboard",
-    color: "vdcRed",
-    content: <DashboardPanel />,
-  },
-  {
-    name: "Settings",
-    query: "settings",
-    color: "vdcRed",
-    content: <SettingsPanel />,
-  },
+  // {
+  //   name: "Dashboard",
+  //   query: "dashboard",
+  //   color: "vdcRed",
+  //   content: <DashboardPanel />,
+  // },
+  // {
+  //   name: "Settings",
+  //   query: "settings",
+  //   color: "vdcRed",
+  //   content: <SettingsPanel />,
+  // },
   {
     name: "Connected Accounts",
     query: "accounts",
