@@ -29,6 +29,9 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
     },
   },
   token: "https://auth.riotgames.com/token",
+  userinfo: {
+    url: "https://auth.riotgames.com/userinfo",
+  },
   async profile(_, tokens) {
     const res = await fetch(
       "https://americas.api.riotgames.com/riot/account/v1/accounts/me",
@@ -159,7 +162,7 @@ async function handleRiotCallback(account, user) {
         riotIGN: userInfoVal.gameName + "#" + userInfoVal.tagLine,
       },
     });
-    
+
     if (!user.primaryRiotAccountID) {
       await prisma.user.update({
         where: {
