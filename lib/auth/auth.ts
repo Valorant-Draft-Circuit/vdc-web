@@ -33,8 +33,7 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
     }
     const data = await res.json();
     return {
-      id: data.puuid,
-      name: data.gameName ? `${data.gameName}#${data.tagLine}` : null,
+      id: profile.sub,
       email: null,
       image: null,
     };
