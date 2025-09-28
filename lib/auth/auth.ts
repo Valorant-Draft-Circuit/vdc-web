@@ -159,7 +159,7 @@ async function handleRiotCallback(account, user) {
         riotIGN: userInfoVal.gameName + "#" + userInfoVal.tagLine,
       },
     });
-
+    
     if (!user.primaryRiotAccountID) {
       await prisma.user.update({
         where: {
