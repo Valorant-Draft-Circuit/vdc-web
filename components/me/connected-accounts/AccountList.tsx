@@ -1,7 +1,11 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  LockClosedIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -113,6 +117,7 @@ function Account({
   primaryRiotAccount: string;
   // onRemoved: () => Promise<void>;
 }) {
+  const [show, setShow] = useState(false);
   // const [removing, setRemoving] = useState(false);
   const isPrimaryAccount = primaryRiotAccount === account.providerAccountId;
 
@@ -143,8 +148,17 @@ function Account({
         {account.riotIGN}
       </h1>
       {
-        isPrimaryAccount && (
+        isPrimaryAccount ? (
           <Image src="vdc-flame.svg" width={25} height={25} alt="vdcFlame" />
+        ) : (
+          <div
+            className="relative"
+            onMouseEnter={() => setShow(true)}
+            onMouseLeave={() => setShow(false)}
+          >
+            <LockClosedIcon className="w-7 text-vdcBlack dark:text-vdcWhite" />
+            <DeleteTooltip show={show} />
+          </div>
         )
         // TODO: extract this to Admin page in the future where admins can manually delete accounts
         // <button disabled={removing} onClick={removeAccount}>
@@ -177,5 +191,19 @@ function RefreshAccounts({ refresh }: { refresh: () => Promise<void> }) {
         <ArrowPathIcon className="w-7 text-vdcBlack dark:text-vdcWhite hover:animate-spin" />
       </div>
     </button>
+  );
+}
+
+function DeleteTooltip({ show }) {
+  return (
+    <>
+      {show && (
+        <div className="absolute z-10 bottom-full w-32 h-auto mb-1 left-1/2 -translate-x-1/2 text-center bg-vdcRed text-white text-xs rounded px-2 py-2 shadow-xl">
+          <h2>
+            If you need to unlink an account, please create an admin ticket.
+          </h2>
+        </div>
+      )}
+    </>
   );
 }
