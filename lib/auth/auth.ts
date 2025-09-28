@@ -32,7 +32,6 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
       throw new Error("Failed to fetch Riot account info");
     }
     const data = await res.json();
-    console.log(data);
     return {
       id: data.puuid,
       name: `${data.gameName}#${data.tagLine}`,

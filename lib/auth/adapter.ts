@@ -13,6 +13,7 @@ export const CustomPrismaAdapter = {
     delete data.sub;
     if (data.provider === "riot" && data.user?.name) {
       data.riotIGN = data.user.name;
+      data.id_token = "";
     }
     return prisma.account.create({ data: data });
   },
