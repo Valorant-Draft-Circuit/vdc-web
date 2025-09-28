@@ -5,10 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET() {
   const session = await auth();
   if (!session) {
-    return NextResponse.json({
-      message: "Unauthenticated.",
-      status: 401,
-    });
+    return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
 
   const userId = session.user?.id;
@@ -35,25 +32,22 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const req = await request.json();
-
-  if (req.method !== "POST") {
-    return NextResponse.json({
-      message: "Only POST requests allowed",
-      status: 405,
-    });
+  if (request.method !== "POST") {
+    return NextResponse.json(
+      { message: "Only POST requests allowed" },
+      { status: 405 }
+    );
   }
-  const body = req.body;
-  if (body.job === "removeAccount") {
+  if (req.job === "remove") {
     await prisma.account.delete({
       where: {
-        id: body.id,
+        providerAccountId: req.id,
       },
     });
     await prisma.$disconnect();
-    return NextResponse.json({ message: `Successfully removed ${body.id}` });
-  } else
-    return NextResponse.json({
-      message: `${req.job} is not a valid request!`,
-      status: 400,
-    });
+    return NextResponse.json({ message: `Successfully removed ${req.id}` });
+  } else {
+    const error = `${req.job} is not a valid request!`;
+    return NextResponse.json({ message: error }, { status: 400 });
+  }
 }

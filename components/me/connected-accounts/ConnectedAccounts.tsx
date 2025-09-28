@@ -7,13 +7,20 @@ export default async function ConnectedAccounts() {
         <div className="flex flex-col space-y-5 xl:items-end mx-10 xl:text-start ">
           <h1 className="italic text-3xl text-vdcBlack">Connected Accounts</h1>
           <h1 className="text-vdcWhite text-md italic text-wrap">
-            TO LINK ANOTHER ACCOUNT, GO TO THE RIOT GAMES WEBSITE AND LOG INTO
-            THE ACCOUNT YOU WANT TO ADD, THEN CLICK THE + ICON
+            TO LINK ANOTHER ACCOUNT, GO TO THE{" "}
+            <a
+              href="https://authenticate.riotgames.com"
+              className="underline"
+              target="_blank"
+            >
+              RIOT GAMES WEBSITE
+            </a>{" "}
+            AND LOG INTO THE ACCOUNT YOU WANT TO ADD, THEN CLICK THE + ICON
           </h1>
         </div>
         <div className="mx-10"></div>
       </div>
-      <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic m-auto text-vdcRed">
+      <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic m-auto text-vdcRed transition-all">
         <AccountList />
       </div>
     </div>

@@ -11,7 +11,14 @@ declare module "next-auth" {
   }
 }
 
-const RiotProvider = (): OAuthConfig<any> => ({
+export interface RiotProfile {
+  sub: string;
+  name?: string;
+  email?: string;
+  username?: string;
+}
+
+const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   id: "riot",
   name: "Riot",
   type: "oauth",
@@ -29,7 +36,6 @@ const RiotProvider = (): OAuthConfig<any> => ({
     return {
       id: profile.sub,
       name: profile.username ?? profile.name ?? null,
-
       email: profile.email ?? null,
       image: null,
     };

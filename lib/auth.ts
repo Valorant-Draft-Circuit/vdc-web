@@ -1,8 +1,9 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 import { OAuthConfig } from "next-auth/providers";
+import { RiotProfile } from "./auth/auth";
 
-const Riot = (): OAuthConfig<any> => ({
+const Riot = (): OAuthConfig<RiotProfile> => ({
   id: "riot",
   name: "Riot",
   type: "oauth",
