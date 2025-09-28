@@ -13,46 +13,23 @@ declare module "next-auth" {
 
 export interface RiotProfile {
   sub: string;
-  puuid?: string;
-  tagLine?: string;
 }
 
 export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   id: "riot",
   name: "Riot",
-  type: "oauth",
-  authorization: {
-    url: "https://auth.riotgames.com/authorize",
-    params: {
-      response_type: "code",
-      scope: "openid offline_access",
-    },
-  },
-  token: "https://auth.riotgames.com/token",
-  userinfo: {
-    url: "https://auth.riotgames.com/userinfo",
-  },
-  checks: ["state"], 
-  async profile(_, tokens) {
-    const res = await fetch(
-      "https://americas.api.riotgames.com/riot/account/v1/accounts/me",
-      {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      }
-    );
-    const data = await res.json();
-
+  type: "oidc",
+  wellKnown: "https://auth.riotgames.com/.well-known/openid-configuration",
+  clientId: process.env.RIOT_CLIENT_ID!,
+  clientSecret: process.env.RIOT_CLIENT_SECRET!,
+  issuer: "https://auth.riotgames.com",
+  profile(profile) {
     return {
-      id: data.puuid,
-      name: data.gameName ? `${data.gameName}#${data.tagLine}` : null,
+      id: profile.sub,
       email: null,
       image: null,
     };
   },
-  clientId: process.env.RIOT_CLIENT_ID!,
-  clientSecret: process.env.RIOT_CLIENT_SECRET!,
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
