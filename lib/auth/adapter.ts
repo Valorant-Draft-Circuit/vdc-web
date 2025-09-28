@@ -13,7 +13,6 @@ export const CustomPrismaAdapter = {
     delete data.sub;
     delete data.id_token;
     if (data.provider === "riot" && data.user?.name) {
-      delete data.id_token;
       data.riotIGN = data.user.name;
       data.id_token = "";
     }
