@@ -41,9 +41,7 @@ function OverallSummary({ summary }) {
     <div className="flex flex-col rounded-xl bg-indigo-50">
       <div className="px-8 sm:px-10 py-10">
         <h2 className="mt-2 text-md text-vdcBlack">Active Players</h2>
-        <h1 className="mt-2 max-w-lg text-3xl text-gray-600 lg">
-          {sum}
-        </h1>
+        <h1 className="mt-2 max-w-lg text-3xl text-gray-600 lg">{sum}</h1>
       </div>
     </div>
   );
@@ -65,7 +63,6 @@ function SignedPlayersSummary({ summary }) {
 }
 
 function SignedPlayersByTier({ tierData }) {
-  console.log(tierData);
   return (
     <div className="rounded-md">
       <h1 className={`text-${TIER_COLOR_MAP[tierData.tier]} text-lg`}>

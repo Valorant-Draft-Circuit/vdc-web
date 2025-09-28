@@ -7,18 +7,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET() {
   const session = await auth();
   if (!session) {
-    return NextResponse.json({
-      message: "Unauthenticated.",
-      status: 401,
-    });
+    return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
   const userRoles = session.user?.roles || "";
 
   if (!hasAccess(userRoles, [Roles.ADMIN, Roles.LEAD_TECH])) {
-    return NextResponse.json({
-      message: "Unauthorized.",
-      status: 403,
-    });
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
   }
 
   const controlPanel = await prisma.controlPanel.findMany();
@@ -34,20 +28,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session) {
-    return NextResponse.json({
-      message: "Unauthenticated.",
-      status: 401,
-    });
+    return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
   const userRoles = session.user?.roles || "";
 
   if (!hasAccess(userRoles, [Roles.ADMIN, Roles.LEAD_TECH])) {
-    return NextResponse.json({
-      message: "Unauthorized.",
-      status: 403,
-    });
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
   }
-  
+
   const updates = await request.json();
   const ops = Object.entries(updates).map(([name, rawValue]) => {
     let value: string;
@@ -70,12 +58,11 @@ export async function POST(request: NextRequest) {
     await prisma.$transaction(ops);
     return NextResponse.json({
       message: `Control Panel values successfully updated.`,
-      status: 200,
     });
   } catch (e) {
-    return NextResponse.json({
-      message: `Error updateing Control Panel Values: ${e}`,
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: `Error updateing Control Panel Values: ${e}` },
+      { status: 500 }
+    );
   }
 }

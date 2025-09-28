@@ -149,7 +149,6 @@ export function GeneralControls({ generalControls, control }) {
 }
 
 function DraftControls({ draftControls, control }) {
-  console.log(draftControls);
   return (
     <ConfigSection
       title="Draft Controls"

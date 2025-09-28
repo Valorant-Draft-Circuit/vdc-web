@@ -3,18 +3,44 @@ import Discord from "next-auth/providers/discord";
 import { CustomPrismaAdapter } from "./adapter";
 import { Adapter } from "next-auth/adapters";
 import { prisma } from "@/prisma/prismadb";
+import { OAuthConfig } from "next-auth/providers";
 
 declare module "next-auth" {
   interface User {
-    roles: string;
+    roles?: string;
   }
 }
 
-// declare module "@auth/core/adapters" {
-//   interface AdapterUser {
-//     roles: string;
-//   }
-// }
+export interface RiotProfile {
+  sub: string;
+  name?: string;
+  email?: string;
+  username?: string;
+}
+
+const RiotProvider = (): OAuthConfig<RiotProfile> => ({
+  id: "riot",
+  name: "Riot",
+  type: "oauth",
+  authorization: {
+    url: "https://auth.riotgames.com/authorize",
+    params: { scope: "openid profile offline_access", response_type: "code" },
+  },
+  token: "https://auth.riotgames.com/token",
+  userinfo: {
+    url: "https://auth.riotgames.com/userinfo",
+  },
+  clientId: process.env.RIOT_CLIENT_ID!,
+  clientSecret: process.env.RIOT_CLIENT_SECRET!,
+  async profile(profile) {
+    return {
+      id: profile.sub,
+      name: profile.username ?? profile.name ?? null,
+      email: profile.email ?? null,
+      image: null,
+    };
+  },
+});
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -22,6 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorization:
         "https://discord.com/api/oauth2/authorize?scope=identify+guilds.join",
     }),
+    RiotProvider,
   ],
   pages: {
     signIn: "/signin",
@@ -70,7 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (!res.ok) {
         console.warn("Unable to update meilisearch player document ");
       }
-      
+
       if (account?.access_token) {
         const freshProfile = await fetch(
           "https://discord.com/api/v10/users/@me",

@@ -102,7 +102,9 @@ function SubmitSignUp() {
       alert("Successfully signed up!");
       window.location.href = "/";
     } else {
-      alert("Something went wrong :( Please try again.");
+      alert(
+        "Something went wrong :( Please try again or contact the VDC Admins/Tech."
+      );
       ref.current?.reset();
       setStatus(null);
     }

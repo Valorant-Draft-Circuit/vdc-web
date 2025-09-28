@@ -47,12 +47,18 @@ export async function getFreeAgentCountByTier(
   faType: LeagueStatus,
   tier: Tier
 ) {
-  const { PROSPECT, APPRENTICE, EXPERT } = await getMMRTierLines();
+  const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } = await getMMRTierLines();
 
   let mmrRange;
   switch (tier) {
+    case Tier.RECRUIT:
+      mmrRange = { lte: RECRUIT.max };
+      break;
     case Tier.PROSPECT:
-      mmrRange = { lte: PROSPECT.max };
+      mmrRange = { 
+        gt: RECRUIT.max,
+        lte: PROSPECT.max,
+       };
       break;
     case Tier.APPRENTICE:
       mmrRange = {

@@ -4,7 +4,7 @@ import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const MMR_ENDPOINT = "https://numbers.vdc.gg/player/signup";
+  
   const req = await request.json();
   await prisma.user.update({
     where: {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       primaryRiotAccountID: req.primaryValorantAccount,
     },
   });
-
+  const MMR_ENDPOINT = `https://numbers.vdc.gg/signup/${req.accountID}`;
   const flags: Flags[] = [];
   if (req.role === "RFA") {
     flags.push(Flags.REGISTERED_AS_RFA);
