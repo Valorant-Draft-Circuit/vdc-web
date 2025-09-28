@@ -46,7 +46,13 @@ export const TIERS_LIST = [
   Tier.PROSPECT,
   Tier.RECRUIT,
 ];
-export const TIER_ORDER = ["MYTHIC", "EXPERT", "APPRENTICE", "PROSPECT", "RECRUIT"];
+export const TIER_ORDER = [
+  "MYTHIC",
+  "EXPERT",
+  "APPRENTICE",
+  "PROSPECT",
+  "RECRUIT",
+];
 
 export const AGENTS = {
   GEKKO: "e370fa57-4757-3604-3648-499e1f642d3f",
@@ -114,7 +120,7 @@ export const STATUS_LABELS: Record<LeagueStatus, string> = {
   [LeagueStatus.APPROVED]: "APPROVED",
 };
 
-export const SUPERUSER_ROLES = [Roles.ADMIN, Roles.OWNER];
+export const SUPERUSER_ROLES = [Roles.OWNER, Roles.LEAD_TECH];
 
 export const GENERAL_CONTROL = [
   ControlPanelID.SIGNUP_STATE,
