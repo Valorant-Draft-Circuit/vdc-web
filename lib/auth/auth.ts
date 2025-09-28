@@ -23,9 +23,18 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   clientId: process.env.RIOT_CLIENT_ID!,
   clientSecret: process.env.RIOT_CLIENT_SECRET!,
   issuer: "https://auth.riotgames.com",
-  profile(profile) {
+  async profile(_, tokens) {
+    const res = await fetch(
+      "https://americas.api.riotgames.com/riot/account/v1/accounts/me",
+      { headers: { Authorization: `Bearer ${tokens.access_token}` } }
+    );
+    if (!res.ok) {
+      throw new Error("Failed to fetch Riot account info");
+    }
+    const data = await res.json();
     return {
-      id: profile.sub,
+      id: data.puuid,
+      name: data.gameName ? `${data.gameName}#${data.tagLine}` : null,
       email: null,
       image: null,
     };
