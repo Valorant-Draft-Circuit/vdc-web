@@ -11,6 +11,7 @@ export const CustomPrismaAdapter = {
 
   linkAccount(data) {
     delete data.sub;
+    delete data.id_token;
     if (data.provider === "riot" && data.user?.name) {
       data.riotIGN = data.user.name;
       data.id_token = "";
