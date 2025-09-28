@@ -13,8 +13,8 @@ declare module "next-auth" {
 
 export interface RiotProfile {
   sub: string;
-  name?: string;
-  email?: string;
+  puuid?: string;
+  tagLine?: string;
 }
 
 export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
@@ -24,26 +24,31 @@ export const RiotProvider = (): OAuthConfig<RiotProfile> => ({
   authorization: {
     url: "https://auth.riotgames.com/authorize",
     params: {
-      scope: "openid profile offline_access",
       response_type: "code",
+      scope: "openid offline_access",
     },
   },
-  token: {
-    url: "https://auth.riotgames.com/token",
-  },
-  userinfo: {
-    url: "https://auth.riotgames.com/userinfo",
-  },
-  clientId: process.env.RIOT_CLIENT_ID!,
-  clientSecret: process.env.RIOT_CLIENT_SECRET!,
-  async profile(profile) {
+  token: "https://auth.riotgames.com/token",
+  async profile(_, tokens) {
+    const res = await fetch(
+      "https://americas.api.riotgames.com/riot/account/v1/accounts/me",
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      }
+    );
+    const data = await res.json();
+
     return {
-      id: profile.sub,
-      name: profile.name ?? null,
-      email: profile.email ?? null,
+      id: data.puuid,
+      name: data.gameName ? `${data.gameName}#${data.tagLine}` : null,
+      email: null,
       image: null,
     };
   },
+  clientId: process.env.RIOT_CLIENT_ID!,
+  clientSecret: process.env.RIOT_CLIENT_SECRET!,
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -154,7 +159,7 @@ async function handleRiotCallback(account, user) {
         riotIGN: userInfoVal.gameName + "#" + userInfoVal.tagLine,
       },
     });
-
+    
     if (!user.primaryRiotAccountID) {
       await prisma.user.update({
         where: {
