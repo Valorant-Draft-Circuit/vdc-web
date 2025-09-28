@@ -9,7 +9,7 @@ export default async function ConnectedAccounts() {
           <h1 className="text-vdcWhite text-md italic text-wrap">
             TO LINK ANOTHER ACCOUNT, GO TO THE{" "}
             <a
-              href="https://authenticate.riotgames.com"
+              href="https://www.riotgames.com/"
               className="underline"
               target="_blank"
             >

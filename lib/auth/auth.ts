@@ -86,11 +86,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       await updateMeilisearch(user);
       if (account?.provider === "riot") {
-        console.log("Riot callback detected");
         await handleRiotCallback(account, user);
       }
       if (account?.provider === "discord") {
-        console.log("Discord callback detected");
         await handleDiscordCallback(account, user);
       }
     },
