@@ -2,7 +2,7 @@ import { hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { getMMRTierLines } from "@/lib/common/utils";
 import { getContractsData } from "@/lib/queries/staff/FM";
-import { Roles } from "@/prisma";
+import { ControlPanel, Roles } from "@/prisma";
 import { ContractStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -27,6 +27,7 @@ export async function GET() {
   const contracts = await getContractsData();
 
   const tierlines = await getMMRTierLines();
+  const FMAccess = await ControlPanel.getDisplayMMRFM();
 
   const formattedContracts = contracts.map((contract) => {
     console.log(contract);
@@ -40,24 +41,26 @@ export async function GET() {
         | null
         | undefined,
       contractRemaining: contract.Status?.contractRemaining,
-      mmr: contract.PrimaryRiotAccount?.MMR?.mmrEffective,
+      mmr: (FMAccess ? contract.PrimaryRiotAccount?.MMR?.mmrEffective : undefined),
       tier:
-        (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
-        tierlines.RECRUIT.max
-          ? "RECRUIT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
-            tierlines.PROSPECT.max
-          ? "PROSPECT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
-            tierlines.APPRENTICE.max
-          ? "APPRENTICE"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
-            tierlines.EXPERT.max
-          ? "EXPERT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
-            tierlines.MYTHIC.max
-          ? "MYTHIC"
-          : "N/A",
+        ( FMAccess ?
+          (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+          tierlines.RECRUIT.max
+            ? "RECRUIT"
+            : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+              tierlines.PROSPECT.max
+            ? "PROSPECT"
+            : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+              tierlines.APPRENTICE.max
+            ? "APPRENTICE"
+            : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+              tierlines.EXPERT.max
+            ? "EXPERT"
+            : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+              tierlines.MYTHIC.max
+            ? "MYTHIC"
+            : "N/A" 
+          : undefined),
       team: undefined as string | undefined,
       franchise: undefined as string | undefined,
     };
