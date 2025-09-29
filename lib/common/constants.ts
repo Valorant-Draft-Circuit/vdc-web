@@ -134,6 +134,7 @@ export const GENERAL_CONTROL = [
 
 export const MMR_CONTROL = [
   ControlPanelID.MMR_DISPLAY_STATE,
+  ControlPanelID.DISPLAY_MMR_FM,
 
   ControlPanelID.RECRUIT_MMR_CAP_PLAYER,
   ControlPanelID.PROSPECT_MMR_CAP_PLAYER,
