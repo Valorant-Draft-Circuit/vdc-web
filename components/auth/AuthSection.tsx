@@ -41,7 +41,7 @@ export default async function AuthSection() {
   );
 }
 
-function determineTeam(user) {
+export function determineTeam(user) {
   const userLeagueStatus = user.Status.leagueStatus;
   const userContractStatus = user.Status.contractStatus;
   if (userLeagueStatus === LeagueStatus.DRAFT_ELIGIBLE) {
