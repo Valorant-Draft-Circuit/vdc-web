@@ -5,6 +5,7 @@ import SignOut from "./SignOut";
 import Link from "next/link";
 import { LeagueStatus } from "@prisma/client";
 import { getUser } from "@/lib/queries/user/user";
+import { getFranchiseSlugOfManager as getFranchiseOfManager } from "@/lib/queries/franchises/franchises";
 
 export default async function AuthSection() {
   const session = await auth();
@@ -15,7 +16,12 @@ export default async function AuthSection() {
     return <SignOut />;
   }
   const user = await getUser(session.user?.id);
-  const team = determineTeam(user);
+  let team = determineTeam(user);
+
+  if (!team) {
+    const slug = await getFranchiseOfManager(user?.id);
+    team = `${slug} Management`;
+  }
 
   return (
     <div className="flex flex-row space-x-2">
@@ -62,6 +68,9 @@ export function determineTeam(user) {
   ) {
     return `${user.Team.Franchise.slug} | ${user.Team.name}`;
   } else if (userLeagueStatus === LeagueStatus.GENERAL_MANAGER) {
+    if (!user.Team) {
+      return null;
+    }
     return `${user.Team.Franchise.name}`;
   }
 }

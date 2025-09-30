@@ -98,6 +98,8 @@ async function getUpcomingMatchesDates(tier: Tier, season: number) {
       dateScheduled: "asc",
     },
   });
+
+  await prisma.$disconnect();
   upcomingMatches.sort((a, b) =>
     a.dateScheduled.toISOString().localeCompare(b.dateScheduled.toISOString())
   );

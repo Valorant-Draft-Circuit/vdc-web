@@ -5,53 +5,73 @@ import SignIn from "./SignIn";
 import Link from "next/link";
 import Image from "next/image";
 import SignOut from "./SignOut";
-import { determineTeam } from "./AuthSection";
+
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../theme/LoadingSpinner";
 import { TUser } from "@/lib/queries/user/user";
+import { determineTeam } from "./AuthSection";
 
 export default function MobileAuth() {
   const [user, setUser] = useState<TUser>();
+  const [slug, setSlug] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
-  async function getUserInfo() {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/player/user/${session?.user?.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
+    async function getUserInfo() {
+      try {
+        setLoading(true);
+        if (!session?.user?.id) return;
+        const userRes = await fetch(`/api/player/user/${session.user.id}`);
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setUser(userData);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     getUserInfo();
   }, [session]);
 
+  useEffect(() => {
+    async function getManagementTitle() {
+      try {
+        setLoading(true);
+        if (!session?.user?.id) return;
+        const res = await fetch(`/api/player/franchise/${session.user.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSlug(data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (user && !determineTeam(user)) {
+      getManagementTitle();
+    }
+  }, [session, user]);
+
   if (!session)
     return (
-      <>
-        <div className="flex flex-col gap-2">
-          <h1 className="text-gray-200 italic px-4 text-lg">Not signed in.</h1>
-          <SignIn />
-        </div>
-      </>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-gray-200 italic px-4 text-lg">Not signed in.</h1>
+        <SignIn />
+      </div>
     );
 
   const userImage = session?.user?.image;
   const userName = user?.name;
-  let team;
-  if (user) {
-    team = determineTeam(user);
-  } else {
-    team = "Loading...";
-  }
+  const team = user ? determineTeam(user) : undefined;
+
+  const displayTeam = team || (slug ? `${slug} Management` : "Loading...");
 
   return (
     <div className="flex flex-col gap-2 items-center">
@@ -73,7 +93,7 @@ export default function MobileAuth() {
           ) : (
             <>
               <h1 className="italic">{userName}</h1>
-              <h2 className="italic">{team}</h2>
+              <h2 className="italic uppercase">{displayTeam}</h2>
             </>
           )}
         </div>

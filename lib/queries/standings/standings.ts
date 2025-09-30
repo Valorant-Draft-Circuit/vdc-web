@@ -195,6 +195,8 @@ async function getAllBo2Games(seasonNumber: number) {
       },
     },
   });
+
+  await prisma.$disconnect();
   return res;
 }
 
@@ -219,6 +221,8 @@ async function getFranchises() {
       },
     },
   });
+  
+  await prisma.$disconnect();
   return res;
 }
 
