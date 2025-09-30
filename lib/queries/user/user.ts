@@ -43,5 +43,7 @@ export async function getUser(id: string) {
       Status: true,
     },
   });
+
+  await prisma.$disconnect();
   return user;
 }

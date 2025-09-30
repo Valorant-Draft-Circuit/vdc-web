@@ -33,6 +33,8 @@ export async function GET(request: NextRequest) {
     tier: tier,
     gameType: gameType,
   });
+  
+  await prisma.$disconnect();
   return NextResponse.json(playerStats);
 }
 

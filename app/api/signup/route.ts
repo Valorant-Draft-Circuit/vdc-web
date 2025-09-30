@@ -4,7 +4,6 @@ import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  
   const req = await request.json();
   await prisma.user.update({
     where: {
@@ -41,6 +40,7 @@ export async function POST(request: NextRequest) {
     body: req.accountID,
   });
 
+  await prisma.$disconnect();
   return NextResponse.json({
     message: "Player successfully signed up",
     status: 200,
