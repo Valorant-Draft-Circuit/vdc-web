@@ -73,7 +73,6 @@ export default async function getFranchiseDetails(slug, season) {
       .filter((game) => game !== undefined);
     return { ...team, futureGames: futureTeamGames, pastGames: pastTeamGames };
   });
-  await prisma.$disconnect();
   return franchise;
 }
 

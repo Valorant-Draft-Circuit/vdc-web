@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
     body: req.accountID,
   });
 
-  await prisma.$disconnect();
   return NextResponse.json({
     message: "Player successfully signed up",
     status: 200,
