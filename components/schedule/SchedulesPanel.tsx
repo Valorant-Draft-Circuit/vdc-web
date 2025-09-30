@@ -1,4 +1,5 @@
 "use client";
+
 import { Tier } from "@prisma/client";
 // import Filter from "../standings/filter/Filter";
 import ScheduleCard from "./ScheduleCard";
@@ -40,7 +41,9 @@ export default function SchedulePanel({
   }, [tier, season]);
 
   useEffect(() => {
-    if (!schedule || matchDays.length === 0) return;
+    if (!schedule || matchDays.length === 0) {
+      return;
+    }
 
     const today = new Date();
     const todayMMDD = (today.getMonth() + 1) * 100 + today.getDate();
@@ -119,7 +122,9 @@ export default function SchedulePanel({
   }, [matchDays, activeDay]);
 
   if (matchDays.length === 0)
-    return <h1 className="text-center">loading...</h1>;
+    return (
+      <h1 className="text-center">No scheduled matches for {tier} (yet?)</h1>
+    );
 
   return (
     <div className="flex flex-col gap-5">
