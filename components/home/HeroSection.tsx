@@ -116,7 +116,7 @@ async function Joined({ session }) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
-          Ready to play, <br />
+          You want to play, <br />
           {user!.name}?
         </h2>
         <SignUpButton />
