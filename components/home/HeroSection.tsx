@@ -94,7 +94,7 @@ async function Joined({ session }) {
         <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           Sign ups are <br />
           not yet open. <br />
-          Check Back later!
+          Check back later!
         </h2>
       </>
     );
