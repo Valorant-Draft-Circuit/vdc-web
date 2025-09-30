@@ -63,7 +63,7 @@ export async function getScheduleByTier(tier: Tier, season: number) {
 async function getUpcomingMatchesDates(tier: Tier, season: number) {
   const upcomingMatches = await prisma.matches.findMany({
     where: {
-      tier: tier,
+      tier: tier as Tier,
       season: season,
       matchType: MatchType.BO2,
       Home: {
