@@ -10,15 +10,22 @@ initCache();
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const tier = searchParams.get("tier");
+  const tierParam = searchParams.get("tier");
   const seasonParam = searchParams.get("season");
 
-  if (!tier) {
+  if (!tierParam) {
     return NextResponse.json({ error: "Missing tier" }, { status: 400 });
   }
 
+  const normalizedTier = tierParam.toUpperCase();
+  const tier = Tier[normalizedTier as keyof typeof Tier];
+
+  if (!tier) {
+    return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+  }
+
   const season = seasonParam ? parseInt(seasonParam) : await getSeasonCached();
-  const schedule = await getScheduleByTierCached(tier as Tier, season);
+  const schedule = await getScheduleByTierCached(tier, season);
 
   return NextResponse.json({ schedule, season });
 }
