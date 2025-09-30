@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth/auth";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -26,7 +26,7 @@ export async function GET() {
       },
     },
   });
-  await prisma.$disconnect();
+
   return NextResponse.json(playerRiotAccounts);
 }
 
@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
         providerAccountId: req.id,
       },
     });
-    await prisma.$disconnect();
     return NextResponse.json({ message: `Successfully removed ${req.id}` });
   } else {
     const error = `${req.job} is not a valid request!`;

@@ -1,5 +1,5 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { ContractStatus, GameType, MatchType } from "@prisma/client";
 
 export default async function getFranchiseDetails(slug, season) {
@@ -73,7 +73,6 @@ export default async function getFranchiseDetails(slug, season) {
       .filter((game) => game !== undefined);
     return { ...team, futureGames: futureTeamGames, pastGames: pastTeamGames };
   });
-  await prisma.$disconnect();
   return franchise;
 }
 

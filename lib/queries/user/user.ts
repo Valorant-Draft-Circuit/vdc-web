@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 export type TUser = Prisma.UserGetPayload<{
   include: {
@@ -43,6 +43,5 @@ export async function getUser(id: string) {
       Status: true,
     },
   });
-  await prisma.$disconnect;
   return user;
 }

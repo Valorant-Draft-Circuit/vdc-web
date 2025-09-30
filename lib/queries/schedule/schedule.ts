@@ -1,5 +1,5 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { MatchType, Tier } from "@prisma/client";
 type TPackagedMatch = ReturnType<typeof packageMatch>;
 
@@ -98,7 +98,6 @@ async function getUpcomingMatchesDates(tier: Tier, season: number) {
       dateScheduled: "asc",
     },
   });
-  await prisma.$disconnect();
   upcomingMatches.sort((a, b) =>
     a.dateScheduled.toISOString().localeCompare(b.dateScheduled.toISOString())
   );

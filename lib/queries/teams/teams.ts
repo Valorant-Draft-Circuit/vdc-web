@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Prisma, Tier } from "@prisma/client";
 
 export type TActiveTeam = Prisma.TeamsGetPayload<{

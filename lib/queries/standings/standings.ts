@@ -1,6 +1,6 @@
 import { TStandingProps } from "@/components/standings/StandingsCard";
 import { MatchType } from "@prisma/client";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Tier } from "@prisma/client";
 import { getAllActiveTeamsIn, TActiveTeam } from "../teams/teams";
 import { getAllGamesBy, TGame } from "../games/games";
@@ -195,7 +195,6 @@ async function getAllBo2Games(seasonNumber: number) {
       },
     },
   });
-  await prisma.$disconnect();
   return res;
 }
 
@@ -220,7 +219,6 @@ async function getFranchises() {
       },
     },
   });
-  await prisma.$disconnect();
   return res;
 }
 

@@ -1,5 +1,5 @@
 import { Flags, Player } from "@/prisma";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
     body: req.accountID,
   });
 
-  await prisma.$disconnect();
   return NextResponse.json({
     message: "Player successfully signed up",
     status: 200,

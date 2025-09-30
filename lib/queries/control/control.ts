@@ -1,5 +1,5 @@
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 
 export async function getSignupState() {
   const response = await prisma.controlPanel.findFirst({
