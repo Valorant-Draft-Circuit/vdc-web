@@ -27,7 +27,7 @@ export async function GET() {
     },
   });
 
-  await prisma.$disconnect();
+  
   return NextResponse.json(playerRiotAccounts);
 }
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       },
     });
     
-    await prisma.$disconnect();
+    
     return NextResponse.json({ message: `Successfully removed ${req.id}` });
   } else {
     const error = `${req.job} is not a valid request!`;

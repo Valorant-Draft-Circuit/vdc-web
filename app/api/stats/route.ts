@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     gameType: gameType,
   });
   
-  await prisma.$disconnect();
+  
   return NextResponse.json(playerStats);
 }
 

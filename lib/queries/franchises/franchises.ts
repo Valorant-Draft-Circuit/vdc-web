@@ -74,7 +74,7 @@ export default async function getFranchiseDetails(slug, season) {
     return { ...team, futureGames: futureTeamGames, pastGames: pastTeamGames };
   });
 
-  await prisma.$disconnect();
+  
   return franchise;
 }
 
@@ -291,7 +291,7 @@ export async function getFranchiseSlugOfManager(userId) {
       slug: true,
     },
   });
-  await prisma.$disconnect();
+  
   return res?.slug;
 }
 

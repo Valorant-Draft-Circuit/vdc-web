@@ -23,7 +23,7 @@ export async function GET() {
     notes: item.notes,
   }));
 
-  await prisma.$disconnect();
+  
   return NextResponse.json({ controlPanelMap });
 }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await prisma.$transaction(ops);
-      await prisma.$disconnect();
+      
 
     return NextResponse.json({
       message: `Control Panel values successfully updated.`,
