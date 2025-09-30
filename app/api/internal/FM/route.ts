@@ -30,7 +30,6 @@ export async function GET() {
   const FMAccess = await ControlPanel.getDisplayMMRFM();
 
   const formattedContracts = contracts.map((contract) => {
-    console.log(contract);
     const formattedContract = {
       discord: contract.name,
       name: contract.PrimaryRiotAccount?.riotIGN,
