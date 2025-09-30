@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 export type TUser = Prisma.UserGetPayload<{
   include: {

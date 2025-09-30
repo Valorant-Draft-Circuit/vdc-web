@@ -1,5 +1,5 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { MatchType, Tier } from "@prisma/client";
 type TPackagedMatch = ReturnType<typeof packageMatch>;
 

@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const CustomPrismaAdapter = {

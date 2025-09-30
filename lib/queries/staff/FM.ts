@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 
 export async function getContractsData() {

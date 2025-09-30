@@ -1,7 +1,8 @@
 import { hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
+import { prisma } from "@/lib/prisma";
 import { Roles } from "@/prisma";
-import { prisma } from "@/prisma/prismadb";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {

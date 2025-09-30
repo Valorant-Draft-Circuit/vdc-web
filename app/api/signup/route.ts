@@ -1,5 +1,5 @@
 import { Flags, Player } from "@/prisma";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 

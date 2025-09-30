@@ -1,5 +1,5 @@
 import { getMMRTierLines } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { addDays, format, subDays } from "date-fns";
 

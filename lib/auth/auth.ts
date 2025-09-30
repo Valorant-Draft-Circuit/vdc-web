@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 import { CustomPrismaAdapter } from "./adapter";
 import { Adapter } from "next-auth/adapters";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { OAuthConfig } from "next-auth/providers";
 
 declare module "next-auth" {

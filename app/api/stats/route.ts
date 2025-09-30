@@ -3,7 +3,7 @@ import {
   GroupedPlayerStats,
   PlayerNameTeam,
 } from "@/lib/queries/stats/stats";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Tier, GameType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
