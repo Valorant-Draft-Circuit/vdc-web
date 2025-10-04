@@ -19,7 +19,7 @@ export type TSignUpInput = {
   primaryValorantAccount: string;
   role: string;
   playedBefore: string;
-  recentPlayed:string;
+  recentlyPlayed:string;
   commit: string;
   reportedAccounts: string;
   readRules: string;

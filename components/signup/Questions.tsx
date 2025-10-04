@@ -97,7 +97,7 @@ export default function Questions({
       rules: { required: true },
     },
     {
-id:"recentPlayed",
+id:"recentlyPlayed",
 type:"radio",
 label: (
 <h2>
@@ -149,7 +149,7 @@ rules: {required:true},
       ],
       show:
         watch("reportedAccounts") === "true" &&
-        (watch("playedBefore") === "false" || (watch("playedBefore") === "true" && (watch("recentPlayed")==="trueFA"||watch("recentPlayed")==="falseFA"))),
+        (watch("playedBefore") === "false" || (watch("playedBefore") === "true" && (watch("recentlyPlayed")==="trueFA"||watch("recentlyPlayed")==="falseFA"))),
       rules: { required: true },
     },
   ];
