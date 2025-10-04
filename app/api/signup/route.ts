@@ -26,6 +26,9 @@ export async function POST(request: NextRequest) {
   if (req.playedBefore === "true") {
     flags.push(Flags.ACTIVE_IN_PAST);
   }
+  if (req.playedLastSeason === "true") {
+    flags.push(Flags.ACTIVE_LAST_SEASON);
+  }
   await Player.modifyFlags(
     { riotPUUID: req.primaryValorantAccount },
     "ADD",
