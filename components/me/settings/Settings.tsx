@@ -1,15 +1,15 @@
 
-export default async function SettingsPanel() {
+export default async function Settings() {
     return(
-        <div className="bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50% py-8 mx-2 rounded-2xl flex flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
+    <div className="bg-gradient-to-b xl:bg-gradient-to-r from-vdcRed from-50% to-vdcWhite dark:to-vdcGrey to-50% py-8 mx-2 rounded-2xl flex flex-col xl:flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
             <div className="flex flex-col w-full"> 
-                <div className="items-end mx-10 text-start ">
+                <div className="xl:items-end mx-10 xl:text-start">
                     <h1 className="italic text-3xl text-vdcBlack"> 
                         Settings 
                     </h1>
-                    <p className="text-vdcWhite text-md italic px-10 text-wrap"> 
-                        Customize your VDC website experience 
-                    </p>
+                    <h1 className="text-vdcWhite text-md italic text-wrap"> 
+                        CUSTOMIZE YOUR VDC WEBSITE EXPERIENCE
+                    </h1>
                 </div>
                 <div className="mx-10">
                     {/* <Image

@@ -5,19 +5,15 @@ import Image from "next/image";
 
 // bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50%
 
-
-
-export default async function DashboardPanel() {
+export default async function Dashboard() {
     return(
-        <div className="bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50% py-8 mx-2 rounded-2xl flex flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
+    <div className="bg-gradient-to-b xl:bg-gradient-to-r from-vdcRed from-50% to-vdcWhite dark:to-vdcGrey to-50% py-8 mx-2 rounded-2xl flex flex-col xl:flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
             <div className="flex flex-col w-full"> 
-                <div className="items-end mx-10 text-start ">
-                    <h1 className="italic text-3xl text-vdcBlack"> 
-                        Dashboard 
+                <div className="xl:items-end mx-10 xl:text-start">
+                    <h1 className="italic text-3xl text-vdcBlack">Dashboard</h1>
+                    <h1 className="text-vdcWhite text-md italic text-wrap"> 
+                        EVERYTHING YOU'VE EVER WANTED TO KNOW ABOUT YOURSELF IN VDC.
                     </h1>
-                    <p className="text-vdcWhite text-md italic px-10 text-wrap"> 
-                        Everything you've ever wanted to know about yourself in VDC. 
-                    </p>
                 </div>
                 <div className="mx-10">
                     {/* <Image
@@ -30,7 +26,7 @@ export default async function DashboardPanel() {
                 </div>
                     
             </div>
-            <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic text-vdcRed">
+            <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic m-auto text-vdcRed transition-all">
                 <div>
                     <h1> My Stats </h1>
                      <StatsCard /> 

@@ -2,22 +2,22 @@
 import { connection } from "next/server";
 import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import ConnectedAccounts from "@/components/me/connected-accounts/ConnectedAccounts";
-// import DashboardPanel from "@/components/me/DashboardPanel";
-// import SettingsPanel from "@/components/me/SettingsPanel";
+import Dashboard from "@/components/me/dashboard/Dashboard";
+import Settings from "@/components/me/settings/Settings";
 
 const tabs: TTabElements[] = [
-  // {
-  //   name: "Dashboard",
-  //   query: "dashboard",
-  //   color: "vdcRed",
-  //   content: <DashboardPanel />,
-  // },
-  // {
-  //   name: "Settings",
-  //   query: "settings",
-  //   color: "vdcRed",
-  //   content: <SettingsPanel />,
-  // },
+  {
+    name: "Dashboard",
+    query: "dashboard",
+    color: "vdcRed",
+    content: <Dashboard />,
+  },
+  {
+    name: "Settings",
+    query: "settings",
+    color: "vdcRed",
+    content: <Settings />,
+  },
   {
     name: "Connected Accounts",
     query: "accounts",
