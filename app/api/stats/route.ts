@@ -3,7 +3,7 @@ import {
   GroupedPlayerStats,
   PlayerNameTeam,
 } from "@/lib/queries/stats/stats";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Tier, GameType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
     tier: tier,
     gameType: gameType,
   });
-  await prisma.$disconnect();
+  
+  
   return NextResponse.json(playerStats);
 }
 

@@ -1,5 +1,5 @@
 import { getMMRTierLines } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { addDays, format, subDays } from "date-fns";
 
@@ -47,12 +47,18 @@ export async function getFreeAgentCountByTier(
   faType: LeagueStatus,
   tier: Tier
 ) {
-  const { PROSPECT, APPRENTICE, EXPERT } = await getMMRTierLines();
+  const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } = await getMMRTierLines();
 
   let mmrRange;
   switch (tier) {
+    case Tier.RECRUIT:
+      mmrRange = { lte: RECRUIT.max };
+      break;
     case Tier.PROSPECT:
-      mmrRange = { lte: PROSPECT.max };
+      mmrRange = { 
+        gt: RECRUIT.max,
+        lte: PROSPECT.max,
+       };
       break;
     case Tier.APPRENTICE:
       mmrRange = {

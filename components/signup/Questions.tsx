@@ -207,7 +207,7 @@ function RoleExplanations() {
   ];
   return (
     <dl className="divide-y divide-gray-900/10 dark:divide-vdcGrey">
-      <h2 className="font-roboto italic text-vdcRed">
+      <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
         &quot;Whats the difference?!&quot;
       </h2>
       {roleExplanations.map((role) => (

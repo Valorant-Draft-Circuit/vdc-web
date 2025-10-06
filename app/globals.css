@@ -35,6 +35,7 @@
   --color-vdcBlue: #3498db;
   --color-vdcGreen: #2ecc71;
   --color-vdcYellow: #f1c40f;
+  --color-vdcOrange: #FF9266;
   --color-vdcWhite: #fffbf5;
   --color-vdcStaff: #68194f;
   --breakpoint-2xl: 100rem;
@@ -43,11 +44,11 @@
   --font-discord: "Discord", sans-serif;
   --font-roboto: "Roboto", sans-serif;
 }
-@source inline('{data-hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
-@source inline('{hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
-@source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
-@source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
-@source inline('{data-selected:,}border-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow}');
+@source inline('{data-hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-selected:,}border-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 
 body {
   background: var(--background);

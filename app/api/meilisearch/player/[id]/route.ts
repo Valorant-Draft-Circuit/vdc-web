@@ -1,6 +1,6 @@
 import { determineTier } from "@/lib/common/utils";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 

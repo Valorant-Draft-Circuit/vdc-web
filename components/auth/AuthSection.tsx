@@ -3,8 +3,9 @@ import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
-import { getUserCached } from "@/lib/common/cache";
 import { LeagueStatus } from "@prisma/client";
+import { getUser } from "@/lib/queries/user/user";
+import { getFranchiseSlugOfManager as getFranchiseOfManager } from "@/lib/queries/franchises/franchises";
 
 export default async function AuthSection() {
   const session = await auth();
@@ -14,8 +15,13 @@ export default async function AuthSection() {
   if (!session.user?.id) {
     return <SignOut />;
   }
-  const user = await getUserCached(session.user?.id);
-  const team = determineTeam(user);
+  const user = await getUser(session.user?.id);
+  let team = determineTeam(user);
+
+  if (!team) {
+    const slug = await getFranchiseOfManager(user?.id);
+    team = `${slug} Management`;
+  }
 
   return (
     <div className="flex flex-row space-x-2">
@@ -41,7 +47,7 @@ export default async function AuthSection() {
   );
 }
 
-function determineTeam(user) {
+export function determineTeam(user) {
   const userLeagueStatus = user.Status.leagueStatus;
   const userContractStatus = user.Status.contractStatus;
   if (userLeagueStatus === LeagueStatus.DRAFT_ELIGIBLE) {
@@ -62,6 +68,9 @@ function determineTeam(user) {
   ) {
     return `${user.Team.Franchise.slug} | ${user.Team.name}`;
   } else if (userLeagueStatus === LeagueStatus.GENERAL_MANAGER) {
+    if (!user.Team) {
+      return null;
+    }
     return `${user.Team.Franchise.name}`;
   }
 }

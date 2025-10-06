@@ -12,9 +12,7 @@ export default function Page() {
       <div className="flex flex-col gap-5 py-10">
         <header>
           <div className="flex flex-row mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 justify-between">
-            <h1 className="text-3xl italic text-vdcRed">
-              VDC Admin Control Panel
-            </h1>
+            <h1 className="text-3xl italic text-vdcRed">Admin Control Panel</h1>
           </div>
         </header>
         <main>

@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 export type TUser = Prisma.UserGetPayload<{
   include: {
@@ -19,6 +19,7 @@ export type TUser = Prisma.UserGetPayload<{
     Status: true;
   };
 }>;
+
 export async function getUser(id: string) {
   const user = await prisma.user.findUnique({
     where: {
@@ -42,6 +43,7 @@ export async function getUser(id: string) {
       Status: true,
     },
   });
-  await prisma.$disconnect;
+
+  
   return user;
 }

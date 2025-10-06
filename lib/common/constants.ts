@@ -6,7 +6,7 @@ const BUCKET_URL = "https://uni-objects.nyc3.cdn.digitaloceanspaces.com/vdc/";
 export const DISCORD_LINK = "https://go.vdc.gg/discord";
 export const RULEBOOK_URL = "https://blog.vdc.gg/rulebook/";
 export const BEHAVIOR_GUIDELINE_URL =
-  "https://docs.google.com/spreadsheets/d/14wmSU43cB2xf9IOCuW0-74Ec8AXt6I6UGZHJhDNJJGc/edit?gid=0#gid=0";
+  "https://go.vdc.gg/guidelines";
 export const DISCORD_USER_HOWTO_URL =
   "https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5H5D7JBY2QKKPVKNA";
 
@@ -20,12 +20,14 @@ export const VDC_PURPLE = "#9b59b6";
 export const VDC_BLUE = "#3498db";
 export const VDC_GREEN = "#2ecc71";
 export const VDC_YELLOW = "#f1c40f";
+export const VDC_ORANGE = "#FF9266";
 
 export const TIER_HEX_COLOR_MAP: Record<Tier, string> = {
   MYTHIC: VDC_PURPLE,
   EXPERT: VDC_BLUE,
   APPRENTICE: VDC_GREEN,
   PROSPECT: VDC_YELLOW,
+  RECRUIT: VDC_ORANGE,
   MIXED: "",
 };
 
@@ -34,6 +36,7 @@ export const TIER_COLOR_MAP: Record<Tier, string> = {
   EXPERT: "vdcBlue",
   APPRENTICE: "vdcGreen",
   PROSPECT: "vdcYellow",
+  RECRUIT: "vdcOrange",
   MIXED: "",
 };
 export const TIERS_LIST = [
@@ -41,8 +44,15 @@ export const TIERS_LIST = [
   Tier.EXPERT,
   Tier.APPRENTICE,
   Tier.PROSPECT,
+  Tier.RECRUIT,
 ];
-export const TIER_ORDER = ["MYTHIC", "EXPERT", "APPRENTICE", "PROSPECT"];
+export const TIER_ORDER = [
+  "MYTHIC",
+  "EXPERT",
+  "APPRENTICE",
+  "PROSPECT",
+  "RECRUIT",
+];
 
 export const AGENTS = {
   GEKKO: "e370fa57-4757-3604-3648-499e1f642d3f",
@@ -101,15 +111,16 @@ export const STATUS_LABELS: Record<LeagueStatus, string> = {
   [LeagueStatus.FREE_AGENT]: "FA",
   [LeagueStatus.RESTRICTED_FREE_AGENT]: "RFA",
   [LeagueStatus.SIGNED]: "SIGNED",
-  [LeagueStatus.UNREGISTERED]: "Viewer",
+  [LeagueStatus.UNREGISTERED]: "VIEWER",
   [LeagueStatus.DRAFT_ELIGIBLE]: "DE",
   [LeagueStatus.SUSPENDED]: "SUSPENDED",
   [LeagueStatus.RETIRED]: "RETIRED",
+  [LeagueStatus.MANUAL_REVIEW]: "MANUAL REVIEW",
   [LeagueStatus.PENDING]: "PENDING",
   [LeagueStatus.APPROVED]: "APPROVED",
 };
 
-export const SUPERUSER_ROLES = [Roles.ADMIN, Roles.OWNER];
+export const SUPERUSER_ROLES = [Roles.OWNER, Roles.LEAD_TECH];
 
 export const GENERAL_CONTROL = [
   ControlPanelID.SIGNUP_STATE,
@@ -123,11 +134,14 @@ export const GENERAL_CONTROL = [
 
 export const MMR_CONTROL = [
   ControlPanelID.MMR_DISPLAY_STATE,
+  ControlPanelID.DISPLAY_MMR_FM,
 
+  ControlPanelID.RECRUIT_MMR_CAP_PLAYER,
   ControlPanelID.PROSPECT_MMR_CAP_PLAYER,
   ControlPanelID.APPRENTICE_MMR_CAP_PLAYER,
   ControlPanelID.EXPERT_MMR_CAP_PLAYER,
 
+  ControlPanelID.RECRUIT_MMR_CAP_TEAM,
   ControlPanelID.PROSPECT_MMR_CAP_TEAM,
   ControlPanelID.APPRENTICE_MMR_CAP_TEAM,
   ControlPanelID.EXPERT_MMR_CAP_TEAM,

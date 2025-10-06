@@ -30,7 +30,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "vdc-assets.nyc3.cdn.digitaloceanspaces.com",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
   serverExternalPackages: ["@prisma/client", ".prisma/client"],

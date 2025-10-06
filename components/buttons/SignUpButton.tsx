@@ -6,7 +6,7 @@ export default function SignUpButton() {
     <Link href={"/signup"}>
       <div className="inline-flex text-md items-center gap-x-2 rounded-md bg-vdcRed px-5 py-2.5 font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
         <FlameLogo className="-ml-0.5 size-5" color={"#FFFFFF"} />
-        <h1>Sign Up</h1>
+        <h1>Lets Play</h1>
       </div>
     </Link>
   );

@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 
 export type TFAQ = {
   question: string;

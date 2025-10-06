@@ -1,6 +1,6 @@
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { ControlPanel } from "@/prisma";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,13 +16,12 @@ export async function GET(
       throw Error();
     }
     const index = meilisearchClient.getIndex("players");
-    const task = await index.addDocuments([ player ]);
+    const task = await index.addDocuments([player]);
     const result = await meilisearchClient.waitForTaskCompletion(task.taskUid);
 
     return NextResponse.json({
       message: "Player documents added",
       task: result,
-      status: 200,
     });
   } catch (err) {
     return NextResponse.json(

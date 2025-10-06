@@ -1,5 +1,5 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { ContractStatus, GameType, MatchType } from "@prisma/client";
 
 export default async function getFranchiseDetails(slug, season) {
@@ -73,7 +73,8 @@ export default async function getFranchiseDetails(slug, season) {
       .filter((game) => game !== undefined);
     return { ...team, futureGames: futureTeamGames, pastGames: pastTeamGames };
   });
-  await prisma.$disconnect();
+
+  
   return franchise;
 }
 
@@ -274,6 +275,24 @@ async function getPastGames(franchise, season) {
       Games: true,
     },
   });
+}
+
+export async function getFranchiseSlugOfManager(userId) {
+  const res = await prisma.franchise.findFirst({
+    where: {
+      OR: [
+        { gmID: userId },
+        { agm1ID: userId },
+        { agm2ID: userId },
+        { agm3ID: userId },
+      ],
+    },
+    select: {
+      slug: true,
+    },
+  });
+  
+  return res?.slug;
 }
 
 export function calculateTeamTotalMmr(roster) {

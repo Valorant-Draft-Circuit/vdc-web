@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const CustomPrismaAdapter = {
@@ -11,6 +11,11 @@ export const CustomPrismaAdapter = {
 
   linkAccount(data) {
     delete data.sub;
+    delete data.id_token;
+    if (data.provider === "riot" && data.user?.name) {
+      data.riotIGN = data.user.name;
+      data.id_token = "";
+    }
     return prisma.account.create({ data: data });
   },
 

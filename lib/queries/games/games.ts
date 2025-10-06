@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { GameType, Prisma, Tier } from "@prisma/client";
 
 export type TGame = Prisma.GamesGetPayload<{

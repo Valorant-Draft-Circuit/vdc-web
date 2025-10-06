@@ -1,6 +1,6 @@
 import { TStandingProps } from "@/components/standings/StandingsCard";
 import { MatchType } from "@prisma/client";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { Tier } from "@prisma/client";
 import { getAllActiveTeamsIn, TActiveTeam } from "../teams/teams";
 import { getAllGamesBy, TGame } from "../games/games";
@@ -25,13 +25,13 @@ export type TeamStats = {
 
 export function getApexRankings(standings: TStandingProps[]) {
   const highlight =
-    standings.length === 4 || standings.length === 8
+    standings.length === 4 || standings.length === 6
       ? 4
-      : standings.length === 10 || standings.length === 12
+      : standings.length === 8 || standings.length === 10
       ? 6
-      : standings.length === 14 || standings.length === 16
+      : standings.length === 12 || standings.length === 14
       ? 8
-      : 4;
+      : 10;
   return highlight;
 }
 
@@ -195,7 +195,8 @@ async function getAllBo2Games(seasonNumber: number) {
       },
     },
   });
-  await prisma.$disconnect();
+
+  
   return res;
 }
 
@@ -220,7 +221,8 @@ async function getFranchises() {
       },
     },
   });
-  await prisma.$disconnect();
+  
+  
   return res;
 }
 

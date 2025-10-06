@@ -25,7 +25,7 @@ export default function Accounts({
         <input
           value={user.name}
           readOnly
-          className="w-full xl:w-1/3 text-vdcRed rounded-sm border p-1 font-semibold hover:cursor-not-allowed"
+          className="w-full xl:w-1/3 text-vdcRed dark:text-gray-400 rounded-sm border p-1 font-semibold hover:cursor-not-allowed"
         />
         <p className="text-xs xl:text-sm">
           If this looks wrong, please create a bug report in the{" "}
@@ -37,7 +37,7 @@ export default function Accounts({
             className="text-[#5865F2] underline hover:text-blue-600"
           >
             #vdc-bug-reports
-          </a>{" "}
+          </a>
           channel
         </p>
       </div>
@@ -47,7 +47,7 @@ export default function Accounts({
         </label>
         <select
           {...register("primaryValorantAccount", { required: true })}
-          className="w-full xl:w-1/3 text-vdcRed rounded-sm border p-1 font-semibold"
+          className="w-full xl:w-1/3 text-vdcRed dark:text-gray-400 rounded-sm border p-1 font-semibold"
         >
           <ValAccounts user={user} />
         </select>

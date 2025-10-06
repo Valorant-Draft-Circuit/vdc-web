@@ -2,7 +2,7 @@ import { isAuthorizedForMeilisearch } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { ControlPanel } from "@/prisma";
-import { prisma } from "@/prisma/prismadb";
+import { prisma } from "@/lib/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
