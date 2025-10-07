@@ -17,7 +17,7 @@ export default function PlayerCard({ player, mmrShow }) {
     <Link
       key={player.id}
       href={`/player/${player.discordId}`}
-      className="flex flex-row h-28 w-88 items-center gap-2 p-2 text-xs rounded-xl hover:scale-102 transition-all duration-100 ease-in-out bg-gradient-to-br from-slate-100 to-slate-300 dark:from-vdcGrey dark:to-vdcBlack drop-shadow-sm"
+      className="flex flex-row h-28 w-96 items-center gap-2 p-4 text-xs rounded-xl hover:scale-102 transition-all duration-100 ease-in-out bg-gradient-to-br from-slate-100 to-slate-300 dark:from-vdcGrey dark:to-vdcBlack drop-shadow-sm"
     >
       <ImageWithFallback
         src={player.image}
