@@ -79,6 +79,7 @@ async function getPlayer(userId: string) {
   });
 
   const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
+    RECRUIT: { min: number; max: number };
     PROSPECT: { min: number; max: number };
     APPRENTICE: { min: number; max: number };
     EXPERT: { min: number; max: number };
@@ -128,11 +129,12 @@ async function getPlayer(userId: string) {
   function determineTier(mmr: number | null) {
     if (mmr === null) return null;
 
-    const { PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
-
+    const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
+    if (mmr <= RECRUIT.max) return Tier.RECRUIT;
     if (mmr <= PROSPECT.max) return Tier.PROSPECT;
     if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
     if (mmr <= EXPERT.max) return Tier.EXPERT;
+    
     return Tier.MYTHIC;
   }
 }

@@ -16,14 +16,14 @@ import { useEffect, useState } from "react";
 import PlayerCard from "./PlayerCard";
 import { STATUS_LABELS, TIERS_LIST } from "@/lib/common/constants";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { LeagueStatus } from "@prisma/client";
+// import { LeagueStatus } from "@prisma/client";
 
 export default function PlayerSearch({ mmrShow }) {
   const defaultStatus = [
-    LeagueStatus.GENERAL_MANAGER,
-    LeagueStatus.SIGNED,
-    LeagueStatus.FREE_AGENT,
-    LeagueStatus.RESTRICTED_FREE_AGENT,
+    // LeagueStatus.GENERAL_MANAGER,
+    // LeagueStatus.SIGNED,
+    // LeagueStatus.FREE_AGENT,
+    // LeagueStatus.RESTRICTED_FREE_AGENT,
   ];
 
   const [query, setQuery] = useState("");

@@ -69,6 +69,7 @@ export type TMeiliPlayer = {
   leagueStatus: string;
   image: string;
 };
+
 async function getPlayers() {
   const users = await prisma.user.findMany({
     select: {
