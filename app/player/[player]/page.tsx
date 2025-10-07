@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { player } = await params;
   let playerIGN;
   if (NUMBER_REGEX.test(player)) {
-    const res = await fetch(`${process.env.URL}/api/users/${player}`);
+    const res = await fetch(`${process.env.URL}/api/users/discord/${player}/riot`);
     if (res.ok) {
       const riotIGN: string = await res.json();
       playerIGN = riotIGN;
