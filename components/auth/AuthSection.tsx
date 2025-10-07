@@ -3,9 +3,9 @@ import SignIn from "./SignIn";
 import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
-import { LeagueStatus } from "@prisma/client";
 import { getUser } from "@/lib/queries/user/user";
 import { getFranchiseSlugOfManager as getFranchiseOfManager } from "@/lib/queries/franchises/franchises";
+import { determineTeam } from "@/lib/common/auth/auth-utils";
 
 export default async function AuthSection() {
   const session = await auth();
@@ -45,32 +45,4 @@ export default async function AuthSection() {
       </div>
     </div>
   );
-}
-
-export function determineTeam(user) {
-  const userLeagueStatus = user.Status.leagueStatus;
-  const userContractStatus = user.Status.contractStatus;
-  if (userLeagueStatus === LeagueStatus.DRAFT_ELIGIBLE) {
-    return "DE";
-  } else if (userLeagueStatus === LeagueStatus.FREE_AGENT) {
-    return "FA";
-  } else if (userLeagueStatus === LeagueStatus.RESTRICTED_FREE_AGENT) {
-    return "RFA";
-  } else if (userLeagueStatus === LeagueStatus.SUSPENDED) {
-    return LeagueStatus.SUSPENDED;
-  } else if (userLeagueStatus === LeagueStatus.UNREGISTERED) {
-    return LeagueStatus.UNREGISTERED;
-  } else if (userLeagueStatus === LeagueStatus.PENDING) {
-    return LeagueStatus.PENDING;
-  } else if (
-    userLeagueStatus === LeagueStatus.GENERAL_MANAGER &&
-    userContractStatus === LeagueStatus.SIGNED
-  ) {
-    return `${user.Team.Franchise.slug} | ${user.Team.name}`;
-  } else if (userLeagueStatus === LeagueStatus.GENERAL_MANAGER) {
-    if (!user.Team) {
-      return null;
-    }
-    return `${user.Team.Franchise.name}`;
-  }
 }
