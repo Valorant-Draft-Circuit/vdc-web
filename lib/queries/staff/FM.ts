@@ -12,7 +12,7 @@ export async function getContractsData() {
         },
         {
           Status: {
-            leagueStatus: { in: [LeagueStatus.FREE_AGENT, LeagueStatus.DRAFT_ELIGIBLE, LeagueStatus.RESTRICTED_FREE_AGENT] },
+            leagueStatus: { in: [LeagueStatus.FREE_AGENT, LeagueStatus.DRAFT_ELIGIBLE, LeagueStatus.RESTRICTED_FREE_AGENT, LeagueStatus.GENERAL_MANAGER] },
           },
         },
       ],
