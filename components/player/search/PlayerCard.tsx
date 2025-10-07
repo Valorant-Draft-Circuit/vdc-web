@@ -17,15 +17,15 @@ export default function PlayerCard({ player, mmrShow }) {
     <Link
       key={player.id}
       href={`/player/${player.discordId}`}
-      className="flex flex-row h-28 w-96 items-center gap-2 p-4 text-xs rounded-xl hover:scale-102 transition-all duration-100 ease-in-out bg-gradient-to-br from-slate-100 to-slate-300 dark:from-vdcGrey dark:to-vdcBlack drop-shadow-sm"
+      className="flex flex-row h-28 w-88 items-center gap-2 p-2 text-xs rounded-xl hover:scale-102 transition-all duration-100 ease-in-out bg-gradient-to-br from-slate-100 to-slate-300 dark:from-vdcGrey dark:to-vdcBlack drop-shadow-sm"
     >
       <ImageWithFallback
         src={player.image}
         fallbackSrc={"/vdc-flame.svg"}
-        className="mx-auto size-24 rounded-full"
+        className="mx-auto size-fit rounded-full"
         alt={`${player.discordName} avatar`}
-        width={50}
-        height={50}
+        width={500}
+        height={500}
       />
 
       <div className="flex-1">
@@ -39,7 +39,7 @@ export default function PlayerCard({ player, mmrShow }) {
 
         {player.teamName && (
           <div className="flex flex-col">
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-1">
               <h2 className="truncate max-w-30 text-center my-auto text-gray-600 dark:text-gray-300">
                 {player.franchiseSlug} | {player.teamName}
               </h2>
@@ -57,7 +57,7 @@ export default function PlayerCard({ player, mmrShow }) {
         )}
       </div>
       {player.riotIGN && (
-        <div className="text-right">
+        <div className="text-right truncate">
           <h1>{player.riotIGN}</h1>
           {mmrShow && isPlaying && player.mmrEffective && (
             <h1>MMR: {player.mmrEffective}</h1>

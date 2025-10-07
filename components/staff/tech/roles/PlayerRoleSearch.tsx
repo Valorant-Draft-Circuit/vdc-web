@@ -4,7 +4,7 @@ import { TMeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/r
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { Input } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import PlayerRolesCard from "./PlayerRolesCard";
+import PlayerCard from "./PlayerCard";
 
 export default function PlayerRoleSearch() {
   const [query, setQuery] = useState("");
@@ -73,36 +73,38 @@ export default function PlayerRoleSearch() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3 w-full  mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1 justify-items-center w-full">
         {query.trim() === "" ? (
           <div className="col-span-full flex items-center justify-center">
             <h1 className="text-center text-gray-500">
-              Type a name to search for a user.
+              Type a name to search for a user to edit.
             </h1>
           </div>
         ) : searchResults.length === 0 && !loading ? (
-          <h1 className="text-center text-gray-500">No users found.</h1>
+          <h1 className="text-center text-gray-500">No user found.</h1>
         ) : (
-          searchResults.map((user) => (
-            <PlayerRolesCard key={user.id} user={user} />
-          ))
+          searchResults.map((user) => <PlayerCard key={user.id} user={user} />)
         )}
       </div>
 
-      <div className="mt-4 flex justify-center">
-        {loading && page === 0 && <h1 className="text-vdcGrey">Loading...</h1>}
-        {!loading && hasMore && searchResults.length > 0 && (
-          <button
-            onClick={loadMore}
-            className="px-4 py-2 bg-vdcRed text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 hover:cursor-pointer"
-          >
-            <h1>{loading ? "Loading…" : "Load more"}</h1>
-          </button>
-        )}
-        {!hasMore && searchResults.length > 0 && (
-          <h1 className="text-vdcGrey">End of results.</h1>
-        )}
-      </div>
+      {query.trim() !== "" && (
+        <div className="mt-4 flex justify-center">
+          {loading && page === 0 && (
+            <h1 className="text-vdcGrey">Loading...</h1>
+          )}
+          {!loading && hasMore && searchResults.length > 0 && (
+            <button
+              onClick={loadMore}
+              className="px-4 py-2 bg-vdcRed text-white rounded-md hover:bg-red-700 disabled:bg-gray-300 hover:cursor-pointer"
+            >
+              <h1>{loading ? "Loading…" : "Load more"}</h1>
+            </button>
+          )}
+          {!hasMore && searchResults.length > 0 && (
+            <h1 className="text-vdcGrey dark:text-vdcWhite">End of results.</h1>
+          )}
+        </div>
+      )}
     </div>
   );
 }

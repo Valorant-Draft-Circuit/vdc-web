@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ discordID: string }> }
+  { params }: { params: Promise<{ discordId: string }> }
 ) {
-  const discordID = (await params).discordID;
-  const riotIGN = await Player.getIGNby({ discordID: discordID });
+  const discordId = (await params).discordId;
+  const riotIGN = await Player.getIGNby({ discordID: discordId });
   if (riotIGN) {
     return NextResponse.json(riotIGN);
   }
