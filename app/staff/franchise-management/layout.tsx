@@ -7,6 +7,7 @@ export const FM_ACCESS_LIST = [
   Roles.LEAGUE_GM,
   Roles.LEAGUE_AGM,
   Roles.TECH_NUMBERS,
+  Roles.ADMIN,
 ];
 
 export default async function Layout({
