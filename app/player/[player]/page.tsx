@@ -103,7 +103,7 @@ export default async function Page({
 
 async function handleDiscordIDSearch(discordID: string) {
   // TODO: rename api so its clear we are searching by discordID
-  const res = await fetch(`${process.env.URL}/api/users/${discordID}`);
+  const res = await fetch(`${process.env.URL}/api/users/discord/${discordID}/riot`);
   if (res.ok) {
     const riotIGN: string = await res.json();
     const encodedIGN = encodeURIComponent(riotIGN);
