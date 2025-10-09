@@ -44,19 +44,19 @@ export async function GET() {
         ? contract.PrimaryRiotAccount?.MMR?.mmrEffective
         : undefined,
       tier: FMAccess
-        ? (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+        ? (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
           tierlines.RECRUIT.max
           ? "RECRUIT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
             tierlines.PROSPECT.max
           ? "PROSPECT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
             tierlines.APPRENTICE.max
           ? "APPRENTICE"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
             tierlines.EXPERT.max
           ? "EXPERT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <
+          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
             tierlines.MYTHIC.max
           ? "MYTHIC"
           : "N/A"
