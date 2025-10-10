@@ -51,8 +51,9 @@ export default async function Page() {
           </Suspense>
         </div>
         <div className="w-full">
-          <ListBox params={"type"} menuElements={gameTypeList} />
-          <Suspense></Suspense>
+          <Suspense>
+            <ListBox params={"type"} menuElements={gameTypeList} />
+          </Suspense>
         </div>
       </div>
       <div>
