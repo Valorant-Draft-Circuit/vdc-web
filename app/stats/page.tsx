@@ -5,17 +5,24 @@ import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { listAllSeasons } from "@/lib/common/utils";
+import { ControlPanel } from "@/prisma";
 import { GameType, Tier } from "@prisma/client";
 import { Suspense } from "react";
 
 export default async function Page() {
+  const seasonState = await ControlPanel.getLeagueState();
+  const gameTypes: GameType[] = [GameType.SEASON, GameType.COMBINE];
+  if (seasonState === "COMBINES") {
+    gameTypes.reverse();
+  }
+
   const currentSeason = await getSeasonCached();
   const listOfAllSeasons = listAllSeasons(currentSeason);
   const seasonList = listOfAllSeasons.map((season) => ({
     query: season,
     name: `SEASON ${season}`,
   }));
-  const gameTypes = [GameType.SEASON, GameType.COMBINE];
+
   const gameTypeList = gameTypes.map((game) => ({
     query: game.toLocaleLowerCase(),
     name: `${game.replace("_", "")} STATS`,
