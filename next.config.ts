@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  domains: ["cdn.discordapp.com"],
+  formats: ["image/webp"],
   serverExternalPackages: ["@prisma/client", ".prisma/client"],
 };
 

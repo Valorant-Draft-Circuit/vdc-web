@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 import { CustomPrismaAdapter } from "./adapter";
 import { Adapter } from "next-auth/adapters";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../prisma";
 import { OAuthConfig } from "next-auth/providers";
 
 declare module "next-auth" {
@@ -167,21 +167,29 @@ async function handleDiscordCallback(account, user) {
       Authorization: `Bearer ${account.access_token}`,
     },
   }).then((res) => res.json());
-
-  const { avatar, id } = freshProfile;
+  const { avatar, id, banner } = freshProfile;
   if (avatar) {
     const format = avatar.startsWith("a_") ? "gif" : "png";
     const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${format}`;
+    let userBanner: string | undefined = undefined;
+
+    if (banner) {
+      const bannerFormat = banner.startsWith("a_") ? "gif" : "png";
+      userBanner = `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`;
+    }
 
     const existingUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { image: true },
+      select: { image: true, banner: true },
     });
 
-    if (existingUser?.image !== newImage) {
+    if (
+      existingUser?.image !== newImage ||
+      existingUser.banner !== userBanner
+    ) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { image: newImage },
+        data: { image: newImage, banner: userBanner },
       });
     }
   }
