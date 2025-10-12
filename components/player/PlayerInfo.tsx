@@ -54,13 +54,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
     <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
       <div className="flex flex-col gap-2">
         <div className="absolute inset-0 bg-black/80 pointer-events-none" />
-        <Image
-          alt={playerInfo.name}
-          src={playerInfo.image}
-          width={5000}
-          height={5000}
-          className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-50 opacity-80 drop-shadow-lg"
-        />
+        <ProfileBanner playerInfo={playerInfo} />
         <div className="flex flex-row gap-5 z-10">
           <span className="relative inline-block">
             <a
@@ -118,7 +112,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
           </div>
         </div>
         <div className="flex flex-row text-sm drop-shadow-2xl gap-1 xl:gap-2 flex-wrap z-10">
-          <QuickLinks ign={encodedIGN} discordId={discordAccountId}/>
+          <QuickLinks ign={encodedIGN} discordId={discordAccountId} />
           {playerTeam.tier && <TierBadge tier={playerTeam.tier} />}
           {playerAccolades.map((accolade, id) => (
             <span key={id}>{accolade.symbol}</span>
@@ -162,6 +156,30 @@ function QuickLinks({ ign, discordId }) {
   );
 }
 
+function ProfileBanner({ playerInfo }) {
+  const hasBanner = playerInfo.banner;
+  if (hasBanner) {
+    return (
+      <Image
+        alt={playerInfo.name}
+        src={playerInfo.banner}
+        fill
+        sizes="100vw"
+        className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-25 blur-xs"
+      />
+    );
+  }
+  return (
+    <Image
+      alt={playerInfo.name}
+      src={playerInfo.image}
+      width={5000}
+      height={5000}
+      className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-50 opacity-80 drop-shadow-lg"
+    />
+  );
+}
+
 function TierBadge(tier) {
   const tierString = tier.tier;
   return (
@@ -182,6 +200,7 @@ function TierBadge(tier) {
     </div>
   );
 }
+
 function getAccolades(accolades) {
   const accoladesWithSymbol = accolades.map((accolade) => {
     let symbol;
