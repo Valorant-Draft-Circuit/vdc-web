@@ -171,7 +171,12 @@ async function handleDiscordCallback(account, user) {
   if (avatar) {
     const format = avatar.startsWith("a_") ? "gif" : "png";
     const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${format}`;
-    const userBanner = `https://cdn.discordapp.com/banners/${id}/${banner}.${format}`;
+    let userBanner: string | undefined = undefined;
+
+    if (banner) {
+      const bannerFormat = banner.startsWith("a_") ? "gif" : "png";
+      userBanner = `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`;
+    }
 
     const existingUser = await prisma.user.findUnique({
       where: { id: user.id },
