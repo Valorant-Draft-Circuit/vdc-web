@@ -167,30 +167,50 @@ async function handleDiscordCallback(account, user) {
       Authorization: `Bearer ${account.access_token}`,
     },
   }).then((res) => res.json());
+
   const { avatar, id, banner } = freshProfile;
-  if (avatar) {
-    const format = avatar.startsWith("a_") ? "gif" : "png";
-    const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${format}`;
-    let userBanner: string | undefined = undefined;
+  if (!avatar) return;
 
-    if (banner) {
-      const bannerFormat = banner.startsWith("a_") ? "gif" : "png";
-      userBanner = `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`;
-    }
+  const avatarFormat = getMediaFormat(avatar);
+  const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatarFormat}`;
 
-    const existingUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { image: true, banner: true },
-    });
+  const bannerFormat = getMediaFormat(banner);
+  const newBanner = banner
+    ? `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`
+    : null;
 
-    if (
-      existingUser?.image !== newImage ||
-      existingUser.banner !== userBanner
-    ) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { image: newImage, banner: userBanner },
-      });
-    }
+  const existingUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { image: true, banner: true },
+  });
+
+  if (!existingUser) {
+    console.warn(
+      `User with ID ${user.id} not found in DB yet. Skipping image update.`
+    );
+    return;
   }
+
+  const existingBanner = existingUser.banner ?? null;
+
+  const dataToUpdate: Record<string, string | null> = {};
+
+  if (existingUser.image !== newImage) {
+    dataToUpdate.image = newImage;
+  }
+
+  if (existingBanner !== newBanner) {
+    dataToUpdate.banner = newBanner;
+  }
+
+  if (Object.keys(dataToUpdate).length > 0) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: dataToUpdate,
+    });
+  }
+}
+
+function getMediaFormat(asset: string) {
+  return asset.startsWith("a_") ? "gif" : "png";
 }
