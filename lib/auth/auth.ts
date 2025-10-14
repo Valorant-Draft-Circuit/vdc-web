@@ -171,13 +171,8 @@ async function handleDiscordCallback(account, user) {
   const { avatar, id, banner } = freshProfile;
   if (!avatar) return;
 
-  const avatarFormat = getMediaFormat(avatar);
-  const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatarFormat}`;
-
-  const bannerFormat = getMediaFormat(banner);
-  const newBanner = banner
-    ? `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`
-    : null;
+  const imageSrc = getMediaSource(avatar, "avatar", id);
+  const bannerSrc = getMediaSource(banner, "banner", id);
 
   const existingUser = await prisma.user.findUnique({
     where: { id: user.id },
@@ -195,12 +190,12 @@ async function handleDiscordCallback(account, user) {
 
   const dataToUpdate: Record<string, string | null> = {};
 
-  if (existingUser.image !== newImage) {
-    dataToUpdate.image = newImage;
+  if (existingUser.image !== imageSrc) {
+    dataToUpdate.image = imageSrc;
   }
 
-  if (existingBanner !== newBanner) {
-    dataToUpdate.banner = newBanner;
+  if (existingBanner !== bannerSrc) {
+    dataToUpdate.banner = bannerSrc;
   }
 
   if (Object.keys(dataToUpdate).length > 0) {
@@ -211,7 +206,16 @@ async function handleDiscordCallback(account, user) {
   }
 }
 
-function getMediaFormat(asset: string | null) {
-  if (!asset) return;
-  return asset.startsWith("a_") ? "gif" : "png";
+function getMediaSource(
+  asset: string | null,
+  assetType: string,
+  id: string
+): string | null {
+  if (!asset) return null;
+  const format = asset.startsWith("a_") ? "gif" : "png";
+  if (assetType === "avatar") {
+    return `https://cdn.discordapp.com/avatars/${id}/${asset}.${format}`;
+  } else {
+    return `https://cdn.discordapp.com/banners/${id}/${asset}.${format}`;
+  }
 }
