@@ -170,37 +170,41 @@ async function handleDiscordCallback(account, user) {
 
   const { avatar, id, banner } = freshProfile;
   if (!avatar) return;
-
+  
   const avatarFormat = getMediaFormat(avatar);
   const newImage = `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatarFormat}`;
-
-  const bannerFormat = getMediaFormat(banner);
-  const newBanner = banner
+  
+  let newBanner: string | null = null;
+  if (banner) {
+    const bannerFormat = getMediaFormat(banner);
+    newBanner = banner
     ? `https://cdn.discordapp.com/banners/${id}/${banner}.${bannerFormat}`
     : null;
-
+  }
+  
   const existingUser = await prisma.user.findUnique({
     where: { id: user.id },
     select: { image: true, banner: true },
   });
-
+  
   if (!existingUser) {
     console.warn(
       `User with ID ${user.id} not found in DB yet. Skipping image update.`
     );
     return;
   }
-
+  
   const existingBanner = existingUser.banner ?? null;
-
   const dataToUpdate: Record<string, string | null> = {};
 
   if (existingUser.image !== newImage) {
     dataToUpdate.image = newImage;
   }
 
-  if (existingBanner !== newBanner) {
-    dataToUpdate.banner = newBanner;
+  if (banner) {
+    if (existingBanner !== newBanner) {
+      dataToUpdate.banner = newBanner;
+    }
   }
 
   if (Object.keys(dataToUpdate).length > 0) {
