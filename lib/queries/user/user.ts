@@ -28,7 +28,7 @@ export async function getUserTier() {
   if (session?.user?.id) {
     user = await getUser(session.user.id);
   }
-  
+
   if (user?.Team) {
     return user?.Team?.tier;
   } else if (user?.PrimaryRiotAccount?.MMR) {
