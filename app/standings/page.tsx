@@ -5,6 +5,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import StandingsPanelSkeleton from "@/components/standings/StandingsPanelSkeleton";
 import { Metadata } from "next";
+import { getUserTier } from "@/lib/queries/user/user";
 
 const CURRENT_SEASON = await getSeasonCached();
 
@@ -26,13 +27,15 @@ tabs.unshift({
 });
 
 export default async function Standings() {
+  const userTier = await getUserTier();
+
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {CURRENT_SEASON} Standings
       </h1>
       <Suspense fallback={<StandingsPanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params="by" />
+        <VerticalTab tabElements={tabs} params="by" defaultQuery={userTier} />
       </Suspense>
     </div>
   );

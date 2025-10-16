@@ -1,3 +1,5 @@
+import { auth } from "@/lib/auth/auth";
+import { determineTier } from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 export type TUser = Prisma.UserGetPayload<{
@@ -20,6 +22,21 @@ export type TUser = Prisma.UserGetPayload<{
   };
 }>;
 
+export async function getUserTier() {
+  const session = await auth();
+  let user;
+  if (session?.user?.id) {
+    user = await getUser(session.user.id);
+  }
+  
+  if (user?.Team) {
+    return user?.Team?.tier;
+  } else if (user?.PrimaryRiotAccount?.MMR) {
+    return await determineTier(user?.PrimaryRiotAccount?.MMR);
+  }
+  return null;
+}
+
 export async function getUser(id: string) {
   const user = await prisma.user.findUnique({
     where: {
@@ -41,9 +58,17 @@ export async function getUser(id: string) {
         },
       },
       Status: true,
+      PrimaryRiotAccount: {
+        select: {
+          MMR: {
+            select: {
+              mmrEffective: true,
+            },
+          },
+        },
+      },
     },
   });
 
-  
   return user;
 }

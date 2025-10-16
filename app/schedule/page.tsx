@@ -3,6 +3,7 @@ import SchedulePanel from "@/components/schedule/SchedulesPanel";
 import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { getUserTier } from "@/lib/queries/user/user";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -20,11 +21,17 @@ export const metadata: Metadata = {
   description: `Season ${CURRENT_SEASON} Schedule`,
 };
 
-export default function Page() {
+export default async function Page() {
+  const userTier = await getUserTier();
+
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
       <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params={"tier"} />
+        <VerticalTab
+          tabElements={tabs}
+          params={"tier"}
+          defaultQuery={userTier}
+        />
       </Suspense>
     </div>
   );

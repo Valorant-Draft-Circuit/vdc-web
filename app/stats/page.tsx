@@ -5,6 +5,7 @@ import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { listAllSeasons } from "@/lib/common/utils";
+import { getUserTier } from "@/lib/queries/user/user";
 import { ControlPanel } from "@/prisma";
 import { GameType, Tier } from "@prisma/client";
 import { Suspense } from "react";
@@ -28,9 +29,11 @@ export default async function Page() {
     name: `${game.replace("_", "")} STATS`,
   }));
 
+  const userTier = await getUserTier();
+
   const defaultQueries = {
     season: currentSeason,
-    tier: Tier.MYTHIC,
+    tier: userTier || Tier.MYTHIC,
   };
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
     name: tier,
