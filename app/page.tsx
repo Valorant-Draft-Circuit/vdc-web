@@ -5,13 +5,26 @@ import News from "../components/home/News";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/queries/home/youtube";
 import { Suspense } from "react";
 import NewsSkeleton from "../components/home/NewsSkeleton";
+import UpcomingMatch from "@/components/schedule/upcoming/UpcomingMatch";
+import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
 
 export default async function Home() {
   const session = await auth();
   const mostRecentVideo = await getLatestYouTubeVideo();
+  const upcomingMatches = await getEveryUpcomingMatch();
+  const displayUpcomingMatches = upcomingMatches.length !== 0;
 
   return (
     <>
+      {displayUpcomingMatches && (
+        <div className="xl:p-4 ">
+          <div className="flex flex-row gap-4 p-5 bg-gray-300 rounded-2xl dark:bg-vdcGrey overflow-auto ">
+            {upcomingMatches.map((match) => (
+              <UpcomingMatch key={match.matchID} match={match} />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="overflow-hidden">
         <div>
           <HeroSection session={session} />
