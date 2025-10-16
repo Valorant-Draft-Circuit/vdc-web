@@ -66,7 +66,6 @@ export default function UpcomingMatch({ match }) {
   );
 }
 
-
 export function ViewFullSchedule() {
   return (
     <Link

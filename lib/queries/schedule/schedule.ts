@@ -75,11 +75,20 @@ interface GetUpcomingMatchesOptions {
   filter?: boolean;
 }
 
+type TUpcomingWhereClause = {
+  tier?: Tier;
+  season: number;
+  matchType: MatchType;
+  Home: { active: boolean };
+  Away: { active: boolean };
+  dateScheduled?: { gte: Date };
+};
+
 async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const currentSeason = await ControlPanel.getSeason();
   const { tier, season, filter } = options;
 
-  const whereClause: any = {
+  const whereClause: TUpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
     matchType: MatchType.BO2,
