@@ -32,7 +32,7 @@ export async function getUserTier() {
   if (user?.Team) {
     return user?.Team?.tier;
   } else if (user?.PrimaryRiotAccount?.MMR) {
-    return await determineTier(user?.PrimaryRiotAccount?.MMR);
+    return await determineTier(user?.PrimaryRiotAccount?.MMR.mmrEffective);
   }
   return null;
 }
