@@ -22,15 +22,27 @@ export type TTabElements = {
 export default function VerticalTab({
   tabElements,
   params,
+  defaultQuery,
 }: {
   tabElements: TTabElements[];
   params: string;
+  defaultQuery?: string;
 }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get(params)?.toLowerCase();
+
+  useEffect(() => {
+    if (!queryParam) {
+      const fallback = defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
+      updateParam(params, fallback);
+    }
+  }, [queryParam]);
+
+  const initialQuery = queryParam || defaultQuery || tabElements[0].query;
   const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === queryParam
+    (t) => t.query.toLowerCase() === initialQuery.toLowerCase()
   );
+  
   const [selectedIndex, setSelectedIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
   );
