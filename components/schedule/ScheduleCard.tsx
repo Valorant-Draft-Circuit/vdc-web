@@ -7,11 +7,12 @@ export default function ScheduleCard({
   matchDay;
   season;
 }) {
+  console.log(season[matchDay].matchType)
   const formattedDate = matchDay.split("|")[0];
   return (
     <div className="overflow-hidden rounded-lg shadow-sm bg-vdcRed p-3 px-auto">
       <div className="px-4 pb-2 sm:px-6 italic text-vdcWhite text-md xl:text-xl xl:pb-0">
-        <h1>{formattedDate}</h1>
+        <h1>{formattedDate} - {season[matchDay][0].matchType}</h1>
       </div>
       <div className="px-2 sm:p-6 flex flex-col gap-2">
         {season[matchDay].map((match, md) => (

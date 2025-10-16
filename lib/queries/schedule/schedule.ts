@@ -78,7 +78,7 @@ interface GetUpcomingMatchesOptions {
 type TUpcomingWhereClause = {
   tier?: Tier;
   season: number;
-  matchType: MatchType;
+  matchType: MatchType[];
   Home: { active: boolean };
   Away: { active: boolean };
   dateScheduled?: { gte: Date };
@@ -91,7 +91,7 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const whereClause: TUpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
-    matchType: MatchType.BO2,
+    matchType: [MatchType.BO2, MatchType.BO3, MatchType.BO5],
     Home: { active: true },
     Away: { active: true },
   };
@@ -102,11 +102,14 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
     whereClause.dateScheduled = {
       gte: new Date(),
     };
-    take = 10;
+    take = 12;
   }
 
   const upcomingMatches = await prisma.matches.findMany({
-    where: whereClause,
+    where: {
+      ...whereClause,
+      matchType: { in: whereClause.matchType },
+    },
     take: take,
     include: {
       Home: {
@@ -129,9 +132,7 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
       },
       Games: true,
     },
-    orderBy: {
-      dateScheduled: "asc",
-    },
+    orderBy: [{ dateScheduled: "asc" }],
   });
 
   return upcomingMatches;

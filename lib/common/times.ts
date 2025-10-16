@@ -24,3 +24,15 @@ export function hours(n: number): number {
 export function days(n: number): number {
   return n * Times.DAY;
 }
+
+export function getTimeUntil(matchDate: Date) {
+  const now = new Date();
+  const dateDiff = new Date(matchDate.getTime() - now.getTime());
+
+  const days = dateDiff.getUTCDate() - 1;
+  const hours = dateDiff.getUTCHours();
+  const minutes = dateDiff.getUTCMinutes();
+  const timeUntil = `${days}d ${hours}h ${minutes}m`;
+
+  return timeUntil;
+}

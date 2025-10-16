@@ -31,6 +31,7 @@ export function packageMatch(match, homeWins, awayWins, formattedDate) {
     tier: match.tier,
     homeWins: homeWins,
     awayWins: awayWins,
+    matchType: match.matchType,
     Home: {
       id: homeTeam.id,
       name: homeTeam.name,
