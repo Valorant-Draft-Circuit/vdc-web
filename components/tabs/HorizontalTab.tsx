@@ -22,15 +22,29 @@ export type TTabElements = {
 export default function HorizontalTab({
   tabElements,
   params,
+  defaultQuery,
 }: {
   tabElements: TTabElements[];
   params: string;
+  defaultQuery?: string;
 }) {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get(params)?.toLowerCase();
+
+  const fallbackQuery =
+    defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
+  const effectiveQuery = queryParam || fallbackQuery;
+  
+  useEffect(() => {
+    if (!queryParam) {
+      updateParam(params, fallbackQuery);
+    }
+  }, [queryParam]);
+
   const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === queryParam
+    (t) => t.query.toLowerCase() === effectiveQuery
   );
+
   const [selectedIndex, setSelectedIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
   );

@@ -48,9 +48,9 @@ export default async function TeamPanel({ team }: { team }) {
           </div>
         </PanelSection>
         <div className="flex-1 flex-col">
-          <PanelSection title="Team Stats">
-            <EmptyMessage text={"TODO: Stats Table go here "} />
-          </PanelSection>
+          {/* <PanelSection title="Team Stats">
+            <EmptyMessage text={""} />
+          </PanelSection> */}
         </div>
       </div>
 

@@ -18,8 +18,8 @@ import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-
 import type { Metadata } from "next";
+import { getUserTier } from "@/lib/queries/user/user";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -40,6 +40,8 @@ export default async function Page({
 }) {
   const { slug } = await params;
   const currentSeason = await getSeasonCached();
+  const userTier = await getUserTier();
+
   const res = await getFranchiseDetailsBySlugCached(
     String(slug).toLocaleLowerCase(),
     currentSeason
@@ -105,7 +107,11 @@ export default async function Page({
         </div>
         <div className="xl:max-w-4xl flex flex-col gap-5">
           <Suspense fallback={<TeamPanelSkeleton />}>
-            <HorizontalTab tabElements={activeTeams} params="team" />
+            <HorizontalTab
+              tabElements={activeTeams}
+              params="team"
+              defaultQuery={userTier}
+            />
           </Suspense>
         </div>
       </div>

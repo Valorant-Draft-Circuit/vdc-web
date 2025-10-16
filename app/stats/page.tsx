@@ -61,7 +61,11 @@ export default async function Page() {
       </div>
       <div>
         <Suspense>
-          <HorizontalTab tabElements={tabs} params="tier" />
+          <HorizontalTab
+            tabElements={tabs}
+            params="tier"
+            defaultQuery={userTier}
+          />
         </Suspense>
       </div>
     </div>
