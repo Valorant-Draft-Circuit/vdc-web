@@ -1,5 +1,6 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
+import { ControlPanel } from "@/prisma";
 import { MatchType, Tier } from "@prisma/client";
 type TPackagedMatch = ReturnType<typeof packageMatch>;
 
@@ -8,10 +9,18 @@ export type TSchedule = {
   preSeason: Record<string, TPackagedMatch[]>;
 };
 
+export async function getEveryUpcomingMatch() {
+  const upcomingMatches = await getUpcomingMatches({ filter: true });
+  return upcomingMatches;
+}
+
 export async function getScheduleByTier(tier: Tier, season: number) {
   const regularSeasonDatesToMatches = {};
   const preseasonDatesToMatches = {};
-  const upcomingMatches = await getUpcomingMatchesDates(tier, season);
+  const upcomingMatches = await getUpcomingMatches({
+    tier: tier,
+    season: season,
+  });
 
   upcomingMatches.map((match) => {
     let homeWins = 0;
@@ -60,19 +69,45 @@ export async function getScheduleByTier(tier: Tier, season: number) {
   return matches;
 }
 
-async function getUpcomingMatchesDates(tier: Tier, season: number) {
+interface GetUpcomingMatchesOptions {
+  tier?: Tier;
+  season?: number;
+  filter?: boolean;
+}
+
+type TUpcomingWhereClause = {
+  tier?: Tier;
+  season: number;
+  matchType: MatchType;
+  Home: { active: boolean };
+  Away: { active: boolean };
+  dateScheduled?: { gte: Date };
+};
+
+async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
+  const currentSeason = await ControlPanel.getSeason();
+  const { tier, season, filter } = options;
+
+  const whereClause: TUpcomingWhereClause = {
+    tier,
+    season: !season ? currentSeason : season,
+    matchType: MatchType.BO2,
+    Home: { active: true },
+    Away: { active: true },
+  };
+
+  let take: number | undefined;
+
+  if (filter) {
+    whereClause.dateScheduled = {
+      gte: new Date(),
+    };
+    take = 10;
+  }
+
   const upcomingMatches = await prisma.matches.findMany({
-    where: {
-      tier,
-      season: season,
-      matchType: MatchType.BO2,
-      Home: {
-        active: true,
-      },
-      Away: {
-        active: true,
-      },
-    },
+    where: whereClause,
+    take: take,
     include: {
       Home: {
         include: {
@@ -99,9 +134,5 @@ async function getUpcomingMatchesDates(tier: Tier, season: number) {
     },
   });
 
-  
-  upcomingMatches.sort((a, b) =>
-    a.dateScheduled.toISOString().localeCompare(b.dateScheduled.toISOString())
-  );
   return upcomingMatches;
 }
