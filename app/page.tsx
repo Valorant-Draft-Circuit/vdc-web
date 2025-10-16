@@ -5,7 +5,9 @@ import News from "../components/home/News";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/queries/home/youtube";
 import { Suspense } from "react";
 import NewsSkeleton from "../components/home/NewsSkeleton";
-import UpcomingMatch from "@/components/schedule/upcoming/UpcomingMatch";
+import UpcomingMatch, {
+  ViewFullSchedule,
+} from "@/components/schedule/upcoming/UpcomingMatch";
 import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
 
 export default async function Home() {
@@ -18,10 +20,11 @@ export default async function Home() {
     <>
       {displayUpcomingMatches && (
         <div className="xl:p-4 ">
-          <div className="flex flex-row gap-4 p-5 bg-gray-300 rounded-2xl dark:bg-vdcGrey overflow-auto ">
+          <div className="flex flex-row gap-4 p-5 bg-gray-300 xl:rounded-2xl dark:bg-vdcGrey overflow-auto ">
             {upcomingMatches.map((match) => (
               <UpcomingMatch key={match.matchID} match={match} />
             ))}
+            <ViewFullSchedule />
           </div>
         </div>
       )}

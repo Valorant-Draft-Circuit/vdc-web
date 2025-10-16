@@ -10,14 +10,14 @@ export type TSchedule = {
 };
 
 export async function getEveryUpcomingMatch() {
-  const upcomingMatches = await getUpcomingMatchesDates();
+  const upcomingMatches = await getUpcomingMatches({ filter: true });
   return upcomingMatches;
 }
 
 export async function getScheduleByTier(tier: Tier, season: number) {
   const regularSeasonDatesToMatches = {};
   const preseasonDatesToMatches = {};
-  const upcomingMatches = await getUpcomingMatchesDates({
+  const upcomingMatches = await getUpcomingMatches({
     tier: tier,
     season: season,
   });
@@ -75,9 +75,7 @@ interface GetUpcomingMatchesOptions {
   filter?: boolean;
 }
 
-async function getUpcomingMatchesDates(
-  options: GetUpcomingMatchesOptions = {}
-) {
+async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const currentSeason = await ControlPanel.getSeason();
   const { tier, season, filter } = options;
 
@@ -89,14 +87,18 @@ async function getUpcomingMatchesDates(
     Away: { active: true },
   };
 
+  let take: number | undefined;
+
   if (filter) {
     whereClause.dateScheduled = {
       gte: new Date(),
     };
+    take = 10;
   }
 
   const upcomingMatches = await prisma.matches.findMany({
     where: whereClause,
+    take: take,
     include: {
       Home: {
         include: {
