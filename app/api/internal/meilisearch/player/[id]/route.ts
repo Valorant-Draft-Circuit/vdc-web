@@ -38,6 +38,7 @@ async function getPlayer(userId: string) {
       id: true,
       name: true,
       image: true,
+      banner: true,
       Accounts: {
         where: { provider: "discord" },
         select: {
@@ -94,6 +95,7 @@ async function getPlayer(userId: string) {
   if (isFreeAgent) {
     return {
       id: player.id,
+      banner: player?.banner,
       discordId: player.Accounts[0]?.providerAccountId || null,
       discordName: player.name,
       riotIGN: player.PrimaryRiotAccount?.riotIGN || null,
@@ -105,6 +107,7 @@ async function getPlayer(userId: string) {
   } else if (isUnregistered) {
     return {
       id: player?.id,
+      banner: player?.banner,
       discordId: player?.Accounts[0]?.providerAccountId || null,
       discordName: player?.name,
       riotIGN: player?.PrimaryRiotAccount?.riotIGN || null,
@@ -114,6 +117,7 @@ async function getPlayer(userId: string) {
   }
   return {
     id: player?.id,
+    banner: player?.banner,
     discordId: player?.Accounts[0]?.providerAccountId || null,
     discordName: player?.name,
     riotIGN: player?.PrimaryRiotAccount?.riotIGN || null,
@@ -134,7 +138,7 @@ async function getPlayer(userId: string) {
     if (mmr <= PROSPECT.max) return Tier.PROSPECT;
     if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
     if (mmr <= EXPERT.max) return Tier.EXPERT;
-    
+
     return Tier.MYTHIC;
   }
 }

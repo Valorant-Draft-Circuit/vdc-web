@@ -68,6 +68,7 @@ export type TMeiliPlayer = {
   franchiseLogo: string;
   leagueStatus: string;
   image: string;
+  banner: string | null;
 };
 
 async function getPlayers() {
@@ -76,6 +77,7 @@ async function getPlayers() {
       id: true,
       name: true,
       image: true,
+      banner: true,
       Accounts: {
         where: { provider: "discord" },
         select: {
@@ -138,6 +140,7 @@ async function getPlayers() {
     if (isFreeAgent) {
       return {
         id: user.id,
+        banner: user?.banner,
         discordId: user.Accounts[0]?.providerAccountId || null,
         discordName: user.name,
         riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
@@ -149,6 +152,7 @@ async function getPlayers() {
     } else if (isUnregistered) {
       return {
         id: user.id,
+        banner: user?.banner,
         discordId: user.Accounts[0]?.providerAccountId || null,
         discordName: user.name,
         riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
@@ -158,6 +162,7 @@ async function getPlayers() {
     }
     return {
       id: user.id,
+      banner: user?.banner,
       discordId: user.Accounts[0]?.providerAccountId || null,
       discordName: user.name,
       riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
