@@ -49,7 +49,7 @@ export default function PlayerCard({ player, mmrShow }) {
       />
 
       <div className="flex-1">
-        <h1 className={player.banner && "text-vdcWhite"}>
+        <h1 className={isBannerValid ? "text-vdcWhite" : ""}>
           {player.discordName}
         </h1>
         {isPlaying && (
@@ -59,7 +59,7 @@ export default function PlayerCard({ player, mmrShow }) {
         )}
         <h2
           className={
-            player.banner ? "text-gray-300" : "text-gray-700 dark:text-gray-300"
+            isBannerValid ? "text-gray-300" : "text-gray-700 dark:text-gray-300"
           }
         >
           {STATUS_LABELS[player.leagueStatus]}
@@ -68,7 +68,13 @@ export default function PlayerCard({ player, mmrShow }) {
         {player.teamName && (
           <div className="flex flex-col">
             <div className="flex flex-row gap-1">
-              <h2 className="truncate max-w-30 text-center my-auto text-gray-600 dark:text-gray-300">
+              <h2
+                className={`truncate max-w-30 text-center my-auto ${
+                  isBannerValid
+                    ? "text-gray-300"
+                    : "text-gray-600 dark:text-gray-300"
+                }`}
+              >
                 {player.franchiseSlug} | {player.teamName}
               </h2>
               {player.franchiseLogo && (
@@ -86,9 +92,13 @@ export default function PlayerCard({ player, mmrShow }) {
       </div>
       {player.riotIGN && (
         <div className="text-right truncate">
-          <h1 className={player.banner && "text-vdcWhite"}>{player.riotIGN}</h1>
+          <h1 className={isBannerValid ? "text-vdcWhite" : ""}>
+            {player.riotIGN}
+          </h1>
           {mmrShow && isPlaying && player.mmrEffective && (
-            <h1>MMR: {player.mmrEffective}</h1>
+            <h1 className={isBannerValid ? "text-vdcWhite" : ""}>
+              MMR: {player.mmrEffective}
+            </h1>
           )}
         </div>
       )}
