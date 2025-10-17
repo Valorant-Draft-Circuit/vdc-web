@@ -125,7 +125,7 @@ async function getPlayers() {
     },
   });
 
-  return users.map((user) => {
+  return users.map(async (user) => {
     const isFreeAgent = user.PrimaryRiotAccount?.MMR && !user.Team;
     const isUnregistered =
       user.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
