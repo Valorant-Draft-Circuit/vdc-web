@@ -5,6 +5,7 @@ import { ControlPanel } from "@/prisma";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { determineTier } from "@/lib/common/utils";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -126,6 +127,7 @@ async function getPlayers() {
   });
 
   const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
+    RECRUIT: { min: number; max: number };
     PROSPECT: { min: number; max: number };
     APPRENTICE: { min: number; max: number };
     EXPERT: { min: number; max: number };
@@ -175,15 +177,4 @@ async function getPlayers() {
       image: user.image || null,
     };
   });
-
-  function determineTier(mmr: number | null) {
-    if (mmr === null) return null;
-
-    const { PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
-
-    if (mmr <= PROSPECT.max) return Tier.PROSPECT;
-    if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
-    if (mmr <= EXPERT.max) return Tier.EXPERT;
-    return Tier.MYTHIC;
-  }
 }
