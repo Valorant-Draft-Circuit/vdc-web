@@ -113,7 +113,9 @@ async function getPlayer(userId: string) {
     discordId: player?.Accounts[0]?.providerAccountId || null,
     discordName: player?.name,
     riotIGN: player?.PrimaryRiotAccount?.riotIGN || null,
-    tier: mmr ? await determineTier(mmr) : player?.Team?.tier || null,
+    tier: player?.Team?.tier
+      ? player?.Team?.tier
+      : (await determineTier(mmr)) || null,
     mmrEffective: mmr,
     teamName: player?.Team?.name || null,
     franchiseSlug: player?.Team?.Franchise.slug || null,
