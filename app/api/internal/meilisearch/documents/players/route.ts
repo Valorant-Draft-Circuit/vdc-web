@@ -125,48 +125,50 @@ async function getPlayers() {
     },
   });
 
-  return users.map(async (user) => {
-    const isFreeAgent = user.PrimaryRiotAccount?.MMR && !user.Team;
-    const isUnregistered =
-      user.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
-    const mmr = user.PrimaryRiotAccount?.MMR?.mmrEffective ?? null;
+  return await Promise.all(
+    users.map(async (user) => {
+      const isFreeAgent = user.PrimaryRiotAccount?.MMR && !user.Team;
+      const isUnregistered =
+        user.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
+      const mmr = user.PrimaryRiotAccount?.MMR?.mmrEffective ?? null;
 
-    if (isFreeAgent) {
+      if (isFreeAgent) {
+        return {
+          id: user.id,
+          banner: user?.banner,
+          discordId: user.Accounts[0]?.providerAccountId || null,
+          discordName: user.name,
+          riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
+          tier: await determineTier(mmr),
+          mmrEffective: mmr,
+          leagueStatus: user.Status?.leagueStatus || null,
+          image: user.image,
+        };
+      } else if (isUnregistered) {
+        return {
+          id: user.id,
+          banner: user?.banner,
+          discordId: user.Accounts[0]?.providerAccountId || null,
+          discordName: user.name,
+          riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
+          leagueStatus: user.Status?.leagueStatus || null,
+          image: user.image,
+        };
+      }
       return {
         id: user.id,
         banner: user?.banner,
         discordId: user.Accounts[0]?.providerAccountId || null,
         discordName: user.name,
         riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
-        tier: await determineTier(mmr),
+        tier: user.Team?.tier || null,
         mmrEffective: mmr,
+        teamName: user.Team?.name || null,
+        franchiseSlug: user.Team?.Franchise.slug || null,
+        franchiseLogo: user.Team?.Franchise?.Brand?.logo || null,
         leagueStatus: user.Status?.leagueStatus || null,
-        image: user.image,
+        image: user.image || null,
       };
-    } else if (isUnregistered) {
-      return {
-        id: user.id,
-        banner: user?.banner,
-        discordId: user.Accounts[0]?.providerAccountId || null,
-        discordName: user.name,
-        riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
-        leagueStatus: user.Status?.leagueStatus || null,
-        image: user.image,
-      };
-    }
-    return {
-      id: user.id,
-      banner: user?.banner,
-      discordId: user.Accounts[0]?.providerAccountId || null,
-      discordName: user.name,
-      riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
-      tier: user.Team?.tier || null,
-      mmrEffective: mmr,
-      teamName: user.Team?.name || null,
-      franchiseSlug: user.Team?.Franchise.slug || null,
-      franchiseLogo: user.Team?.Franchise?.Brand?.logo || null,
-      leagueStatus: user.Status?.leagueStatus || null,
-      image: user.image || null,
-    };
-  });
+    })
+  );
 }
