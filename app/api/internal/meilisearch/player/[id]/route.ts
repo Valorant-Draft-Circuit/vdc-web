@@ -91,7 +91,7 @@ async function getPlayer(userId: string) {
       discordId: player.Accounts[0]?.providerAccountId || null,
       discordName: player.name,
       riotIGN: player.PrimaryRiotAccount?.riotIGN || null,
-      tier: determineTier(mmr),
+      tier: await determineTier(mmr),
       mmrEffective: mmr,
       leagueStatus: player.Status?.leagueStatus || null,
       image: player.image,
