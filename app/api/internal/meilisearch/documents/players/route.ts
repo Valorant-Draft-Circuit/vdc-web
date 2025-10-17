@@ -161,7 +161,7 @@ async function getPlayers() {
         discordId: user.Accounts[0]?.providerAccountId || null,
         discordName: user.name,
         riotIGN: user.PrimaryRiotAccount?.riotIGN || null,
-        tier: user.Team?.tier || null,
+        tier: mmr ? await determineTier(mmr) : user?.Team?.tier || null,
         mmrEffective: mmr,
         teamName: user.Team?.name || null,
         franchiseSlug: user.Team?.Franchise.slug || null,
