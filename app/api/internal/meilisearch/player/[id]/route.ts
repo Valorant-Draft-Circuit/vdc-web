@@ -1,7 +1,6 @@
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
-import { ControlPanel } from "@/prisma";
 import { prisma } from "@/lib/prisma";
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { determineTier } from "@/lib/common/utils";
 
@@ -79,14 +78,6 @@ async function getPlayer(userId: string) {
       },
     },
   });
-
-  const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
-    RECRUIT: { min: number; max: number };
-    PROSPECT: { min: number; max: number };
-    APPRENTICE: { min: number; max: number };
-    EXPERT: { min: number; max: number };
-    MYTHIC: { min: number; max: number };
-  };
 
   const isFreeAgent = player?.PrimaryRiotAccount?.MMR && !player.Team;
   const isUnregistered =
