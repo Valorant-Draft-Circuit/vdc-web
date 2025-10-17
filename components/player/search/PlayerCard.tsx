@@ -12,7 +12,7 @@ import { isUserPlaying } from "@/lib/common/utils";
 
 export default function PlayerCard({ player, mmrShow }) {
   const [isBannerValid, setIsBannerValid] = useState(false);
-
+  console.log(player)
   useEffect(() => {
     async function checkBanner() {
       if (!player.banner) return;
