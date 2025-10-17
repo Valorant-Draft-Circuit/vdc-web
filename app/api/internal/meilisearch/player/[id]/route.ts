@@ -1,8 +1,8 @@
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
-import { ControlPanel } from "@/prisma";
 import { prisma } from "@/lib/prisma";
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { determineTier } from "@/lib/common/utils";
 
 export async function GET(
   request: NextRequest,
@@ -79,14 +79,6 @@ async function getPlayer(userId: string) {
     },
   });
 
-  const mmrTierLines = (await ControlPanel.getMMRCaps("PLAYER")) as {
-    RECRUIT: { min: number; max: number };
-    PROSPECT: { min: number; max: number };
-    APPRENTICE: { min: number; max: number };
-    EXPERT: { min: number; max: number };
-    MYTHIC: { min: number; max: number };
-  };
-
   const isFreeAgent = player?.PrimaryRiotAccount?.MMR && !player.Team;
   const isUnregistered =
     player?.Status?.leagueStatus === LeagueStatus.UNREGISTERED;
@@ -129,16 +121,4 @@ async function getPlayer(userId: string) {
     leagueStatus: player?.Status?.leagueStatus || null,
     image: player?.image || null,
   };
-
-  function determineTier(mmr: number | null) {
-    if (mmr === null) return null;
-
-    const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } = mmrTierLines;
-    if (mmr <= RECRUIT.max) return Tier.RECRUIT;
-    if (mmr <= PROSPECT.max) return Tier.PROSPECT;
-    if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
-    if (mmr <= EXPERT.max) return Tier.EXPERT;
-
-    return Tier.MYTHIC;
-  }
 }
