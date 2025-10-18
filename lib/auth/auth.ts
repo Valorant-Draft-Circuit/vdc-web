@@ -211,11 +211,13 @@ function getMediaSource(
   assetType: string,
   id: string
 ): string | null {
+  const assetSize = 2048;
+
   if (!asset) return null;
-  const format = asset.startsWith("a_") ? "gif" : "png";
+  const format = asset.startsWith("a_") ? "gif" : "webp";
   if (assetType === "avatar") {
-    return `https://cdn.discordapp.com/avatars/${id}/${asset}.${format}`;
+    return `https://cdn.discordapp.com/avatars/${id}/${asset}.${format}?size=${assetSize}`;
   } else {
-    return `https://cdn.discordapp.com/banners/${id}/${asset}.${format}`;
+    return `https://cdn.discordapp.com/banners/${id}/${asset}.${format}?size=${assetSize}`;
   }
 }
