@@ -77,7 +77,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               className="hover:opacity-80"
             >
               <h2 className="text-vdcRed">
-                {riotIGN}{" "}
+                {riotIGN}
                 <span className="text-gray-300 text-sm">{riotTag}</span>
               </h2>
             </a>
@@ -165,7 +165,7 @@ function ProfileBanner({ playerInfo }) {
         src={playerInfo.banner}
         fill
         sizes="100vw"
-        className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-25 blur-xs"
+        className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-35 dark:brightness-20"
       />
     );
   }
