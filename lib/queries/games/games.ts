@@ -53,3 +53,8 @@ export async function getAllGamesBy(
     },
   });
 }
+
+
+export function determineWinner(){
+  
+}
