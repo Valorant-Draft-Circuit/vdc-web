@@ -9,7 +9,7 @@ import SignOut from "./SignOut";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../theme/LoadingSpinner";
 import { TUser } from "@/lib/queries/user/user";
-import { determineTeam } from "@/lib/common/auth/auth-utils";
+import { getUserStatus } from "@/lib/common/auth/auth-utils";
 
 export default function MobileAuth() {
   const [user, setUser] = useState<TUser>();
@@ -56,7 +56,7 @@ export default function MobileAuth() {
       }
     }
 
-    if (user && !determineTeam(user)) {
+    if (user && !getUserStatus(user)) {
       getManagementTitle();
     }
   }, [session, user]);
@@ -71,9 +71,9 @@ export default function MobileAuth() {
 
   const userImage = session?.user?.image;
   const userName = user?.name;
-  const team = user ? determineTeam(user) : undefined;
+  const status = user ? getUserStatus(user) : undefined;
 
-  const displayTeam = team || (slug ? `${slug} Management` : "Loading...");
+  const displayStatus = status || (slug ? `${slug} Management` : "Loading...");
 
   return (
     <div className="flex flex-col gap-2 items-center">
@@ -95,7 +95,7 @@ export default function MobileAuth() {
           ) : (
             <>
               <h1 className="italic">{userName}</h1>
-              <h2 className="italic uppercase">{displayTeam}</h2>
+              <h2 className="italic uppercase">{displayStatus}</h2>
             </>
           )}
         </div>

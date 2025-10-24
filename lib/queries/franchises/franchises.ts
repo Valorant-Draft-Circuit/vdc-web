@@ -1,6 +1,6 @@
 import { formatDate, packageMatch } from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
-import { ContractStatus, GameType, MatchType } from "@prisma/client";
+import { ContractStatus, GameType } from "@prisma/client";
 
 export default async function getFranchiseDetails(slug, season) {
   const franchise = await getFranchise(slug);
@@ -74,7 +74,6 @@ export default async function getFranchiseDetails(slug, season) {
     return { ...team, futureGames: futureTeamGames, pastGames: pastTeamGames };
   });
 
-  
   return franchise;
 }
 
@@ -237,7 +236,6 @@ async function getPastGames(franchise, season) {
           },
         },
       ],
-      matchType: MatchType.BO2,
       season: season,
       dateScheduled: {
         lt: new Date(),
@@ -277,7 +275,7 @@ async function getPastGames(franchise, season) {
   });
 }
 
-export async function getFranchiseSlugOfManager(userId) {
+export async function getManagerFranchiseSlug(userId) {
   const res = await prisma.franchise.findFirst({
     where: {
       OR: [
@@ -291,7 +289,7 @@ export async function getFranchiseSlugOfManager(userId) {
       slug: true,
     },
   });
-  
+
   return res?.slug;
 }
 

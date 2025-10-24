@@ -4,8 +4,11 @@ import Image from "next/image";
 import SignOut from "./SignOut";
 import Link from "next/link";
 import { getUser } from "@/lib/queries/user/user";
-import { getFranchiseSlugOfManager as getFranchiseOfManager } from "@/lib/queries/franchises/franchises";
-import { determineTeam } from "@/lib/common/auth/auth-utils";
+import {
+  getManagementTitle,
+  getUserStatus,
+} from "@/lib/common/auth/auth-utils";
+import { getManagerFranchiseSlug } from "@/lib/queries/franchises/franchises";
 
 export default async function AuthSection() {
   const session = await auth();
@@ -16,18 +19,19 @@ export default async function AuthSection() {
     return <SignOut />;
   }
   const user = await getUser(session.user?.id);
-  let team = determineTeam(user);
-
-  if (!team) {
-    const slug = await getFranchiseOfManager(user?.id);
-    team = `${slug} Management`;
+  let status = await getUserStatus(user);
+  if (!status) {
+    const userRoles = BigInt(user!.roles);
+    const managementTitle = getManagementTitle(userRoles);
+    const franchiseSlug = await getManagerFranchiseSlug(user!.id);
+    status = `${franchiseSlug} ${managementTitle}`;
   }
 
   return (
     <div className="flex flex-row space-x-2">
       <div className="flex flex-col text-vdcWhite p-2 items-end text-sm ">
         <h1 className="italic">{user?.name}</h1>
-        <h1 className="">{team}</h1>
+        <h1>{status}</h1>
       </div>
       <div className="flex m-auto">
         <Link href="/me">

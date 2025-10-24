@@ -1,4 +1,4 @@
-import { getFranchiseSlugOfManager } from "@/lib/queries/franchises/franchises";
+import { getManagerFranchiseSlug } from "@/lib/queries/franchises/franchises";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const userId = (await params).userId;
-  const slug = await getFranchiseSlugOfManager(userId);
+  const slug = await getManagerFranchiseSlug(userId);
 
   if (!slug) {
     return NextResponse.json({ error: "Not Found." }, { status: 404 });
