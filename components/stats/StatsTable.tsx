@@ -43,7 +43,7 @@ export default function StatsTable({ data }) {
       cell: ({ getValue }) => {
         const val = getValue();
         if (typeof val === "number") {
-          const percentKeys = ["kast", "hs"];
+          const percentKeys = ["kast", "hs", "mapWinPercent", "roundWinPercent"];
           const roundedKeys = [
             "attackRating",
             "defenseRating",
@@ -56,9 +56,15 @@ export default function StatsTable({ data }) {
             "acs",
             ...percentKeys,
           ];
-          return roundedKeys.includes(key)
-            ? val.toFixed(2) + (percentKeys.includes(key) ? "%" : "")
-            : val;
+
+          if (roundedKeys.includes(key)) {
+            let displayVal = val;
+            if (key === "mapWinPercent" || key === "roundWinPercent") {
+              displayVal = val * 100;
+            }
+            return displayVal.toFixed(2) + (percentKeys.includes(key) ? "%" : "");
+          }
+          return val;
         }
         return val ?? "—";
       },

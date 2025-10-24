@@ -33,14 +33,97 @@ export async function GET(request: NextRequest) {
     tier: tier,
     gameType: gameType,
   });
-  
-  
+
   return NextResponse.json(playerStats);
 }
 
 async function getStatsBy(statsQuery: TStatsQuery) {
   const playerStats = await getPlayerStats(statsQuery);
-  return await formatStats(playerStats);
+
+  
+  if (statsQuery.gameType === GameType.COMBINE) {
+    const roundsRows = await prisma.playerStats.findMany({
+      where: {
+        Game: {
+          gameType: statsQuery.gameType,
+          tier: statsQuery.tier,
+          season: statsQuery.season,
+        },
+      },
+      select: {
+        userID: true,
+        Game: {
+          select: { rounds: true },
+        },
+      },
+    });
+
+    const roundsMap: Record<string, number> = {};
+    for (const row of roundsRows) {
+      const r = row.Game?.rounds ?? 0;
+      roundsMap[row.userID] = (roundsMap[row.userID] || 0) + r;
+    }
+
+  return await formatStats(playerStats, roundsMap, undefined, undefined, false, false);
+  }
+
+  
+  const statRows = await prisma.playerStats.findMany({
+    where: {
+      Game: {
+        gameType: statsQuery.gameType,
+        tier: statsQuery.tier,
+        season: statsQuery.season,
+      },
+    },
+    select: {
+      userID: true,
+      team: true,
+      Game: {
+        select: {
+          rounds: true,
+          roundsWonHome: true,
+          roundsWonAway: true,
+          winner: true,
+          Match: {
+            select: { home: true, away: true },
+          },
+        },
+      },
+    },
+  });
+
+  const roundsMap: Record<string, number> = {};
+  const winsMap: Record<string, number> = {};
+  const winnerRoundsMap: Record<string, number> = {};
+
+  for (const row of statRows) {
+    const uid = row.userID;
+    const g = row.Game;
+    const teamId = row.team;
+    const rounds = g?.rounds ?? 0;
+    roundsMap[uid] = (roundsMap[uid] || 0) + rounds;
+
+   
+    if (g?.winner && teamId && g.winner === teamId) {
+      winsMap[uid] = (winsMap[uid] || 0) + 1;
+    }
+
+    
+    let sideRounds = 0;
+    if (g?.Match) {
+      const homeId = g.Match.home;
+      const awayId = g.Match.away;
+      if (teamId && homeId && teamId === homeId) {
+        sideRounds = g.roundsWonHome ?? 0;
+      } else if (teamId && awayId && teamId === awayId) {
+        sideRounds = g.roundsWonAway ?? 0;
+      }
+    }
+    winnerRoundsMap[uid] = (winnerRoundsMap[uid] || 0) + sideRounds;
+  }
+
+  return await formatStats(playerStats, roundsMap, winsMap, winnerRoundsMap, true);
 }
 
 async function getPlayerStats(query: TStatsQuery) {
@@ -87,7 +170,12 @@ async function getPlayerStats(query: TStatsQuery) {
 }
 
 async function formatStats(
-  playerStats: GroupedPlayerStats[]
+  playerStats: GroupedPlayerStats[],
+  roundsMap?: Record<string, number>,
+  winsMap?: Record<string, number>,
+  winnerRoundsMap?: Record<string, number>,
+  includeWinPercent = true,
+  includeRounds = true
 ): Promise<FormattedStat[]> {
   const userIds = playerStats.map((ps) => ps.userID);
 
@@ -114,7 +202,13 @@ async function formatStats(
     const kills = stats._sum.kills ?? 0;
     const deaths = stats._sum.deaths ?? 0;
 
-    return {
+  const totalRounds = includeRounds && roundsMap ? (roundsMap[stats.userID] ?? 0) : undefined;
+    const wins = winsMap?.[stats.userID] ?? 0;
+    const winnerRounds = winnerRoundsMap?.[stats.userID] ?? 0;
+    const mapWinPercent = stats._count.userID > 0 ? wins / stats._count.userID : null;
+  const roundWinPercent = typeof totalRounds === "number" && totalRounds > 0 ? winnerRounds / totalRounds : null;
+
+    const base: any = {
       name: user?.PrimaryRiotAccount?.riotIGN ?? null,
       team: teamName,
       matchesPlayed: stats._count.userID,
@@ -137,5 +231,16 @@ async function formatStats(
       firstDeaths: stats._sum.firstDeaths,
       hs: stats._avg.hsPercent,
     };
+
+    if (includeRounds && totalRounds !== undefined) {
+      base.totalRounds = totalRounds;
+    }
+
+    if (includeWinPercent) {
+      base.mapWinPercent = mapWinPercent;
+      base.roundWinPercent = roundWinPercent;
+    }
+
+    return base as FormattedStat;
   });
 }

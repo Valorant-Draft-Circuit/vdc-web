@@ -10,6 +10,9 @@ export const HEADERS = [
   "CONTRACT_STATUS",
   "CONTRACT_REMAINING",
   "MP",
+  "RP",
+  "MWP",
+  "RWP",
   "ATK_RATING",
   "DEF_RATING",
   "ACS",
@@ -46,6 +49,9 @@ export const FIELDS = [
   { key: "contractStatus", label: "CONTRACT_STATUS" },
   { key: "contractRemaining", label: "CONTRACT_REMAINING" },
   { key: "matchesPlayed", label: "MP" },
+  { key: "totalRounds", label: "RP" },
+  { key: "mapWinPercent", label: "MWP" },
+  { key: "roundWinPercent", label: "RWP" },
   { key: "attackRating", label: "ATK_RATING" },
   { key: "defenseRating", label: "DEF_RATING" },
   { key: "acs", label: "ACS" },
@@ -120,6 +126,9 @@ export type FormattedStat = {
   name: string | null;
   team: string;
   matchesPlayed: number;
+  totalRounds?: number;
+  mapWinPercent?: number | null;
+  roundWinPercent?: number | null;
   acs: number | null;
   attackRating: number | null;
   defenseRating: number | null;
