@@ -51,7 +51,7 @@ function Match({ stat }: { stat }) {
     mapUrl = MAP_LIST_URL(MAPS[map.toUpperCase()]);
   }
   const goToGame = () =>
-    router.push(`/match/${stat.Game.Match.matchID}/game/${stat.Game.gameID}`);
+    router.push(`/match/${stat.Game.Match.matchID}?game=${stat.Game.gameID}`);
 
   return (
     <div className="relative rounded-md">

@@ -41,9 +41,9 @@ export const HEADERS = [
 export const FIELDS = [
   { key: "discord", label: "DISCORD" },
   { key: "name", label: "NAME" },
-  { key: "agents", label: "AGENT" },
   { key: "franchise", label: "FRANCHISE" },
   { key: "team", label: "TEAM" },
+  { key: "agents", label: "AGENT" },
   { key: "mmr", label: "MMR" },
   { key: "tier", label: "TIER" },
   { key: "leagueStatus", label: "LEAGUE_STATUS" },
@@ -113,6 +113,7 @@ export type GroupedPlayerStats = {
 export type GroupedGamePlayerStats = {
   userID: string;
   agents: string[];
+  team: string | null;
   _sum: {
     kills: number | null;
     deaths: number | null;
@@ -127,7 +128,6 @@ export type GroupedGamePlayerStats = {
     antiEcoKills: number | null;
     ecoDeaths: number | null;
     exitKills: number | null;
-    clutches: number | null;
   };
   _avg: {
     acs: number | null;
@@ -181,6 +181,7 @@ export type FormattedStat = {
 
 export type FormattedGameStat = {
   name: string | null;
+  team: string | null;
   agents: string[] | null;
   acs: number | null;
   attackRating: number | null;
@@ -188,7 +189,7 @@ export type FormattedGameStat = {
   totalKills: number | null;
   totalDeaths: number | null;
   totalAssists: number | null;
-  totalClutches: number | null;
+
   kdr: number | null;
   kast: number | null;
   firstKills: number | null;
@@ -228,6 +229,7 @@ async function getAggregatedPlayerStatsByMatch(
         select: {
           PlayerStats: {
             select: {
+              Team: { select: { name: true } },
               userID: true,
               agent: true,
               kills: true,
@@ -367,20 +369,28 @@ export async function getPlayerStatsByGame(
     },
   });
 
-  const agentData = await prisma.playerStats.findMany({
+  const playerData = await prisma.playerStats.findMany({
     where: { Game: { gameID } },
-    select: { userID: true, agent: true },
+    select: {
+      userID: true,
+      agent: true,
+      Team: { select: { name: true } },
+    },
   });
 
-  const agentMap: Record<string, string[]> = {};
-  for (const { userID, agent } of agentData) {
-    if (!agentMap[userID]) agentMap[userID] = [];
-    if (agent) agentMap[userID].push(agent);
+  const mergedMap: Record<string, { agents: string[]; team: string | null }> =
+    {};
+
+  for (const { userID, agent, Team } of playerData) {
+    if (!mergedMap[userID])
+      mergedMap[userID] = { agents: [], team: Team?.name ?? null };
+    if (agent) mergedMap[userID].agents.push(agent);
   }
 
   return groupedStats.map((stat) => ({
     ...stat,
-    agents: agentMap[stat.userID] ?? [],
+    agents: mergedMap[stat.userID]?.agents ?? [],
+    team: mergedMap[stat.userID]?.team ?? null,
   }));
 }
 
@@ -455,19 +465,16 @@ async function formatStats(
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
 
-      const agents = stats.agents;
-      const agentString = agents;
-
       return {
         name: user?.PrimaryRiotAccount?.riotIGN ?? null,
-        agents: agentString ?? null,
+        agents: stats.agents ?? null,
+        team: stats.team,
         acs: stats._avg.acs,
         attackRating: stats._avg.ratingAttack,
         defenseRating: stats._avg.ratingDefense,
         totalKills: kills,
         totalDeaths: deaths,
         totalAssists: stats._sum.assists,
-        totalClutches: stats._sum.clutches,
         kdr: deaths === 0 ? null : kills / deaths,
         kast: stats._avg.kast,
         firstKills: stats._sum.firstKills,

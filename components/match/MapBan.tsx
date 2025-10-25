@@ -39,7 +39,7 @@ export default function MapBan({ mapBan, teams }) {
         mapBan.gameId && "hover:cursor-pointer hover:brightness-95"
       } ${
         params.get("game") === mapBan.gameId &&
-        "border-2 border-vdcRed rounded-lg"
+        "border-1 border-vdcRed rounded-lg"
       }`}
       onClick={() => {
         updateParam("game", mapBan.gameId);
