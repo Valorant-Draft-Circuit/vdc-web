@@ -68,7 +68,7 @@ export default async function Page({
       <div className="mx-auto xl:max-w-5xl">
         <div className="relative xl:col-span-5 xl:rounded-3xl px-3 xl:px-10 py-10 overflow-hidden xl:shadow-2xl">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-40"
+            className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-20"
             style={
               {
                 "--h": homeTeamColor,
@@ -118,11 +118,11 @@ export default async function Page({
 
 async function TeamIdentity({ team, teamBrand }) {
   const franchiseSlug = team?.Franchise.slug;
-  const teamTier = String(team.tier).toLowerCase();
+
   return (
     <div className="flex flex-col text-center w-1/3 hover:brightness-80">
-      <h1 className="text-vdcRed">{team?.Franchise.slug}</h1>
-      <Link href={`/franchise/${franchiseSlug}?team=${teamTier}`}>
+      <h1 className="text-vdcWhite italic">{team?.Franchise.slug}</h1>
+      <Link href={`/franchises/${franchiseSlug}?team=${team.tier}`}>
         <Image
           alt={`${teamBrand?.logo}`}
           src={`${TEAM_LOGOS_URL}${teamBrand?.logo}`}
@@ -131,7 +131,7 @@ async function TeamIdentity({ team, teamBrand }) {
           className="size-25 xl:size-50 drop-shadow-lg m-auto"
         />
       </Link>
-      <h1 className="text-vdcRed truncate">{team?.name}</h1>
+      <h1 className="text-vdcWhite italic truncate">{team?.name}</h1>
     </div>
   );
 }
