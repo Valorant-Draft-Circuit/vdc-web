@@ -6,6 +6,7 @@ import {
 } from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import { getMatch } from "@/lib/queries/match/match";
+import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -107,7 +108,7 @@ export default async function Page({
         </div>
         <div className="p-2">
           <h1>MAP BANS / PICKS</h1>
-          <div className="flex flex-col xl:flex-row gap-1">
+          <div className="flex flex-col xl:flex-row gap-1 mx-auto">
             {matchInfo?.MapBans.map((mapBan) => (
               <MapBan key={mapBan.id} mapBan={mapBan} teams={teams} />
             ))}
@@ -123,37 +124,44 @@ async function MapBan({ mapBan, teams }) {
   const isBan = mapBan.type === "BAN";
   const isDiscard = mapBan.type === "DISCARD";
   const { home, away } = teams;
-  let team;
+  let decidingTeam;
   if (mapBan.team === home.id) {
-    team = home;
+    decidingTeam = home;
   } else {
-    team = away;
+    decidingTeam = away;
   }
 
   return (
-    <div className="relative">
+    <div className="relative xl:w-72 ">
       <Image
         alt={mapBan.map}
         src={mapUrl}
         width={5000}
         height={5000}
-        className={` absolute inset-0 -z-10 size-full object-cover brightness-30 ${
-          (isBan || isDiscard) && "grayscale"
+        className={`absolute inset-0 -z-10 size-full object-cover ${
+          isBan || isDiscard ? "grayscale brightness-30" : "brightness-50"
         }`}
       />
-      <div className="flex flex-row xl:flex-col italic p-5 gap-5 justify-between">
+      <div className="flex flex-row xl:flex-col italic gap-5 p-5 justify-between">
         <div className="flex flex-row xl:flex-col gap-5 drop-shadow-lg text-vdcWhite my-auto xl:m-auto xl:text-center">
           <h1>{mapBan.map}</h1>
-          <h1>-</h1>
           <h1>{mapBan.type}</h1>
+          {isBan ? (
+            <XMarkIcon className="size-5 m-auto text-vdcRed" />
+          ) : isDiscard ? (
+            <TrashIcon className="size-5 m-auto text-gray-400" />
+          ) : (
+            <h1>{mapBan.side}</h1>
+          )}
         </div>
-        <div>
+
+        <div className="mt-auto xl:mt-10 self-end xl:self-center">
           <Image
-            alt={team?.name}
-            src={`${TEAM_LOGOS_URL}${team?.Franchise.Brand.logo}`}
+            alt={decidingTeam?.name}
+            src={`${TEAM_LOGOS_URL}${decidingTeam?.Franchise.Brand.logo}`}
             width={5000}
             height={5000}
-            className="size-10 xl:size-25 "
+            className="size-10 xl:size-25"
           />
         </div>
       </div>
