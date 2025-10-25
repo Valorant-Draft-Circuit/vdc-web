@@ -3,14 +3,14 @@
 import { useParams, useSearchParams } from "next/navigation";
 import StatsTable from "../stats/StatsTable";
 import { useEffect, useState } from "react";
+import { FormattedGameStat, FormattedStat } from "@/lib/queries/stats/stats";
 
 export default function MatchStats() {
-  const [data, setData] = useState();
+  const [data, setData] = useState<FormattedStat[] | FormattedGameStat[]>();
   const params = useParams();
   const searchParams = useSearchParams();
   const matchId = params.matchId;
   const gameParam = searchParams.get("game");
-  console.log(gameParam);
 
   useEffect(() => {
     async function fetchStats() {
@@ -42,7 +42,16 @@ export default function MatchStats() {
     fetchStats();
   }, [gameParam]);
 
-  console.log(data)
+  if (data?.length === 0) {
+    return (
+      <div className="p-10 m-auto text-vdcRed text-center">
+        <h1>
+          We are working to implement stats on legacy match data. Please check
+          back later!
+        </h1>
+      </div>
+    );
+  }
 
   return <StatsTable data={data} />;
 }
