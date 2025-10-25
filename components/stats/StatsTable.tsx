@@ -62,12 +62,19 @@ export default function StatsTable({ data }) {
             "fkpr",
             "fdpr",
             "acs",
-            ...percentKeys,
           ];
-          return roundedKeys.includes(key)
-            ? val.toFixed(2) + (percentKeys.includes(key) ? "%" : "")
-            : val;
+
+          if (percentKeys.includes(key)) {
+            return Math.round(val) + "%";
+          }
+
+          if (roundedKeys.includes(key)) {
+            return val.toFixed(2);
+          }
+
+          return val;
         }
+
         if (Array.isArray(val)) {
           return (
             <div className="flex flex-wrap gap-1">
@@ -78,7 +85,7 @@ export default function StatsTable({ data }) {
                   alt={agent}
                   width={500}
                   height={500}
-                  className="size-5 xl:size-7"
+                  className="size-5 xl:size-7 m-auto"
                 />
               ))}
             </div>
@@ -102,7 +109,19 @@ export default function StatsTable({ data }) {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: (updaterOrValue) => {
+      const newSorting =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(sorting)
+          : updaterOrValue;
+
+      const hasACS = newSorting.some((s) => s.id === "acs");
+      if (!hasACS) {
+        newSorting.push({ id: "acs", desc: true });
+      }
+
+      setSorting(newSorting);
+    },
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
@@ -137,7 +156,11 @@ export default function StatsTable({ data }) {
       <table className="mx-auto w-full">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableCol headerGroup={headerGroup} key={headerGroup.id} />
+            <TableCol
+              headerGroup={headerGroup}
+              table={table}
+              key={headerGroup.id}
+            />
           ))}
         </thead>
         <tbody>
@@ -150,10 +173,16 @@ export default function StatsTable({ data }) {
   );
 }
 
-function TableCol({ headerGroup }) {
+function TableCol({ headerGroup, table }) {
+  const sortingState = table.getState().sorting;
+  const primarySortId = sortingState[0]?.id;
+
   return (
     <tr key={headerGroup.id}>
       {headerGroup.headers.map((header) => {
+        const isPrimarySorted = header.column.id === primarySortId;
+        const isSortable = header.column.getCanSort();
+
         return (
           <th
             key={header.id}
@@ -167,14 +196,16 @@ function TableCol({ headerGroup }) {
             {header.isPlaceholder ? null : (
               <div className="flex flex-col">
                 <div
-                  onClick={header.column.getToggleSortingHandler()}
-                  className={`${
-                    header.column.getCanSort()
+                  onClick={
+                    isSortable
+                      ? header.column.getToggleSortingHandler()
+                      : undefined
+                  }
+                  className={`flex flex-row ${
+                    isSortable
                       ? "cursor-pointer select-none hover:text-vdcRed"
                       : ""
-                  }  ${
-                    header.column.getIsSorted() ? "text-vdcRed" : ""
-                  } flex flex-row`}
+                  } ${isPrimarySorted ? "text-vdcRed" : ""}`}
                 >
                   <h1>
                     {flexRender(
@@ -202,6 +233,7 @@ function TableCol({ headerGroup }) {
     </tr>
   );
 }
+
 function TableRow({ row, idx }) {
   return (
     <tr
