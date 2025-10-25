@@ -85,7 +85,7 @@ export default function StatsTable({ data }) {
                   alt={agent}
                   width={500}
                   height={500}
-                  className="size-5 xl:size-7 m-auto"
+                  className="size-6 xl:size-7"
                 />
               ))}
             </div>
