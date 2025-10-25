@@ -8,12 +8,12 @@ export async function getMatch(id: string) {
     include: {
       Home: {
         include: {
-          Franchise: { select: { Brand: true } },
+          Franchise: { select: { Brand: true, slug: true } },
         },
       },
       Away: {
         include: {
-          Franchise: { select: { Brand: true } },
+          Franchise: { select: { Brand: true, slug: true } },
         },
       },
       MapBans: true,
