@@ -61,7 +61,7 @@ export default async function Page({
 
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-4xl">
+      <div className="mx-auto xl:max-w-5xl">
         <div className="relative xl:col-span-5 xl:rounded-3xl px-10 py-10 overflow-hidden xl:shadow-2xl">
           <div
             className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-40"
@@ -107,7 +107,7 @@ export default async function Page({
         </div>
         <div className="p-2">
           <h1>MAP BANS / PICKS</h1>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col xl:flex-row gap-1">
             {matchInfo?.MapBans.map((mapBan) => (
               <MapBan key={mapBan.id} mapBan={mapBan} teams={teams} />
             ))}
@@ -141,8 +141,8 @@ async function MapBan({ mapBan, teams }) {
           (isBan || isDiscard) && "grayscale"
         }`}
       />
-      <div className="flex flex-row italic p-5 gap-5 justify-between">
-        <div className="flex flex-row gap-5 drop-shadow-lg text-vdcWhite my-auto">
+      <div className="flex flex-row xl:flex-col italic p-5 gap-5 justify-between">
+        <div className="flex flex-row xl:flex-col gap-5 drop-shadow-lg text-vdcWhite my-auto xl:m-auto xl:text-center">
           <h1>{mapBan.map}</h1>
           <h1>-</h1>
           <h1>{mapBan.type}</h1>
@@ -153,7 +153,7 @@ async function MapBan({ mapBan, teams }) {
             src={`${TEAM_LOGOS_URL}${team?.Franchise.Brand.logo}`}
             width={5000}
             height={5000}
-            className="size-10"
+            className="size-10 xl:size-25 "
           />
         </div>
       </div>
