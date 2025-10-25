@@ -1,16 +1,23 @@
-import {
-  MAP_LIST_URL,
-  MAPS,
-  TEAM_LOGOS_URL,
-  TIER_COLOR_MAP,
-} from "@/lib/common/constants";
+import MapBan from "@/components/match/MapBan";
+import MatchStats from "@/components/match/MatchStats";
+import { TEAM_LOGOS_URL, TIER_COLOR_MAP } from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import { getMatch } from "@/lib/queries/match/match";
-import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { MapBanType } from "@prisma/client";
+import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+type TPlayedMapBans = {
+  id: number;
+  matchID: number;
+  order: number;
+  type: MapBanType;
+  team: number | null;
+  map: string | null;
+  side: MapBansSide | null;
+  gameId?: string;
+};
 
 type Props = {
   params: Promise<{ matchId: string }>;
@@ -47,12 +54,34 @@ export default async function Page({
   const awayTeamColor = toTailwindCustomHexCode(awayTeamBrand!.colorPrimary);
 
   const matchGames = matchInfo?.Games;
+  const playedMapBans: TPlayedMapBans[] = [];
+
   let homeWins = 0,
     awayWins = 0;
+
   matchGames?.forEach((game) => {
     if (game.winner === homeTeam?.id) homeWins++;
     else awayWins++;
+
+    matchInfo?.MapBans.forEach((mapBan) => {
+      if (game.map === mapBan.map) {
+        playedMapBans.push({
+          ...mapBan,
+          gameId: game.gameID,
+        });
+      }
+    });
   });
+
+  const mapBans = matchInfo?.MapBans?.filter(
+    (mapban) =>
+      mapban.type !== MapBanType.PICK && mapban.type !== MapBanType.DECIDER
+  );
+
+  const mapBansWithGameId = [...(mapBans ?? []), ...(playedMapBans ?? [])];
+  mapBansWithGameId.sort(
+    (firstItem, secondItem) => firstItem.order - secondItem.order
+  );
 
   const matchDate = new Date(matchInfo!.dateScheduled).toLocaleString(`en-US`, {
     month: `short`,
@@ -62,10 +91,9 @@ export default async function Page({
   });
 
   const hasMapBaps = matchInfo?.MapBans.length !== 0;
-  console.log(matchInfo);
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-5xl">
+      <div className="mx-auto xl:max-w-7xl">
         <div className="relative xl:col-span-5 xl:rounded-3xl px-3 xl:px-10 py-10 overflow-hidden xl:shadow-2xl">
           <div
             className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-20"
@@ -105,12 +133,15 @@ export default async function Page({
           <div className="p-2">
             <h1>MAP BANS / PICKS</h1>
             <div className="flex flex-col xl:flex-row gap-1 mx-auto">
-              {matchInfo?.MapBans.map((mapBan) => (
+              {mapBansWithGameId.map((mapBan) => (
                 <MapBan key={mapBan.id} mapBan={mapBan} teams={teams} />
               ))}
             </div>
           </div>
         )}
+        <div>
+          <MatchStats />
+        </div>
       </div>
     </div>
   );
@@ -132,56 +163,6 @@ async function TeamIdentity({ team, teamBrand }) {
         />
       </Link>
       <h1 className="text-vdcWhite italic truncate">{team?.name}</h1>
-    </div>
-  );
-}
-
-async function MapBan({ mapBan, teams }) {
-  const mapUrl = MAP_LIST_URL(MAPS[mapBan.map.toUpperCase()]);
-  const isBan = mapBan.type === MapBanType.BAN;
-  const isDiscard = mapBan.type === MapBanType.DISCARD;
-  const { home, away } = teams;
-  let decidingTeam;
-  if (mapBan.team === home.id) {
-    decidingTeam = home;
-  } else {
-    decidingTeam = away;
-  }
-
-  return (
-    <div className="relative xl:w-72">
-      <Image
-        alt={mapBan.map}
-        src={mapUrl}
-        width={5000}
-        height={5000}
-        className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
-          isBan || isDiscard ? "grayscale brightness-30" : "brightness-50"
-        }`}
-      />
-      <div className="flex flex-row xl:flex-col italic gap-5 p-5 justify-between">
-        <div className="flex flex-row xl:flex-col gap-5 drop-shadow-lg text-vdcWhite my-auto xl:m-auto xl:text-center">
-          <h1>{mapBan.map}</h1>
-          <h1>{mapBan.type}</h1>
-          {isBan ? (
-            <XMarkIcon className="size-5 m-auto text-vdcRed" />
-          ) : isDiscard ? (
-            <TrashIcon className="size-5 m-auto text-gray-400" />
-          ) : (
-            <h1>{mapBan.side}</h1>
-          )}
-        </div>
-
-        <div className="mt-auto xl:mt-10 self-end xl:self-center">
-          <Image
-            alt={decidingTeam?.name}
-            src={`${TEAM_LOGOS_URL}${decidingTeam?.Franchise.Brand.logo}`}
-            width={5000}
-            height={5000}
-            className="size-10 xl:size-20"
-          />
-        </div>
-      </div>
     </div>
   );
 }
