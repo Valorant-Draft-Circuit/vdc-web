@@ -30,7 +30,6 @@ export default function MatchStats() {
         try {
           res = await fetch(`/api/stats/match/${matchId}`);
           if (!res.ok) {
-            console.log(res)
             throw new Error(`Error fetching stats: ${res.status}`);
           }
           const data = await res.json();

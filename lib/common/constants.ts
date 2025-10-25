@@ -105,6 +105,10 @@ export const MAP_LIST_URL = (UUID) => {
   return `https://media.valorant-api.com/maps/${UUID}/splash.png`;
 };
 
+export const SECONDARY_MAP_LIST_URL = (UUID) => {
+  return `https://media.valorant-api.com/maps/${UUID}/premierbackgroundimage.png`;
+};
+
 export const STATUS_LABELS: Record<LeagueStatus, string> = {
   [LeagueStatus.GENERAL_MANAGER]: "GM/AGM",
   [LeagueStatus.FREE_AGENT]: "FA",

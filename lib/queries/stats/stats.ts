@@ -228,8 +228,8 @@ async function getAggregatedPlayerStatsByMatch(
       Games: {
         select: {
           PlayerStats: {
-            include: { Team: { select: { name: true } } },
             select: {
+              Team: { select: { name: true } },
               userID: true,
               agent: true,
               kills: true,
