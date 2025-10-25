@@ -170,7 +170,6 @@ export default async function Page({
 
 function MatchOverview({ gameOverview, teams }) {
   const mapUrl = SECONDARY_MAP_LIST_URL(MAPS[gameOverview.map.toUpperCase()]);
-  console.log(gameOverview);
   return (
     <>
       <h1>Match Overview</h1>
