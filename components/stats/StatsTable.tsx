@@ -1,5 +1,10 @@
 "use client";
-import { FIELDS, FormattedStat } from "@/lib/queries/stats/stats";
+import { AGENTS, AGENTURL } from "@/lib/common/constants";
+import {
+  FIELDS,
+  FormattedGameStat,
+  FormattedStat,
+} from "@/lib/queries/stats/stats";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/16/solid";
 import {
   Column,
@@ -14,6 +19,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Link from "next/link";
+import Image from "next/image";
 
 import { useState, useMemo, useEffect, InputHTMLAttributes } from "react";
 
@@ -32,7 +38,9 @@ export default function StatsTable({ data }) {
     },
   ]);
 
-  const columns = useMemo<ColumnDef<FormattedStat>[]>(() => {
+  const columns = useMemo<
+    ColumnDef<FormattedStat | FormattedGameStat>[]
+  >(() => {
     if (!data || data.length === 0) return [];
     const sampleRow = data[0];
     const activeFields = FIELDS.filter(({ key }) => key in sampleRow);
@@ -59,6 +67,22 @@ export default function StatsTable({ data }) {
           return roundedKeys.includes(key)
             ? val.toFixed(2) + (percentKeys.includes(key) ? "%" : "")
             : val;
+        }
+        if (Array.isArray(val)) {
+          return (
+            <div className="flex flex-wrap gap-1">
+              {val.map((agent: string) => (
+                <Image
+                  key={agent}
+                  src={AGENTURL(AGENTS[agent.toUpperCase()])}
+                  alt={agent}
+                  width={500}
+                  height={500}
+                  className="size-5 xl:size-7"
+                />
+              ))}
+            </div>
+          );
         }
         return val ?? "—";
       },

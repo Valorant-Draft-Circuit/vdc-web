@@ -6,9 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ vdcId: string }> }
 ) {
   const vdcId = (await params).vdcId;
-  console.log(vdcId);
   const player = await Player.getBy({ userID: vdcId });
-  console.log(player);
   if (player) {
     return NextResponse.json(player);
   }
