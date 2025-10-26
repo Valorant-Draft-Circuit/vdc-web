@@ -36,7 +36,7 @@ export default function MapBan({ mapBan, teams }) {
   return (
     <div
       className={`relative xl:w-72 ${
-        mapBan.gameId && "hover:cursor-pointer hover:brightness-95"
+        mapBan.gameId && "hover:cursor-pointer hover:brightness-90"
       } ${
         params.get("game") === mapBan.gameId &&
         "border-1 border-vdcRed rounded-lg"
@@ -51,7 +51,7 @@ export default function MapBan({ mapBan, teams }) {
         width={5000}
         height={5000}
         className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
-          isBan || isDiscard ? "grayscale brightness-30" : "brightness-50"
+          isBan || isDiscard ? "grayscale brightness-40 dark:brightness-30" : "brightness-55 dark:brightness-50"
         }`}
       />
       <div className="flex flex-row xl:flex-col italic gap-5 p-5 justify-between">
