@@ -8,11 +8,12 @@ import {
 } from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import { getMatch } from "@/lib/queries/match/match";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 type TPlayedMapBans = {
   id: number;
@@ -31,9 +32,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
+  const matchInfo = await getMatch(matchId);
+
+  const homeTeam = matchInfo?.Home;
+  const awayTeam = matchInfo?.Away;
+
   return {
-    title: `VDC | Match ${matchId}`,
-    description: `Match ${matchId}`,
+    title: `VDC | S${matchInfo?.season} ${matchInfo?.tier} MD${matchInfo?.matchDay}: ${homeTeam?.Franchise.slug} VS ${awayTeam?.Franchise.slug}`,
+    description: `Season ${matchInfo?.season} ${matchInfo?.tier} ${matchInfo?.tier}Match Day ${matchInfo?.matchDay}. ${homeTeam?.Franchise.slug} ${homeTeam?.name} VS ${awayTeam?.Franchise.slug} ${awayTeam?.name}`,
   };
 }
 
@@ -46,6 +52,8 @@ export default async function Page({
 }) {
   const { matchId } = await params;
   const matchInfo = await getMatch(matchId);
+  if (!matchInfo) notFound();
+
   const gameId = (await searchParams).game;
   const gameOverview = matchInfo?.Games.find((game) => game.gameID === gameId);
   const mapPick = matchInfo?.MapBans.find(
@@ -113,7 +121,7 @@ export default async function Page({
       <div className="mx-auto xl:max-w-7xl">
         <div className="relative xl:col-span-5 xl:rounded-3xl px-3 xl:px-10 py-10 overflow-hidden xl:shadow-2xl">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-20"
+            className="absolute inset-0 bg-gradient-to-r from-[var(--h)] to-[var(--a)] brightness-40 dark:brightness-20"
             style={
               {
                 "--h": homeTeamColor,
@@ -142,13 +150,23 @@ export default async function Page({
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-between text-lg p-2">
+        <div className="flex flex-row justify-between text-sm xl:text-lg p-2">
           <h1>SEASON {matchInfo?.season} MATCH DAY 1</h1>
           <h1>{matchDate}</h1>
         </div>
         {hasMapBaps && (
-          <div className="p-2">
-            <h1>MAP BANS / PICKS</h1>
+          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+            <div className="flex flex-col gap-3">
+              {gameOverview && (
+                <Link
+                  className="bg-vdcRed rounded-lg text-xs xl:text-lg p-2 text-center text-vdcWhite my-auto hover:cursor-pointer hover:brightness-95"
+                  href={`/match/${matchId}`}
+                >
+                  <h1>BACK TO MATCH OVERVIEW</h1>
+                </Link>
+              )}
+              <h1>MAP BANS / PICKS</h1>
+            </div>
             <div className="flex flex-col xl:flex-row gap-1 mx-auto">
               {mapBansWithGameId.map((mapBan) => (
                 <MapBan key={mapBan.id} mapBan={mapBan} teams={teams} />
@@ -156,7 +174,7 @@ export default async function Page({
             </div>
           </div>
         )}
-        <div className="flex flex-col gap-4 p-5 xl:p-0 xl:py-5">
+        <div className="flex flex-col gap-4 p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
           {gameOverview && (
             <MatchOverview gameOverview={gameOverviewWithTeam} teams={teams} />
           )}
@@ -172,7 +190,7 @@ function MatchOverview({ gameOverview, teams }) {
   const mapUrl = SECONDARY_MAP_LIST_URL(MAPS[gameOverview.map.toUpperCase()]);
   return (
     <>
-      <h1>Match Overview</h1>
+      <h1>Game Overview</h1>
       <div className="flex flex-col gap-2 relative p-10">
         <Image
           alt={gameOverview.map}
@@ -182,10 +200,11 @@ function MatchOverview({ gameOverview, teams }) {
           className={`absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-90`}
         />
         <div className="flex flex-col justify-between text-vdcWhite gap-2">
-          <div className="flex flex-col text-sm">
-            <h1>{gameOverview.gameType} Game</h1>
+          <div className="flex flex-col text-xs xl:text-sm">
+            <h2>Game type: {gameOverview.gameType}</h2>
             <h2>Rounds played: {gameOverview.rounds}</h2>
           </div>
+
           <div className="flex flex-row justify-between">
             <OverviewScore
               team={teams.home}
@@ -237,7 +256,7 @@ function OverviewScore({ team, score, isHome, pick, winner }) {
             !isHome && "flex-row-reverse"
           }`}
         >
-          <CheckBadgeIcon className="size-5 m-auto" />
+          <CheckBadgeIcon className="size-5 m-auto text-vdcBlue" />
           <h1 className="hidden xl:block">MAP PICK</h1>
         </div>
       )}
