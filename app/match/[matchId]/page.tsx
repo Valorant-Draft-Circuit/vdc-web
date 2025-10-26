@@ -1,3 +1,4 @@
+import Game from "@/components/match/Game";
 import MapBan from "@/components/match/MapBan";
 import MatchStats from "@/components/match/MatchStats";
 import {
@@ -150,26 +151,44 @@ export default async function Page({
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-between text-sm xl:text-lg p-2">
-          <h1>SEASON {matchInfo?.season} MATCH DAY 1</h1>
+        <div className="flex flex-row justify-between text-sm xl:text-lg p-2 xl:p-0 xl:py-2">
+          <h1>
+            SEASON {matchInfo?.season} MATCH DAY {matchInfo.matchDay}
+          </h1>
           <h1>{matchDate}</h1>
         </div>
-        {hasMapBaps && (
-          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
-            <div className="flex flex-col gap-3">
-              {gameOverview && (
-                <Link
-                  className="bg-vdcRed rounded-lg text-xs xl:text-lg p-2 text-center text-vdcWhite my-auto hover:cursor-pointer hover:brightness-95"
-                  href={`/match/${matchId}`}
-                >
-                  <h1>BACK TO MATCH OVERVIEW</h1>
-                </Link>
-              )}
-              <h1>MAP BANS / PICKS</h1>
+        {gameOverview && (
+          <Link href={`/match/${matchId}`}>
+            <div className="bg-vdcRed p-1.5 rounded-lg text-xs xl:text-lg text-center text-vdcWhite hover:cursor-pointer hover:brightness-95">
+              <h1>MATCH OVERVIEW</h1>
             </div>
+          </Link>
+        )}
+        {hasMapBaps ? (
+          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+            <h1>MAP BANS / PICKS</h1>
             <div className="flex flex-col xl:flex-row gap-1 mx-auto">
-              {mapBansWithGameId.map((mapBan) => (
-                <MapBan key={mapBan.id} mapBan={mapBan} teams={teams} />
+              {mapBansWithGameId.map((mapBan, i) => (
+                <MapBan
+                  key={mapBan.id}
+                  mapBan={mapBan}
+                  teams={teams}
+                  delay={i * 75}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+            <h1>Games Played</h1>
+            <div className="flex flex-col gap-1 mx-auto">
+              {matchInfo.Games.map((game, i) => (
+                <Game
+                  key={game.gameID}
+                  game={game}
+                  gameNumber={i}
+                  delay={i * 75}
+                />
               ))}
             </div>
           </div>
@@ -197,7 +216,7 @@ function MatchOverview({ gameOverview, teams }) {
           src={mapUrl}
           width={50000}
           height={50000}
-          className={`absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-90`}
+          className={`absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-175 dark:brightness-90`}
         />
         <div className="flex flex-col justify-between text-vdcWhite gap-2">
           <div className="flex flex-col text-xs xl:text-sm">

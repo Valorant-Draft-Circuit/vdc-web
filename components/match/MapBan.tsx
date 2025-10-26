@@ -5,45 +5,44 @@ import { XMarkIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { MapBanType } from "@prisma/client";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function MapBan({ mapBan, teams }) {
+export default function MapBan({ mapBan, teams, delay = 0 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setAnimateIn(true), delay);
+    return () => clearTimeout(timeout);
+  }, [delay]);
 
   const updateParam = (key: string, value: string) => {
-    if (value) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(key, value);
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    } else {
-      return;
-    }
+    if (!value) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const mapUrl = MAP_LIST_URL(MAPS[mapBan.map.toUpperCase()]);
+  const { home, away } = teams;
+  const decidingTeam = mapBan.team === home.id ? home : away;
   const isBan = mapBan.type === MapBanType.BAN;
   const isDiscard = mapBan.type === MapBanType.DISCARD;
-  const { home, away } = teams;
-  let decidingTeam;
-  if (mapBan.team === home.id) {
-    decidingTeam = home;
-  } else {
-    decidingTeam = away;
-  }
 
   return (
     <div
-      className={`relative xl:w-72 ${
-        mapBan.gameId && "hover:cursor-pointer hover:brightness-90"
-      } ${
-        params.get("game") === mapBan.gameId &&
-        "border-1 border-vdcRed rounded-lg"
-      }`}
-      onClick={() => {
-        updateParam("game", mapBan.gameId);
-      }}
+      className={`relative xl:w-72 transform transition-all duration-300 ease-out
+        ${animateIn ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}
+        ${mapBan.gameId && "hover:cursor-pointer hover:brightness-90"}
+        ${
+          params.get("game") === mapBan.gameId &&
+          "border-1 border-vdcRed rounded-lg"
+        }`}
+      style={{ transitionDelay: `${delay}ms` }}
+      onClick={() => updateParam("game", mapBan.gameId)}
     >
       <Image
         alt={mapBan.map}
@@ -51,7 +50,9 @@ export default function MapBan({ mapBan, teams }) {
         width={5000}
         height={5000}
         className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
-          isBan || isDiscard ? "grayscale brightness-40 dark:brightness-30" : "brightness-55 dark:brightness-50"
+          isBan || isDiscard
+            ? "grayscale brightness-35 dark:brightness-30"
+            : "brightness-55 dark:brightness-50"
         }`}
       />
       <div className="flex flex-row xl:flex-col italic gap-5 p-5 justify-between">
