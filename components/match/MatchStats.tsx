@@ -34,7 +34,6 @@ export default function MatchStats() {
             credentials: "include",
           });
           if (!res.ok) {
-            console.log(res);
             throw new Error(`Error fetching stats: ${res.status}`);
           }
           const data = await res.json();
