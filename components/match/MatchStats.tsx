@@ -17,7 +17,9 @@ export default function MatchStats() {
       let res;
       if (gameParam) {
         try {
-          res = await fetch(`/api/stats/match/${matchId}/game/${gameParam}`);
+          res = await fetch(`/api/stats/match/${matchId}/game/${gameParam}`, {
+            credentials: "include",
+          });
           if (!res.ok) {
             throw new Error(`Error fetching stats: ${res.status}`);
           }
@@ -28,9 +30,11 @@ export default function MatchStats() {
         }
       } else {
         try {
-          res = await fetch(`/api/stats/match/${matchId}`);
+          res = await fetch(`/api/stats/match/${matchId}`, {
+            credentials: "include",
+          });
           if (!res.ok) {
-            console.log(res)
+            console.log(res);
             throw new Error(`Error fetching stats: ${res.status}`);
           }
           const data = await res.json();
