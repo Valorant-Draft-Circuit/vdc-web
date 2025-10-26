@@ -41,9 +41,9 @@ export const HEADERS = [
 export const FIELDS = [
   { key: "discord", label: "DISCORD" },
   { key: "name", label: "NAME" },
+  { key: "agents", label: "AGENT" },
   { key: "franchise", label: "FRANCHISE" },
   { key: "team", label: "TEAM" },
-  { key: "agents", label: "AGENT" },
   { key: "mmr", label: "MMR" },
   { key: "tier", label: "TIER" },
   { key: "leagueStatus", label: "LEAGUE_STATUS" },

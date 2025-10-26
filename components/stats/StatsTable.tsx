@@ -152,7 +152,7 @@ export default function StatsTable({ data }) {
   }
 
   return (
-    <div className="max-h-[70vh] overflow-auto rounded-2xl">
+    <div className="max-h-[70vh] overflow-auto rounded-2xl border-1 border-gray-200 dark:border-gray-600">
       <table className="mx-auto w-full">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -187,7 +187,7 @@ function TableCol({ headerGroup, table }) {
           <th
             key={header.id}
             colSpan={header.colSpan}
-            className={`sticky top-0 border-b italic border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm 4xl:text-md backdrop-blur-sm z-10 ${
+            className={`sticky top-0 border-b italic border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-xs xl:text-sm 4xl:text-md backdrop-blur-sm z-10 ${
               header.column.id === "name"
                 ? "left-0 z-30 bg-white dark:bg-vdcBlack"
                 : ""
@@ -248,7 +248,7 @@ function TableRow({ row, idx }) {
           return (
             <td
               key={cell.id}
-              className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm 4xl:text-md dark:text-white sticky left-0 z-10 bg-gray-200 dark:bg-vdcGrey`}
+              className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-xs xl:text-sm md dark:text-white sticky left-0 z-10 bg-gray-200 dark:bg-vdcGrey`}
             >
               <Link
                 href={`/player/${encodedPlayer}`}
@@ -264,7 +264,7 @@ function TableRow({ row, idx }) {
           return (
             <td
               key={cell.id}
-              className="border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm 4xl:text-md dark:text-white"
+              className="border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-xs xl:text-sm 4xl:text-md dark:text-white"
             >
               <h2>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -281,7 +281,7 @@ function Filter({ column }: { column: Column<unknown> }) {
   const columnFilterValue = column.getFilterValue();
   return (
     <DebouncedInput
-      className="w-full px-1 border border-vdcGrey rounded text-sm focus:outline-vdcRed dark:text-vdcWhite"
+      className="w-full px-1 border border-vdcGrey rounded text-xsxl:text-sm  focus:outline-vdcRed dark:text-vdcWhite"
       onChange={(value) => column.setFilterValue(value)}
       placeholder={`Search...`}
       type="text"
@@ -330,7 +330,7 @@ function TableColSkeleton() {
         return (
           <th
             key={i}
-            className="sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-sm backdrop-blur-sm z-10 w-20"
+            className="sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-xs backdrop-blur-sm z-10 w-20"
           >
             <div className="flex flex-col">
               <div className="h-5 w-20 bg-gray-400 dark:bg-gray-600 rounded"></div>
@@ -352,7 +352,7 @@ function TableRowSkeleton({ idx }) {
         return (
           <td
             key={i}
-            className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-sm dark:text-white animate-pulse`}
+            className={`border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-4 text-xs dark:text-white animate-pulse`}
           >
             <div className="h-5 w-auto bg-gray-400 dark:bg-gray-600 rounded"></div>
           </td>
