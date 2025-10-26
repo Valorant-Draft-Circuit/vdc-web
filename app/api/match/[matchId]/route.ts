@@ -6,10 +6,10 @@ export async function GET(
   { params }: { params: Promise<{ matchId: string }> }
 ) {
   const matchId = (await params).matchId;
-  const gameData = await getStatsBy({ matchId: matchId });
+  const matchData = await getStatsBy({ matchId: matchId });
 
-  if (gameData) {
-    return NextResponse.json(gameData);
+  if (matchData) {
+    return NextResponse.json(matchData);
   }
   return NextResponse.json({ error: "Not Found." }, { status: 404 });
 }

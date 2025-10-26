@@ -17,7 +17,7 @@ export default function MatchStats() {
       let res;
       if (gameParam) {
         try {
-          res = await fetch(`/api/stats/match/${matchId}/game/${gameParam}`, {
+          res = await fetch(`/api/match/${matchId}/game/${gameParam}`, {
             credentials: "include",
           });
           if (!res.ok) {
@@ -30,7 +30,7 @@ export default function MatchStats() {
         }
       } else {
         try {
-          res = await fetch(`/api/stats/match/${matchId}`, {
+          res = await fetch(`/api/match/${matchId}`, {
             credentials: "include",
           });
           if (!res.ok) {
