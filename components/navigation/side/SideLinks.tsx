@@ -48,7 +48,7 @@ export default function SideLinks({ preview }) {
           <div className="p-2 flex flex-row">
             <Link href="/" onClick={() => setOpen(!open)}>
               <FlameLogo
-                color={currentPath === "/" ? "#de3845" : "#fffbf5"}
+                color={currentPath === "/" ? "#eb6123" : "#fffbf5"}
                 className="w-10"
               />
             </Link>
