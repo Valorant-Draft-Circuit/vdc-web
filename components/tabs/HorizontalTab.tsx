@@ -37,7 +37,7 @@ export default function HorizontalTab({
   
   useEffect(() => {
     if (!queryParam) {
-      updateParam(params, fallbackQuery);
+      replaceParam(params, fallbackQuery);
     }
   }, [queryParam]);
 
@@ -62,6 +62,12 @@ export default function HorizontalTab({
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const replaceParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (

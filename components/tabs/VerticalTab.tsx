@@ -34,7 +34,7 @@ export default function VerticalTab({
   useEffect(() => {
     if (!queryParam) {
       const fallback = defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
-      updateParam(params, fallback);
+      replaceParam(params, fallback);
     }
   }, [queryParam]);
 
@@ -60,6 +60,12 @@ export default function VerticalTab({
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const replaceParam = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
