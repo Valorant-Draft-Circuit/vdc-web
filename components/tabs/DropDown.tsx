@@ -30,7 +30,7 @@ export default function ListBox({
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set(paramsKey, selected.query);
-    router.push(`${pathname}?${newParams.toString()}`);
+    router.replace(`${pathname}?${newParams.toString()}`);
   }, [selected, router, pathname, paramsKey, searchParams]);
 
   return (

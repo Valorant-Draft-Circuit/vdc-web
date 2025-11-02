@@ -27,6 +27,7 @@ export default function TabWrapper({
   const initialIndex = tabElements.findIndex(
     (t) => t.query.toLowerCase() === queryParam
   );
+
   const [selectedIndex, setSelectedIndex] = useState(
     initialIndex >= 0 ? initialIndex : 0
   );
