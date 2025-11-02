@@ -220,7 +220,7 @@ function MatchOverview({ gameOverview, teams }) {
       <h1>Game Overview</h1>
       <div className="flex flex-col gap-2 relative p-10 rounded-lg">
         <Image
-          alt={gameOverview.map}
+          alt={gameOverview.gameID}
           src={bgImage}
           width={50000}
           height={50000}

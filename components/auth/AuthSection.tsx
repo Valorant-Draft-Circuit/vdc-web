@@ -24,7 +24,11 @@ export default async function AuthSection() {
     const userRoles = BigInt(user!.roles);
     const managementTitle = getManagementTitle(userRoles);
     const franchiseSlug = await getManagerFranchiseSlug(user!.id);
-    status = `${franchiseSlug} ${managementTitle}`;
+    if (!franchiseSlug || franchiseSlug === undefined) {
+      status = "Please Contact Tech";
+    } else {
+      status = `${franchiseSlug} ${managementTitle}`;
+    }
   }
 
   return (
