@@ -16,15 +16,15 @@ export default function ListBox({
   params,
   menuElements,
 }: {
-  params;
+  params: string;
   menuElements: TMenuElement[];
 }) {
-  const paramsKey = params.toString().toLowerCase();
-  const searchParams = useSearchParams();
+  const paramsKey = params.toLowerCase();
   const router = useRouter();
   const pathname = usePathname();
-
+  const searchParams = useSearchParams();
   const urlParam = searchParams.get(paramsKey) ?? menuElements[0].query;
+
   const [selected, setSelected] = useState<TMenuElement>(
     menuElements.find((m) => m.query === urlParam) || menuElements[0]
   );
@@ -32,18 +32,24 @@ export default function ListBox({
   const isInitialRender = useRef(true);
 
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return; 
+    }
+
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set(paramsKey, selected.query);
 
-    const newUrl = `${pathname}?${newParams.toString()}`;
+    router.push(`${pathname}?${newParams.toString()}`);
+  }, [selected]);
 
-    if (isInitialRender.current) {
-      router.replace(newUrl);
-      isInitialRender.current = false;
-    } else {
-      router.push(newUrl);
+  useEffect(() => {
+    const newParam = searchParams.get(paramsKey) ?? menuElements[0].query;
+    const matched = menuElements.find((m) => m.query === newParam);
+    if (matched && matched.query !== selected.query) {
+      setSelected(matched);
     }
-  }, [selected, router, pathname, paramsKey, searchParams]);
+  }, [searchParams]);
 
   return (
     <div className="xl:px-0 sm:px-12">
