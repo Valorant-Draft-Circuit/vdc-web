@@ -34,7 +34,6 @@ export default function ListBox({
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.set(paramsKey, selected.query);
-
     const newUrl = `${pathname}?${newParams.toString()}`;
 
     if (isInitialRender.current) {
