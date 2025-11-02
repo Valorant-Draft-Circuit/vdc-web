@@ -1,6 +1,6 @@
 "use client";
 
-import { MAP_LIST_URL, MAPS } from "@/lib/common/constants";
+import { MAP_LIST_URL, MAPS, TIER_COLOR_MAP } from "@/lib/common/constants";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,9 +23,8 @@ export default function Game({ game, gameNumber, delay = 0 }) {
     params.set(key, value);
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
-
-  const mapUrl = MAP_LIST_URL(MAPS[game.map.toUpperCase()]);
-
+  const tierColor = TIER_COLOR_MAP[game.tier];
+  const map = game.map;
   return (
     <div
       className={`relative xl:w-full transform transition-all duration-300 ease-out
@@ -37,19 +36,29 @@ export default function Game({ game, gameNumber, delay = 0 }) {
       style={{ transitionDelay: `${delay}ms` }}
       onClick={() => updateParam("game", game.gameID)}
     >
-      <Image
-        alt={game.map}
-        src={mapUrl}
-        width={5000}
-        height={5000}
-        className="absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-55 dark:brightness-50"
-      />
+      {map && (
+        <Image
+          alt={game.map}
+          src={MAP_LIST_URL(MAPS[game.map.toUpperCase()])}
+          width={5000}
+          height={5000}
+          className="absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-55 dark:brightness-50"
+        />
+      )}
 
       <div className="overflow-hidden">
-        <div className="flex flex-row xl:flex-col italic gap-5 px-5 py-10 text-vdcWhite">
-          <h1>
-            Game {gameNumber + 1}: {game.map}
-          </h1>
+        <div
+          className={`flex flex-row xl:flex-col italic gap-5 px-5 py-10 text-vdcWhite rounded-lg ${
+            !map && "bg-gradient-to-br to-vdcBlack from-" + tierColor
+          }`}
+        >
+          {map ? (
+            <h1>
+              Game {gameNumber + 1}: {game.map}
+            </h1>
+          ) : (
+            <h1>Game {gameNumber + 1}</h1>
+          )}
         </div>
       </div>
     </div>

@@ -38,8 +38,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const homeTeam = matchInfo?.Home;
   const awayTeam = matchInfo?.Away;
 
+  let matchDay = "MATCH";
+  if (matchInfo?.matchDay) {
+    matchDay = `MD ${matchInfo?.matchDay}`;
+  }
+
   return {
-    title: `VDC | S${matchInfo?.season} ${matchInfo?.tier} MD${matchInfo?.matchDay}: ${homeTeam?.Franchise.slug} VS ${awayTeam?.Franchise.slug}`,
+    title: `VDC | S${matchInfo?.season} ${matchInfo?.tier} ${matchDay}: ${homeTeam?.Franchise.slug} VS ${awayTeam?.Franchise.slug}`,
     description: `Season ${matchInfo?.season} ${matchInfo?.tier} ${matchInfo?.tier}Match Day ${matchInfo?.matchDay}. ${homeTeam?.Franchise.slug} ${homeTeam?.name} VS ${awayTeam?.Franchise.slug} ${awayTeam?.name}`,
   };
 }
@@ -206,19 +211,27 @@ export default async function Page({
 }
 
 function MatchOverview({ gameOverview, teams }) {
-  const mapUrl = SECONDARY_MAP_LIST_URL(MAPS[gameOverview.map.toUpperCase()]);
+  const map = gameOverview.map;
+  const bgImage = map
+    ? SECONDARY_MAP_LIST_URL(MAPS[gameOverview.map.toUpperCase()])
+    : "/map-placeholder.webp";
   return (
     <>
       <h1>Game Overview</h1>
-      <div className="flex flex-col gap-2 relative p-10">
+      <div className="flex flex-col gap-2 relative p-10 rounded-lg">
         <Image
-          alt={gameOverview.map}
-          src={mapUrl}
+          alt={gameOverview.gameID}
+          src={bgImage}
           width={50000}
           height={50000}
-          className={`absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-175 dark:brightness-90`}
+          className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
+            map
+              ? "brightness-175 dark:brightness-90"
+              : "brightness-50 dark:brightness-30 object-[70%_30%]"
+          }`}
         />
-        <div className="flex flex-col justify-between text-vdcWhite gap-2">
+
+        <div className="flex flex-col justify-between gap-2 text-vdcWhite">
           <div className="flex flex-col text-xs xl:text-sm">
             <h2>Game type: {gameOverview.gameType}</h2>
             <h2>Rounds played: {gameOverview.rounds}</h2>

@@ -29,6 +29,7 @@ export function getUserStatus(user) {
       ? "MANUAL REVIEW"
       : leagueStatus;
   }
+
   if (contractStatus) {
     const { Franchise, name } = user.Team;
     if (contractStatus === ContractStatus.SIGNED) {
@@ -56,6 +57,12 @@ export function getUserStatus(user) {
   const exceptionStatuses = [LeagueStatus.RETIRED, LeagueStatus.SUSPENDED];
   if (exceptionStatuses.includes(leagueStatus)) {
     return leagueStatus;
+  }
+
+  if (leagueStatus === LeagueStatus.GENERAL_MANAGER) {
+    if (isFranchiseManagement(userRole)) {
+      return null;
+    }
   }
 
   if (leagueStatus === LeagueStatus.UNREGISTERED) {

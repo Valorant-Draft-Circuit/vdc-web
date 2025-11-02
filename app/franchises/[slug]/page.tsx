@@ -20,6 +20,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getUserTier } from "@/lib/queries/user/user";
+import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -51,6 +52,8 @@ export default async function Page({
   if (res) {
     franchiseInfo = res;
   }
+  const franchiseHasTier = await franchiseContainsTier(franchiseInfo.id, userTier);
+  const defaultQuery = franchiseHasTier ? userTier : ""
 
   const primary = toTailwindCustomHexCode(franchiseInfo!.Brand!.colorPrimary);
   const secondary = toTailwindCustomHexCode(
@@ -110,7 +113,7 @@ export default async function Page({
             <HorizontalTab
               tabElements={activeTeams}
               params="team"
-              defaultQuery={userTier}
+              defaultQuery={defaultQuery}
             />
           </Suspense>
         </div>
@@ -158,4 +161,17 @@ function getActiveTeams(franchiseInfo) {
   return [...activeFranchiseTeams].sort(
     (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query)
   );
+}
+
+async function franchiseContainsTier(franchise, tier) {
+  const res = await prisma.teams.findFirst({
+    where: {
+      franchise: franchise,
+      tier: tier,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !!res;
 }
