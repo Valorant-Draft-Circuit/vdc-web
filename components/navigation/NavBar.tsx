@@ -50,6 +50,11 @@ export const navLinks = [
         href: "https://twitch.tv/valorantdraftcircuit",
         ext: true,
       },
+      {
+        name: "FA Hub",
+        href: "https://discord.gg/988zsjKyTt",
+        ext: true,
+      },
     ],
   },
 ];
