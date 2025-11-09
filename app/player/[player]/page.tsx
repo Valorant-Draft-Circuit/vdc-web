@@ -26,7 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { player } = await params;
   let playerIGN;
   if (NUMBER_REGEX.test(player)) {
-    const res = await fetch(`${process.env.URL}/api/users/discord/${player}/riot`);
+    const res = await fetch(
+      `${process.env.URL}/api/users/discord/${player}/riot`
+    );
     if (res.ok) {
       const riotIGN: string = await res.json();
       playerIGN = riotIGN;
@@ -93,7 +95,11 @@ export default async function Page({
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <div className="p-2 flex flex-col xl:gap-5">
-          <ListBox params={"Season"} menuElements={menuElements} />
+          <ListBox
+            params={"Season"}
+            menuElements={menuElements}
+            defaultDropDownQuery={currentSeason.toString()}
+          />
           <HorizontalTab tabElements={tabElements} params={"by"} />
         </div>
       </div>
@@ -103,7 +109,9 @@ export default async function Page({
 
 async function handleDiscordIDSearch(discordID: string) {
   // TODO: rename api so its clear we are searching by discordID
-  const res = await fetch(`${process.env.URL}/api/users/discord/${discordID}/riot`);
+  const res = await fetch(
+    `${process.env.URL}/api/users/discord/${discordID}/riot`
+  );
   if (res.ok) {
     const riotIGN: string = await res.json();
     const encodedIGN = encodeURIComponent(riotIGN);

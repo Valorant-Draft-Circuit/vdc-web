@@ -8,18 +8,21 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 type TMenuElement = { query: string; name: string };
 
 export default function ListBox({
   params,
   menuElements,
+  defaultDropDownQuery,
 }: {
   params: string;
   menuElements: TMenuElement[];
+  defaultDropDownQuery: string;
 }) {
   const paramsKey = params.toLowerCase();
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -29,19 +32,21 @@ export default function ListBox({
     menuElements.find((m) => m.query === urlParam) || menuElements[0]
   );
 
-  const isInitialRender = useRef(true);
-
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return; 
+    const params = new URLSearchParams(searchParams);
+    const current = params.get(paramsKey);
+
+    if (!current) {
+      params.set(paramsKey, defaultDropDownQuery.toLowerCase());
+      router.replace(`${pathname}?${params.toString()}`);
+      return;
     }
 
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.set(paramsKey, selected.query);
-
-    router.push(`${pathname}?${newParams.toString()}`);
-  }, [selected]);
+    if (current !== selected.query) {
+      params.set(paramsKey, selected.query);
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  }, [selected, searchParams]);
 
   useEffect(() => {
     const newParam = searchParams.get(paramsKey) ?? menuElements[0].query;

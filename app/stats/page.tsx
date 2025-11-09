@@ -8,7 +8,13 @@ import { listAllSeasons } from "@/lib/common/utils";
 import { getUserTier } from "@/lib/queries/user/user";
 import { ControlPanel } from "@/prisma";
 import { GameType, Tier } from "@prisma/client";
+import { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: `VDC | Stats`,
+  description: `Valorant Draft Circuit player stats page.`,
+};
 
 export default async function Page() {
   const seasonState = await ControlPanel.getLeagueState();
@@ -35,6 +41,7 @@ export default async function Page() {
     season: currentSeason,
     tier: userTier || Tier.MYTHIC,
   };
+
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
     name: tier,
     query: tier,
@@ -50,12 +57,20 @@ export default async function Page() {
       <div className="flex flex-row gap-2 px-5 sm:px-0 py-1 xl:py-0">
         <div className="w-full">
           <Suspense>
-            <ListBox params={"season"} menuElements={seasonList} />
+            <ListBox
+              params={"season"}
+              menuElements={seasonList}
+              defaultDropDownQuery={currentSeason.toString()}
+            />
           </Suspense>
         </div>
         <div className="w-full">
           <Suspense>
-            <ListBox params={"type"} menuElements={gameTypeList} />
+            <ListBox
+              params={"type"}
+              menuElements={gameTypeList}
+              defaultDropDownQuery={gameTypes[0].toLowerCase()}
+            />
           </Suspense>
         </div>
       </div>
