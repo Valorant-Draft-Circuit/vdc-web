@@ -52,8 +52,6 @@ export default async function Page({
   if (res) {
     franchiseInfo = res;
   }
-  const franchiseHasTier = await franchiseContainsTier(franchiseInfo.id, userTier);
-  const defaultQuery = franchiseHasTier ? userTier : ""
 
   const primary = toTailwindCustomHexCode(franchiseInfo!.Brand!.colorPrimary);
   const secondary = toTailwindCustomHexCode(
@@ -61,6 +59,13 @@ export default async function Page({
   );
   const agmList = getAgms(franchiseInfo);
   const activeTeams = getActiveTeams(franchiseInfo);
+
+  const franchiseHasTier = await franchiseContainsTier(
+    franchiseInfo.id,
+    userTier
+  );
+  const defaultTier = userTier ? userTier : "";
+  const defaultQuery = franchiseHasTier ? defaultTier : "";
 
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
