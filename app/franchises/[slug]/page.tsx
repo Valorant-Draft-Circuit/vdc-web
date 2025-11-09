@@ -60,12 +60,14 @@ export default async function Page({
   const agmList = getAgms(franchiseInfo);
   const activeTeams = getActiveTeams(franchiseInfo);
 
-  const franchiseHasTier = await franchiseContainsTier(
-    franchiseInfo.id,
-    userTier
-  );
-  const defaultTier = userTier ? userTier : "";
-  const defaultQuery = franchiseHasTier ? defaultTier : "";
+  let defaultQuery = "";
+  if (userTier) {
+    const franchiseHasTier = await franchiseContainsTier(
+      franchiseInfo.id,
+      userTier
+    );
+    defaultQuery = franchiseHasTier ? userTier : "";
+  }
 
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
