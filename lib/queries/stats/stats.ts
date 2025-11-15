@@ -197,6 +197,15 @@ export type FormattedGameStat = {
   hs: number | null;
 };
 
+export type FormattedTeamStat = {
+  name: string | null;
+  acs: number | null;
+  totalKills: number | null;
+  totalDeaths: number | null;
+  totalAssists: number | null;
+  kdr: number | null;
+};
+
 type TStatsQuery = {
   tier?: Tier;
   season?: number;

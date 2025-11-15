@@ -5,6 +5,7 @@ import MatchCard from "@/components/schedule/MatchCard";
 import Divider from "@/components/theme/Divider";
 import { ControlPanel } from "@/prisma";
 import { calculateTeamTotalMmr } from "@/lib/queries/franchises/franchises";
+import TeamStatsPanel from "./TeamStats";
 
 export default async function TeamPanel({ team }: { team }) {
   const season = await getSeasonCached();
@@ -48,9 +49,9 @@ export default async function TeamPanel({ team }: { team }) {
           </div>
         </PanelSection>
         <div className="flex-1 flex-col">
-          {/* <PanelSection title="Team Stats">
-            <EmptyMessage text={""} />
-          </PanelSection> */}
+          <PanelSection title="Team Stats">
+            <TeamStatsPanel />
+          </PanelSection>
         </div>
       </div>
 

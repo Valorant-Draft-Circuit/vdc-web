@@ -128,22 +128,7 @@ export default function StatsTable({ data }) {
   });
 
   if (!data) {
-    return (
-      <div className="max-h-[70vh] overflow-auto rounded-2xl">
-        <table className="mx-auto w-full">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableColSkeleton key={headerGroup.id} />
-            ))}
-          </thead>
-          <tbody>
-            {Array.from({ length: 12 }).map((_, idx) => (
-              <TableRowSkeleton idx={idx} key={idx} />
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+    return <h1 className=" p-4 text-center text-vdcRed">Loading...</h1>;
   }
   if (data.length === 0) {
     return (
