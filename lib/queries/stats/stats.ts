@@ -197,12 +197,22 @@ export type FormattedGameStat = {
   hs: number | null;
 };
 
+export type FormattedTeamStat = {
+  name: string | null;
+  acs: number | null;
+  totalKills: number | null;
+  totalDeaths: number | null;
+  totalAssists: number | null;
+  kdr: number | null;
+};
+
 type TStatsQuery = {
   tier?: Tier;
   season?: number;
   gameType?: GameType;
   gameId?: string;
   matchId?: string;
+  teamId?: number;
 };
 
 export async function getStatsBy(statsQuery: TStatsQuery) {
@@ -213,10 +223,39 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
   } else if (statsQuery.matchId) {
     playerStats = await getAggregatedPlayerStatsByMatch(statsQuery.matchId);
     return await formatStats(playerStats, "gameStats");
+  } else if (statsQuery.teamId && statsQuery.season) {
+    playerStats = await getStatsByTeam(statsQuery.teamId, statsQuery.season);
+    return await formatStats(playerStats, "teamStats");
   } else {
     playerStats = await getOverallPlayerStats(statsQuery);
     return await formatStats(playerStats);
   }
+}
+
+async function getStatsByTeam(teamId: number, season: number) {
+  return prisma.playerStats.groupBy({
+    where: {
+      Game: { season: season },
+      Player: {
+        team: teamId,
+      },
+    },
+    by: ["userID"],
+    _sum: {
+      kills: true,
+      deaths: true,
+      assists: true,
+    },
+    _avg: {
+      acs: true,
+      ratingAttack: true,
+      ratingDefense: true,
+      kast: true,
+    },
+    _count: {
+      userID: true,
+    },
+  });
 }
 
 async function getAggregatedPlayerStatsByMatch(
@@ -440,7 +479,7 @@ async function getOverallPlayerStats(query: TStatsQuery) {
 async function formatStats(
   playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[],
   statType?: string
-): Promise<FormattedStat[] | FormattedGameStat[]> {
+): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
   const userIds = playerStats.map((ps) => ps.userID);
 
   const users: PlayerNameTeam[] = await prisma.user.findMany({
@@ -480,6 +519,21 @@ async function formatStats(
         firstKills: stats._sum.firstKills,
         firstDeaths: stats._sum.firstDeaths,
         hs: stats._avg.hsPercent,
+      };
+    });
+  } else if (statType === "teamStats") {
+    return playerStats.map((stats): FormattedTeamStat => {
+      const user = userMap[stats.userID];
+      const kills = stats._sum.kills ?? 0;
+      const deaths = stats._sum.deaths ?? 0;
+
+      return {
+        name: user?.PrimaryRiotAccount?.riotIGN ?? null,
+        acs: stats._avg.acs,
+        totalKills: kills,
+        totalDeaths: deaths,
+        totalAssists: stats._sum.assists,
+        kdr: deaths === 0 ? null : kills / deaths,
       };
     });
   } else {
