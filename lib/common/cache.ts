@@ -12,6 +12,7 @@ import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
 
 let cache: NodeCache;
+initCache();
 
 export function initCache() {
   if (!cache) {
@@ -25,7 +26,7 @@ export function initCache() {
 export async function getSeasonCached(): Promise<number> {
   const key = "currentSeason";
   const hit = cache.get<number>(key);
-  if (hit !== undefined) return hit;
+  if (hit) return hit;
 
   const season = await ControlPanel.getSeason();
   cache.set(key, season, Times.DAY);
@@ -35,7 +36,7 @@ export async function getSeasonCached(): Promise<number> {
 export async function getFaqCached(): Promise<TFAQ[]> {
   const key = "faqs";
   const hit = cache.get<TFAQ[]>(key);
-  if (hit !== undefined) return hit;
+  if (hit) return hit;
 
   const faqs = await getFaq();
   cache.set(key, faqs, Times.DAY);

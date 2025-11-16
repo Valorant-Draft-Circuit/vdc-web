@@ -11,7 +11,7 @@ type RouteParams = {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<RouteParams> }
 ) {
   const { slug, tier } = await params;
   const tierEnum = tier.toUpperCase() as Tier;

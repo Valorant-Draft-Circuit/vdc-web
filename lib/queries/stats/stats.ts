@@ -223,7 +223,7 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
   } else if (statsQuery.matchId) {
     playerStats = await getAggregatedPlayerStatsByMatch(statsQuery.matchId);
     return await formatStats(playerStats, "gameStats");
-  } else if (statsQuery.teamId) {
+  } else if (statsQuery.teamId && statsQuery.season) {
     playerStats = await getStatsByTeam(statsQuery.teamId, statsQuery.season);
     return await formatStats(playerStats, "teamStats");
   } else {
@@ -231,9 +231,8 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
     return await formatStats(playerStats);
   }
 }
-async function getStatsByTeam(teamId: number, season: number) {
-  console.log("teamId to search by:", teamId);
 
+async function getStatsByTeam(teamId: number, season: number) {
   return prisma.playerStats.groupBy({
     where: {
       Game: { season: season },
