@@ -1,3 +1,4 @@
+import { avg } from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
 import { Tier, GameType } from "@prisma/client";
 
@@ -13,6 +14,7 @@ export const HEADERS = [
   "CONTRACT_STATUS",
   "CONTRACT_REMAINING",
   "MP",
+  "RATING",
   "ATK_RATING",
   "DEF_RATING",
   "ACS",
@@ -52,6 +54,7 @@ export const FIELDS = [
   { key: "matchesPlayed", label: "MP" },
   { key: "attackRating", label: "ATK_RATING" },
   { key: "defenseRating", label: "DEF_RATING" },
+  { key: "rating", label: "RATING" },
   { key: "acs", label: "ACS" },
   { key: "totalKills", label: "K" },
   { key: "totalDeaths", label: "D" },
@@ -199,6 +202,7 @@ export type FormattedGameStat = {
 
 export type FormattedTeamStat = {
   name: string | null;
+  rating: number | null;
   acs: number | null;
   totalKills: number | null;
   totalDeaths: number | null;
@@ -526,9 +530,10 @@ async function formatStats(
       const user = userMap[stats.userID];
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
-
+      const rating = avg([stats._avg.ratingAttack, stats._avg.ratingDefense]);
       return {
         name: user?.PrimaryRiotAccount?.riotIGN ?? null,
+        rating: rating,
         acs: stats._avg.acs,
         totalKills: kills,
         totalDeaths: deaths,

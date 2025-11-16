@@ -4,6 +4,7 @@ import {
   FIELDS,
   FormattedGameStat,
   FormattedStat,
+  FormattedTeamStat,
 } from "@/lib/queries/stats/stats";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/16/solid";
 import {
@@ -39,7 +40,7 @@ export default function StatsTable({ data }) {
   ]);
 
   const columns = useMemo<
-    ColumnDef<FormattedStat | FormattedGameStat>[]
+    ColumnDef<FormattedStat | FormattedGameStat | FormattedTeamStat>[]
   >(() => {
     if (!data || data.length === 0) return [];
     const sampleRow = data[0];
@@ -55,6 +56,7 @@ export default function StatsTable({ data }) {
           const roundedKeys = [
             "attackRating",
             "defenseRating",
+            "rating",
             "kdr",
             "kpr",
             "apr",

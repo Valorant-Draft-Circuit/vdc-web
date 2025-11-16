@@ -113,14 +113,16 @@ export default async function Page({
   mapBansWithGameId.sort(
     (firstItem, secondItem) => firstItem.order - secondItem.order
   );
+  const today = new Date();
+  const matchDateObj = new Date(matchInfo!.dateScheduled);
+  const isInFuture = matchDateObj > today;
 
-  const matchDate = new Date(matchInfo!.dateScheduled).toLocaleString(`en-US`, {
+  const matchDate = matchDateObj.toLocaleString(`en-US`, {
     month: `short`,
     day: `2-digit`,
     weekday: "short",
     year: `numeric`,
   });
-
   const hasMapBaps = matchInfo?.MapBans.length !== 0;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
@@ -162,49 +164,63 @@ export default async function Page({
           </h1>
           <h1>{matchDate}</h1>
         </div>
-        {gameOverview && (
-          <Link href={`/match/${matchId}`}>
-            <div className="bg-vdcRed p-1.5 rounded-lg text-xs xl:text-lg text-center text-vdcWhite hover:cursor-pointer hover:brightness-95">
-              <h1>MATCH OVERVIEW</h1>
-            </div>
-          </Link>
-        )}
-        {hasMapBaps ? (
-          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
-            <h1>MAP BANS / PICKS</h1>
-            <div className="flex flex-col xl:flex-row gap-1 mx-auto">
-              {mapBansWithGameId.map((mapBan, i) => (
-                <MapBan
-                  key={mapBan.id}
-                  mapBan={mapBan}
-                  teams={teams}
-                  delay={i * 75}
-                />
-              ))}
-            </div>
+        {isInFuture ? (
+          <div className="mx-10">
+            <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
+              This match has not been played yet! Stats and game details will be
+              available after the match has completed and submitted.
+            </h2>
           </div>
         ) : (
-          <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
-            <h1>Games Played</h1>
-            <div className="flex flex-col gap-1 mx-auto">
-              {matchInfo.Games.map((game, i) => (
-                <Game
-                  key={game.gameID}
-                  game={game}
-                  gameNumber={i}
-                  delay={i * 75}
+          <>
+            {gameOverview && (
+              <Link href={`/match/${matchId}`}>
+                <div className="bg-vdcRed p-1.5 rounded-lg text-xs xl:text-lg text-center text-vdcWhite hover:cursor-pointer hover:brightness-95">
+                  <h1>MATCH OVERVIEW</h1>
+                </div>
+              </Link>
+            )}
+            {hasMapBaps ? (
+              <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+                <h1>MAP BANS / PICKS</h1>
+                <div className="flex flex-col xl:flex-row gap-1 mx-auto">
+                  {mapBansWithGameId.map((mapBan, i) => (
+                    <MapBan
+                      key={mapBan.id}
+                      mapBan={mapBan}
+                      teams={teams}
+                      delay={i * 75}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+                <h1>Games Played</h1>
+                <div className="flex flex-col gap-1 mx-auto">
+                  {matchInfo.Games.map((game, i) => (
+                    <Game
+                      key={game.gameID}
+                      game={game}
+                      gameNumber={i}
+                      delay={i * 75}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-col gap-4 p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+              {gameOverview && (
+                <MatchOverview
+                  gameOverview={gameOverviewWithTeam}
+                  teams={teams}
                 />
-              ))}
+              )}
+              <h1>Match Stats</h1>
+              <MatchStats />
             </div>
-          </div>
+          </>
         )}
-        <div className="flex flex-col gap-4 p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
-          {gameOverview && (
-            <MatchOverview gameOverview={gameOverviewWithTeam} teams={teams} />
-          )}
-          <h1>Match Stats</h1>
-          <MatchStats />
-        </div>
       </div>
     </div>
   );
