@@ -1,3 +1,4 @@
+import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import {
   AGENTS,
   AGENTURL,
@@ -5,6 +6,7 @@ import {
   MAPS,
   TEAM_LOGOS_URL,
 } from "@/lib/common/constants";
+import { TAgents, TMaps } from "@/lib/common/valorant-api";
 import { Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +31,34 @@ export default function PlayerMatches({ stats }: { stats }) {
 }
 
 function Match({ stat }: { stat }) {
+  const [maps, setMaps] = useState<TMaps>();
   const router = useRouter();
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadMaps() {
+      try {
+        const data = await getMapsCached();
+        if (isMounted) {
+          setMaps(data);
+        }
+      } catch (err) {
+        console.error("Failed to load maps", err);
+        if (isMounted) {
+          setMaps(MAPS);
+        }
+      }
+    }
+    loadMaps();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!maps) {
+    return;
+  }
+
   const date = new Date(stat.Game.datePlayed).toLocaleString(`en-US`, {
     month: `short`,
     day: `2-digit`,
@@ -48,7 +77,7 @@ function Match({ stat }: { stat }) {
   const map: string = stat.Game.map;
   let mapUrl;
   if (map) {
-    mapUrl = MAP_LIST_URL(MAPS[map.toUpperCase()]);
+    mapUrl = MAP_LIST_URL(maps[map.toUpperCase()]);
   }
   const goToGame = () =>
     router.push(`/match/${stat.Game.Match.matchID}?game=${stat.Game.gameID}`);
@@ -128,6 +157,32 @@ function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
 }
 
 function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
+  const [agents, setAgents] = useState<TAgents>();
+  useEffect(() => {
+    let isMounted = true;
+    async function loadAgents() {
+      try {
+        const data = await getAgentsCached();
+        if (isMounted) {
+          setAgents(data);
+        }
+      } catch (err) {
+        console.error("Failed to load agents", err);
+        if (isMounted) {
+          setAgents(AGENTS);
+        }
+      }
+    }
+    loadAgents();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!agents) {
+    return;
+  }
+
   const k = stat.kills;
   const d = stat.deaths;
   const a = stat.assists;
@@ -138,11 +193,11 @@ function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
     <div className="m-auto flex flex-row gap-1">
       <div className="p-1">
         <Image
-          src={AGENTURL(AGENTS[agent.toUpperCase()])}
+          src={AGENTURL(agents[agent.toUpperCase()])}
           alt={agent}
           width={500}
           height={500}
-          className="size-10"
+          className="size-10 text-xs"
         />
       </div>
       <div className="flex flex-col gap-1 my-auto text-center">

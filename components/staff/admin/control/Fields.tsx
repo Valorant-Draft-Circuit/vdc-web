@@ -14,6 +14,8 @@ import {
 import { ChevronDownIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { TMaps } from "@/lib/common/valorant-api";
+import { getMapsCached } from "@/lib/common/cache";
 
 export function SwitchField({ field, label }) {
   return (
@@ -97,6 +99,7 @@ export function InputField({ field, label }) {
 }
 
 export function MapPoolSelect({ field, label }) {
+  const [maps, setMaps] = useState<TMaps>();
   const [activeMaps, setActiveMaps] = useState<string[]>(() => {
     const value = field.value;
     if (typeof value === "string") {
@@ -117,7 +120,32 @@ export function MapPoolSelect({ field, label }) {
     field.onChange(activeMaps);
   }, [activeMaps]);
 
-  const mapList = Object.keys(MAPS).sort();
+  useEffect(() => {
+    let isMounted = true;
+    async function loadMaps() {
+      try {
+        const data = await getMapsCached();
+        if (isMounted) {
+          setMaps(data);
+        }
+      } catch (err) {
+        console.error("Failed to load maps", err);
+        if (isMounted) {
+          setMaps(MAPS);
+        }
+      }
+    }
+    loadMaps();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!maps) {
+    return;
+  }
+
+  const mapList = Object.keys(maps).sort();
   return (
     <div>
       <label className="block mb-1 uppercase text-vdcRed">
@@ -152,7 +180,7 @@ export function MapPoolSelect({ field, label }) {
                   </h1>
                   <Image
                     alt=""
-                    src={MAP_LIST_URL(MAPS[map.toUpperCase()])}
+                    src={MAP_LIST_URL(maps[map.toUpperCase()])}
                     width={5000}
                     height={5000}
                     className="absolute inset-0 -z-10 size-full object-cover brightness-50"

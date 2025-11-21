@@ -10,7 +10,7 @@ import {
 import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
-import { getAgents, getMaps, TMaps } from "./valorant-api";
+import { getAgents, getMaps, TAgents, TMaps } from "./valorant-api";
 
 let cache: NodeCache;
 initCache();
@@ -24,9 +24,9 @@ export function initCache() {
   }
 }
 
-export async function getAgentsCached() {
+export async function getAgentsCached(): Promise<TAgents> {
   const key = "agents";
-  const hit = cache.get(key);
+  const hit = cache.get<TAgents>(key);
   if (hit) return hit;
 
   const agents = await getAgents();
