@@ -1,8 +1,8 @@
 import Game from "@/components/match/Game";
 import MapBan from "@/components/match/MapBan";
 import MatchStats from "@/components/match/MatchStats";
+import { getMapsCached } from "@/lib/common/cache";
 import {
-  MAPS,
   SECONDARY_MAP_LIST_URL,
   TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
@@ -226,10 +226,11 @@ export default async function Page({
   );
 }
 
-function MatchOverview({ gameOverview, teams }) {
+async function MatchOverview({ gameOverview, teams }) {
+  const maps = await getMapsCached();
   const map = gameOverview.map;
   const bgImage = map
-    ? SECONDARY_MAP_LIST_URL(MAPS[gameOverview.map.toUpperCase()])
+    ? SECONDARY_MAP_LIST_URL(maps[gameOverview.map.toUpperCase()])
     : "/map-placeholder.webp";
   return (
     <>

@@ -65,28 +65,30 @@ export default function PlayerCard({ player, mmrShow }: { player; mmrShow }) {
 
   return (
     <>
-      <div className="flex flex-row items-center gap-3 rounded-md bg-gray-100 dark:bg-[#353543] px-3 py-2 drop-shadow-lg text-vdcGrey dark:text-gray-300 w-full max-w-xs">
-        <div className="relative flex flex-row">
-          <Image
-            src={player.image}
-            alt={player.name}
-            width={250}
-            height={250}
-            className="inline-block size-10 rounded-full my-auto text-xs"
-          />
-          <ContextIcons
-            pStatus={player.Status.contractStatus}
-            captain={player.Captain}
-          />
-        </div>
-        <div className="w-52 my-auto border-r-1 border-vdcBlack">
-          <h2
-            className="italic text-sm xl:text-md hover:cursor-pointer hover:text-vdcRed hover:underline text-start"
-            onClick={goToProfile}
-          >
-            {player.riotName}
-          </h2>
-          {mmrShow && <h1 className="text-xs">{playerMmr} MMR</h1>}
+      <div className="flex flex-row justify-between items-center gap-3 rounded-md bg-gray-100 dark:bg-[#353543] px-3 py-2 drop-shadow-lg text-vdcGrey dark:text-gray-300 w-full min-w-sm">
+        <div className="flex flex-row gap-3">
+          <div className="relative flex flex-row">
+            <Image
+              src={player.image}
+              alt={player.name}
+              width={250}
+              height={250}
+              className="inline-block size-8 rounded-full my-auto text-xs"
+            />
+            <ContextIcons
+              pStatus={player.Status.contractStatus}
+              captain={player.Captain}
+            />
+          </div>
+          <div className="w-64 my-auto border-r-1 border-vdcBlack truncate">
+            <h2
+              className="italic text-xs xl:text-sm hover:cursor-pointer hover:text-vdcRed hover:underline text-start"
+              onClick={goToProfile}
+            >
+              {player.riotName}
+            </h2>
+            {mmrShow && <h1 className="text-xs">{playerMmr} MMR</h1>}
+          </div>
         </div>
         <div>
           <Link
