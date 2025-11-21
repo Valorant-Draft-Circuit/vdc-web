@@ -81,7 +81,9 @@ export const AGENTS = {
   JETT: "add6443a-41bd-e414-f6ad-e58d267f4e95",
   TEJO: "b444168c-4e35-8076-db47-ef9bf368f384",
   WAYLAY: "df1cb487-4902-002e-5c17-d28e83e78588",
+  VETO: "92eeef5d-43b5-1d4a-8d03-b3927a09034b",
 };
+
 export const AGENTURL = (UUID) => {
   return `https://media.valorant-api.com/agents/${UUID}/displayicon.png`;
 };

@@ -10,6 +10,7 @@ import {
 import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
+import { getAgents, getMaps, TMaps } from "./valorant-api";
 
 let cache: NodeCache;
 initCache();
@@ -21,6 +22,26 @@ export function initCache() {
       checkperiod: minutes(10), // prune expired keys every 10 mins
     });
   }
+}
+
+export async function getAgentsCached() {
+  const key = "agents";
+  const hit = cache.get(key);
+  if (hit) return hit;
+
+  const agents = await getAgents();
+  cache.set(key, agents, Times.DAY);
+  return agents;
+}
+
+export async function getMapsCached(): Promise<TMaps> {
+  const key = "maps";
+  const hit = cache.get<TMaps>(key);
+  if (hit) return hit;
+
+  const maps = await getMaps();
+  cache.set(key, maps, Times.DAY);
+  return maps;
 }
 
 export async function getSeasonCached(): Promise<number> {

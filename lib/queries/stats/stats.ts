@@ -425,9 +425,13 @@ export async function getPlayerStatsByGame(
     {};
 
   for (const { userID, agent, Team } of playerData) {
+    let normalizedAgent = agent;
+    if (agent === "KAYO") {
+      normalizedAgent = "KAY/O";
+    }
     if (!mergedMap[userID])
       mergedMap[userID] = { agents: [], team: Team?.name ?? null };
-    if (agent) mergedMap[userID].agents.push(agent);
+    if (agent) mergedMap[userID].agents.push(normalizedAgent);
   }
 
   return groupedStats.map((stat) => ({

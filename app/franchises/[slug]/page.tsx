@@ -70,8 +70,8 @@ export default async function Page({
   }
 
   return (
-    <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
+    <div className="mx-auto max-w-[100rem] pb-10 xl:px-8 xl:py-12">
+      <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
         <div
           style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
           className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)]"
@@ -115,7 +115,7 @@ export default async function Page({
             </div>
           </div>
         </div>
-        <div className="xl:max-w-4xl flex flex-col gap-5">
+        <div className="xl:max-w-5xl flex flex-col gap-5">
           <Suspense fallback={<TeamPanelSkeleton />}>
             <HorizontalTab
               tabElements={activeTeams}
