@@ -95,7 +95,7 @@ export default async function Page({
     else awayWins++;
 
     matchInfo?.MapBans.forEach((mapBan) => {
-      if (game.map === mapBan.map) {
+      if (game.map?.toUpperCase() === mapBan.map?.toUpperCase()) {
         playedMapBans.push({
           ...mapBan,
           gameId: game.gameID,
@@ -168,7 +168,7 @@ export default async function Page({
           <div className="mx-10">
             <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
               This match has not been played yet! Stats and game details will be
-              available after the match has completed and submitted.
+              available after the match has been completed and submitted.
             </h2>
           </div>
         ) : (
