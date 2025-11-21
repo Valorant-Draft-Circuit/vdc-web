@@ -344,8 +344,13 @@ async function getAggregatedPlayerStatsByMatch(
         },
       };
     }
-
-    if (stat.agent) acc[u].agents.add(stat.agent);
+    if (stat.agent) {
+      let normalizedAgent = stat.agent;
+      if (stat.agent === "KAYO") {
+        normalizedAgent = "KAY/O";
+      }
+      acc[u].agents.add(normalizedAgent);
+    }
 
     Object.keys(acc[u]._sum).forEach((key) => {
       acc[u]._sum[key] += stat[key] ?? 0;
