@@ -49,10 +49,10 @@ export default function MatchStats() {
   if (data?.length === 0) {
     return (
       <div className="p-10 m-auto text-vdcRed text-center">
-        <h1>
-          We are working to implement stats on legacy match data. Please check
-          back later!
-        </h1>
+        <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
+          No stats found. Please check back later as they might not have been
+          processed yet!
+        </h2>
       </div>
     );
   }

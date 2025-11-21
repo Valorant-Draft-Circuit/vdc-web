@@ -12,10 +12,11 @@ export default function UpcomingMatch({ match }) {
   const matchType = match.matchType;
 
   return (
-    <div
+    <Link
+      href={`/match/${match.matchID}`}
       className={`flex flex-col p-5 rounded-2xl bg-gradient-to-b from-${
         TIER_COLOR_MAP[match.tier]
-      } from-3% to-gray-100 dark:to-vdcBlack to-0% text-center gap-2 flex-shrink-0`}
+      } from-3% to-gray-100 dark:to-vdcBlack to-0% text-center gap-2 flex-shrink-0 hover:brightness-90`}
     >
       <h1 className="italic">
         {match.tier} - {matchType}
@@ -58,7 +59,7 @@ export default function UpcomingMatch({ match }) {
         </Link>
       </div>
       <h2 className="italic">{timeUntil}</h2>
-    </div>
+    </Link>
   );
 }
 
