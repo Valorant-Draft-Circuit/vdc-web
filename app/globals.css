@@ -29,8 +29,8 @@
 @theme {
   --color-vdcBlack: #1a1a1a;
   --color-vdcWhite: #fffbf5;
+  --color-vdcRed: #de3845;
   /* --color-vdcRed: #eb6123; */
-  --color-vdcRed: #eb6123;
 
   --color-vdcGrey: #32353a;
   --color-vdcPurple: #9b59b6;
