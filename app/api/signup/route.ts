@@ -2,9 +2,15 @@ import { Flags, Player } from "@/prisma";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { getSignupState } from "@/lib/queries/control/control";
 
 export async function POST(request: NextRequest) {
+  const signupState = await getSignupState();
+  const rfaOnly = signupState === "RFA_ONLY";
   const req = await request.json();
+  if (rfaOnly) {
+    req.role = "RFA";
+  }
   await prisma.user.update({
     where: {
       id: req.accountID,
@@ -40,7 +46,6 @@ export async function POST(request: NextRequest) {
     body: req.accountID,
   });
 
-  
   return NextResponse.json({
     message: "Player successfully signed up",
     status: 200,

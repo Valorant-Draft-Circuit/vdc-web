@@ -45,7 +45,7 @@ export default function UpcomingMatch({ match }) {
             e.stopPropagation();
           }}
           href={`/franchises/${
-            homeTeam.slug
+            awayTeam.slug
           }?team=${match.tier.toLocaleLowerCase()}`}
           className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
         >

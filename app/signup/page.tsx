@@ -1,7 +1,6 @@
 import DiscordButton from "@/components/buttons/DiscordButton";
 import SignUpForm from "@/components/signup/SignUpForm";
 import { auth } from "@/lib/auth/auth";
-import { getSeasonCached } from "@/lib/common/cache";
 import { getSignupState } from "@/lib/queries/control/control";
 import { getUser } from "@/lib/queries/user/user";
 import { Metadata } from "next";
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const session = await auth();
-  const currentSeason = await getSeasonCached();
   const signupState = await getSignupState();
 
   let user;
@@ -45,7 +43,7 @@ export default async function Page() {
           {signupState === "CLOSED" ? (
             <SignUpsClosed />
           ) : isSignedIn ? (
-            <SignUpForm user={user} currentSeason={currentSeason} />
+            <SignUpForm user={user} signupState={signupState} />
           ) : (
             <NotSignedIn />
           )}
