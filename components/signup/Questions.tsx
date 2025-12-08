@@ -13,11 +13,13 @@ import { BEHAVIOR_GUIDELINE_URL } from "@/lib/common/constants";
 export default function Questions({
   register,
   watch,
+  signupState,
 }: {
-  season;
   register: UseFormRegister<TSignUpInput>;
   watch: UseFormWatch<TSignUpInput>;
+  signupState: string;
 }) {
+  const rfaOnly = signupState === "RFA_ONLY";
   const reqQuestions = [
     {
       id: "role",
@@ -28,14 +30,30 @@ export default function Questions({
             Do you want to sign up to be drafted on a team? or join the league
             as a sub who <span className="text-vdcRed">CANNOT</span> be signed?
           </h2>
-          <RoleExplanations />
+          <RoleExplanations rfaOnly={rfaOnly} />
         </>
       ),
       options: [
         { value: "DE", label: "DE" },
         { value: "RFA", label: "RFA" },
       ],
-      show: true,
+      show: !rfaOnly,
+      rules: { required: true },
+    },
+    {
+      id: "rfaOnly",
+      type: "radio",
+      label: (
+        <>
+          <h2>
+            Are you aware that you are signing up for VDC as an RFA, a sub that{" "}
+            <span className="text-vdcRed">CANNOT</span> be signed?
+          </h2>
+          <RoleExplanations rfaOnly={rfaOnly} />
+        </>
+      ),
+      options: [{ value: "rfaAck", label: "Yes" }],
+      show: rfaOnly,
       rules: { required: true },
     },
     {
@@ -80,8 +98,9 @@ export default function Questions({
         { value: "false", label: "No" },
       ],
       show:
-        watch("role") &&
-        (watch("role") === "RFA" || watch("commit") === "true"),
+        watch("rfaOnly") == "rfaAck" ||
+        (watch("role") &&
+          (watch("role") === "RFA" || watch("commit") === "true")),
       rules: { required: true },
     },
     {
@@ -120,10 +139,9 @@ export default function Questions({
             ?
           </h2>
           <p className="italic text-xs">
-            By signing up you hereby agree to abide by ALL of the
-            league&apos;s rules/behavioral guidelines and will accept the
-            consequences that come with for not adhereing to any and all of the
-            rules.
+            By signing up you hereby agree to abide by ALL of the league&apos;s
+            rules/behavioral guidelines and will accept the consequences that
+            come with for not adhereing to any and all of the rules.
           </p>
         </>
       ),
@@ -190,51 +208,63 @@ const RadioGroup = ({ name, register, label, options, rules }) => {
   );
 };
 
-function RoleExplanations() {
+function RoleExplanations(props: { rfaOnly: boolean }) {
   const roleExplanations = [
     {
       id: "DE",
       name: "Draft Eligible",
+      show: !props.rfaOnly,
       explanation:
         "a player who can be drafted at the start of the season, and later converted to a Free Agent if they get cut at any time during the season.",
     },
     {
       id: "RFA",
       name: "Restricted Free Agent",
+      show: true,
       explanation:
         "A free agent with some restrictions: This player cannot be signed or drafted and cannot substitute for the same team 2 match days in a row.",
     },
   ];
   return (
     <dl className="divide-y divide-gray-900/10 dark:divide-vdcGrey">
-      <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
-        &quot;Whats the difference?!&quot;
-      </h2>
-      {roleExplanations.map((role) => (
-        <Disclosure key={role.id} as="div" className="py-2">
-          <dt>
-            <DisclosureButton className="group flex w-full items-start justify-between text-left text-vdcBlack dark:text-vdcWhite hover:cursor-pointer">
-              <span className="my-auto italic">
-                <h1>{role.id}</h1>
-              </span>
-              <span className="ml-6 flex h-7 items-center">
-                <ChevronDownIcon
-                  aria-hidden="true"
-                  className="size-6 transition-transform duration-200 group-data-open:rotate-180"
-                />
-              </span>
-            </DisclosureButton>
-          </dt>
-          <DisclosurePanel
-            as="dd"
-            className="mt-2 pr-12 flex flex-row text-xs xl:text-sm"
-          >
-            <p className=" text-vdcBlack dark:text-vdcWhite">
-              <span className="font-bold">{role.name}</span>: {role.explanation}
-            </p>
-          </DisclosurePanel>
-        </Disclosure>
-      ))}
+      {props.rfaOnly ? (
+        <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
+          &quot;What does RFA mean?&quot;
+        </h2>
+      ) : (
+        <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
+          &quot;Whats the difference?!&quot;
+        </h2>
+      )}
+      {roleExplanations.map(
+        (role) =>
+          role.show && (
+            <Disclosure key={role.id} as="div" className="py-2">
+              <dt>
+                <DisclosureButton className="group flex w-full items-start justify-between text-left text-vdcBlack dark:text-vdcWhite hover:cursor-pointer">
+                  <span className="my-auto italic">
+                    <h1>{role.id}</h1>
+                  </span>
+                  <span className="ml-6 flex h-7 items-center">
+                    <ChevronDownIcon
+                      aria-hidden="true"
+                      className="size-6 transition-transform duration-200 group-data-open:rotate-180"
+                    />
+                  </span>
+                </DisclosureButton>
+              </dt>
+              <DisclosurePanel
+                as="dd"
+                className="mt-2 pr-12 flex flex-row text-xs xl:text-sm"
+              >
+                <p className=" text-vdcBlack dark:text-vdcWhite">
+                  <span className="font-bold">{role.name}</span>:{" "}
+                  {role.explanation}
+                </p>
+              </DisclosurePanel>
+            </Disclosure>
+          )
+      )}
     </dl>
   );
 }

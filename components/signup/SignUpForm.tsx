@@ -22,9 +22,10 @@ export type TSignUpInput = {
   commit: string;
   reportedAccounts: string;
   readRules: string;
+  rfaOnly: string;
 };
 
-export default function SignUpForm({ user, currentSeason }) {
+export default function SignUpForm({ user, signupState }) {
   const methods = useForm<TSignUpInput>();
   if (user.Status.leagueStatus !== LeagueStatus.UNREGISTERED) {
     return (
@@ -45,9 +46,9 @@ export default function SignUpForm({ user, currentSeason }) {
 
           <Divider title={"2. Required Questions"} />
           <Questions
-            season={currentSeason}
             register={methods.register}
             watch={methods.watch}
+            signupState={signupState}
           />
 
           {methods.watch("readRules") === "true" && (
