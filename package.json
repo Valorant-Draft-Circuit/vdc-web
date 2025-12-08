@@ -10,36 +10,36 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@auth/core": "^0.39.0",
+    "@auth/core": "^0.39.1",
     "@auth/prisma-adapter": "2.7.4",
-    "@headlessui/react": "^2.2.2",
+    "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
-    "@marsidev/react-turnstile": "^1.1.0",
+    "@marsidev/react-turnstile": "^1.3.1",
     "@prisma/client": "6.15.0",
     "@tanstack/react-table": "^8.21.3",
-    "@tryghost/content-api": "^1.11.22",
+    "@tryghost/content-api": "^1.12.2",
     "date-fns": "^4.1.0",
     "meilisearch": "^0.33.0",
-    "next": "^15.3.5",
+    "next": "^15.5.7",
     "next-auth": "5.0.0-beta.27",
     "next-themes": "^0.4.6",
     "node-cache": "^5.1.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-hook-form": "^7.56.4"
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-hook-form": "^7.68.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@iconify-json/material-symbols": "^1.2.21",
-    "@tailwindcss/postcss": "^4.1.5",
-    "@types/node": "^20.17.32",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.3",
+    "@eslint/eslintrc": "^3.3.3",
+    "@iconify-json/material-symbols": "^1.2.49",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "^20.19.25",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@types/tryghost__content-api": "^1.3.17",
-    "eslint": "^9.26.0",
+    "eslint": "^9.39.1",
     "eslint-config-next": "15.3.1",
     "prisma": "6.15.0",
-    "tailwindcss": "^4.1.5",
-    "typescript": "^5.8.3"
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
   }
 }
