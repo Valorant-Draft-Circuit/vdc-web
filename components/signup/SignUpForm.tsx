@@ -87,9 +87,13 @@ async function handleRegistration(data: TSignUpInput) {
 }
 
 function SubmitSignUp() {
-  type TStatus = "error" | "expired" | "solved";
+  enum CAPTCHA_STATUS {
+    "ERROR",
+    "SOLVED",
+    "EXPIRED",
+  }
   const ref = useRef<TurnstileInstance | null>(null);
-  const [status, setStatus] = useState<TStatus | null>(null);
+  const [status, setStatus] = useState<CAPTCHA_STATUS | null>(null);
   const [loading, setLoading] = useState(false);
 
   const { handleSubmit } = useFormContext<TSignUpInput>();
@@ -117,11 +121,11 @@ function SubmitSignUp() {
         <Turnstile
           siteKey="0x4AAAAAAALpf4cDrG3xTBbw"
           ref={ref}
-          onError={() => setStatus("error")}
+          onError={() => setStatus(CAPTCHA_STATUS.ERROR)}
           onExpire={() => ref.current?.reset()}
-          onSuccess={() => setStatus("solved")}
+          onSuccess={() => setStatus(CAPTCHA_STATUS.SOLVED)}
         />
-        {status === "error" && (
+        {status === CAPTCHA_STATUS.ERROR && (
           <button
             type="button"
             className="my-auto rounded-md bg-orange-500 px-3.5 py-2.5 text-sm font-semibold text-white"
@@ -133,7 +137,7 @@ function SubmitSignUp() {
       </div>
 
       <button
-        disabled={status !== "solved" || loading}
+        disabled={status !== CAPTCHA_STATUS.SOLVED || loading}
         type="submit"
         onClick={handleSubmit(onSubmit)}
         className="inline-flex items-center gap-x-2 rounded-md bg-vdcRed px-3.5 py-2.5 text-sm text-white shadow-xs hover:brightness-90 disabled:cursor-not-allowed disabled:opacity-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 hover:cursor-pointer"
