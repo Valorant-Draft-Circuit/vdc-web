@@ -39,7 +39,7 @@ export async function getAgents(): Promise<TAgents> {
 export async function getMaps(): Promise<TMaps> {
   try {
     const res = await fetch("https://valorant-api.com/v1/maps");
-
+    
     if (!res.ok) {
       console.warn("Failed to fetch maps. Falling back to static maps map");
       return MAPS;
@@ -54,7 +54,7 @@ export async function getMaps(): Promise<TMaps> {
 
     const maps: TMaps = {};
     for (const map of data) {
-      if (map.displayName && map.uuid) {
+      if (map.displayName && map.uuid && map.tacticalDescription) {
         maps[map.displayName.toUpperCase()] = map.uuid;
       }
     }
