@@ -19,6 +19,7 @@ export type TSignUpInput = {
   primaryValorantAccount: string;
   role: string;
   playedBefore: string;
+  playedLastSeason: string;
   commit: string;
   reportedAccounts: string;
   readRules: string;

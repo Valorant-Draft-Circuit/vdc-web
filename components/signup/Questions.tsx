@@ -115,6 +115,17 @@ export default function Questions({
       rules: { required: true },
     },
     {
+      id: "playedLastSeason",
+      type: "radio",
+      label: <h2>Have you played last season?</h2>,
+      options: [
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
+      ],
+      show: watch("playedBefore") === "true", 
+      rules: { required: true },
+    },
+    {
       id: "readRules",
       type: "radio",
       label: (
@@ -151,7 +162,7 @@ export default function Questions({
       ],
       show:
         watch("reportedAccounts") === "true" &&
-        (watch("playedBefore") === "false" || watch("playedBefore") === "true"),
+        (watch("playedBefore") === "false" || (watch("playedBefore") === "true") && (watch("playedBefore") === "PB" || (watch("playedBefore") === "not PB"))),
       rules: { required: true },
     },
   ];
