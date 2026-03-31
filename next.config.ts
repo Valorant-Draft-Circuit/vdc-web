@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // This should strip out console logs in production, but keep warnings and errors
+  // compiler: {
+  //   removeConsole:
+  //     process.env.NODE_ENV === "production"
+  //       ? {
+  //           exclude: ["warn", "error"],
+  //         }
+  //       : false,
+  // },
   images: {
     remotePatterns: [
       {
