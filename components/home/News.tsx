@@ -10,7 +10,7 @@ export default async function News() {
         ({ title, date, featured_image, url, featured_image_alt }) => (
           <div
             className="xl:w-full hover:scale-101 transition duration-150 ease-in-out"
-            key={date}
+            key={title}
           >
             <a href={url ?? ""} target="_blank">
               <div className="shrink-0 ">
@@ -30,7 +30,7 @@ export default async function News() {
               </div>
             </a>
           </div>
-        )
+        ),
       )}
     </div>
   );

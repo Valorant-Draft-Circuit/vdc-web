@@ -35,7 +35,7 @@ export default async function Page() {
     name: `${game.replace("_", "")} STATS`,
   }));
 
-  const userTier = await getUserTier();
+  const userTier = await getUserTier({ isStats: true });
 
   const defaultQueries = {
     season: currentSeason,
