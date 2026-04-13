@@ -45,7 +45,7 @@ export default async function Page({
 
   const res = await getFranchiseDetailsBySlugCached(
     String(slug).toLocaleLowerCase(),
-    currentSeason
+    currentSeason,
   );
 
   let franchiseInfo;
@@ -55,7 +55,7 @@ export default async function Page({
 
   const primary = toTailwindCustomHexCode(franchiseInfo!.Brand!.colorPrimary);
   const secondary = toTailwindCustomHexCode(
-    franchiseInfo!.Brand!.colorSecondary
+    franchiseInfo!.Brand!.colorSecondary,
   );
   const agmList = getAgms(franchiseInfo);
   const activeTeams = getActiveTeams(franchiseInfo);
@@ -64,7 +64,7 @@ export default async function Page({
   if (userTier) {
     const franchiseHasTier = await franchiseContainsTier(
       franchiseInfo.id,
-      userTier
+      userTier,
     );
     defaultQuery = franchiseHasTier ? userTier : "";
   }
@@ -145,9 +145,9 @@ function getAgms(franchiseInfo) {
   return agmSlots
     .filter(
       (
-        agm
+        agm,
       ): agm is { name: string; Accounts: { providerAccountId: string }[] } =>
-        Boolean(agm && agm.name)
+        Boolean(agm && agm.name),
     )
     .map((agm) => ({
       name: agm.name,
@@ -157,7 +157,7 @@ function getAgms(franchiseInfo) {
 
 function getActiveTeams(franchiseInfo) {
   const activeFranchiseTeams: TTabElements[] = franchiseInfo.Teams.filter(
-    (team) => team.active
+    (team) => team.active,
   ).map((team) => ({
     id: team.id,
     query: team.tier,
@@ -166,7 +166,7 @@ function getActiveTeams(franchiseInfo) {
     content: <TeamPanel team={team} />,
   }));
   return [...activeFranchiseTeams].sort(
-    (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query)
+    (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query),
   );
 }
 

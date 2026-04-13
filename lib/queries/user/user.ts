@@ -23,7 +23,7 @@ export type TUser = Prisma.UserGetPayload<{
   };
 }>;
 
-export async function getUserTier(isStats?: boolean) {
+export async function getUserTier(props?: { isStats: boolean }) {
   const session = await auth();
   const isMmrVisible = await ControlPanel.getMMRDisplayState();
   const leagueState = await ControlPanel.getLeagueState();
@@ -38,7 +38,7 @@ export async function getUserTier(isStats?: boolean) {
     return user?.Team?.tier;
   } else if (
     (isMmrVisible && user?.PrimaryRiotAccount?.MMR) ||
-    (isStats && isCombines && user.PrimaryRiotAccount.MMR)
+    (props?.isStats && isCombines && user.PrimaryRiotAccount.MMR)
   ) {
     return await determineTier(user?.PrimaryRiotAccount?.MMR.mmrEffective);
   }
