@@ -38,7 +38,7 @@ export async function getUserTier(props?: { isStats: boolean }) {
     return user?.Team?.tier;
   } else if (
     (isMmrVisible && user?.PrimaryRiotAccount?.MMR) ||
-    (props?.isStats && isCombines && user.PrimaryRiotAccount.MMR)
+    (props?.isStats && isCombines && user?.PrimaryRiotAccount?.MMR)
   ) {
     return await determineTier(user?.PrimaryRiotAccount?.MMR.mmrEffective);
   }
