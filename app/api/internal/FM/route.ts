@@ -1,4 +1,4 @@
-import { hasAccess } from "@/lib/auth/access";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { getMMRTierLines } from "@/lib/common/utils";
 import { getContractsData } from "@/lib/queries/staff/FM";
@@ -11,7 +11,17 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
-  const userRoles = session.user?.roles || "";
+  const userId = session.user?.id;
+  if (!userId)
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
+
+  const userRoles = await getUserRoles(userId);
+  if (!userRoles)
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
+
+  if (!hasAccess(userRoles, [Roles.ADMIN, Roles.LEAD_TECH])) {
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
+  }
 
   if (
     !hasAccess(userRoles, [
@@ -48,18 +58,18 @@ export async function GET() {
           tierlines.RECRUIT.max
           ? "RECRUIT"
           : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
-            tierlines.PROSPECT.max
-          ? "PROSPECT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
-            tierlines.APPRENTICE.max
-          ? "APPRENTICE"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
-            tierlines.EXPERT.max
-          ? "EXPERT"
-          : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
-            tierlines.MYTHIC.max
-          ? "MYTHIC"
-          : "N/A"
+              tierlines.PROSPECT.max
+            ? "PROSPECT"
+            : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
+                tierlines.APPRENTICE.max
+              ? "APPRENTICE"
+              : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
+                  tierlines.EXPERT.max
+                ? "EXPERT"
+                : (contract.PrimaryRiotAccount?.MMR?.mmrEffective ?? -1) <=
+                    tierlines.MYTHIC.max
+                  ? "MYTHIC"
+                  : "N/A"
         : undefined,
       team: undefined as string | undefined,
       franchise: undefined as string | undefined,

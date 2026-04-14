@@ -1,5 +1,5 @@
 import UnAuthorized from "@/components/auth/Unauthorized";
-import { hasAccess } from "@/lib/auth/access";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { Roles } from "@/prisma";
 
@@ -16,8 +16,13 @@ export default async function Layout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  const userRole = session?.user?.roles || "";
-  if (!hasAccess(userRole, FM_ACCESS_LIST)) {
+  const userId = session?.user?.id;
+  if (!userId) return <UnAuthorized />;
+
+  const userRoles = await getUserRoles(userId);
+  if (!userRoles) return <UnAuthorized />;
+
+  if (!hasAccess(userRoles, FM_ACCESS_LIST)) {
     return <UnAuthorized />;
   }
   return <div>{children}</div>;

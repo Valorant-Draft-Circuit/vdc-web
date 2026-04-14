@@ -1,11 +1,11 @@
-import { isAuthorizedForMeilisearch } from "@/lib/auth/access";
+import { getUserRoles, isAuthorizedForMeilisearch } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ name: string }> }
+  { params }: { params: Promise<{ name: string }> },
 ) {
   const url = request.nextUrl;
   const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
@@ -17,15 +17,18 @@ export async function GET(
     if (!session) {
       return NextResponse.json(
         { message: "Unauthorized: no valid session" },
-        { status: 401 }
+        { status: 401 },
       );
     }
+    const userId = session.user?.id;
+    if (!userId)
+      return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
 
-    const roles = session.user?.roles ?? "";
-    if (!isAuthorizedForMeilisearch(roles)) {
+    const userRoles = await getUserRoles(userId);
+    if (!isAuthorizedForMeilisearch(userRoles)) {
       return NextResponse.json(
         { message: "Forbidden: insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -36,7 +39,7 @@ export async function GET(
     await meilisearchClient.getIndex(indexName);
     return NextResponse.json(
       { message: "Index already exists", status: 409 },
-      { status: 409 }
+      { status: 409 },
     );
   } catch {
     const task = await meilisearchClient.createIndex(indexName);
