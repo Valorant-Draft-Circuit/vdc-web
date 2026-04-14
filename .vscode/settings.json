@@ -1,5 +1,6 @@
 {
 	"files.associations": {
 		"wrangler.json": "jsonc"
-	}
+	},
+	"prisma.pinToPrisma6": true
 }

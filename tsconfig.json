@@ -15,7 +15,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "noImplicitAny": false, // reenable after prisma repo gets fixed
     "plugins": [
@@ -34,7 +34,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/schedule/[season]"
+    "app/schedule/[season]",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
