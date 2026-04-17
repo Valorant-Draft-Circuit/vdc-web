@@ -43,5 +43,5 @@ export async function getUserRoles(userId: string) {
       roles: true,
     },
   });
-  return user?.roles;
+  return user?.roles ?? "";
 }
