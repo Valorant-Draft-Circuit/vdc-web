@@ -7,8 +7,10 @@ import { getUserRoles, hasAccess } from "@/lib/auth/access";
 export default async function NavLinks() {
   const session = await auth();
   const isLoggedIn = !!session?.user;
-  const userRoles = isLoggedIn ? await getUserRoles(session?.user?.id!) : "";
-
+  let userRoles = "";
+  if (isLoggedIn && session?.user?.id) {
+    userRoles = await getUserRoles(session.user.id);
+  }
   const filteredStaffLinks = staffLinks.links.filter((link) =>
     hasAccess(userRoles, link.roles),
   );
