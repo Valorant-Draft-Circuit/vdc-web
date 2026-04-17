@@ -2,14 +2,17 @@ import { DropDown } from "./DropDowns";
 import { navLinks, staffLinks } from "./NavBar";
 import HomeLink from "./HomeLink";
 import { auth } from "@/lib/auth/auth";
-import { hasAccess } from "@/lib/auth/access";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 
 export default async function NavLinks() {
   const session = await auth();
   const isLoggedIn = !!session?.user;
-  const userRole = session?.user?.roles ?? "";
+  let userRoles = "";
+  if (isLoggedIn && session?.user?.id) {
+    userRoles = await getUserRoles(session.user.id);
+  }
   const filteredStaffLinks = staffLinks.links.filter((link) =>
-    hasAccess(userRole, link.roles),
+    hasAccess(userRoles, link.roles),
   );
 
   return (
