@@ -1,4 +1,4 @@
-import { hasAccess } from "@/lib/auth/access";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Roles } from "@/prisma";
@@ -10,7 +10,13 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
-  const userRoles = session.user?.roles || "";
+  const userId = session.user?.id;
+  if (!userId)
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
+
+  const userRoles = await getUserRoles(userId);
+  if (!userRoles)
+    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
 
   if (!hasAccess(userRoles, [Roles.ADMIN, Roles.LEAD_TECH])) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
@@ -23,7 +29,6 @@ export async function GET() {
     notes: item.notes,
   }));
 
-  
   return NextResponse.json({ controlPanelMap });
 }
 
@@ -58,7 +63,6 @@ export async function POST(request: NextRequest) {
 
   try {
     await prisma.$transaction(ops);
-      
 
     return NextResponse.json({
       message: `Control Panel values successfully updated.`,
@@ -66,7 +70,7 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { message: `Error updateing Control Panel Values: ${e}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

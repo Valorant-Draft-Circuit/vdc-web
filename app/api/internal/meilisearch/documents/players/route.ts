@@ -1,4 +1,4 @@
-import { isAuthorizedForMeilisearch } from "@/lib/auth/access";
+import { getUserRoles, isAuthorizedForMeilisearch } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { prisma } from "@/lib/prisma";
@@ -17,15 +17,19 @@ export async function GET(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { message: "Unauthorized: no valid session" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-    const roles = session.user?.roles ?? "";
-    if (!isAuthorizedForMeilisearch(roles)) {
+    const userId = session.user?.id;
+    if (!userId)
+      return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
+
+    const userRoles = await getUserRoles(userId);
+    if (!isAuthorizedForMeilisearch(userRoles)) {
       return NextResponse.json(
         { message: "Forbidden: insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -34,7 +38,7 @@ export async function GET(request: NextRequest) {
   if (!players || !Array.isArray(players)) {
     return NextResponse.json(
       { message: "No players provided", status: 400 },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     return NextResponse.json(
       { message: err || "Failed to add player documents", status: 400 },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }
@@ -171,6 +175,6 @@ async function getPlayers() {
         leagueStatus: user.Status?.leagueStatus || null,
         image: user.image || null,
       };
-    })
+    }),
   );
 }
