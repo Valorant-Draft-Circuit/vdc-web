@@ -1,6 +1,6 @@
 import NodeCache from "node-cache";
 import { ControlPanel, Franchise, Team } from "@/prisma";
-import { TFAQ, getFaq } from "../queries/about/faq";
+// import { TFAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
 import { TStandingProps } from "@/components/standings/StandingsCard";
 import {
@@ -54,15 +54,15 @@ export async function getSeasonCached(): Promise<number> {
   return season;
 }
 
-export async function getFaqCached(): Promise<TFAQ[]> {
-  const key = "faqs";
-  const hit = cache.get<TFAQ[]>(key);
-  if (hit) return hit;
+// export async function getFaqCached(): Promise<TFAQ[]> {
+//   const key = "faqs";
+//   const hit = cache.get<TFAQ[]>(key);
+//   if (hit) return hit;
 
-  const faqs = await getFaq();
-  cache.set(key, faqs, Times.DAY);
-  return faqs;
-}
+//   const faqs = await getFaq();
+//   cache.set(key, faqs, Times.DAY);
+//   return faqs;
+// }
 
 export async function getFranchiseStandingsCached(
   season: number

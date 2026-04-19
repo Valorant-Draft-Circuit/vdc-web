@@ -1,3 +1,5 @@
+// This has been deprecated in favor of just having a json object in the app/about/page.tsx file.
+
 import { prisma } from "@/lib/prisma";
 
 export type TFAQ = {

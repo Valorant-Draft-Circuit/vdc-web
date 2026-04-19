@@ -7,27 +7,30 @@ import StandingsPanelSkeleton from "@/components/standings/StandingsPanelSkeleto
 import { Metadata } from "next";
 import { getUserTier } from "@/lib/queries/user/user";
 
-const CURRENT_SEASON = await getSeasonCached();
-
-export const metadata: Metadata = {
-  title: `VDC | Season ${CURRENT_SEASON} Standings`,
-  description: `Season ${CURRENT_SEASON} Standings`,
-};
-const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
-  query: tier,
-  name: tier,
-  color: TIER_COLOR_MAP[tier],
-  content: <StandingsPanel query={tier} />,
-}));
-tabs.unshift({
-  name: "franchises",
-  query: "franchises",
-  color: "vdcRed",
-  content: <StandingsPanel query="franchises" />,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const season = await getSeasonCached();
+  return {
+    title: `VDC | Season ${season} Standings`,
+    description: `Season ${season} Standings`,
+  };
+}
 
 export default async function Standings() {
+  const CURRENT_SEASON = await getSeasonCached();
   const userTier = await getUserTier();
+
+  const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+    query: tier,
+    name: tier,
+    color: TIER_COLOR_MAP[tier],
+    content: <StandingsPanel query={tier} />,
+  }));
+  tabs.unshift({
+    name: "franchises",
+    query: "franchises",
+    color: "vdcRed",
+    content: <StandingsPanel query="franchises" />,
+  });
 
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">

@@ -6,8 +6,34 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { getFaqCached } from "@/lib/common/cache";
 import { Metadata } from "next";
+
+const faqs = [
+  {
+    question: "What is VDC?",
+    answer: "We are an NA based, community run Valorant league for all skill levels. We offer a casual-competitive season-based environment without the need to make a team of your own.",
+  },
+  {
+    question: "What rank do I need to be?",
+    answer: "All skill levels are welcome and able to play! We divide our players between skill-based tiers that include players ranging from Iron to Radiant. All Valorant players have a chance to play in a competitive and fun environment.",
+  },
+  {
+    question: "How do I join a team?",
+    answer: "After combines are completed, we hold a draft. Every player is drafted onto a team and will have an opportunity to tryout with their team to make a final roster spot. Pre-made teams may not enter.",
+  },
+  {
+    question: "What are combines?",
+    answer: "Combines are 5v5 in house games where your stats are recorded before the official season begins. They are scouting grounds for General Managers to see who they want to add to their teams.",
+  },
+  {
+    question: "Can I join or play even if I can't commit to the match days?",
+    answer: "Absolutely! There's an option to play as a restricted free agent and play as a sub for the season. Additionally we have an active LFG where you can join PUGs and 10mans! We also need people to help run our league. Have talents in media, tech, art, and others? Come join and talk to us!",
+  },
+  {
+    question: "This sounds too good to be true... What's the catch?",
+    answer: "That's the best part! There are none! There are no entry fees or costs. The only requirement to join is that you are willing to commit to the team that drafts you, and more importantly that you have fun.",
+  },
+];
 
 export const metadata: Metadata = {
   title: "VDC | About",
@@ -15,7 +41,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const faqs = await getFaqCached();
 
   return (
     <div>
