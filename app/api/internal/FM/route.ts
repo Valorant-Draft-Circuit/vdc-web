@@ -19,10 +19,6 @@ export async function GET() {
   if (!userRoles)
     return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
 
-  if (!hasAccess(userRoles, [Roles.ADMIN, Roles.LEAD_TECH])) {
-    return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
-  }
-
   if (
     !hasAccess(userRoles, [
       Roles.ADMIN,
