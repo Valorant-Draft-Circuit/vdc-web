@@ -1,4 +1,8 @@
-import { formatDate, packageMatch } from "@/lib/common/utils";
+import {
+  determineIfKnockout,
+  formatDate,
+  packageMatch,
+} from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
 import { MatchType, Tier } from "@prisma/client";
@@ -15,14 +19,19 @@ export async function getEveryUpcomingMatch() {
 }
 
 export async function getScheduleByTier(tier: Tier, season: number) {
-  const regularSeasonDatesToMatches = {};
   const preseasonDatesToMatches = {};
+  const regularSeasonDatesToMatches = {};
+
   const upcomingMatches = await getUpcomingMatches({
     tier: tier,
     season: season,
   });
 
-  upcomingMatches.map((match) => {
+  upcomingMatches.map((match, i, upcomingMatches) => {
+    let knockoutType;
+    if (i !== 0) {
+      knockoutType = determineIfKnockout(match, upcomingMatches, i);
+    }
     let homeWins = 0;
     let awayWins = 0;
     if (match.Games) {
@@ -45,7 +54,7 @@ export async function getScheduleByTier(tier: Tier, season: number) {
         match,
         homeWins,
         awayWins,
-        formattedDate
+        formattedDate,
       );
       preseasonDatesToMatches[formattedDate].push(packagedMatch);
     } else {
@@ -53,11 +62,13 @@ export async function getScheduleByTier(tier: Tier, season: number) {
       if (!regularSeasonDatesToMatches[formattedDate]) {
         regularSeasonDatesToMatches[formattedDate] = [];
       }
+
       const packagedMatch = packageMatch(
         match,
         homeWins,
         awayWins,
-        formattedDate
+        formattedDate,
+        knockoutType,
       );
       regularSeasonDatesToMatches[formattedDate].push(packagedMatch);
     }
@@ -91,7 +102,12 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const whereClause: TUpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
-    matchType: [MatchType.BO2, MatchType.BO3, MatchType.BO5],
+    matchType: [
+      MatchType.PRE_SEASON,
+      MatchType.BO2,
+      MatchType.BO3,
+      MatchType.BO5,
+    ],
     Home: { active: true },
     Away: { active: true },
   };

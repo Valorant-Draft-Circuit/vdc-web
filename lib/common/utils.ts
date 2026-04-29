@@ -1,4 +1,4 @@
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 
 export const isTier = (value: string): value is Tier => {
@@ -16,13 +16,19 @@ export function formatDate(date: Date) {
   newDate.setDate(newDate.getDate() - 1);
 
   return newDate.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   });
 }
 
-export function packageMatch(match, homeWins, awayWins, formattedDate) {
+export function packageMatch(
+  match,
+  homeWins,
+  awayWins,
+  formattedDate,
+  knockoutType?,
+) {
   const homeTeam = match.Home!;
   const awayTeam = match.Away!;
   return {
@@ -32,6 +38,7 @@ export function packageMatch(match, homeWins, awayWins, formattedDate) {
     homeWins: homeWins,
     awayWins: awayWins,
     matchType: match.matchType,
+    knockoutType: knockoutType,
     Home: {
       id: homeTeam.id,
       name: homeTeam.name,
@@ -111,3 +118,21 @@ export async function getMMRTierLines() {
   return mmrTierLines;
 }
 
+export function determineIfKnockout(match, matchesList, index) {
+  const prevMatch = matchesList[index - 1];
+  if (
+    prevMatch.matchType === MatchType.BO2 &&
+    match.matchType === MatchType.BO3
+  ) {
+    return "QUARTERFINALS";
+  } else if (
+    prevMatch.matchType === MatchType.BO3 &&
+    match.matchType === MatchType.BO3
+  ) {
+    return "SEMIFINALS";
+  } else if (match.matchType === MatchType.BO5) {
+    return "FINALS";
+  } else {
+    return "";
+  }
+}
