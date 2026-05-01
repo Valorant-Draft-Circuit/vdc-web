@@ -6,7 +6,7 @@ import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
 import { getUser } from "@/lib/queries/user/user";
 import { getSignupState } from "@/lib/queries/control/control";
-import { getLocalMatchDayTime } from "@/lib/common/times";
+import { matchDayTimeWithFallback } from "@/lib/common/times";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
 export default async function HeroSection({ session }) {
@@ -47,8 +47,8 @@ export default async function HeroSection({ session }) {
               VDC is an NA based, community run VALORANT league for all skill
               levels. We offer a casually competitive season based environment
               without the need to make a team of your own. Our match days are
-              every Wednesdays and Fridays at {getLocalMatchDayTime()} during
-              the season.
+              every Wednesdays and Fridays at {matchDayTimeWithFallback()}{" "}
+              during the season.
             </p>
           </div>
         </div>

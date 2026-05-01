@@ -7,7 +7,7 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { Metadata } from "next";
-import { getLocalMatchDayTime } from "@/lib/common/times";
+import { matchDayTimeWithFallback } from "@/lib/common/times";
 
 const faqs = [
   {
@@ -104,7 +104,7 @@ export default async function Page() {
                   <p className="text-base/7 text-vdcBlack dark:text-vdcWhite">
                     {faq.answer.replace(
                       "{{localtime}}",
-                      getLocalMatchDayTime(),
+                      matchDayTimeWithFallback(),
                     )}
                   </p>
                 </DisclosurePanel>

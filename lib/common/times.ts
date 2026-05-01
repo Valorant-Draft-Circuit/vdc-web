@@ -47,3 +47,14 @@ export function getLocalMatchDayTime() {
     .split(" ")[2];
   return localTime + " " + tz;
 }
+
+export function matchDayTimeWithFallback() {
+  if (
+    !getLocalMatchDayTime().includes("EST") ||
+    !getLocalMatchDayTime().includes("EDT")
+  ) {
+    return `${getLocalMatchDayTime()} (9:00 EST)`;
+  } else {
+    return getLocalMatchDayTime();
+  }
+}
