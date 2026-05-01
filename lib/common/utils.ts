@@ -28,6 +28,7 @@ export function packageMatch(
   awayWins,
   formattedDate,
   knockoutType?,
+  playoffRound?,
 ) {
   const homeTeam = match.Home!;
   const awayTeam = match.Away!;
@@ -39,6 +40,7 @@ export function packageMatch(
     awayWins: awayWins,
     matchType: match.matchType,
     knockoutType: knockoutType,
+    playoffRound: playoffRound,
     Home: {
       id: homeTeam.id,
       name: homeTeam.name,
@@ -118,20 +120,11 @@ export async function getMMRTierLines() {
   return mmrTierLines;
 }
 
-export function determineIfKnockout(match, matchesList, index) {
-  const prevMatch = matchesList[index - 1];
-  if (
-    prevMatch.matchType === MatchType.BO2 &&
-    match.matchType === MatchType.BO3
-  ) {
-    return "QUARTERFINALS";
-  } else if (
-    prevMatch.matchType === MatchType.BO3 &&
-    match.matchType === MatchType.BO3
-  ) {
-    return "SEMIFINALS";
+export function determineIfKnockout(match) {
+  if (match.matchType === MatchType.BO3) {
+    return "PLAYOFFS";
   } else if (match.matchType === MatchType.BO5) {
-    return "FINALS";
+    return "GRAND FINALS";
   } else {
     return "";
   }

@@ -46,25 +46,27 @@ export default async function getFranchiseDetails(slug, season) {
     });
 
     const futureTeamGames = futureGames
-      .map((game, i, futureGames) => {
-        let knockoutType;
-        if (i !== 0) {
-          knockoutType = determineIfKnockout(game, futureGames, i);
-        }
+      .map((game) => {
+        const knockoutType = determineIfKnockout(game);
+
         if (game.home === team.id || game.away === team.id) {
           const formattedDate = formatDate(game.dateScheduled);
-          const packagedMatch = packageMatch(game, 0, 0, formattedDate);
+          const packagedMatch = packageMatch(
+            game,
+            0,
+            0,
+            formattedDate,
+            knockoutType,
+          );
           return packagedMatch;
         }
       })
       .filter((game) => game !== undefined);
 
     const pastTeamGames = pastGames
-      .map((game, i, pastGames) => {
-        let knockoutType;
-        if (i !== 0) {
-          knockoutType = determineIfKnockout(game, pastGames, i);
-        }
+      .map((game) => {
+        const knockoutType = determineIfKnockout(game);
+
         if (game.home === team.id || game.away === team.id) {
           let homeWins = 0;
           let awayWins = 0;
@@ -78,6 +80,7 @@ export default async function getFranchiseDetails(slug, season) {
             homeWins,
             awayWins,
             formattedDate,
+            knockoutType,
           );
           return packagedMatch;
         }
@@ -253,6 +256,7 @@ async function getPastGames(franchise, season) {
         lt: new Date(),
       },
     },
+    orderBy: [{ dateScheduled: "desc" }],
     include: {
       Home: {
         include: {

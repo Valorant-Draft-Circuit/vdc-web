@@ -8,9 +8,12 @@ export default function ScheduleCard({
   season;
 }) {
   const formattedDate = matchDay.split("|")[0];
-  const matchType = matchDay.knockoutType
-    ? matchDay.knockoutType
-    : season[matchDay][0].matchType;
+  const matchType =
+    season[matchDay][0].knockoutType === "PLAYOFFS"
+      ? `${season[matchDay][0].knockoutType} R${season[matchDay][0].playoffRound}`
+      : season[matchDay][0].knockoutType === "GRAND FINALS"
+        ? season[matchDay][0].knockoutType
+        : season[matchDay][0].matchType;
 
   return (
     <div className="overflow-hidden rounded-lg shadow-sm bg-vdcRed p-3 px-auto">

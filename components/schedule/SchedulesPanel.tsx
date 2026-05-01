@@ -32,6 +32,8 @@ export default function SchedulePanel({
       const allDays = [
         ...Object.keys(data.schedule.preSeason || {}),
         ...Object.keys(data.schedule.regularSeason || {}),
+        ...Object.keys(data.schedule.bo3Season || {}),
+        ...Object.keys(data.schedule.bo5Season || {}),
       ];
       setSchedule(data.schedule);
       setMatchDays(allDays);
@@ -157,8 +159,11 @@ export default function SchedulePanel({
         {matchDays.map((day) => {
           const seasonData = schedule?.preSeason[day]
             ? schedule.preSeason
-            : schedule?.regularSeason;
-
+            : {
+                ...schedule?.regularSeason,
+                ...schedule?.bo3Season,
+                ...schedule?.bo5Season,
+              };
           return (
             <div
               key={day}
