@@ -9,6 +9,7 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { BEHAVIOR_GUIDELINE_URL } from "@/lib/common/constants";
+import { getLocalMatchDayTime } from "@/lib/common/times";
 
 export default function Questions({
   register,
@@ -66,7 +67,7 @@ export default function Questions({
             <h2>
               Are you able to play 2 maps{" "}
               <span className="text-vdcRed">EVERY </span>Wednesday and Friday at{" "}
-              {getLocalTime()} (9:00 PM EST)?
+              {getLocalMatchDayTime()} (9:00 PM EST)?
             </h2>
           </div>
         </>
@@ -156,19 +157,8 @@ export default function Questions({
     },
   ];
 
-  function getLocalTime() {
-    const localTime = new Date("2023-03-08T02:00:00Z").toLocaleTimeString(
-      "en-US",
-      { hour: "2-digit", minute: "2-digit" }
-    );
-    const tz = new Date()
-      .toLocaleTimeString("en-us", { timeZoneName: "short" })
-      .split(" ")[2];
-    return localTime + " " + tz;
-  }
-
   return (
-    <div className="divide-y-1 divide-vdcGrey">
+    <div className="divide-y divide-vdcGrey">
       {reqQuestions.map(
         (q) =>
           q.show && (
@@ -181,7 +171,7 @@ export default function Questions({
                 rules={q.rules}
               />
             </div>
-          )
+          ),
       )}
     </div>
   );
@@ -263,7 +253,7 @@ function RoleExplanations(props: { rfaOnly: boolean }) {
                 </p>
               </DisclosurePanel>
             </Disclosure>
-          )
+          ),
       )}
     </dl>
   );
