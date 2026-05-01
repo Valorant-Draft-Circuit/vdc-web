@@ -7,31 +7,43 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { Metadata } from "next";
+import { matchDayTimeWithFallback } from "@/lib/common/times";
 
 const faqs = [
   {
     question: "What is VDC?",
-    answer: "We are an NA based, community run Valorant league for all skill levels. We offer a casual-competitive season-based environment without the need to make a team of your own.",
+    answer:
+      "We are an NA based, community run Valorant league for all skill levels. We offer a casual-competitive season-based environment without the need to make a team of your own.",
+  },
+  {
+    question: "When are VDC match days?",
+    answer:
+      "VDC standard match days are every Wednesdays and Fridays at {{localtime}} during an ongoing season.",
   },
   {
     question: "What rank do I need to be?",
-    answer: "All skill levels are welcome and able to play! We divide our players between skill-based tiers that include players ranging from Iron to Radiant. All Valorant players have a chance to play in a competitive and fun environment.",
+    answer:
+      "All skill levels are welcome and able to play! We divide our players between skill-based tiers that include players ranging from Iron to Radiant. All Valorant players have a chance to play in a competitive and fun environment.",
   },
   {
     question: "How do I join a team?",
-    answer: "After combines are completed, we hold a draft. Every player is drafted onto a team and will have an opportunity to tryout with their team to make a final roster spot. Pre-made teams may not enter.",
+    answer:
+      "After combines are completed, we hold a draft. Every player is drafted onto a team and will have an opportunity to tryout with their team to make a final roster spot. Pre-made teams may not enter.",
   },
   {
     question: "What are combines?",
-    answer: "Combines are 5v5 in house games where your stats are recorded before the official season begins. They are scouting grounds for General Managers to see who they want to add to their teams.",
+    answer:
+      "Combines are 5v5 in house games where your stats are recorded before the official season begins. They are scouting grounds for General Managers to see who they want to add to their teams.",
   },
   {
     question: "Can I join or play even if I can't commit to the match days?",
-    answer: "Absolutely! There's an option to play as a restricted free agent and play as a sub for the season. Additionally we have an active LFG where you can join PUGs and 10mans! We also need people to help run our league. Have talents in media, tech, art, and others? Come join and talk to us!",
+    answer:
+      "Absolutely! There's an option to play as a restricted free agent and play as a sub for the season. Additionally we have an active LFG where you can join PUGs and 10mans! We also need people to help run our league. Have talents in media, tech, art, and others? Come join and talk to us!",
   },
   {
     question: "This sounds too good to be true... What's the catch?",
-    answer: "That's the best part! There are none! There are no entry fees or costs. The only requirement to join is that you are willing to commit to the team that drafts you, and more importantly that you have fun.",
+    answer:
+      "That's the best part! There are none! There are no entry fees or costs. The only requirement to join is that you are willing to commit to the team that drafts you, and more importantly that you have fun.",
   },
 ];
 
@@ -41,7 +53,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-
   return (
     <div>
       <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
@@ -91,7 +102,10 @@ export default async function Page() {
                 </dt>
                 <DisclosurePanel as="dd" className="mt-2 pr-12">
                   <p className="text-base/7 text-vdcBlack dark:text-vdcWhite">
-                    {faq.answer}
+                    {faq.answer.replace(
+                      "{{localtime}}",
+                      matchDayTimeWithFallback(),
+                    )}
                   </p>
                 </DisclosurePanel>
               </Disclosure>
