@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
 import { getUser } from "@/lib/queries/user/user";
 import { getSignupState } from "@/lib/queries/control/control";
+import { getLocalMatchDayTime } from "@/lib/common/times";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
 export default async function HeroSection({ session }) {
@@ -28,7 +29,7 @@ export default async function HeroSection({ session }) {
               clipPath:
                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
             }}
-            className="relative left-[calc(50%-7rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-slate-800 to-black brightness-20 lg:left-[calc(50%-30rem)] lg:w-[72.1875rem]"
+            className="relative left-[calc(50%-7rem)] aspect-1155/678 w-144.5` -translate-x-1/2 rotate-30 bg-linear-to-tr from-slate-800 to-black brightness-20 lg:left-[calc(50%-30rem)] lg:w-288.75"
           />
         </div>
         <div className="bg-vdcBlack py-8 mx-2 rounded-2xl flex flex-col space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-8/12">
@@ -45,7 +46,9 @@ export default async function HeroSection({ session }) {
             <p className="text-white text-md italic">
               VDC is an NA based, community run VALORANT league for all skill
               levels. We offer a casually competitive season based environment
-              without the need to make a team of your own.
+              without the need to make a team of your own. Our match days are
+              every Wednesdays and Fridays at {getLocalMatchDayTime()} during
+              the season.
             </p>
           </div>
         </div>
