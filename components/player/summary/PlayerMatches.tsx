@@ -141,8 +141,8 @@ function ComebineGame({
     ["FK", stat.firstKills],
     ["FD", stat.firstDeaths],
 
-    ["PL", stat.plants],
-    ["DE", stat.defuses],
+    ["P", stat.plants],
+    ["D", stat.defuses],
 
     ["AEK", stat.antiEcoKills],
     ["AED", stat.antiEcoDeaths],
