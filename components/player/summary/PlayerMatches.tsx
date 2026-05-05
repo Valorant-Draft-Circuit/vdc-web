@@ -135,14 +135,14 @@ function ComebineGame({
   const tierOutlineColor = tierOutlineMap[tier];
 
   const statPairs = [
-    ["ATK", stat.ratingAttack.toFixed(2)],
-    ["DEF", stat.ratingDefense.toFixed(2)],
+    ["A", stat.ratingAttack.toFixed(2)],
+    ["D", stat.ratingDefense.toFixed(2)],
 
     ["FK", stat.firstKills],
     ["FD", stat.firstDeaths],
 
-    ["PLANTS", stat.plants],
-    ["DEFUSES", stat.defuses],
+    ["P", stat.plants],
+    ["D", stat.defuses],
 
     ["AEK", stat.antiEcoKills],
     ["AED", stat.antiEcoDeaths],
@@ -196,7 +196,7 @@ function ComebineGame({
           </div>
           <div className="flex flex-row py-2 justify-between w-full">
             <IndividualOverview stat={stat} mapUrl={mapUrl} />
-            <div className="m-auto grid grid-rows-2 grid-flow-col gap-2 text-xs italic">
+            <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs italic">
               {statPairs.map(([label, value], i) => (
                 <h1 key={i}>
                   {label}: <span className="text-gray-400">{value}</span>

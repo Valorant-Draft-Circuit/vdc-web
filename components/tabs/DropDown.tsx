@@ -69,7 +69,7 @@ export default function ListBox({
 
         <ListboxOptions
           transition
-          className="absolute bg-vdcWhite dark:bg-vdcBlack rounded-sm mt-1 w-full border border-gray-300 focus:outline-none transition duration-100 ease-in data-leave:data-closed:opacity-0"
+          className="z-50 absolute bg-vdcWhite dark:bg-vdcBlack rounded-sm mt-1 w-full border border-gray-300 focus:outline-none transition duration-100 ease-in data-leave:data-closed:opacity-0"
         >
           {menuElements.map((element) => (
             <ListboxOption
