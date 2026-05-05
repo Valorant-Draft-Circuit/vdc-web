@@ -34,7 +34,7 @@ export default function HorizontalTab({
   const fallbackQuery =
     defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
   const effectiveQuery = queryParam || fallbackQuery;
-  
+
   useEffect(() => {
     if (!queryParam) {
       replaceParam(params, fallbackQuery);
@@ -42,11 +42,11 @@ export default function HorizontalTab({
   }, [queryParam]);
 
   const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === effectiveQuery
+    (t) => t.query.toLowerCase() === effectiveQuery,
   );
 
   const [selectedIndex, setSelectedIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0
+    initialIndex >= 0 ? initialIndex : 0,
   );
   const router = useRouter();
   const pathname = usePathname();

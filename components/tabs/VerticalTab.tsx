@@ -33,18 +33,19 @@ export default function VerticalTab({
 
   useEffect(() => {
     if (!queryParam) {
-      const fallback = defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
+      const fallback =
+        defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
       replaceParam(params, fallback);
     }
   }, [queryParam]);
 
   const initialQuery = queryParam || defaultQuery || tabElements[0].query;
   const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === initialQuery.toLowerCase()
+    (t) => t.query.toLowerCase() === initialQuery.toLowerCase(),
   );
-  
+
   const [selectedIndex, setSelectedIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0
+    initialIndex >= 0 ? initialIndex : 0,
   );
   const router = useRouter();
   const pathname = usePathname();
