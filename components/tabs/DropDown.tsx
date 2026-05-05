@@ -29,7 +29,7 @@ export default function ListBox({
   const urlParam = searchParams.get(paramsKey) ?? menuElements[0].query;
 
   const [selected, setSelected] = useState<TMenuElement>(
-    menuElements.find((m) => m.query === urlParam) || menuElements[0]
+    menuElements.find((m) => m.query === urlParam) || menuElements[0],
   );
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function ListBox({
   }, [searchParams]);
 
   return (
-    <div className="xl:px-0 sm:px-12">
+    <div className="xl:px-0 sm:px-12 relative">
       <Listbox value={selected} onChange={setSelected}>
         <ListboxButton
           className="relative flex flex-row rounded-md py-2 pl-4 pr-8 w-full 
@@ -69,7 +69,7 @@ export default function ListBox({
 
         <ListboxOptions
           transition
-          className="rounded-sm mt-1 w-full border border-gray-300 focus:outline-none transition duration-100 ease-in data-leave:data-closed:opacity-0"
+          className="absolute bg-vdcWhite dark:bg-vdcBlack rounded-sm mt-1 w-full border border-gray-300 focus:outline-none transition duration-100 ease-in data-leave:data-closed:opacity-0"
         >
           {menuElements.map((element) => (
             <ListboxOption

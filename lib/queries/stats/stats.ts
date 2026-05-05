@@ -219,6 +219,17 @@ type TStatsQuery = {
   teamId?: number;
 };
 
+type TPlayerStatsQuery = {
+  season: number;
+  riotIgn: string;
+  gameType: GameType;
+};
+
+export async function getPlayerStatsBy(playerStatsQuery: TPlayerStatsQuery) {
+  const playerStats = await getPlayerStats(playerStatsQuery);
+  return playerStats;
+}
+
 export async function getStatsBy(statsQuery: TStatsQuery) {
   let playerStats;
   if (statsQuery.gameId) {
@@ -234,6 +245,27 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
     playerStats = await getOverallPlayerStats(statsQuery);
     return await formatStats(playerStats);
   }
+}
+
+async function getPlayerStats(playerStatsQuery: TPlayerStatsQuery) {
+  const userId = await prisma.account.findFirst({
+    where: { riotIGN: playerStatsQuery.riotIgn },
+    select: { userId: true },
+  });
+  if (!userId) {
+    throw new Error(`No user found with riotIGN: ${playerStatsQuery.riotIgn}`);
+  }
+
+  return prisma.playerStats.findMany({
+    where: {
+      AND: [
+        { userID: userId.userId },
+        { Game: { gameType: playerStatsQuery.gameType } },
+        { Game: { season: playerStatsQuery.season } },
+      ],
+    },
+    include: { Game: { include: { Match: true } } },
+  });
 }
 
 async function getStatsByTeam(teamId: number, season: number) {
@@ -263,7 +295,7 @@ async function getStatsByTeam(teamId: number, season: number) {
 }
 
 async function getAggregatedPlayerStatsByMatch(
-  matchId: string
+  matchId: string,
 ): Promise<(GroupedPlayerStats & { agents: string[] })[]> {
   const match = await prisma.matches.findFirst({
     where: { matchID: Number(matchId) },
@@ -305,64 +337,67 @@ async function getAggregatedPlayerStatsByMatch(
 
   const allStats = match.Games.flatMap((g) => g.PlayerStats);
 
-  const grouped = allStats.reduce((acc, stat) => {
-    const u = stat.userID;
+  const grouped = allStats.reduce(
+    (acc, stat) => {
+      const u = stat.userID;
 
-    if (!acc[u]) {
-      acc[u] = {
-        userID: u,
-        agents: new Set<string>(),
-        _sum: {
-          kills: 0,
-          deaths: 0,
-          assists: 0,
-          plants: 0,
-          defuses: 0,
-          firstKills: 0,
-          firstDeaths: 0,
-          tradeKills: 0,
-          tradeDeaths: 0,
-          ecoKills: 0,
-          antiEcoKills: 0,
-          ecoDeaths: 0,
-          exitKills: 0,
-          clutches: 0,
-        },
-        _avg: {
-          acs: 0,
-          ratingAttack: 0,
-          ratingDefense: 0,
-          kast: 0,
-          kills: 0,
-          assists: 0,
-          firstKills: 0,
-          firstDeaths: 0,
-          hsPercent: 0,
-        },
-        _count: {
-          userID: 0,
-        },
-      };
-    }
-    if (stat.agent) {
-      let normalizedAgent = stat.agent;
-      if (stat.agent === "KAYO") {
-        normalizedAgent = "KAY/O";
+      if (!acc[u]) {
+        acc[u] = {
+          userID: u,
+          agents: new Set<string>(),
+          _sum: {
+            kills: 0,
+            deaths: 0,
+            assists: 0,
+            plants: 0,
+            defuses: 0,
+            firstKills: 0,
+            firstDeaths: 0,
+            tradeKills: 0,
+            tradeDeaths: 0,
+            ecoKills: 0,
+            antiEcoKills: 0,
+            ecoDeaths: 0,
+            exitKills: 0,
+            clutches: 0,
+          },
+          _avg: {
+            acs: 0,
+            ratingAttack: 0,
+            ratingDefense: 0,
+            kast: 0,
+            kills: 0,
+            assists: 0,
+            firstKills: 0,
+            firstDeaths: 0,
+            hsPercent: 0,
+          },
+          _count: {
+            userID: 0,
+          },
+        };
       }
-      acc[u].agents.add(normalizedAgent);
-    }
+      if (stat.agent) {
+        let normalizedAgent = stat.agent;
+        if (stat.agent === "KAYO") {
+          normalizedAgent = "KAY/O";
+        }
+        acc[u].agents.add(normalizedAgent);
+      }
 
-    Object.keys(acc[u]._sum).forEach((key) => {
-      acc[u]._sum[key] += stat[key] ?? 0;
-    });
+      Object.keys(acc[u]._sum).forEach((key) => {
+        acc[u]._sum[key] += stat[key] ?? 0;
+      });
 
-    Object.keys(acc[u]._avg).forEach((key) => {
-      acc[u]._avg[key] += stat[key] ?? 0;
-    });
+      Object.keys(acc[u]._avg).forEach((key) => {
+        acc[u]._avg[key] += stat[key] ?? 0;
+      });
 
-    acc[u]._count.userID++;
-    return acc;
-  }, {} as Record<string, GroupedPlayerStats & { agents: Set<string> }>);
+      acc[u]._count.userID++;
+      return acc;
+    },
+    {} as Record<string, GroupedPlayerStats & { agents: Set<string> }>,
+  );
 
   return Object.values(grouped).map((entry) => {
     const n = entry._count.userID;
@@ -378,7 +413,7 @@ async function getAggregatedPlayerStatsByMatch(
 }
 
 export async function getPlayerStatsByGame(
-  gameID: string
+  gameID: string,
 ): Promise<GroupedGamePlayerStats[]> {
   const groupedStats = await prisma.playerStats.groupBy({
     where: {
@@ -491,7 +526,7 @@ async function getOverallPlayerStats(query: TStatsQuery) {
 
 async function formatStats(
   playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[],
-  statType?: string
+  statType?: string,
 ): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
   const userIds = playerStats.map((ps) => ps.userID);
 
@@ -509,7 +544,7 @@ async function formatStats(
   });
 
   const userMap: Record<string, PlayerNameTeam> = Object.fromEntries(
-    users.map((u) => [u.id, u])
+    users.map((u) => [u.id, u]),
   );
   if (statType === "gameStats") {
     return playerStats.map((stats): FormattedGameStat => {

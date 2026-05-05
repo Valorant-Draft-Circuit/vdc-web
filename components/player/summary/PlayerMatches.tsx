@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/theme/LoadingSpinner";
 import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import {
   AGENTS,
@@ -7,22 +8,34 @@ import {
   TEAM_LOGOS_URL,
 } from "@/lib/common/constants";
 import { TAgents, TMaps } from "@/lib/common/valorant-api";
-import { Tier } from "@prisma/client";
+import { GameType, Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function PlayerMatches({ stats }: { stats }) {
+export default function PlayerMatches({
+  stats,
+  gameType,
+}: {
+  stats;
+  gameType;
+}) {
+  const total = stats.length;
   return (
     <div className="divide-y">
       <div className="px-4 py-2 xl:px-6">
-        <h1 className="text-sm italic">Match History</h1>
+        <h1 className="text-sm italic">{gameType} Match History</h1>
       </div>
       <div>
         <ul role="list" className="flex flex-col gap-2 pt-2">
-          {[...stats].reverse().map((stat) => (
-            <Match stat={stat} key={stat.id} />
+          {[...stats].reverse().map((stat, i) => (
+            <Match
+              stat={stat}
+              gameType={gameType}
+              key={stat.id}
+              matchCount={total - i}
+            />
           ))}
         </ul>
       </div>
@@ -30,7 +43,7 @@ export default function PlayerMatches({ stats }: { stats }) {
   );
 }
 
-function Match({ stat }: { stat }) {
+function Match({ stat, gameType, matchCount }: { stat; gameType; matchCount }) {
   const [maps, setMaps] = useState<TMaps>();
   const router = useRouter();
 
@@ -64,6 +77,72 @@ function Match({ stat }: { stat }) {
     day: `2-digit`,
     weekday: "short",
   });
+
+  if (gameType === GameType.COMBINE) {
+    return ComebineGame({ stat, date, matchCount });
+  } else {
+    return SeasonGame({ stat, maps, router, date });
+  }
+}
+
+function ComebineGame({ stat, date, matchCount }: { stat; date; matchCount }) {
+  const tier = stat.Game.tier;
+  const TIER_BG_MAP: Record<Tier, string> = {
+    MYTHIC: "bg-vdcPurple/30",
+    EXPERT: "bg-vdcBlue/30",
+    APPRENTICE: "bg-vdcGreen/30",
+    PROSPECT: "bg-vdcYellow/30",
+    RECRUIT: "bg-vdcOrange/30",
+    MIXED: "bg-transparent",
+  };
+  const tierColor = TIER_BG_MAP[tier];
+
+  return (
+    <div className="relative rounded-md">
+      <li
+        key={stat.id}
+        className={`${tierColor} p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
+      >
+        <div
+          className={
+            "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite flex flex-col divide-y"
+          }
+        >
+          <div className="flex flex-row gap-2">
+            <h1 className={"text-vdcGrey dark:text-vdcWhite  text-xs italic"}>
+              {date} - {tier} COMBINE #{matchCount}
+            </h1>
+          </div>
+          <div className="flex flex-row py-2 justify-between w-full">
+            <IndividualOverview stat={stat} />
+          </div>
+          <div className="flex flex-row">
+            <IndividualStats stats={stat} />
+          </div>
+        </div>
+      </li>
+    </div>
+  );
+}
+
+function SeasonGame({
+  stat,
+  maps,
+  router,
+  date,
+}: {
+  stat;
+  maps;
+  router;
+  date;
+}) {
+  if (!stat?.Game?.Match)
+    return (
+      <div className="flex m-auto">
+        <LoadingSpinner />
+      </div>
+    );
+
   const playerTeam = stat.team;
   let result = "Defeat";
   if (playerTeam === stat.Game.winner) {
@@ -81,11 +160,10 @@ function Match({ stat }: { stat }) {
   }
   const goToGame = () =>
     router.push(`/match/${stat.Game.Match.matchID}?game=${stat.Game.gameID}`);
-
   return (
     <div className="relative rounded-md">
       <Image
-        alt=""
+        alt="map"
         src={mapUrl}
         width={5000}
         height={5000}
@@ -103,7 +181,7 @@ function Match({ stat }: { stat }) {
             mapUrl
               ? "text-vdcWhite divide-vdcWhite"
               : "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite"
-          } flex flex-col divide-y-1`}
+          } flex flex-col divide-y`}
         >
           <div className="flex flex-row gap-2">
             <h1
@@ -127,19 +205,26 @@ function Match({ stat }: { stat }) {
     </div>
   );
 }
-
-function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
+function IndividualStats({ stats, mapUrl }: { stats; mapUrl? }) {
   const atk = stats.ratingAttack;
   const def = stats.ratingDefense;
   const rating = ((atk + def) / 2).toFixed(2);
-  const adr = (stats.damage / stats.Game.rounds).toFixed(2);
+  let damageStats, damageStatsName;
+  if (stats.Game.rounds) {
+    damageStatsName = "ADR";
+    damageStats = (stats.damage / stats.Game.rounds).toFixed(2);
+  } else {
+    damageStatsName = "TOTAL DMG";
+    damageStats = stats.damage;
+  }
   const hs = stats.hsPercent.toFixed(2);
   const statsList = [
     { name: "Rating", value: rating },
     { name: "ACS", value: stats.acs },
-    { name: "ADR", value: adr },
+    { name: damageStatsName, value: damageStats },
     { name: "HS%", value: `${hs}%` },
   ];
+
   return (
     <div className="grid grid-cols-4 gap-2 w-full px-2 pt-1 mx-auto">
       {statsList.map((stat, index) => (
@@ -156,7 +241,7 @@ function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
   );
 }
 
-function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
+function IndividualOverview({ stat, mapUrl }: { stat; mapUrl? }) {
   const [agents, setAgents] = useState<TAgents>();
   useEffect(() => {
     let isMounted = true;
