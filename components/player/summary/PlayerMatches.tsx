@@ -78,46 +78,134 @@ function Match({ stat, gameType, matchCount }: { stat; gameType; matchCount }) {
     weekday: "short",
   });
 
+  const map: string = stat.Game.map;
+  let mapUrl;
+  if (map) {
+    mapUrl = MAP_LIST_URL(maps[map.toUpperCase()]);
+  }
+
   if (gameType === GameType.COMBINE) {
-    return ComebineGame({ stat, date, matchCount });
+    return ComebineGame({ stat, date, matchCount, mapUrl });
   } else {
     return SeasonGame({ stat, maps, router, date });
   }
 }
 
-function ComebineGame({ stat, date, matchCount }: { stat; date; matchCount }) {
+function ComebineGame({
+  stat,
+  date,
+  matchCount,
+  mapUrl,
+}: {
+  stat;
+  date;
+  matchCount;
+  mapUrl;
+}) {
   const tier = stat.Game.tier;
-  const TIER_BG_MAP: Record<Tier, string> = {
-    MYTHIC: "bg-vdcPurple/30",
-    EXPERT: "bg-vdcBlue/30",
-    APPRENTICE: "bg-vdcGreen/30",
-    PROSPECT: "bg-vdcYellow/30",
-    RECRUIT: "bg-vdcOrange/30",
-    MIXED: "bg-transparent",
+  const tierBgMap: Record<Tier, string> = {
+    MYTHIC: "bg-vdcPurple/15",
+    EXPERT: "bg-vdcBlue/13",
+    APPRENTICE: "bg-vdcGreen/7",
+    PROSPECT: "bg-vdcYellow/5",
+    RECRUIT: "bg-vdcOrange/10",
+    MIXED: "bg-vdcRed/10",
   };
-  const tierColor = TIER_BG_MAP[tier];
+
+  const tierBgGradientMap: Record<Tier, string> = {
+    MYTHIC: "from-vdcPurple/30",
+    EXPERT: "from-vdcBlue/30",
+    APPRENTICE: "from-vdcGreen/30",
+    PROSPECT: "from-vdcYellow/30",
+    RECRUIT: "from-vdcOrange/30",
+    MIXED: "from-vdcRed/30",
+  };
+
+  const tierOutlineMap: Record<Tier, string> = {
+    MYTHIC: "outline-vdcPurple",
+    EXPERT: "outline-vdcBlue",
+    APPRENTICE: "outline-vdcGreen",
+    PROSPECT: "outline-vdcYellow",
+    RECRUIT: "outline-vdcOrange",
+    MIXED: "outline-vdcRed",
+  };
+
+  const tierBgColor = tierBgMap[tier];
+  const tierBgFrom = tierBgGradientMap[tier];
+  const tierOutlineColor = tierOutlineMap[tier];
+
+  const statPairs = [
+    ["ATK", stat.ratingAttack.toFixed(2)],
+    ["DEF", stat.ratingDefense.toFixed(2)],
+
+    ["FK", stat.firstKills],
+    ["FD", stat.firstDeaths],
+
+    ["PLANTS", stat.plants],
+    ["DEFUSES", stat.defuses],
+
+    ["AEK", stat.antiEcoKills],
+    ["AED", stat.antiEcoDeaths],
+
+    ["TK", stat.tradeKills],
+    ["TD", stat.tradeDeaths],
+
+    ["KAST", `${stat.kast}%`],
+    ["CLUT", stat.clutches],
+  ];
 
   return (
     <div className="relative rounded-md">
+      {mapUrl && (
+        <Image
+          alt="map"
+          src={mapUrl}
+          width={5000}
+          height={5000}
+          className="absolute inset-0 -z-20 size-full object-cover brightness-30 rounded-md"
+        />
+      )}
       <li
         key={stat.id}
-        className={`${tierColor} p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
+        className={`${mapUrl ? tierBgColor : `bg-linear-to-tl ${tierBgFrom} to-white dark:to-vdcBlack ${tierOutlineColor} outline`} p-2 rounded-md`}
       >
         <div
-          className={
-            "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite flex flex-col divide-y"
-          }
+          className={`${
+            mapUrl
+              ? "text-vdcWhite divide-vdcWhite"
+              : "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite"
+          } flex flex-col divide-y`}
         >
-          <div className="flex flex-row gap-2">
-            <h1 className={"text-vdcGrey dark:text-vdcWhite  text-xs italic"}>
+          <div className="flex flex-row gap-2 justify-between">
+            <h1
+              className={`${
+                mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
+              } text-xs italic`}
+            >
               {date} - {tier} COMBINE #{matchCount}
             </h1>
+            {stat.Game.map && (
+              <h1
+                className={`${
+                  mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
+                } text-xs italic`}
+              >
+                {stat.Game.map}
+              </h1>
+            )}
           </div>
           <div className="flex flex-row py-2 justify-between w-full">
-            <IndividualOverview stat={stat} />
+            <IndividualOverview stat={stat} mapUrl={mapUrl} />
+            <div className="m-auto grid grid-rows-2 grid-flow-col gap-2 text-xs italic">
+              {statPairs.map(([label, value], i) => (
+                <h1 key={i}>
+                  {label}: <span className="text-gray-400">{value}</span>
+                </h1>
+              ))}
+            </div>
           </div>
           <div className="flex flex-row">
-            <IndividualStats stats={stat} />
+            <IndividualStats stats={stat} mapUrl={mapUrl} />
           </div>
         </div>
       </li>
@@ -205,7 +293,8 @@ function SeasonGame({
     </div>
   );
 }
-function IndividualStats({ stats, mapUrl }: { stats; mapUrl? }) {
+
+function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
   const atk = stats.ratingAttack;
   const def = stats.ratingDefense;
   const rating = ((atk + def) / 2).toFixed(2);
@@ -241,7 +330,7 @@ function IndividualStats({ stats, mapUrl }: { stats; mapUrl? }) {
   );
 }
 
-function IndividualOverview({ stat, mapUrl }: { stat; mapUrl? }) {
+function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
   const [agents, setAgents] = useState<TAgents>();
   useEffect(() => {
     let isMounted = true;
