@@ -160,8 +160,8 @@ function ComebineGame({
         <Image
           alt="map"
           src={mapUrl}
-          width={3000}
-          height={3000}
+          width={5000}
+          height={5000}
           className="absolute inset-0 -z-20 size-full object-cover brightness-30 rounded-md"
         />
       )}
@@ -198,7 +198,7 @@ function ComebineGame({
             <IndividualOverview stat={stat} mapUrl={mapUrl} />
             <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs italic">
               {statPairs.map(([label, value], i) => (
-                <h1 key={i} className="flex flex-col xl:flex-row">
+                <h1 key={i} className="flex flex-col xl:flex-row xl:gap-2">
                   {label}: <span className="text-gray-400 text-center xl:text-start">{value}</span>
                 </h1>
               ))}
