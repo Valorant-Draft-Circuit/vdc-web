@@ -200,6 +200,7 @@ function ComebineGame({
               {statPairs.map(([label, value], i) => (
                 <h1 key={i} className="flex flex-col xl:flex-row">
                   {label}: <span className="text-gray-400 text-center xl:text-start">{value}</span>
+
                 </h1>
               ))}
             </div>
