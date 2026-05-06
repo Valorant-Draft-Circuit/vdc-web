@@ -122,10 +122,6 @@ export function hasFlags(
     typeof f === "string" ? parseInt(f, 16) : Number(f),
   );
 
-  if (normalized.includes(0)) {
-    return value === 0;
-  }
-
   if (mode === "all") {
     return normalized.every((flag) => (value & flag) !== 0);
   }
