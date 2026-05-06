@@ -51,7 +51,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   }
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
-    <div className="relative bg-gradient-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
+    <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
       <div className="flex flex-col gap-2">
         <div className="absolute inset-0 bg-black/80 pointer-events-none" />
         <ProfileBanner playerInfo={playerInfo} />
@@ -128,7 +128,7 @@ function QuickLinks({ ign, discordId }) {
     <>
       <a target="_blank" href={`${TRACKER_PROFILE_URL}/${ign}`}>
         <div
-          className={`flex flex-row px-3 py-2 bg-gradient-to-br bg-[#e2273c] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
+          className={`flex flex-row px-3 py-2 bg-linear-to-br bg-[#e2273c] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
         >
           <Image
             src="/external/trn-logo.svg"
@@ -141,7 +141,7 @@ function QuickLinks({ ign, discordId }) {
       </a>
       <a target="_blank" href={`https://discord.com/users/${discordId}`}>
         <div
-          className={`flex flex-row px-4 py-2 bg-gradient-to-br bg-[#5865F2] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
+          className={`flex flex-row px-4 py-2 bg-linear-to-br bg-[#5865F2] rounded-md text-xs text-vdcBlack gap-1 hover:brightness-80`}
         >
           <Image
             src="/external/discord-logo.svg"
@@ -193,7 +193,7 @@ function TierBadge(tier) {
             : tierString === Tier.EXPERT
             ? "to-blue-600"
             : "to-purple-600"
-        } flex flex-row px-2 py-1 bg-gradient-to-br from-vdcWhite rounded-md text-xs text-vdcBlack gap-1`}
+        } flex flex-row px-2 py-1 bg-linear-to-br from-vdcWhite rounded-md text-xs text-vdcBlack gap-1`}
       >
         <h1>{tierString}</h1>
       </div>
