@@ -106,7 +106,7 @@ export default async function Page({
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <div className="p-2 flex flex-col xl:gap-5">
-          <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 z-10 w-full">
+          <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">
             <div className="w-full">
               <ListBox
                 params={"Season"}
