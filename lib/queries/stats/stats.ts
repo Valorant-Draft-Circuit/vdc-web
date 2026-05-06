@@ -1,5 +1,6 @@
-import { avg } from "@/lib/common/utils";
+import { avg, hasFlags } from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
+import { Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
 
 export const HEADERS = [
@@ -156,6 +157,7 @@ export type PlayerNameTeam = {
   Team: {
     name: string;
   } | null;
+  flags: string;
 };
 
 export type FormattedStat = {
@@ -540,6 +542,7 @@ async function formatStats(
       Team: {
         select: { name: true },
       },
+      flags: true,
     },
   });
 
@@ -588,7 +591,22 @@ async function formatStats(
   } else {
     return playerStats.map((stats): FormattedStat => {
       const user = userMap[stats.userID];
-      const teamName = user?.Team?.name ?? "FA/RFA";
+
+      const isNewPlayer = hasFlags(user.flags, [0]);
+      const isRFA = hasFlags(user.flags, [Flags.REGISTERED_AS_RFA]);
+      const isFA = hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
+
+      let teamName;
+      if (!user?.Team?.name && isNewPlayer) {
+        teamName = "DE";
+      } else if (!user?.Team?.name && isRFA) {
+        teamName = "RFA";
+      } else if (!user?.Team?.name && isFA) {
+        teamName = "FA";
+      } else if (user?.Team?.name) {
+        teamName = user?.Team?.name;
+      }
+
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
 
