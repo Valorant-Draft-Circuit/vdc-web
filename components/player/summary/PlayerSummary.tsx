@@ -61,7 +61,7 @@ export default function PlayerSummary() {
   });
 
   return (
-    <div className="flex flex-col px-2 xl:px-0 gap-2">
+    <div className="flex flex-col xl:px-0 gap-2">
       {gameType?.toUpperCase() === GameType.COMBINE && <CombineDisclaimer />}
 
       <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
@@ -78,6 +78,7 @@ export default function PlayerSummary() {
     </div>
   );
 }
+
 function CombineDisclaimer() {
   return (
     <div className="rounded-md bg-vdcRed/30 dark:bg-vdcRed/10 p-4 mx-2 xl:mx-0 outline outline-vdcRed/20">
