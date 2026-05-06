@@ -592,7 +592,7 @@ async function formatStats(
     return playerStats.map((stats): FormattedStat => {
       const user = userMap[stats.userID];
 
-      const isNewPlayer = hasFlags(user.flags, [0]);
+      const isNewPlayer = !hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
       const isRFA = hasFlags(user.flags, [Flags.REGISTERED_AS_RFA]);
       const isFA = hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
 
