@@ -198,9 +198,8 @@ function ComebineGame({
             <IndividualOverview stat={stat} mapUrl={mapUrl} />
             <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs italic">
               {statPairs.map(([label, value], i) => (
-                <h1 key={i} className="flex flex-col xl:flex-row">
+                <h1 key={i} className="flex flex-col xl:flex-row xl:gap-2">
                   {label}: <span className="text-gray-400 text-center xl:text-start">{value}</span>
-
                 </h1>
               ))}
             </div>
