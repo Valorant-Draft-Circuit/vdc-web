@@ -33,7 +33,7 @@ declare module "@tanstack/react-table" {
 
 type TCombineFilter = "all" | "eDE" | "eFA";
 
-export default function StatsTable({ data, gameType }: { data; gameType }) {
+export default function StatsTable({ data, gameType }: { data; gameType? }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [combineFilter, setCombineFilter] = useState<TCombineFilter>("all");
   const [sorting, setSorting] = useState<SortingState>([
