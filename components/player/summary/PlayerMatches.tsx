@@ -160,8 +160,8 @@ function ComebineGame({
         <Image
           alt="map"
           src={mapUrl}
-          width={5000}
-          height={5000}
+          width={3000}
+          height={3000}
           className="absolute inset-0 -z-20 size-full object-cover brightness-30 rounded-md"
         />
       )}
