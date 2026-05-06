@@ -1,5 +1,5 @@
 import { LeagueStatus, Tier } from "@prisma/client";
-import { ControlPanel } from "@/prisma";
+import { ControlPanel, Flags } from "@/prisma";
 
 export const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
@@ -111,3 +111,24 @@ export async function getMMRTierLines() {
   return mmrTierLines;
 }
 
+export function hasFlags(
+  flags: string | number,
+  checkFlags: (Flags | number | string)[],
+  mode: "all" | "any" = "all",
+) {
+  const value = typeof flags === "string" ? parseInt(flags, 16) : flags;
+
+  const normalized = checkFlags.map((f) =>
+    typeof f === "string" ? parseInt(f, 16) : Number(f),
+  );
+
+  if (normalized.includes(0)) {
+    return value === 0;
+  }
+
+  if (mode === "all") {
+    return normalized.every((flag) => (value & flag) !== 0);
+  }
+
+  return normalized.some((flag) => (value & flag) !== 0);
+}

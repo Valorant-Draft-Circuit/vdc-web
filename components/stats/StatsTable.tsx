@@ -21,8 +21,8 @@ import {
 } from "@tanstack/react-table";
 import Link from "next/link";
 import Image from "next/image";
-
 import { useState, useMemo, useEffect, InputHTMLAttributes } from "react";
+import { FunnelIcon } from "@heroicons/react/24/outline";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,8 +30,12 @@ declare module "@tanstack/react-table" {
     filterVariant?: "text";
   }
 }
-export default function StatsTable({ data }) {
+
+type TCombineFilter = "all" | "eDE" | "eFA";
+
+export default function StatsTable({ data, gameType }: { data; gameType }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [combineFilter, setCombineFilter] = useState<TCombineFilter>("all");
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "acs",
@@ -100,8 +104,24 @@ export default function StatsTable({ data }) {
     }));
   }, [data]);
 
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    switch (combineFilter) {
+      case "eDE":
+        return data.filter(
+          (row) => row.team === "DE" && row.matchesPlayed >= 8,
+        );
+      case "eFA":
+        return data.filter(
+          (row) => row.team === "FA" && row.matchesPlayed >= 6,
+        );
+      default:
+        return data;
+    }
+  }, [data, combineFilter]);
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: {
       columnFilters,
@@ -138,8 +158,32 @@ export default function StatsTable({ data }) {
     );
   }
 
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "eDE", label: "Eligible DE's" },
+    { value: "eFA", label: "Eligible FA's" },
+  ];
+
   return (
-    <div className="max-h-[70vh] overflow-auto rounded-2xl border-1 border-gray-200 dark:border-gray-600">
+    <div className="max-h-[70vh] overflow-auto rounded-2xl border border-gray-200 dark:border-gray-600">
+      {gameType === "combine" && (
+        <div className="pl-2 pt-2 flex gap-2 text-xs items-center">
+          <FunnelIcon className="size-5" />
+          {filterOptions.map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => setCombineFilter(filter.value as TCombineFilter)}
+              className={`p-1 border rounded hover:cursor-pointer hover:text-vdcRed ${
+                combineFilter === filter.value
+                  ? "text-vdcRed border-vdcRed"
+                  : ""
+              }`}
+            >
+              <h1>{filter.label}</h1>
+            </button>
+          ))}
+        </div>
+      )}
       <table className="mx-auto w-full">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -197,7 +241,7 @@ function TableCol({ headerGroup, table }) {
                   <h1>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )
                       ?.toString()
                       .replace("_", " ")}
