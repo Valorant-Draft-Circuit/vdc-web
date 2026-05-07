@@ -32,13 +32,5 @@ export default function StatsPanel({ defaultQueries }) {
     }
     fetchStats();
   }, [seasonQuery, tierQuery, gameTypeQuery]);
-  return (
-    <StatsTable
-      data={data}
-      gameType={gameTypeQuery}
-      tier={tierQuery}
-      season={seasonQuery}
-      currentSeason={defaultQueries.season}
-    />
-  );
+  return <StatsTable data={data} gameType={gameTypeQuery} tier={tierQuery} />;
 }

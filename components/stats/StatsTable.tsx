@@ -37,14 +37,10 @@ export default function StatsTable({
   data,
   gameType,
   tier,
-  season,
-  currentSeason,
 }: {
   data;
   gameType?;
   tier?;
-  season?;
-  currentSeason?;
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [combineFilter, setCombineFilter] = useState<TCombineFilter>("all");
@@ -185,7 +181,7 @@ export default function StatsTable({
 
   return (
     <div className="max-h-[70vh] overflow-auto rounded-2xl border border-gray-200 dark:border-gray-600">
-      {gameType === "combine" && season === currentSeason && (
+      {gameType === "combine" && (
         <Filters
           combineFilter={combineFilter}
           setCombineFilter={setCombineFilter}
