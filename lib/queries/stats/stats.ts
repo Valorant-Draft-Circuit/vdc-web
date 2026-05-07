@@ -245,7 +245,7 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
     return await formatStats(playerStats, "teamStats");
   } else {
     playerStats = await getOverallPlayerStats(statsQuery);
-    return await formatStats(playerStats);
+    return await formatStats(playerStats, statsQuery.gameType);
   }
 }
 
@@ -529,6 +529,7 @@ async function getOverallPlayerStats(query: TStatsQuery) {
 async function formatStats(
   playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[],
   statType?: string,
+  gameType?: GameType,
 ): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
   const userIds = playerStats.map((ps) => ps.userID);
 
@@ -597,11 +598,11 @@ async function formatStats(
       const isFA = hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
 
       let teamName;
-      if (!user?.Team?.name && isNewPlayer) {
+      if (!user?.Team?.name && isNewPlayer && gameType === GameType.COMBINE) {
         teamName = "DE";
       } else if (!user?.Team?.name && isRFA) {
         teamName = "RFA";
-      } else if (!user?.Team?.name && isFA) {
+      } else if (!user?.Team?.name || isFA) {
         teamName = "FA";
       } else if (user?.Team?.name) {
         teamName = user?.Team?.name;
