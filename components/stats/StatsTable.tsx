@@ -22,7 +22,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useMemo, useEffect, InputHTMLAttributes } from "react";
-import { FunnelIcon } from "@heroicons/react/24/outline";
+import { Switch } from "@headlessui/react";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,9 +33,24 @@ declare module "@tanstack/react-table" {
 
 type TCombineFilter = "all" | "eDE" | "eFA";
 
-export default function StatsTable({ data, gameType }: { data; gameType? }) {
+export default function StatsTable({
+  data,
+  gameType,
+  tier,
+  season,
+  currentSeason,
+}: {
+  data;
+  gameType?;
+  tier?;
+  season?;
+  currentSeason?;
+}) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [combineFilter, setCombineFilter] = useState<TCombineFilter>("all");
+  const [currentTierOnlyFilter, setCurrentTierOnlyFilter] =
+    useState<boolean>(false);
+
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "acs",
@@ -106,19 +121,29 @@ export default function StatsTable({ data, gameType }: { data; gameType? }) {
 
   const filteredData = useMemo(() => {
     if (!data) return [];
+    console.log(currentTierOnlyFilter);
+
+    let dataToReturn = data;
+
+    if (currentTierOnlyFilter) {
+      dataToReturn = data.filter(
+        (row) => row.currentTier.toUpperCase() === tier.toUpperCase(),
+      );
+    }
+
     switch (combineFilter) {
       case "eDE":
-        return data.filter(
+        return dataToReturn.filter(
           (row) => row.team === "DE" && row.matchesPlayed >= 8,
         );
       case "eFA":
-        return data.filter(
+        return dataToReturn.filter(
           (row) => row.team === "FA" && row.matchesPlayed >= 6,
         );
       default:
-        return data;
+        return dataToReturn;
     }
-  }, [data, combineFilter]);
+  }, [data, combineFilter, currentTierOnlyFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -158,31 +183,15 @@ export default function StatsTable({ data, gameType }: { data; gameType? }) {
     );
   }
 
-  const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "eDE", label: "Eligible DE's" },
-    { value: "eFA", label: "Eligible FA's" },
-  ];
-
   return (
     <div className="max-h-[70vh] overflow-auto rounded-2xl border border-gray-200 dark:border-gray-600">
-      {gameType === "combine" && (
-        <div className="pl-2 pt-2 flex gap-2 text-xs items-center">
-          <FunnelIcon className="size-5" />
-          {filterOptions.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setCombineFilter(filter.value as TCombineFilter)}
-              className={`p-1 border rounded hover:cursor-pointer hover:text-vdcRed ${
-                combineFilter === filter.value
-                  ? "text-vdcRed border-vdcRed"
-                  : ""
-              }`}
-            >
-              <h1>{filter.label}</h1>
-            </button>
-          ))}
-        </div>
+      {gameType === "combine" && season === currentSeason && (
+        <Filters
+          combineFilter={combineFilter}
+          setCombineFilter={setCombineFilter}
+          currentTierOnlyFilter={currentTierOnlyFilter}
+          setCurrentTierOnlyFilter={setCurrentTierOnlyFilter}
+        />
       )}
       <table className="mx-auto w-full">
         <thead>
@@ -200,6 +209,56 @@ export default function StatsTable({ data, gameType }: { data; gameType? }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function Filters({
+  combineFilter,
+  setCombineFilter,
+  currentTierOnlyFilter,
+  setCurrentTierOnlyFilter,
+}) {
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "eDE", label: "Eligible DE's" },
+    { value: "eFA", label: "Eligible FA's" },
+  ];
+  return (
+    <div className="pl-2 pt-2 flex gap-2 text-xs items-center divide-x-2">
+      <div className="flex flex-row gap-2 pr-2">
+        {filterOptions.map((filter) => (
+          <button
+            key={filter.value}
+            onClick={() => setCombineFilter(filter.value as TCombineFilter)}
+            className={`p-1 xl:p-2 border rounded hover:cursor-pointer hover:text-vdcRed ${
+              combineFilter === filter.value ? "text-vdcRed border-vdcRed" : ""
+            }`}
+          >
+            <h1>{filter.label}</h1>
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-row items-center gap-2">
+        <h1 className="text-center">CURR TIER ONLY</h1>
+        <Switch
+          checked={currentTierOnlyFilter}
+          onChange={(val) => setCurrentTierOnlyFilter(val ? true : false)}
+          className="group relative inline-flex h-6 w-11 4xl:scale-150 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-vdcGrey transition-colors duration-200 ease-in-out inset-ring inset-ring-white/10 outline-offset-2 focus:ring-0 focus:ring-vdcWhite focus:ring-offset focus:outline-hidden data-checked:bg-vdcRed"
+        >
+          <span className="sr-only"></span>
+          <span className="pointer-events-none relative inline-block size-5 transform rounded-full bg-vdcWhite shadow-sm ring-0 transition duration-200 ease-in-out group-data-checked:translate-x-5">
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 flex size-full items-center justify-center transition-opacity duration-100 ease-in group-data-checked:opacity-0 group-data-checked:duration-100 group-data-checked:ease-out"
+            ></span>
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 flex size-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out group-data-checked:opacity-100 group-data-checked:duration-200 group-data-checked:ease-in"
+            ></span>
+          </span>
+        </Switch>
+      </div>
     </div>
   );
 }

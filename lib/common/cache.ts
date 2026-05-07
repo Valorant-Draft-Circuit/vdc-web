@@ -11,6 +11,7 @@ import { Prisma, Tier } from "@prisma/client";
 import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
 import { getAgents, getMaps, TAgents, TMaps } from "./valorant-api";
+import { getMMRTierLines } from "./utils";
 
 let cache: NodeCache;
 initCache();
@@ -65,7 +66,7 @@ export async function getSeasonCached(): Promise<number> {
 // }
 
 export async function getFranchiseStandingsCached(
-  season: number
+  season: number,
 ): Promise<TStandingProps[]> {
   const key = "franchiseStandings";
   const hit = cache.get<TStandingProps[]>(key);
@@ -78,7 +79,7 @@ export async function getFranchiseStandingsCached(
 
 export async function getStandingsByCached(
   season: number,
-  tier: Tier
+  tier: Tier,
 ): Promise<TStandingProps[]> {
   const key = `s${season}-${tier.toLocaleLowerCase()}-standing`;
   const hit = cache.get<TStandingProps[]>(key);
@@ -109,7 +110,7 @@ export async function getAllTeamsByTierCached(tier: Tier): Promise<TTeam[]> {
 
 export async function getScheduleByTierCached(
   tier: Tier,
-  season: number
+  season: number,
 ): Promise<TSchedule> {
   const key = `s${season}-${tier}-schedule`;
   const hit = cache.get<TSchedule>(key);
@@ -138,7 +139,7 @@ export async function getAllActiveFranchisesCached() {
 
 export async function getFranchiseDetailsBySlugCached(
   slug: string,
-  season: number
+  season: number,
 ) {
   const key = `s${season}-${slug}-franchise`;
   const hit = cache.get(key);
@@ -157,4 +158,22 @@ export async function getTeamByIdCached(id: number) {
   const team = await Team.getBy({ id: id });
   cache.set(key, team, Times.DAY);
   return team;
+}
+
+type TMmrTierLies = {
+  RECRUIT: { min: number; max: number };
+  PROSPECT: { min: number; max: number };
+  APPRENTICE: { min: number; max: number };
+  EXPERT: { min: number; max: number };
+  MYTHIC: { min: number; max: number };
+};
+
+export async function getMmmrTierLinesCached() {
+  const key = "mmrTierLines";
+  const hit = cache.get<TMmrTierLies>(key);
+  if (hit !== undefined) return hit;
+
+  const mmrTierLines = await getMMRTierLines();
+  cache.set(key, mmrTierLines, Times.DAY);
+  return mmrTierLines;
 }
