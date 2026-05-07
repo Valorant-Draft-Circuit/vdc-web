@@ -1,6 +1,6 @@
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
-import { getMMRTierLines } from "@/lib/common/utils";
+import { getMmmrTierLinesCached } from "@/lib/common/cache";
 import { getContractsData } from "@/lib/queries/staff/FM";
 import { ControlPanel, Roles } from "@/prisma";
 import { ContractStatus } from "@prisma/client";
@@ -32,7 +32,7 @@ export async function GET() {
 
   const contracts = await getContractsData();
 
-  const tierlines = await getMMRTierLines();
+  const tierlines = await getMmmrTierLinesCached();
   const FMAccess = await ControlPanel.getDisplayMMRFM();
 
   const formattedContracts = contracts.map((contract) => {
