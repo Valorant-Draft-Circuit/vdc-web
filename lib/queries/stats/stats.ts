@@ -622,12 +622,12 @@ async function formatStats(opts: {
 
       let teamName;
       if (opts.gameType === GameType.COMBINE) {
-        if (!user?.Team?.name && isNewPlayer) {
+        if (!user?.Team?.name && isRFA) {
+          teamName = "RFA";
+        } else if (!user?.Team?.name && isNewPlayer) {
           teamName = "DE";
         } else if (!user?.Team?.name && isFA) {
           teamName = "FA";
-        } else if (!user?.Team?.name && isRFA) {
-          teamName = "RFA";
         } else if (user?.Team?.name) {
           teamName = user?.Team?.name;
         }
