@@ -1,6 +1,5 @@
 import {
   avg,
-  determineTier,
   determineTierWithTierLines,
   getMMRTierLines,
   hasFlags,
@@ -564,9 +563,9 @@ async function formatStats(opts: {
     },
   });
 
-  let users: PlayerNameTeam[] = [];
+  const users: PlayerNameTeam[] = [];
   usersData.forEach((userData) => {
-    const userMmr = userData?.PrimaryRiotAccount?.MMR?.mmrEffective!;
+    const userMmr = userData?.PrimaryRiotAccount?.MMR?.mmrEffective;
     const userTier = determineTierWithTierLines(userMmr!, mmrTierLines) as Tier;
     users.push({ ...userData, tier: userTier });
   });
