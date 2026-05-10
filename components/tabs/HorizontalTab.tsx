@@ -34,7 +34,7 @@ export default function HorizontalTab({
   const fallbackQuery =
     defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
   const effectiveQuery = queryParam || fallbackQuery;
-  
+
   useEffect(() => {
     if (!queryParam) {
       replaceParam(params, fallbackQuery);
@@ -42,11 +42,11 @@ export default function HorizontalTab({
   }, [queryParam]);
 
   const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === effectiveQuery
+    (t) => t.query.toLowerCase() === effectiveQuery,
   );
 
   const [selectedIndex, setSelectedIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0
+    initialIndex >= 0 ? initialIndex : 0,
   );
   const router = useRouter();
   const pathname = usePathname();
@@ -150,7 +150,7 @@ export function MobileTabs({
             />
           </ListboxButton>
 
-          <ListboxOptions className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+          <ListboxOptions className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
             {tabElements.map((tab) => (
               <ListboxOption
                 key={tab.query}

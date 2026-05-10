@@ -32,7 +32,7 @@ export default async function Page() {
 
   const gameTypeList = gameTypes.map((game) => ({
     query: game.toLocaleLowerCase(),
-    name: `${game.replace("_", "")} STATS`,
+    name: `${game.replace("_", "")}`,
   }));
 
   const userTier = await getUserTier({ isStats: true });

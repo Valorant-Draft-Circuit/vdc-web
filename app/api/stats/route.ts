@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       {
         error: `Missing params. You must provide season, tier, and type`,
       },
-      { status: 422 }
+      { status: 422 },
     );
   }
 

@@ -18,7 +18,7 @@ export default function StatsPanel({ defaultQueries }) {
       if (seasonQuery && gameTypeQuery && tierQuery) {
         try {
           const res = await fetch(
-            `/api/stats?type=${gameTypeQuery}&tier=${tierQuery}&season=${seasonQuery}`
+            `/api/stats?type=${gameTypeQuery}&tier=${tierQuery}&season=${seasonQuery}`,
           );
           if (!res.ok) {
             throw new Error(`Error fetching stats: ${res.status}`);
@@ -32,6 +32,5 @@ export default function StatsPanel({ defaultQueries }) {
     }
     fetchStats();
   }, [seasonQuery, tierQuery, gameTypeQuery]);
-
-  return <StatsTable data={data} />;
+  return <StatsTable data={data} gameType={gameTypeQuery} tier={tierQuery} />;
 }

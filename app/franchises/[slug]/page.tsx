@@ -70,7 +70,7 @@ export default async function Page({
   }
 
   return (
-    <div className="mx-auto max-w-[100rem] pb-10 xl:px-8 xl:py-12">
+    <div className="mx-auto max-w-400 pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
         <div
           style={{ "--p": primary, "--s": secondary } as React.CSSProperties}

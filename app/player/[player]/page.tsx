@@ -9,6 +9,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { listAllSeasons } from "@/lib/common/utils";
+import { ControlPanel } from "@/prisma";
 
 type TPlayerIGN = {
   encoded: string;
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let playerIGN;
   if (NUMBER_REGEX.test(player)) {
     const res = await fetch(
-      `${process.env.URL}/api/users/discord/${player}/riot`
+      `${process.env.URL}/api/users/discord/${player}/riot`,
     );
     if (res.ok) {
       const riotIGN: string = await res.json();
@@ -51,10 +52,20 @@ export default async function Page({
 }) {
   const currentSeason = await getSeasonCached();
   const listOfAllSeasons = listAllSeasons(currentSeason);
-  const menuElements = listOfAllSeasons.map((season) => ({
+  const seasonsMenu = listOfAllSeasons.map((season) => ({
     query: season,
     name: `SEASON ${season}`,
   }));
+
+  const gameTypeMenu = [
+    { query: "season", name: "SEASON" },
+    { query: "combine", name: "COMBINE" },
+  ];
+
+  const leagueState = await ControlPanel.getLeagueState();
+  if (leagueState === "COMBINES") {
+    gameTypeMenu.reverse();
+  }
 
   const { player } = await params;
   const playerIGN: TPlayerIGN = { encoded: "", decoded: "" };
@@ -95,11 +106,22 @@ export default async function Page({
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <div className="p-2 flex flex-col xl:gap-5">
-          <ListBox
-            params={"Season"}
-            menuElements={menuElements}
-            defaultDropDownQuery={currentSeason.toString()}
-          />
+          <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">
+            <div className="w-full">
+              <ListBox
+                params={"Season"}
+                menuElements={seasonsMenu}
+                defaultDropDownQuery={currentSeason.toString()}
+              />
+            </div>
+            <div className="w-full">
+              <ListBox
+                params={"type"}
+                menuElements={gameTypeMenu}
+                defaultDropDownQuery={gameTypeMenu.toString()}
+              />
+            </div>
+          </div>
           <HorizontalTab tabElements={tabElements} params={"by"} />
         </div>
       </div>
@@ -110,7 +132,7 @@ export default async function Page({
 async function handleDiscordIDSearch(discordID: string) {
   // TODO: rename api so its clear we are searching by discordID
   const res = await fetch(
-    `${process.env.URL}/api/users/discord/${discordID}/riot`
+    `${process.env.URL}/api/users/discord/${discordID}/riot`,
   );
   if (res.ok) {
     const riotIGN: string = await res.json();

@@ -36,3 +36,25 @@ export function getTimeUntil(matchDate: Date) {
 
   return timeUntil;
 }
+
+export function getLocalMatchDayTime() {
+  const localTime = new Date("2023-03-08T02:00:00Z").toLocaleTimeString(
+    "en-US",
+    { hour: "2-digit", minute: "2-digit" },
+  );
+  const tz = new Date()
+    .toLocaleTimeString("en-us", { timeZoneName: "short" })
+    .split(" ")[2];
+  return localTime + " " + tz;
+}
+
+export function matchDayTimeWithFallback() {
+  if (
+    !getLocalMatchDayTime().includes("EST") ||
+    !getLocalMatchDayTime().includes("EDT")
+  ) {
+    return `${getLocalMatchDayTime()} (9:00 EST)`;
+  } else {
+    return getLocalMatchDayTime();
+  }
+}

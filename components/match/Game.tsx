@@ -49,7 +49,7 @@ export default function Game({ game, gameNumber, delay = 0 }) {
       <div className="overflow-hidden">
         <div
           className={`flex flex-row xl:flex-col italic gap-5 px-5 py-10 text-vdcWhite rounded-lg ${
-            !map && "bg-gradient-to-br to-vdcBlack from-" + tierColor
+            !map && "bg-linear-to-br to-vdcBlack from-" + tierColor
           }`}
         >
           {map ? (

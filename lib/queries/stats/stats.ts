@@ -1,5 +1,11 @@
-import { avg } from "@/lib/common/utils";
+import {
+  avg,
+  determineTierWithTierLines,
+  getMMRTierLines,
+  hasFlags,
+} from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
+import { Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
 
 export const HEADERS = [
@@ -152,15 +158,21 @@ export type PlayerNameTeam = {
   id: string;
   PrimaryRiotAccount: {
     riotIGN: string | null;
+    MMR: {
+      mmrEffective: number | null;
+    } | null;
   } | null;
   Team: {
     name: string;
   } | null;
+  flags: string;
+  tier: Tier;
 };
 
 export type FormattedStat = {
   name: string | null;
   team: string;
+  currentTier: Tier;
   matchesPlayed: number;
   acs: number | null;
   attackRating: number | null;
@@ -219,21 +231,54 @@ type TStatsQuery = {
   teamId?: number;
 };
 
+type TPlayerStatsQuery = {
+  season: number;
+  riotIgn: string;
+  gameType: GameType;
+};
+
+export async function getPlayerStatsBy(playerStatsQuery: TPlayerStatsQuery) {
+  const playerStats = await getPlayerStats(playerStatsQuery);
+  return playerStats;
+}
+
 export async function getStatsBy(statsQuery: TStatsQuery) {
   let playerStats;
   if (statsQuery.gameId) {
     playerStats = await getPlayerStatsByGame(statsQuery.gameId);
-    return await formatStats(playerStats, "gameStats");
+    return await formatStats({ playerStats, statType: "gameStats" });
   } else if (statsQuery.matchId) {
     playerStats = await getAggregatedPlayerStatsByMatch(statsQuery.matchId);
-    return await formatStats(playerStats, "gameStats");
+    return await formatStats({ playerStats, statType: "gameStats" });
   } else if (statsQuery.teamId && statsQuery.season) {
     playerStats = await getStatsByTeam(statsQuery.teamId, statsQuery.season);
-    return await formatStats(playerStats, "teamStats");
+    return await formatStats({ playerStats, statType: "teamStats" });
   } else {
+    console.log(statsQuery.tier);
     playerStats = await getOverallPlayerStats(statsQuery);
-    return await formatStats(playerStats);
+    return await formatStats({ playerStats, gameType: statsQuery.gameType });
   }
+}
+
+async function getPlayerStats(playerStatsQuery: TPlayerStatsQuery) {
+  const userId = await prisma.account.findFirst({
+    where: { riotIGN: playerStatsQuery.riotIgn },
+    select: { userId: true },
+  });
+  if (!userId) {
+    throw new Error(`No user found with riotIGN: ${playerStatsQuery.riotIgn}`);
+  }
+
+  return prisma.playerStats.findMany({
+    where: {
+      AND: [
+        { userID: userId.userId },
+        { Game: { gameType: playerStatsQuery.gameType } },
+        { Game: { season: playerStatsQuery.season } },
+      ],
+    },
+    include: { Game: { include: { Match: true } } },
+  });
 }
 
 async function getStatsByTeam(teamId: number, season: number) {
@@ -263,7 +308,7 @@ async function getStatsByTeam(teamId: number, season: number) {
 }
 
 async function getAggregatedPlayerStatsByMatch(
-  matchId: string
+  matchId: string,
 ): Promise<(GroupedPlayerStats & { agents: string[] })[]> {
   const match = await prisma.matches.findFirst({
     where: { matchID: Number(matchId) },
@@ -305,64 +350,67 @@ async function getAggregatedPlayerStatsByMatch(
 
   const allStats = match.Games.flatMap((g) => g.PlayerStats);
 
-  const grouped = allStats.reduce((acc, stat) => {
-    const u = stat.userID;
+  const grouped = allStats.reduce(
+    (acc, stat) => {
+      const u = stat.userID;
 
-    if (!acc[u]) {
-      acc[u] = {
-        userID: u,
-        agents: new Set<string>(),
-        _sum: {
-          kills: 0,
-          deaths: 0,
-          assists: 0,
-          plants: 0,
-          defuses: 0,
-          firstKills: 0,
-          firstDeaths: 0,
-          tradeKills: 0,
-          tradeDeaths: 0,
-          ecoKills: 0,
-          antiEcoKills: 0,
-          ecoDeaths: 0,
-          exitKills: 0,
-          clutches: 0,
-        },
-        _avg: {
-          acs: 0,
-          ratingAttack: 0,
-          ratingDefense: 0,
-          kast: 0,
-          kills: 0,
-          assists: 0,
-          firstKills: 0,
-          firstDeaths: 0,
-          hsPercent: 0,
-        },
-        _count: {
-          userID: 0,
-        },
-      };
-    }
-    if (stat.agent) {
-      let normalizedAgent = stat.agent;
-      if (stat.agent === "KAYO") {
-        normalizedAgent = "KAY/O";
+      if (!acc[u]) {
+        acc[u] = {
+          userID: u,
+          agents: new Set<string>(),
+          _sum: {
+            kills: 0,
+            deaths: 0,
+            assists: 0,
+            plants: 0,
+            defuses: 0,
+            firstKills: 0,
+            firstDeaths: 0,
+            tradeKills: 0,
+            tradeDeaths: 0,
+            ecoKills: 0,
+            antiEcoKills: 0,
+            ecoDeaths: 0,
+            exitKills: 0,
+            clutches: 0,
+          },
+          _avg: {
+            acs: 0,
+            ratingAttack: 0,
+            ratingDefense: 0,
+            kast: 0,
+            kills: 0,
+            assists: 0,
+            firstKills: 0,
+            firstDeaths: 0,
+            hsPercent: 0,
+          },
+          _count: {
+            userID: 0,
+          },
+        };
       }
-      acc[u].agents.add(normalizedAgent);
-    }
+      if (stat.agent) {
+        let normalizedAgent = stat.agent;
+        if (stat.agent === "KAYO") {
+          normalizedAgent = "KAY/O";
+        }
+        acc[u].agents.add(normalizedAgent);
+      }
 
-    Object.keys(acc[u]._sum).forEach((key) => {
-      acc[u]._sum[key] += stat[key] ?? 0;
-    });
+      Object.keys(acc[u]._sum).forEach((key) => {
+        acc[u]._sum[key] += stat[key] ?? 0;
+      });
 
-    Object.keys(acc[u]._avg).forEach((key) => {
-      acc[u]._avg[key] += stat[key] ?? 0;
-    });
+      Object.keys(acc[u]._avg).forEach((key) => {
+        acc[u]._avg[key] += stat[key] ?? 0;
+      });
 
-    acc[u]._count.userID++;
-    return acc;
-  }, {} as Record<string, GroupedPlayerStats & { agents: Set<string> }>);
+      acc[u]._count.userID++;
+      return acc;
+    },
+    {} as Record<string, GroupedPlayerStats & { agents: Set<string> }>,
+  );
 
   return Object.values(grouped).map((entry) => {
     const n = entry._count.userID;
@@ -378,7 +426,7 @@ async function getAggregatedPlayerStatsByMatch(
 }
 
 export async function getPlayerStatsByGame(
-  gameID: string
+  gameID: string,
 ): Promise<GroupedGamePlayerStats[]> {
   const groupedStats = await prisma.playerStats.groupBy({
     where: {
@@ -489,30 +537,44 @@ async function getOverallPlayerStats(query: TStatsQuery) {
   });
 }
 
-async function formatStats(
-  playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[],
-  statType?: string
-): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
-  const userIds = playerStats.map((ps) => ps.userID);
-
-  const users: PlayerNameTeam[] = await prisma.user.findMany({
+async function formatStats(opts: {
+  playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[];
+  statType?: string;
+  gameType?: GameType;
+}): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
+  const userIds = opts.playerStats.map((ps) => ps.userID);
+  const mmrTierLines = await getMMRTierLines();
+  const usersData = await prisma.user.findMany({
     where: { id: { in: userIds } },
     select: {
       id: true,
       PrimaryRiotAccount: {
-        select: { riotIGN: true },
+        select: {
+          riotIGN: true,
+          MMR: {
+            select: { mmrEffective: true },
+          },
+        },
       },
       Team: {
         select: { name: true },
       },
+      flags: true,
     },
   });
 
+  const users: PlayerNameTeam[] = [];
+  usersData.forEach((userData) => {
+    const userMmr = userData?.PrimaryRiotAccount?.MMR?.mmrEffective;
+    const userTier = determineTierWithTierLines(userMmr!, mmrTierLines) as Tier;
+    users.push({ ...userData, tier: userTier });
+  });
+
   const userMap: Record<string, PlayerNameTeam> = Object.fromEntries(
-    users.map((u) => [u.id, u])
+    users.map((u) => [u.id, u]),
   );
-  if (statType === "gameStats") {
-    return playerStats.map((stats): FormattedGameStat => {
+  if (opts.statType === "gameStats") {
+    return opts.playerStats.map((stats): FormattedGameStat => {
       const user = userMap[stats.userID];
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
@@ -534,8 +596,8 @@ async function formatStats(
         hs: stats._avg.hsPercent,
       };
     });
-  } else if (statType === "teamStats") {
-    return playerStats.map((stats): FormattedTeamStat => {
+  } else if (opts.statType === "teamStats") {
+    return opts.playerStats.map((stats): FormattedTeamStat => {
       const user = userMap[stats.userID];
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
@@ -551,15 +613,41 @@ async function formatStats(
       };
     });
   } else {
-    return playerStats.map((stats): FormattedStat => {
+    return opts.playerStats.map((stats): FormattedStat => {
       const user = userMap[stats.userID];
-      const teamName = user?.Team?.name ?? "FA/RFA";
+
+      const isNewPlayer = !hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
+      const isRFA = hasFlags(user.flags, [Flags.REGISTERED_AS_RFA]);
+      const isFA = hasFlags(user.flags, [Flags.ACTIVE_LAST_SEASON]);
+
+      let teamName;
+      if (opts.gameType === GameType.COMBINE) {
+        if (!user?.Team?.name && isRFA) {
+          teamName = "RFA";
+        } else if (!user?.Team?.name && isNewPlayer) {
+          teamName = "DE";
+        } else if (!user?.Team?.name && isFA) {
+          teamName = "FA";
+        } else if (user?.Team?.name) {
+          teamName = user?.Team?.name;
+        }
+      } else {
+        if (!user?.Team?.name && isRFA) {
+          teamName = "RFA";
+        } else if (!user.Team?.name) {
+          teamName = "FA";
+        } else if (user?.Team?.name) {
+          teamName = user?.Team?.name;
+        }
+      }
+
       const kills = stats._sum.kills ?? 0;
       const deaths = stats._sum.deaths ?? 0;
 
       return {
         name: user?.PrimaryRiotAccount?.riotIGN ?? null,
         team: teamName,
+        currentTier: user.tier,
         matchesPlayed: stats._count.userID,
         acs: stats._avg.acs,
         attackRating: stats._avg.ratingAttack,
