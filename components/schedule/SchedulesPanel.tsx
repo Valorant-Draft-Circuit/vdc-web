@@ -26,12 +26,14 @@ export default function SchedulePanel({
     const fetchSchedule = async () => {
       const res = await fetch(
         `/api/schedule?tier=${tier}&season=${season || ""}`,
-        { next: { revalidate: 3600 } }
+        { next: { revalidate: 3600 } },
       );
       const data = await res.json();
       const allDays = [
         ...Object.keys(data.schedule.preSeason || {}),
         ...Object.keys(data.schedule.regularSeason || {}),
+        ...Object.keys(data.schedule.bo3Season || {}),
+        ...Object.keys(data.schedule.bo5Season || {}),
       ];
       setSchedule(data.schedule);
       setMatchDays(allDays);
@@ -102,7 +104,7 @@ export default function SchedulePanel({
 
       if (visibleDays.length > 0) {
         const closest = visibleDays.sort(
-          (a, b) => a.distanceToTop - b.distanceToTop
+          (a, b) => a.distanceToTop - b.distanceToTop,
         )[0];
         if (closest.day !== activeDay) {
           setActiveDay(closest.day);
@@ -157,8 +159,11 @@ export default function SchedulePanel({
         {matchDays.map((day) => {
           const seasonData = schedule?.preSeason[day]
             ? schedule.preSeason
-            : schedule?.regularSeason;
-
+            : {
+                ...schedule?.regularSeason,
+                ...schedule?.bo3Season,
+                ...schedule?.bo5Season,
+              };
           return (
             <div
               key={day}
@@ -180,7 +185,7 @@ export default function SchedulePanel({
 function PreviousDayButton({ matchDays, activeDay, scrollToDay }) {
   return (
     <button
-      className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
+      className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
       onClick={() => {
         const idx = matchDays.indexOf(activeDay!);
 

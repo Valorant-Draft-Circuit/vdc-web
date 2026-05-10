@@ -1,4 +1,4 @@
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { ControlPanel, Flags } from "@/prisma";
 import { getMmmrTierLinesCached } from "./cache";
 
@@ -17,13 +17,20 @@ export function formatDate(date: Date) {
   newDate.setDate(newDate.getDate() - 1);
 
   return newDate.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   });
 }
 
-export function packageMatch(match, homeWins, awayWins, formattedDate) {
+export function packageMatch(
+  match,
+  homeWins,
+  awayWins,
+  formattedDate,
+  knockoutType?,
+  playoffRound?,
+) {
   const homeTeam = match.Home!;
   const awayTeam = match.Away!;
   return {
@@ -33,6 +40,8 @@ export function packageMatch(match, homeWins, awayWins, formattedDate) {
     homeWins: homeWins,
     awayWins: awayWins,
     matchType: match.matchType,
+    knockoutType: knockoutType,
+    playoffRound: playoffRound,
     Home: {
       id: homeTeam.id,
       name: homeTeam.name,
@@ -120,6 +129,16 @@ export async function getMMRTierLines() {
   };
 
   return mmrTierLines;
+}
+
+export function determineIfKnockout(match) {
+  if (match.matchType === MatchType.BO3) {
+    return "PLAYOFFS";
+  } else if (match.matchType === MatchType.BO5) {
+    return "GRAND FINALS";
+  } else {
+    return "";
+  }
 }
 
 export function hasFlags(

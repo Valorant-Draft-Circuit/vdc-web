@@ -1,12 +1,18 @@
-import { formatDate, packageMatch } from "@/lib/common/utils";
+import {
+  determineIfKnockout,
+  formatDate,
+  packageMatch,
+} from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
 import { MatchType, Tier } from "@prisma/client";
 type TPackagedMatch = ReturnType<typeof packageMatch>;
 
 export type TSchedule = {
-  regularSeason: Record<string, TPackagedMatch[]>;
   preSeason: Record<string, TPackagedMatch[]>;
+  regularSeason: Record<string, TPackagedMatch[]>;
+  bo3Season: Record<string, TPackagedMatch[]>;
+  bo5Season: Record<string, TPackagedMatch[]>;
 };
 
 export async function getEveryUpcomingMatch() {
@@ -15,14 +21,20 @@ export async function getEveryUpcomingMatch() {
 }
 
 export async function getScheduleByTier(tier: Tier, season: number) {
-  const regularSeasonDatesToMatches = {};
   const preseasonDatesToMatches = {};
+  const regularSeasonDatesToMatches = {};
+  const bo3DatesToMatches = {};
+  const bo5DatesToMatches = {};
+
   const upcomingMatches = await getUpcomingMatches({
     tier: tier,
     season: season,
   });
-
+  let playoffRound = 0;
+  let lastMatchDay;
   upcomingMatches.map((match) => {
+    const knockoutType = determineIfKnockout(match);
+
     let homeWins = 0;
     let awayWins = 0;
     if (match.Games) {
@@ -45,26 +57,68 @@ export async function getScheduleByTier(tier: Tier, season: number) {
         match,
         homeWins,
         awayWins,
-        formattedDate
+        formattedDate,
       );
       preseasonDatesToMatches[formattedDate].push(packagedMatch);
-    } else {
-      formattedDate = `${formattedDate} - MD ${match.matchDay}|${match.dateScheduled}`;
+    } else if (match.matchType === MatchType.BO2) {
+      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
       if (!regularSeasonDatesToMatches[formattedDate]) {
         regularSeasonDatesToMatches[formattedDate] = [];
       }
+
       const packagedMatch = packageMatch(
         match,
         homeWins,
         awayWins,
-        formattedDate
+        formattedDate,
+        knockoutType,
       );
       regularSeasonDatesToMatches[formattedDate].push(packagedMatch);
+    } else if (match.matchType === MatchType.BO3) {
+      if (lastMatchDay !== match.matchDay) {
+        playoffRound += 1;
+        lastMatchDay = match.matchDay;
+      }
+
+      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
+
+      if (!bo3DatesToMatches[formattedDate]) {
+        bo3DatesToMatches[formattedDate] = [];
+      }
+
+      const packagedMatch = packageMatch(
+        match,
+        homeWins,
+        awayWins,
+        formattedDate,
+        knockoutType,
+        playoffRound,
+      );
+
+      bo3DatesToMatches[formattedDate].push(packagedMatch);
+    } else if (match.matchType === MatchType.BO5) {
+      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
+
+      if (!bo5DatesToMatches[formattedDate]) {
+        bo5DatesToMatches[formattedDate] = [];
+      }
+
+      const packagedMatch = packageMatch(
+        match,
+        homeWins,
+        awayWins,
+        formattedDate,
+        knockoutType,
+      );
+      bo5DatesToMatches[formattedDate].push(packagedMatch);
     }
   });
+
   const matches = {
-    regularSeason: regularSeasonDatesToMatches,
     preSeason: preseasonDatesToMatches,
+    regularSeason: regularSeasonDatesToMatches,
+    bo3Season: bo3DatesToMatches,
+    bo5Season: bo5DatesToMatches,
   };
   return matches;
 }
@@ -91,7 +145,12 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const whereClause: TUpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
-    matchType: [MatchType.BO2, MatchType.BO3, MatchType.BO5],
+    matchType: [
+      MatchType.PRE_SEASON,
+      MatchType.BO2,
+      MatchType.BO3,
+      MatchType.BO5,
+    ],
     Home: { active: true },
     Away: { active: true },
   };

@@ -1,4 +1,8 @@
-import { formatDate, packageMatch } from "@/lib/common/utils";
+import {
+  determineIfKnockout,
+  formatDate,
+  packageMatch,
+} from "@/lib/common/utils";
 import { prisma } from "@/lib/prisma";
 import { ContractStatus, GameType } from "@prisma/client";
 
@@ -43,9 +47,17 @@ export default async function getFranchiseDetails(slug, season) {
 
     const futureTeamGames = futureGames
       .map((game) => {
+        const knockoutType = determineIfKnockout(game);
+
         if (game.home === team.id || game.away === team.id) {
           const formattedDate = formatDate(game.dateScheduled);
-          const packagedMatch = packageMatch(game, 0, 0, formattedDate);
+          const packagedMatch = packageMatch(
+            game,
+            0,
+            0,
+            formattedDate,
+            knockoutType,
+          );
           return packagedMatch;
         }
       })
@@ -53,6 +65,8 @@ export default async function getFranchiseDetails(slug, season) {
 
     const pastTeamGames = pastGames
       .map((game) => {
+        const knockoutType = determineIfKnockout(game);
+
         if (game.home === team.id || game.away === team.id) {
           let homeWins = 0;
           let awayWins = 0;
@@ -65,7 +79,8 @@ export default async function getFranchiseDetails(slug, season) {
             game,
             homeWins,
             awayWins,
-            formattedDate
+            formattedDate,
+            knockoutType,
           );
           return packagedMatch;
         }
@@ -241,6 +256,7 @@ async function getPastGames(franchise, season) {
         lt: new Date(),
       },
     },
+    orderBy: [{ dateScheduled: "desc" }],
     include: {
       Home: {
         include: {
