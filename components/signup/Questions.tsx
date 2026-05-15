@@ -111,9 +111,25 @@ export default function Questions({
       options: [
         { value: "true", label: "Yes" },
         { value: "false", label: "No" },
+        
       ],
       show: watch("reportedAccounts") === "true",
       rules: { required: true },
+    },
+    {
+id:"recentlyPlayed",
+type:"radio",
+label: (
+<h2>
+  Were you an Free Agent from last season
+</h2>
+),
+options: [
+        { value: "trueFA", label: "Yes" },
+        { value: "falseFA", label: "No" },
+],
+show: watch("playedBefore")==="true",
+rules: {required:true},
     },
     {
       id: "readRules",
@@ -152,7 +168,7 @@ export default function Questions({
       ],
       show:
         watch("reportedAccounts") === "true" &&
-        (watch("playedBefore") === "false" || watch("playedBefore") === "true"),
+        (watch("playedBefore") === "false" || (watch("playedBefore") === "true" && (watch("recentlyPlayed")==="trueFA"||watch("recentlyPlayed")==="falseFA"))),
       rules: { required: true },
     },
   ];
