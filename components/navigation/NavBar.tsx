@@ -52,7 +52,7 @@ export const navLinks = [
       },
       {
         name: "FA Hub",
-        href: "https://discord.gg/988zsjKyTt",
+        href: "https://go.vdc.gg/fahub",
         ext: true,
       },
     ],
