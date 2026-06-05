@@ -17,6 +17,7 @@ import {
 import { toTailwindCustomHexCode } from "@/lib/common/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getUserTier } from "@/lib/queries/user/user";
@@ -24,6 +25,7 @@ import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -34,24 +36,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const currentSeason = await getSeasonCached();
-  const userTier = await getUserTier();
+export default async function Page({ params, searchParams }: Props) {
+  const [{ slug }, sp, currentSeason, userTier] = await Promise.all([
+    params,
+    searchParams,
+    getSeasonCached(),
+    getUserTier(),
+  ]);
 
   const res = await getFranchiseDetailsBySlugCached(
     String(slug).toLocaleLowerCase(),
     currentSeason,
   );
+  if (!res) notFound();
 
-  let franchiseInfo;
-  if (res) {
-    franchiseInfo = res;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const franchiseInfo: any = res;
 
   const primary = toTailwindCustomHexCode(franchiseInfo!.Brand!.colorPrimary);
   const secondary = toTailwindCustomHexCode(
@@ -67,6 +67,15 @@ export default async function Page({
       userTier,
     );
     defaultQuery = franchiseHasTier ? userTier : "";
+  }
+
+  if (activeTeams.length > 0) {
+    const validTeams = new Set(activeTeams.map((t) => t.query.toLowerCase()));
+    const teamOk = typeof sp.team === "string" && validTeams.has(sp.team);
+    if (!teamOk) {
+      const defaultTeam = (defaultQuery || activeTeams[0].query).toLowerCase();
+      redirect(`/franchises/${slug}?team=${defaultTeam}`);
+    }
   }
 
   return (
@@ -116,13 +125,19 @@ export default async function Page({
           </div>
         </div>
         <div className="xl:max-w-5xl flex flex-col gap-5">
-          <Suspense fallback={<TeamPanelSkeleton />}>
-            <HorizontalTab
-              tabElements={activeTeams}
-              params="team"
-              defaultQuery={defaultQuery}
-            />
-          </Suspense>
+          {activeTeams.length === 0 ? (
+            <div className="text-center italic text-vdcGrey dark:text-vdcWhite py-10">
+              No active teams for this franchise.
+            </div>
+          ) : (
+            <Suspense fallback={<TeamPanelSkeleton />}>
+              <HorizontalTab
+                tabElements={activeTeams}
+                params="team"
+                defaultQuery={defaultQuery}
+              />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>

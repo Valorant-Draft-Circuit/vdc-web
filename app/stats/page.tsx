@@ -9,6 +9,7 @@ import { getUserTier } from "@/lib/queries/user/user";
 import { ControlPanel } from "@/prisma";
 import { GameType, Tier } from "@prisma/client";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -16,15 +17,43 @@ export const metadata: Metadata = {
   description: `Valorant Draft Circuit player stats page.`,
 };
 
-export default async function Page() {
-  const seasonState = await ControlPanel.getLeagueState();
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Page({ searchParams }: Props) {
+  const [sp, seasonState, currentSeason, userTier] = await Promise.all([
+    searchParams,
+    ControlPanel.getLeagueState(),
+    getSeasonCached(),
+    getUserTier({ isStats: true }),
+  ]);
+
   const gameTypes: GameType[] = [GameType.SEASON, GameType.COMBINE];
   if (seasonState === "COMBINES") {
     gameTypes.reverse();
   }
 
-  const currentSeason = await getSeasonCached();
   const listOfAllSeasons = listAllSeasons(currentSeason);
+
+  const defaultType = gameTypes[0].toLowerCase();
+  const defaultTier = (userTier || Tier.MYTHIC).toLowerCase();
+  const validTypes = new Set(gameTypes.map((g) => g.toLowerCase()));
+  const validTiers = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
+  const validSeasons = new Set(listOfAllSeasons);
+
+  const seasonOk = typeof sp.season === "string" && validSeasons.has(sp.season);
+  const typeOk = typeof sp.type === "string" && validTypes.has(sp.type);
+  const tierOk = typeof sp.tier === "string" && validTiers.has(sp.tier);
+
+  if (!seasonOk || !typeOk || !tierOk) {
+    const next = new URLSearchParams();
+    next.set("season", seasonOk ? (sp.season as string) : currentSeason.toString());
+    next.set("type", typeOk ? (sp.type as string) : defaultType);
+    next.set("tier", tierOk ? (sp.tier as string) : defaultTier);
+    redirect(`/stats?${next.toString()}`);
+  }
+
   const seasonList = listOfAllSeasons.map((season) => ({
     query: season,
     name: `SEASON ${season}`,
@@ -34,8 +63,6 @@ export default async function Page() {
     query: game.toLocaleLowerCase(),
     name: `${game.replace("_", "")}`,
   }));
-
-  const userTier = await getUserTier({ isStats: true });
 
   const defaultQueries = {
     season: currentSeason,
