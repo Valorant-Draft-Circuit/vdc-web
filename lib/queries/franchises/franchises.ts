@@ -8,10 +8,11 @@ import { ContractStatus, GameType } from "@prisma/client";
 
 export default async function getFranchiseDetails(slug, season) {
   const franchise = await getFranchise(slug);
+  if (!franchise) return null;
   const playerStats = await getPlayerStats(franchise, season);
   const futureGames = await getFutureGames(franchise, season);
   const pastGames = await getPastGames(franchise, season);
-  franchise!.Teams = franchise!.Teams.map((team) => {
+  franchise.Teams = franchise.Teams.map((team) => {
     team.Roster = team.Roster.map((player) => {
       const stats = playerStats.find((s) => s.userID === player.id);
 
