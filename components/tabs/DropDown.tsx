@@ -8,7 +8,6 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 type TMenuElement = { query: string; name: string };
 
@@ -22,45 +21,28 @@ export default function ListBox({
   defaultDropDownQuery: string;
 }) {
   const paramsKey = params.toLowerCase();
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const urlParam = searchParams.get(paramsKey) ?? menuElements[0].query;
 
-  const [selected, setSelected] = useState<TMenuElement>(
-    menuElements.find((m) => m.query === urlParam) || menuElements[0],
-  );
+  const queryValue =
+    searchParams.get(paramsKey) ?? defaultDropDownQuery.toLowerCase();
+  const selected =
+    menuElements.find(
+      (m) => m.query.toString().toLowerCase() === queryValue.toLowerCase(),
+    ) ?? menuElements[0];
 
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    const current = params.get(paramsKey);
-
-    if (!current) {
-      params.set(paramsKey, defaultDropDownQuery.toLowerCase());
-      router.replace(`${pathname}?${params.toString()}`);
-      return;
-    }
-
-    if (current !== selected.query) {
-      params.set(paramsKey, selected.query);
-      router.push(`${pathname}?${params.toString()}`);
-    }
-  }, [selected, searchParams]);
-
-  useEffect(() => {
-    const newParam = searchParams.get(paramsKey) ?? menuElements[0].query;
-    const matched = menuElements.find((m) => m.query === newParam);
-    if (matched && matched.query !== selected.query) {
-      setSelected(matched);
-    }
-  }, [searchParams]);
+  const handleChange = (next: TMenuElement) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set(paramsKey, next.query.toString().toLowerCase());
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  };
 
   return (
     <div className="xl:px-0 sm:px-12 relative">
-      <Listbox value={selected} onChange={setSelected}>
+      <Listbox value={selected} onChange={handleChange}>
         <ListboxButton
-          className="relative flex flex-row rounded-md py-2 pl-4 pr-8 w-full 
+          className="relative flex flex-row rounded-md py-2 pl-4 pr-8 w-full
           dark:bg-vdcBlack text-sm text-vdcGrey dark:text-vdcWhite outline-1 -outline-offset-1 outline-gray-300 data-hover:cursor-pointer"
         >
           <h2>{selected.name}</h2>

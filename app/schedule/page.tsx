@@ -5,6 +5,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { getUserTier } from "@/lib/queries/user/user";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,9 +16,22 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Page() {
-  const CURRENT_SEASON = await getSeasonCached();
-  const userTier = await getUserTier();
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Page({ searchParams }: Props) {
+  const [sp, CURRENT_SEASON, userTier] = await Promise.all([
+    searchParams,
+    getSeasonCached(),
+    getUserTier(),
+  ]);
+
+  const validTiers = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
+  if (typeof sp.tier !== "string" || !validTiers.has(sp.tier)) {
+    const defaultTier = (userTier || TIERS_LIST[0]).toLowerCase();
+    redirect(`/schedule?tier=${defaultTier}`);
+  }
 
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
     name: tier,

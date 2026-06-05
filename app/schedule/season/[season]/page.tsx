@@ -10,6 +10,7 @@ import { Suspense } from "react";
 
 type Props = {
   params: Promise<{ season: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -20,13 +21,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ season: number }>;
-}) {
-  const currentSeason = await getSeasonCached();
-  const { season } = await params;
+export default async function Page({ params, searchParams }: Props) {
+  const [{ season }, sp, currentSeason] = await Promise.all([
+    params,
+    searchParams,
+    getSeasonCached(),
+  ]);
   const seasonNumber = Number(season);
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
     query: tier,
@@ -37,7 +37,7 @@ export default async function Page({
 
   if (seasonNumber === currentSeason) {
     redirect(`/schedule`);
-  } else if (season > currentSeason) {
+  } else if (seasonNumber > currentSeason) {
     return (
       <div className="flex min-h-screen justify-center items-center">
         <div className="py-10 max-w-7xl xl:py-12 flex flex-col gap-10 text-center">
@@ -52,6 +52,12 @@ export default async function Page({
         </div>
       </div>
     );
+  }
+
+  const validBy = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
+  if (typeof sp.by !== "string" || !validBy.has(sp.by)) {
+    const defaultBy = TIERS_LIST[0].toLowerCase();
+    redirect(`/schedule/season/${season}?by=${defaultBy}`);
   }
 
   return (

@@ -5,6 +5,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import StandingsPanelSkeleton from "@/components/standings/StandingsPanelSkeleton";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getUserTier } from "@/lib/queries/user/user";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,9 +16,25 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Standings() {
-  const CURRENT_SEASON = await getSeasonCached();
-  const userTier = await getUserTier();
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Standings({ searchParams }: Props) {
+  const [sp, CURRENT_SEASON, userTier] = await Promise.all([
+    searchParams,
+    getSeasonCached(),
+    getUserTier(),
+  ]);
+
+  const validBy = new Set([
+    "franchises",
+    ...TIERS_LIST.map((t) => t.toLowerCase()),
+  ]);
+  if (typeof sp.by !== "string" || !validBy.has(sp.by)) {
+    const defaultBy = (userTier || "franchises").toLowerCase();
+    redirect(`/standings?by=${defaultBy}`);
+  }
 
   const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
     query: tier,
