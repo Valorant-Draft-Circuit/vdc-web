@@ -18,6 +18,7 @@ type TPlayerIGN = {
 
 type Props = {
   params: Promise<{ player: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const NUMBER_REGEX = /^\d+$/;
@@ -45,12 +46,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ player: string }>;
-}) {
-  const currentSeason = await getSeasonCached();
+export default async function Page({ params, searchParams }: Props) {
+  const [{ player }, sp, currentSeason, leagueState] = await Promise.all([
+    params,
+    searchParams,
+    getSeasonCached(),
+    ControlPanel.getLeagueState(),
+  ]);
+
+  if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
+
+  const playerIGN: TPlayerIGN = { encoded: "", decoded: "" };
+  if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
+  else if (player.includes("-")) {
+    const playerSplit = player.split("-");
+    playerIGN.encoded = `${playerSplit[0]}${ENCODED_DIVIDER}${playerSplit[1]}`;
+  } else {
+    return <PlayerNotFound player={decodeURIComponent(player)} />;
+  }
+  playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
+
   const listOfAllSeasons = listAllSeasons(currentSeason);
   const seasonsMenu = listOfAllSeasons.map((season) => ({
     query: season,
@@ -61,23 +76,26 @@ export default async function Page({
     { query: "season", name: "SEASON" },
     { query: "combine", name: "COMBINE" },
   ];
-
-  const leagueState = await ControlPanel.getLeagueState();
   if (leagueState === "COMBINES") {
     gameTypeMenu.reverse();
   }
 
-  const { player } = await params;
-  const playerIGN: TPlayerIGN = { encoded: "", decoded: "" };
-  if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
-  else if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
-  else if (player.includes("-")) {
-    const playerSplit = player.split("-");
-    playerIGN.encoded = `${playerSplit[0]}${ENCODED_DIVIDER}${playerSplit[1]}`;
-  } else {
-    return <PlayerNotFound player={decodeURIComponent(player)} />;
+  const defaultType = leagueState === "COMBINES" ? "combine" : "season";
+  const validTypes = new Set(["season", "combine"]);
+  const validBy = new Set(["summary", "agents", "maps"]);
+  const validSeasons = new Set(listOfAllSeasons);
+
+  const seasonOk = typeof sp.season === "string" && validSeasons.has(sp.season);
+  const typeOk = typeof sp.type === "string" && validTypes.has(sp.type);
+  const byOk = typeof sp.by === "string" && validBy.has(sp.by);
+
+  if (!seasonOk || !typeOk || !byOk) {
+    const next = new URLSearchParams();
+    next.set("season", seasonOk ? (sp.season as string) : currentSeason.toString());
+    next.set("type", typeOk ? (sp.type as string) : defaultType);
+    next.set("by", byOk ? (sp.by as string) : "summary");
+    redirect(`/player/${player}?${next.toString()}`);
   }
-  playerIGN.decoded = decodeURIComponent(playerIGN.encoded);
 
   const tabElements: TTabElements[] = [
     {
@@ -109,7 +127,7 @@ export default async function Page({
           <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">
             <div className="w-full">
               <ListBox
-                params={"Season"}
+                params={"season"}
                 menuElements={seasonsMenu}
                 defaultDropDownQuery={currentSeason.toString()}
               />
@@ -118,7 +136,7 @@ export default async function Page({
               <ListBox
                 params={"type"}
                 menuElements={gameTypeMenu}
-                defaultDropDownQuery={gameTypeMenu.toString()}
+                defaultDropDownQuery={defaultType}
               />
             </div>
           </div>

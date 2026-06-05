@@ -1,7 +1,6 @@
 "use client";
 
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   Listbox,
@@ -28,105 +27,75 @@ export default function VerticalTab({
   params: string;
   defaultQuery?: string;
 }) {
-  const searchParams = useSearchParams();
-  const queryParam = searchParams.get(params)?.toLowerCase();
-
-  useEffect(() => {
-    if (!queryParam) {
-      const fallback =
-        defaultQuery?.toLowerCase() || tabElements[0].query.toLowerCase();
-      replaceParam(params, fallback);
-    }
-  }, [queryParam]);
-
-  const initialQuery = queryParam || defaultQuery || tabElements[0].query;
-  const initialIndex = tabElements.findIndex(
-    (t) => t.query.toLowerCase() === initialQuery.toLowerCase(),
-  );
-
-  const [selectedIndex, setSelectedIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0,
-  );
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (initialIndex !== selectedIndex && initialIndex >= 0) {
-      setSelectedIndex(initialIndex);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialIndex]);
+  const fallbackQuery =
+    defaultQuery?.toLowerCase() ?? tabElements[0].query.toLowerCase();
+  const activeQuery =
+    searchParams.get(params)?.toLowerCase() ?? fallbackQuery;
 
-  const updateParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
+  const derivedIndex = tabElements.findIndex(
+    (t) => t.query.toLowerCase() === activeQuery,
+  );
+  const selectedIndex = derivedIndex >= 0 ? derivedIndex : 0;
 
-  const replaceParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  const handleChange = (index: number) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set(params, tabElements[index].query.toLowerCase());
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
   return (
-    <>
-      <TabGroup
-        selectedIndex={selectedIndex}
-        onChange={(index) => {
-          setSelectedIndex(index);
-          const newQuery = tabElements[index].query.toLowerCase();
-          updateParam(params, newQuery);
-        }}
-        vertical
-        className="flex flex-col xl:flex-row"
-      >
-        <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
-          <MobileTabs
-            setSelected={(idx: number) => {
-              setSelectedIndex(idx);
-              updateParam(params, tabElements[idx].query.toLowerCase());
-            }}
-            selected={selectedIndex}
-            tabElements={tabElements}
-          />
-        </div>
+    <TabGroup
+      selectedIndex={selectedIndex}
+      onChange={handleChange}
+      vertical
+      className="flex flex-col xl:flex-row"
+    >
+      <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-screen pt-5 px-5 sm:px-12 ">
+        <MobileTabs
+          tabElements={tabElements}
+          selected={selectedIndex}
+          onSelect={handleChange}
+        />
+      </div>
 
-        <div className="hidden xl:block">
-          <div className="flex flex-row gap-2 sticky top-26 self-start">
-            <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl">
-              <TabList className="flex flex-col items-start gap-1 rounded-2xl drop-shadow-2xl">
-                {tabElements.map(({ name, color }) => (
-                  <Tab
-                    key={name}
-                    className={`rounded-lg text-xl text-vdcBlack dark:text-vdcWhite py-1 text-start w-42 px-2 data-hover:bg-gray-300 dark:data-hover:bg-vdcBlack focus:not-data-focus:outline-none data-hover:text-${color} data-hover:cursor-pointer data-selected:bg-gray-300 dark:data-selected:bg-vdcBlack data-selected:text-${color}`}
-                  >
-                    <h1 className="italic">{name}</h1>
-                  </Tab>
-                ))}
-              </TabList>
-            </div>
+      <div className="hidden xl:block">
+        <div className="flex flex-row gap-2 sticky top-26 self-start">
+          <div className="p-4 drop-shadow-lg bg-gray-100 dark:bg-vdcGrey rounded-2xl">
+            <TabList className="flex flex-col items-start gap-1 rounded-2xl drop-shadow-2xl">
+              {tabElements.map(({ name, color }) => (
+                <Tab
+                  key={name}
+                  className={`rounded-lg text-xl text-vdcBlack dark:text-vdcWhite py-1 text-start w-42 px-2 data-hover:bg-gray-300 dark:data-hover:bg-vdcBlack focus:not-data-focus:outline-none data-hover:text-${color} data-hover:cursor-pointer data-selected:bg-gray-300 dark:data-selected:bg-vdcBlack data-selected:text-${color}`}
+                >
+                  <h1 className="italic">{name}</h1>
+                </Tab>
+              ))}
+            </TabList>
           </div>
         </div>
+      </div>
 
-        <TabPanels className="w-auto sm:w-xl md:w-2xl xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
-          {tabElements.map(({ content, query: query }) => (
-            <TabPanel key={query}>{content}</TabPanel>
-          ))}
-        </TabPanels>
-      </TabGroup>
-    </>
+      <TabPanels className="w-auto sm:w-xl md:w-2xl xl:w-4xl flex flex-col gap-2 m-auto p-3 rounded-2xl">
+        {tabElements.map(({ content, query }) => (
+          <TabPanel key={query}>{content}</TabPanel>
+        ))}
+      </TabPanels>
+    </TabGroup>
   );
 }
 
 function MobileTabs({
   tabElements,
-  setSelected,
   selected,
+  onSelect,
 }: {
   tabElements: TTabElements[];
-  setSelected;
-  selected;
+  selected: number;
+  onSelect: (index: number) => void;
 }) {
   const selectedTab: TTabElements = tabElements[selected];
 
@@ -136,7 +105,7 @@ function MobileTabs({
         value={selectedTab}
         onChange={(tab) => {
           const idx = tabElements.findIndex((t) => t.query === tab.query);
-          if (idx >= 0) setSelected(idx);
+          if (idx >= 0) onSelect(idx);
         }}
       >
         <div className="relative col-start-1 row-start-1">
