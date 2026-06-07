@@ -219,8 +219,8 @@ export default async function Page({
                 />
               )}
               <h1>Match Stats</h1>
-              {gameId ? (
-                <GameStats gameId={gameId} />
+              {gameOverview ? (
+                <GameStats gameId={gameOverview.gameID} />
               ) : (
                 <MatchStats matchId={matchId} />
               )}
