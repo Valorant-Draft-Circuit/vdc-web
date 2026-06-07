@@ -1,4 +1,5 @@
 import ControlPanelForm from "@/components/staff/admin/control/ControlPanelForm";
+import { getAllControlPanel } from "@/lib/queries/control/getAllControlPanel";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,7 +7,8 @@ export const metadata: Metadata = {
   description: `Control Panel`,
 };
 
-export default function Page() {
+export default async function Page() {
+  const initialControls = await getAllControlPanel();
   return (
     <div className="min-h-full">
       <div className="flex flex-col gap-5 py-10">
@@ -18,7 +20,7 @@ export default function Page() {
         <main>
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-4rounded-lg">
             <div>
-              <ControlPanelForm />
+              <ControlPanelForm initialControls={initialControls} />
             </div>
           </div>
         </main>

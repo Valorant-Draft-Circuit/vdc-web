@@ -1,32 +1,11 @@
-"use client";
-
 import {
   AdminSummary,
   FreeAgentTierCount,
   SignedTierCount,
-} from "@/app/api/staff/admins/summary/route";
+} from "@/lib/queries/staff/getAdminSummary";
 import { TIER_COLOR_MAP } from "@/lib/common/constants";
-import { useEffect, useState } from "react";
 
-export default function LeagueDashboard() {
-  const [summary, setSummary] = useState<AdminSummary>();
-
-  useEffect(() => {
-    async function fetchSummary() {
-      try {
-        const res = await fetch(`/api/staff/admins/summary`);
-        if (!res.ok) {
-          throw new Error(`Error fetching summary: ${res.status}`);
-        }
-        const data = await res.json();
-        setSummary(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    fetchSummary();
-  }, []);
-
+export default function LeagueDashboard({ summary }: { summary: AdminSummary }) {
   return (
     <div className="grid lg:grid-cols-3 grid-row-1 gap-5">
       <OverallSummary summary={summary} />
@@ -36,10 +15,8 @@ export default function LeagueDashboard() {
   );
 }
 
-function OverallSummary({ summary }: { summary?: AdminSummary }) {
-  const signed = summary?.signedPlayerCount ?? 0;
-  const freeAgents = summary?.freeAgentCount ?? 0;
-  const sum = signed + freeAgents;
+function OverallSummary({ summary }: { summary: AdminSummary }) {
+  const sum = summary.signedPlayerCount + summary.freeAgentCount;
 
   return (
     <div className="flex flex-col rounded-xl bg-indigo-50">
@@ -51,14 +28,14 @@ function OverallSummary({ summary }: { summary?: AdminSummary }) {
   );
 }
 
-function SignedPlayersSummary({ summary }: { summary?: AdminSummary }) {
+function SignedPlayersSummary({ summary }: { summary: AdminSummary }) {
   return (
     <div className="rounded-xl flex flex-col bg-indigo-50 p-5">
       <h2 className="text-md text-vdcBlack">
-        Signed Players ({summary?.signedPlayerCount})
+        Signed Players ({summary.signedPlayerCount})
       </h2>
       <div className="grid grid-cols-2 gap-2">
-        {summary?.signedPlayerCountByTier?.map((tierData) => (
+        {summary.signedPlayerCountByTier.map((tierData) => (
           <SignedPlayersByTier key={tierData.tier} tierData={tierData} />
         ))}
       </div>
@@ -79,14 +56,14 @@ function SignedPlayersByTier({ tierData }: { tierData: SignedTierCount }) {
   );
 }
 
-function FreeAgentSummary({ summary }: { summary?: AdminSummary }) {
+function FreeAgentSummary({ summary }: { summary: AdminSummary }) {
   return (
     <div className="rounded-xl flex flex-col bg-indigo-50 p-5">
       <h2 className="text-md text-vdcBlack">
-        Free Agent Pool ({summary?.freeAgentCount})
+        Free Agent Pool ({summary.freeAgentCount})
       </h2>
       <div className="grid grid-cols-2 gap-2">
-        {summary?.freeAgentCountByTier?.map((tierData) => (
+        {summary.freeAgentCountByTier.map((tierData) => (
           <FreeAgentsByTier key={tierData.tier} tierData={tierData} />
         ))}
       </div>

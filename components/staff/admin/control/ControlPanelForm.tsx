@@ -1,9 +1,9 @@
 "use client";
 
 import { CONTROL_GROUPS } from "@/lib/common/constants";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Control, useForm } from "react-hook-form";
-import { ConfigSection, ConfigSectionSkeleton } from "./ConfigSection";
+import { ConfigSection } from "./ConfigSection";
 import {
   InputField,
   MapPoolSelect,
@@ -11,6 +11,8 @@ import {
   SwitchField,
   TextAreaField,
 } from "./Fields";
+import { updateControlPanelAction } from "@/app/staff/admin/control/actions";
+import type { ControlPanelItem } from "@/lib/queries/control/getAllControlPanel";
 
 export type ConfigItem = {
   label: string;
@@ -22,70 +24,58 @@ type ControlsSectionProps = {
   control: Control;
 };
 
-export default function ControlPanelForm() {
-  const [generalControls, setGeneralControls] = useState<ConfigItem[]>([]);
-  const [mmrControls, setMmrControls] = useState<ConfigItem[]>([]);
-  const [draftControls, setDraftControls] = useState<ConfigItem[]>([]);
-  const [banControls, setBanControls] = useState<ConfigItem[]>([]);
+export default function ControlPanelForm({
+  initialControls,
+}: {
+  initialControls: ControlPanelItem[];
+}) {
+  const items: ConfigItem[] = useMemo(
+    () =>
+      initialControls.map((item) => ({
+        label: item.label,
+        value: item.value,
+        notes: item.notes ?? "",
+      })),
+    [initialControls],
+  );
 
-  const [loading, setLoading] = useState(true);
-  const { control, handleSubmit, reset } = useForm<{ [key: string]: string }>();
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    async function fetchControlPanel() {
-      try {
-        const res = await fetch("/api/internal/control");
-        const { controlPanelMap } = await res.json();
-        const data: ConfigItem[] = controlPanelMap;
-        const groupMap: Record<string, ConfigItem[]> = {
-          general: [],
-          mmr: [],
-          draft: [],
-          ban: [],
-        };
-
-        data.forEach((item, i) => {
-          const idx = i + 1;
-          for (const [groupName, controlSet] of Object.entries(
-            CONTROL_GROUPS
-          )) {
-            if (controlSet.has(idx)) {
-              groupMap[groupName].push(item);
-              break;
-            }
-          }
-        });
-
-        setGeneralControls(groupMap.general);
-        setMmrControls(groupMap.mmr);
-        setDraftControls(groupMap.draft);
-        setBanControls(groupMap.ban);
-
-        reset(Object.fromEntries(data.map((c) => [c.label, c.value])));
-      } finally {
-        setLoading(false);
+  const groupedControls = useMemo(() => {
+    const groupMap: Record<string, ConfigItem[]> = {
+      general: [],
+      mmr: [],
+      draft: [],
+      ban: [],
+    };
+    items.forEach((item, i) => {
+      const idx = i + 1;
+      for (const [groupName, controlSet] of Object.entries(CONTROL_GROUPS)) {
+        if (controlSet.has(idx)) {
+          groupMap[groupName].push(item);
+          break;
+        }
       }
-    }
+    });
+    return groupMap;
+  }, [items]);
 
-    fetchControlPanel();
-  }, [reset]);
+  const defaultValues = useMemo(
+    () => Object.fromEntries(items.map((c) => [c.label, c.value])),
+    [items],
+  );
+
+  const { control, handleSubmit } = useForm<{ [key: string]: string }>({
+    defaultValues,
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const onSubmit = async (formData: { [key: string]: string }) => {
     setIsSaving(true);
-    try {
-      const res = await fetch("/api/internal/control", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const { message } = await res.json();
-      alert(message);
-    } catch (err) {
-      console.error("Failed to save:", err);
-      alert("Failed to save settings.");
-    } finally {
-      setIsSaving(false);
+    const result = await updateControlPanelAction(formData);
+    setIsSaving(false);
+    if (result.ok) {
+      alert("Control Panel values successfully updated.");
+    } else {
+      alert(`Failed to save: ${result.error}`);
     }
   };
 
@@ -94,31 +84,20 @@ export default function ControlPanelForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 flex flex-col max-w-4xl mx-auto"
     >
-      {loading ? (
-        <>
-          <ConfigSectionSkeleton />
-          <ConfigSectionSkeleton />
-          <ConfigSectionSkeleton />
-          <ConfigSectionSkeleton />
-        </>
-      ) : (
-        <>
-          <GeneralControls
-            generalControls={generalControls}
-            control={control}
-          />
-          <DraftControls draftControls={draftControls} control={control} />
-          <MmrControls mmrControls={mmrControls} control={control} />
-          <BanControls banControls={banControls} control={control} />
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="bg-vdcRed text-vdcWhite px-6 py-2 rounded hover:bg-red-700 disabled:opacity-50 hover:cursor-pointer"
-          >
-            <h1>{isSaving ? "Saving..." : "Save"}</h1>
-          </button>
-        </>
-      )}
+      <GeneralControls
+        generalControls={groupedControls.general}
+        control={control}
+      />
+      <DraftControls draftControls={groupedControls.draft} control={control} />
+      <MmrControls mmrControls={groupedControls.mmr} control={control} />
+      <BanControls banControls={groupedControls.ban} control={control} />
+      <button
+        type="submit"
+        disabled={isSaving}
+        className="bg-vdcRed text-vdcWhite px-6 py-2 rounded hover:bg-red-700 disabled:opacity-50 hover:cursor-pointer"
+      >
+        <h1>{isSaving ? "Saving..." : "Save"}</h1>
+      </button>
     </form>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { ROLES } from "@/lib/common/constants";
+import { updateRolesAction } from "@/app/staff/tech/manage-roles/[vdcId]/actions";
 
 type Role = (typeof ROLES)[number];
 
@@ -33,27 +34,18 @@ export default function RoleSelector({
   }, [query]);
 
   async function handleSubmit() {
+    if (!vdcId) {
+      setStatus("error");
+      return;
+    }
     setSaving(true);
     setStatus("idle");
-
-    try {
-      const res = await fetch(`/api/users/vdc/${vdcId}/roles`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roles: selectedRoles.map((r) => r.value.toString()),
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update roles");
-
-      setStatus("success");
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
-    } finally {
-      setSaving(false);
-    }
+    const result = await updateRolesAction(
+      vdcId,
+      selectedRoles.map((r) => r.value.toString()),
+    );
+    setSaving(false);
+    setStatus(result.ok ? "success" : "error");
   }
   return (
     <div className="flex flex-row justify-between gap-5">
