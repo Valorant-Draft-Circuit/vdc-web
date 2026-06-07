@@ -1,9 +1,3 @@
-const PRODUCTION_ORIGINS = ["https://vdc.gg", "https://www.vdc.gg"];
-
-const PREVIEW_ORIGIN_SUFFIX = ".vercel.app";
-
-const DEVELOPMENT_ORIGINS = ["http://localhost:3000"];
-
 const ORIGIN_EXEMPT_PATH_PATTERNS: RegExp[] = [
   /^\/api\/auth\//,
   /^\/api\/internal\/health$/,
@@ -13,20 +7,53 @@ export function isOriginExemptPath(pathname: string): boolean {
   return ORIGIN_EXEMPT_PATH_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
+function stripTrailingSlashes(value: string): string {
+  return value.replace(/\/+$/, "");
+}
+
+function getAllowedOrigins(): string[] {
+  const allowed: string[] = [];
+
+  if (process.env.AUTH_URL) {
+    allowed.push(stripTrailingSlashes(process.env.AUTH_URL));
+  }
+
+  const extra = process.env.ALLOWED_API_ORIGINS;
+  if (extra) {
+    for (const raw of extra.split(",")) {
+      const trimmed = stripTrailingSlashes(raw.trim());
+      if (trimmed) allowed.push(trimmed);
+    }
+  }
+
+  return allowed;
+}
+
+function getAllowedOriginSuffixes(): string[] {
+  const suffixes = process.env.ALLOWED_API_ORIGIN_SUFFIXES;
+  if (!suffixes) return [];
+
+  return suffixes
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 export function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false;
 
-  if (PRODUCTION_ORIGINS.some((allowed) => origin === allowed)) return true;
-  if (DEVELOPMENT_ORIGINS.some((allowed) => origin.startsWith(allowed))) return true;
+  const normalized = stripTrailingSlashes(origin);
+  if (getAllowedOrigins().some((allowed) => allowed === normalized)) return true;
+
+  const suffixes = getAllowedOriginSuffixes();
+  if (suffixes.length === 0) return false;
 
   try {
-    const host = new URL(origin).host;
-    if (host.endsWith(PREVIEW_ORIGIN_SUFFIX)) return true;
+    const host = new URL(normalized).host;
+    return suffixes.some((suffix) => host.endsWith(suffix));
   } catch {
     return false;
   }
-
-  return false;
 }
 
 export function extractRequestOrigin(headers: Headers): string | null {
