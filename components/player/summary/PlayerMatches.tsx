@@ -1,3 +1,5 @@
+"use client";
+
 import LoadingSpinner from "@/components/theme/LoadingSpinner";
 import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import {

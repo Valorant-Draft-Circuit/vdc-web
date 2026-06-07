@@ -1,13 +1,8 @@
-"use client";
-
-import { useParams, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { GameType, Prisma } from "@prisma/client";
+import { InformationCircleIcon } from "@heroicons/react/16/solid";
 import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
-import { GameType, Prisma } from "@prisma/client";
 import PlayerMatches from "./PlayerMatches";
-import { InformationCircleIcon } from "@heroicons/react/16/solid";
-import { PlayerSummarySkeleton } from "./PlayerSummarySkeleton";
 
 export type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
@@ -18,64 +13,32 @@ export type ProcessedPlayerStat = StatsPayload & {
   totalDamage: number | null;
 };
 
-export default function PlayerSummary() {
-  const [stats, setStats] = useState<StatsPayload[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { player } = useParams();
-  const searchParams = useSearchParams();
-  const season = searchParams.get("season");
-  const gameType = searchParams.get("type")?.toLowerCase();
+type Props = {
+  stats: StatsPayload[] | null;
+  gameType: string | undefined;
+};
 
-  useEffect(() => {
-    if (!player || !season) {
-      setStats(null);
-      setLoading(false);
-      return;
-    }
-    async function fetchStats() {
-      try {
-        const res = await fetch(
-          `/api/player/stats/${player}?season=${season}&type=${gameType}`,
-        );
-        if (!res.ok) {
-          throw new Error(`Error fetching stats: ${res.status}`);
-        }
-        const data = await res.json();
-        setStats(data);
-      } catch (err) {
-        console.error(err);
-        setStats(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchStats();
-  }, [player, season, gameType]);
-
-  if (loading) {
-    return <PlayerSummarySkeleton />;
-  }
-
+export default function PlayerSummary({ stats, gameType }: Props) {
   if (!stats || stats.length === 0) {
     return <NoStats />;
   }
 
-  const processedPlayerStats = stats.map((s) => {
-    const rounds = s.Game.rounds;
-    return { ...s, rounds: rounds, totalDamage: s.damage };
-  });
+  const processedPlayerStats: ProcessedPlayerStat[] = stats.map((s) => ({
+    ...s,
+    rounds: s.Game.rounds,
+    totalDamage: s.damage,
+  }));
+
+  const isCombine = gameType?.toUpperCase() === GameType.COMBINE;
 
   return (
     <div className="flex flex-col xl:px-0 gap-2">
-      {gameType?.toUpperCase() === GameType.COMBINE && <CombineDisclaimer />}
+      {isCombine && <CombineDisclaimer />}
 
       <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
         <div className="flex flex-col gap-2 xl:w-1/2">
-          <>
-            <PlayerRating stats={processedPlayerStats} />
-            <PlayerStats stats={processedPlayerStats} />
-          </>
+          <PlayerRating stats={processedPlayerStats} />
+          <PlayerStats stats={processedPlayerStats} />
         </div>
         <div className="w-full">
           <PlayerMatches stats={stats} gameType={gameType?.toUpperCase()} />
@@ -115,4 +78,3 @@ export function NoStats() {
     </div>
   );
 }
-

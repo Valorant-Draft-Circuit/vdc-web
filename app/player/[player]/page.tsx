@@ -1,8 +1,11 @@
+import { Suspense } from "react";
+import { GameType } from "@prisma/client";
 import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
 import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
 import PlayerSummary from "@/components/player/summary/PlayerSummary";
+import { PlayerSummarySkeleton } from "@/components/player/summary/PlayerSummarySkeleton";
 import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
 import { TabElement } from "@/components/tabs/types";
@@ -13,6 +16,7 @@ import { listAllSeasons } from "@/lib/common/season";
 import { ControlPanel } from "@/prisma";
 import { getPlayerByRiotIGN } from "@/lib/queries/user/getPlayerByRiotIGN";
 import { getRiotIGNByDiscordId } from "@/lib/queries/user/getRiotIGNByDiscordId";
+import { getPlayerStatsBy } from "@/lib/queries/stats/stats";
 
 type PlayerIGN = {
   encoded: string;
@@ -93,12 +97,24 @@ export default async function Page({ params, searchParams }: Props) {
     redirect(`/player/${player}?${next.toString()}`);
   }
 
+  const season = parseInt(sp.season as string);
+  const gameTypeParam = (sp.type as string).toUpperCase() as GameType;
+
   const tabElements: TabElement[] = [
     {
       query: "Summary",
       color: "vdcRed",
       name: "Summary",
-      content: <PlayerSummary />,
+      content: (
+        <Suspense fallback={<PlayerSummarySkeleton />}>
+          <PlayerSummaryWithStats
+            riotIGN={playerIGN.decoded}
+            season={season}
+            gameType={gameTypeParam}
+            gameTypeParam={sp.type as string}
+          />
+        </Suspense>
+      ),
     },
     {
       query: "Agents",
@@ -151,4 +167,23 @@ async function handleDiscordIDSearch(discordID: string) {
     redirect(`/player/${encodedIGN}`);
   }
   return <PlayerNotFound player={discordID} />;
+}
+
+async function PlayerSummaryWithStats({
+  riotIGN,
+  season,
+  gameType,
+  gameTypeParam,
+}: {
+  riotIGN: string;
+  season: number;
+  gameType: GameType;
+  gameTypeParam: string;
+}) {
+  const stats = await getPlayerStatsBy({
+    riotIgn: riotIGN,
+    season,
+    gameType,
+  });
+  return <PlayerSummary stats={stats ?? null} gameType={gameTypeParam} />;
 }
