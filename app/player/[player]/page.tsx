@@ -1,8 +1,11 @@
+import { Suspense } from "react";
+import { GameType } from "@prisma/client";
 import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
 import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
 import PlayerSummary from "@/components/player/summary/PlayerSummary";
+import { PlayerSummarySkeleton } from "@/components/player/summary/PlayerSummarySkeleton";
 import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
 import { TabElement } from "@/components/tabs/types";
@@ -11,7 +14,9 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { listAllSeasons } from "@/lib/common/season";
 import { ControlPanel } from "@/prisma";
-import { PlayerProfile } from "@/app/api/player/[riotIGN]/route";
+import { getPlayerByRiotIGN } from "@/lib/queries/user/getPlayerByRiotIGN";
+import { getRiotIGNByDiscordId } from "@/lib/queries/user/getRiotIGNByDiscordId";
+import { getPlayerStatsBy } from "@/lib/queries/stats/stats";
 
 type PlayerIGN = {
   encoded: string;
@@ -28,17 +33,10 @@ const ENCODED_DIVIDER = encodeURIComponent("#");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { player } = await params;
-  let playerIGN;
+  let playerIGN: string;
   if (NUMBER_REGEX.test(player)) {
-    const res = await fetch(
-      `${process.env.URL}/api/users/discord/${player}/riot`,
-    );
-    if (res.ok) {
-      const riotIGN: string = await res.json();
-      playerIGN = riotIGN;
-    } else {
-      playerIGN = "Player";
-    }
+    const riotIGN = await getRiotIGNByDiscordId(player);
+    playerIGN = riotIGN ?? "Player";
   } else {
     playerIGN = decodeURIComponent(player);
   }
@@ -99,12 +97,24 @@ export default async function Page({ params, searchParams }: Props) {
     redirect(`/player/${player}?${next.toString()}`);
   }
 
+  const season = parseInt(sp.season as string);
+  const gameTypeParam = (sp.type as string).toUpperCase() as GameType;
+
   const tabElements: TabElement[] = [
     {
       query: "Summary",
       color: "vdcRed",
       name: "Summary",
-      content: <PlayerSummary />,
+      content: (
+        <Suspense fallback={<PlayerSummarySkeleton />}>
+          <PlayerSummaryWithStats
+            riotIGN={playerIGN.decoded}
+            season={season}
+            gameType={gameTypeParam}
+            gameTypeParam={sp.type as string}
+          />
+        </Suspense>
+      ),
     },
     {
       query: "Agents",
@@ -120,7 +130,7 @@ export default async function Page({ params, searchParams }: Props) {
     },
   ];
 
-  const playerInfo = await getPlayerByRiot(playerIGN.encoded);
+  const playerInfo = await getPlayerByRiotIGN(playerIGN.decoded);
   if (!playerInfo) return <PlayerNotFound player={playerIGN.decoded} />;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
@@ -151,33 +161,29 @@ export default async function Page({ params, searchParams }: Props) {
 }
 
 async function handleDiscordIDSearch(discordID: string) {
-  // TODO: rename api so its clear we are searching by discordID
-  const res = await fetch(
-    `${process.env.URL}/api/users/discord/${discordID}/riot`,
-  );
-  if (res.ok) {
-    const riotIGN: string = await res.json();
+  const riotIGN = await getRiotIGNByDiscordId(discordID);
+  if (riotIGN) {
     const encodedIGN = encodeURIComponent(riotIGN);
     redirect(`/player/${encodedIGN}`);
-  } else {
-    return <PlayerNotFound player={discordID} />;
   }
+  return <PlayerNotFound player={discordID} />;
 }
 
-async function getPlayerByRiot(riotIGN: string): Promise<PlayerProfile | null> {
-  const res = await fetch(`${process.env.URL}/api/player/${riotIGN}`);
-  if (res.ok) {
-    return (await res.json()) as PlayerProfile;
-  }
-  return null;
+async function PlayerSummaryWithStats({
+  riotIGN,
+  season,
+  gameType,
+  gameTypeParam,
+}: {
+  riotIGN: string;
+  season: number;
+  gameType: GameType;
+  gameTypeParam: string;
+}) {
+  const stats = await getPlayerStatsBy({
+    riotIgn: riotIGN,
+    season,
+    gameType,
+  });
+  return <PlayerSummary stats={stats ?? null} gameType={gameTypeParam} />;
 }
-
-// async function getPlayerStatsByCurrentSeason(riotIGN) {
-//   const res = await fetch(`${process.env.URL}/api/player/stats/${riotIGN}`);
-//   if (res.ok) {
-//     const data: string = await res.json();
-//     return data;
-//   } else {
-//     return null;
-//   }
-// }

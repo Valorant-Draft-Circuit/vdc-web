@@ -10,7 +10,7 @@ import { parseRiotIGN } from "@/lib/common/player";
 import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
-import { PlayerProfile } from "@/app/api/player/[riotIGN]/route";
+import { PlayerProfile } from "@/lib/types/player";
 
 export default async function PlayerInfo({
   playerInfo,
