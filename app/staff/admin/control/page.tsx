@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: `Control Panel`,
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const initialControls = await getAllControlPanel();
   return (

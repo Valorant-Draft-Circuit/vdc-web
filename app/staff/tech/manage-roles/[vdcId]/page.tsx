@@ -4,6 +4,8 @@ import RoleSelector from "@/components/staff/tech/roles/RoleSelector";
 import { ROLES } from "@/lib/common/constants";
 import { getUser } from "@/lib/queries/user/user";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page({
   params,
 }: {

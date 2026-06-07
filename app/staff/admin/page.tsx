@@ -3,6 +3,7 @@ import { getAdminSummary } from "@/lib/queries/staff/admin";
 import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const [currentSeason, leagueState, summary] = await Promise.all([
