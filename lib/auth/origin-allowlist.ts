@@ -1,6 +1,8 @@
 const ORIGIN_EXEMPT_PATH_PATTERNS: RegExp[] = [
   /^\/api\/auth\//,
   /^\/api\/internal\/health$/,
+  /^\/api\/internal\/meilisearch\/documents\/players$/,
+  /^\/api\/internal\/meilisearch\/index\/[^/]+$/,
 ];
 
 export function isOriginExemptPath(pathname: string): boolean {

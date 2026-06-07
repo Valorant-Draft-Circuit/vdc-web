@@ -4,15 +4,19 @@ import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import InactivityWrapper from "../../theme/InactivityWrapper";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import FlameLogo from "../../theme/FlameLogo";
 import ThemeSwitch from "../../theme/ThemeSwitch";
 import { VerticalDropDown } from "../DropDowns";
 import { navLinks } from "../NavBar";
-import MobileAuth from "../../auth/MobileAuth";
-import { SessionProvider } from "next-auth/react";
 
-export default function SideLinks({ preview }: { preview: boolean }) {
+export default function SideLinks({
+  preview,
+  mobileAuth,
+}: {
+  preview: boolean;
+  mobileAuth: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 
@@ -71,13 +75,7 @@ export default function SideLinks({ preview }: { preview: boolean }) {
             />
           ))}
         </div>
-        {!preview && (
-          <div className="mx-auto">
-            <SessionProvider>
-              <MobileAuth />
-            </SessionProvider>
-          </div>
-        )}
+        {!preview && <div className="mx-auto">{mobileAuth}</div>}
       </div>
     </>
   );
