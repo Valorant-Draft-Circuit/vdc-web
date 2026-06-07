@@ -1,5 +1,5 @@
 import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
-import SchedulePanel from "@/components/schedule/SchedulesPanel";
+import SchedulePanelLoader from "@/components/schedule/SchedulePanelLoader";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
@@ -29,11 +29,17 @@ export default async function Page({ params, searchParams }: Props) {
     getSeasonCached(),
   ]);
   const seasonNumber = Number(season);
+  const activeBy = sp.by as string;
   const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     query: tier,
     name: tier,
     color: TIER_COLOR_MAP[tier],
-    content: <SchedulePanel tier={tier} season={seasonNumber} />,
+    content:
+      tier.toLowerCase() === activeBy ? (
+        <Suspense fallback={<SchedulePanelSkeleton />}>
+          <SchedulePanelLoader tier={tier} season={seasonNumber} />
+        </Suspense>
+      ) : null,
   }));
 
   if (seasonNumber === currentSeason) {
@@ -66,9 +72,7 @@ export default async function Page({ params, searchParams }: Props) {
       <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
         Season {season} Match History
       </h1>
-      <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab tabElements={tabs} params="by" />
-      </Suspense>
+      <VerticalTab tabElements={tabs} params="by" />
     </div>
   );
 }

@@ -217,7 +217,7 @@ export default async function Page({
                 />
               )}
               <h1>Match Stats</h1>
-              <MatchStats />
+              <MatchStats matchId={matchId} gameId={gameId as string | undefined} />
             </div>
           </>
         )}

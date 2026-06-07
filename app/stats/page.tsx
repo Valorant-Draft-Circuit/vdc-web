@@ -70,11 +70,20 @@ export default async function Page({ searchParams }: Props) {
     tier: userTier || Tier.MYTHIC,
   };
 
+  const seasonNumber = Number(sp.season);
+  const gameType = (sp.type as string).toUpperCase() as GameType;
+  const activeTier = sp.tier as string;
+
   const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     name: tier,
     query: tier,
     color: TIER_COLOR_MAP[tier],
-    content: <StatsPanel defaultQueries={defaultQueries} />,
+    content:
+      tier.toLowerCase() === activeTier ? (
+        <Suspense>
+          <StatsPanel tier={tier} season={seasonNumber} gameType={gameType} />
+        </Suspense>
+      ) : null,
   }));
 
   return (

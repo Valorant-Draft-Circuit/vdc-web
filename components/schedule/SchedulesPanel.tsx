@@ -3,19 +3,28 @@
 import { Tier } from "@prisma/client";
 // import Filter from "../standings/filter/Filter";
 import ScheduleCard from "./ScheduleCard";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import { Schedule } from "@/lib/queries/schedule/schedule";
 
 export default function SchedulePanel({
   tier,
   season,
+  schedule,
 }: {
   tier: Tier;
   season?: number;
+  schedule: Schedule;
 }) {
-  const [matchDays, setMatchDays] = useState<string[]>([]);
-  const [schedule, setSchedule] = useState<Schedule>();
+  const matchDays = useMemo(
+    () => [
+      ...Object.keys(schedule.preSeason || {}),
+      ...Object.keys(schedule.regularSeason || {}),
+      ...Object.keys(schedule.bo3Season || {}),
+      ...Object.keys(schedule.bo5Season || {}),
+    ],
+    [schedule],
+  );
   const [nearestDay, setNearestDay] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -23,27 +32,7 @@ export default function SchedulePanel({
   const todaysMatchDateRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const fetchSchedule = async () => {
-      const res = await fetch(
-        `/api/schedule?tier=${tier}&season=${season || ""}`,
-        { next: { revalidate: 3600 } },
-      );
-      const data = await res.json();
-      const allDays = [
-        ...Object.keys(data.schedule.preSeason || {}),
-        ...Object.keys(data.schedule.regularSeason || {}),
-        ...Object.keys(data.schedule.bo3Season || {}),
-        ...Object.keys(data.schedule.bo5Season || {}),
-      ];
-      setSchedule(data.schedule);
-      setMatchDays(allDays);
-    };
-
-    fetchSchedule();
-  }, [tier, season]);
-
-  useEffect(() => {
-    if (!schedule || matchDays.length === 0) {
+    if (matchDays.length === 0) {
       return;
     }
 
@@ -65,7 +54,7 @@ export default function SchedulePanel({
     } else {
       scrollToDay(matchDays[matchDays.length - 1]);
     }
-  }, [schedule, matchDays]);
+  }, [matchDays]);
 
   const scrollToDay = (day: string) => {
     const el = cardRefs.current[day];
@@ -157,12 +146,12 @@ export default function SchedulePanel({
         className="relative h-[calc(100vh-12rem)] overflow-y-auto space-y-5 scrollbar-hidden"
       >
         {matchDays.map((day) => {
-          const seasonData = schedule?.preSeason[day]
+          const seasonData = schedule.preSeason[day]
             ? schedule.preSeason
             : {
-                ...schedule?.regularSeason,
-                ...schedule?.bo3Season,
-                ...schedule?.bo5Season,
+                ...schedule.regularSeason,
+                ...schedule.bo3Season,
+                ...schedule.bo5Season,
               };
           return (
             <div
