@@ -62,8 +62,9 @@ export default async function Page({
   if (!matchInfo) notFound();
 
   const gameParam = (await searchParams).game;
-  const gameId = typeof gameParam === "string" ? gameParam : undefined;
-  const gameOverview = matchInfo?.Games.find((game) => game.gameID === gameId);
+  const gameOverview = matchInfo?.Games.find(
+    (game) => typeof gameParam === "string" && game.gameID === gameParam,
+  );
   const mapPick = matchInfo?.MapBans.find(
     (mapBan) => mapBan.map === gameOverview?.map
   )?.team;
