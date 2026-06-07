@@ -8,7 +8,7 @@ import {
   getManagementTitle,
   getUserStatus,
 } from "@/lib/common/auth/auth-utils";
-import { getManagerFranchiseSlug } from "@/lib/queries/franchises/franchises";
+import { getManagerFranchiseSlug } from "@/lib/queries/franchises/getManagerFranchiseSlug";
 
 export default async function AuthSection() {
   const session = await auth();

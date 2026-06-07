@@ -4,6 +4,7 @@ import { CustomPrismaAdapter } from "./adapter";
 import { Adapter } from "next-auth/adapters";
 import { prisma } from "../prisma";
 import { OAuthConfig } from "next-auth/providers";
+import { updatePlayerDocument } from "@/lib/meilisearch/updatePlayerDocument";
 
 declare module "next-auth" {
   interface User {
@@ -96,11 +97,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 });
 
 async function updateMeilisearch(user) {
-  const res = await fetch(
-    `${process.env.URL}/api/meilisearch/player/${user.id}`
-  );
-  if (!res.ok) {
-    console.warn("Unable to update meilisearch player document ");
+  try {
+    await updatePlayerDocument(user.id);
+  } catch (err) {
+    console.warn("Unable to update meilisearch player document", err);
   }
 }
 async function createNewUser(user) {

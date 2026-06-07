@@ -1,6 +1,13 @@
 import AccountList from "./AccountList";
+import { auth } from "@/lib/auth/auth";
+import { getRiotAccountsByUserId } from "@/lib/queries/user/getRiotAccountsByUserId";
 
 export default async function ConnectedAccounts() {
+  const session = await auth();
+  const data = session?.user?.id
+    ? await getRiotAccountsByUserId(session.user.id)
+    : null;
+
   return (
     <div className="bg-gradient-to-b xl:bg-gradient-to-r from-vdcRed from-50% to-vdcWhite dark:to-vdcGrey to-50% py-8 mx-2 rounded-2xl flex flex-col xl:flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
       <div className="flex flex-col w-full ">
@@ -21,7 +28,10 @@ export default async function ConnectedAccounts() {
         <div className="mx-10"></div>
       </div>
       <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic m-auto text-vdcRed transition-all">
-        <AccountList />
+        <AccountList
+          accounts={data?.Accounts ?? []}
+          primaryRiotAccountID={data?.primaryRiotAccountID ?? ""}
+        />
       </div>
     </div>
   );

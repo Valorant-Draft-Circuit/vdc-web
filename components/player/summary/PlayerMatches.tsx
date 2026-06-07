@@ -18,13 +18,19 @@ import { useRouter } from "next/navigation";
 type Router = ReturnType<typeof useRouter>;
 import { useEffect, useState } from "react";
 import { StatsPayload } from "./PlayerSummary";
+import type {
+  TeamLogoInfo,
+  TeamLogoMap,
+} from "@/lib/queries/teams/getTeamLogoById";
 
 export default function PlayerMatches({
   stats,
   gameType,
+  teamMap,
 }: {
   stats: StatsPayload[];
   gameType: string | undefined;
+  teamMap: TeamLogoMap;
 }) {
   const total = stats.length;
   return (
@@ -40,6 +46,7 @@ export default function PlayerMatches({
               gameType={gameType}
               key={stat.id}
               matchCount={total - i}
+              teamMap={teamMap}
             />
           ))}
         </ul>
@@ -52,10 +59,12 @@ function Match({
   stat,
   gameType,
   matchCount,
+  teamMap,
 }: {
   stat: StatsPayload;
   gameType: string | undefined;
   matchCount: number;
+  teamMap: TeamLogoMap;
 }) {
   const [maps, setMaps] = useState<Maps>();
   const router = useRouter();
@@ -100,7 +109,7 @@ function Match({
   if (gameType === GameType.COMBINE) {
     return ComebineGame({ stat, date, matchCount, mapUrl });
   } else {
-    return SeasonGame({ stat, maps, router, date });
+    return SeasonGame({ stat, maps, router, date, teamMap });
   }
 }
 
@@ -231,11 +240,13 @@ function SeasonGame({
   maps,
   router,
   date,
+  teamMap,
 }: {
   stat: StatsPayload;
   maps: Maps;
   router: Router;
   date: string;
+  teamMap: TeamLogoMap;
 }) {
   if (!stat?.Game?.Match)
     return (
@@ -296,7 +307,7 @@ function SeasonGame({
           <div className="flex flex-row py-2 justify-between w-full">
             <IndividualOverview stat={stat} mapUrl={mapUrl} />
             <GameInfo stat={stat} />
-            <Lobby teams={teams} />
+            <Lobby teams={teams} teamMap={teamMap} />
           </div>
           <div className="flex flex-row">
             <IndividualStats stats={stat} mapUrl={mapUrl} />
@@ -447,54 +458,37 @@ function GameInfo({ stat }: { stat: StatsPayload }) {
 
 function Lobby({
   teams,
+  teamMap,
 }: {
   teams: { home: { id: number }; away: { id: number } };
+  teamMap: TeamLogoMap;
 }) {
-  const home = teams.home;
-  const away = teams.away;
   return (
     <div className="m-auto flex flex-row text-center gap-1 xl:gap-2">
-      <TeamLogo team={home} />
+      <TeamLogo id={teams.home.id} info={teamMap[teams.home.id]} />
       <h1 className="text-xs my-auto italic text-gray-400">VS</h1>
-      <TeamLogo team={away} />
+      <TeamLogo id={teams.away.id} info={teamMap[teams.away.id]} />
     </div>
   );
 }
 
-type TeamInfo = {
-  slug: string;
-  tier: Tier;
-};
-
-function TeamLogo({ team }: { team: { id: number } }) {
-  const [teamURL, setTeamURL] = useState("");
-  const [teamInfo, setTeamInfo] = useState<TeamInfo>();
-
-  useEffect(() => {
-    async function fetchTeam() {
-      try {
-        const res = await fetch(`/api/teams/${team.id}`, {
-          cache: "force-cache",
-        });
-        if (!res.ok) {
-          throw new Error(`Error fetching team info: ${res.status}`);
-        }
-        const data = await res.json();
-        const info = { slug: data.Franchise.slug, tier: data.tier };
-        setTeamInfo(info);
-        setTeamURL(data.Franchise.Brand.logo);
-      } catch (err) {
-        console.error(err);
-        setTeamURL("/vdc-flame.svg");
-      }
-    }
-    fetchTeam();
-  }, [team.id]);
-
-  if (!teamURL) {
+function TeamLogo({
+  id,
+  info,
+}: {
+  id: number;
+  info: TeamLogoInfo | undefined;
+}) {
+  if (!info || !info.logoPath) {
     return (
-      <div className="flex flex-row text-xs drop-shadow-md animate-pulse">
-        <div className="bg-vdcGrey size-10 rounded-full"></div>
+      <div className="flex flex-row text-xs drop-shadow-md">
+        <Image
+          src="/vdc-flame.svg"
+          alt={String(id)}
+          width={500}
+          height={500}
+          className="size-10 m-auto text-center w-fit"
+        />
       </div>
     );
   }
@@ -505,11 +499,11 @@ function TeamLogo({ team }: { team: { id: number } }) {
         onClick={(e) => {
           e.stopPropagation();
         }}
-        href={`/franchises/${teamInfo?.slug}?team=${teamInfo?.tier}`}
+        href={`/franchises/${info.slug}?team=${info.tier}`}
       >
         <Image
-          src={`${TEAM_LOGOS_URL}${teamURL}`}
-          alt={String(team.id)}
+          src={`${TEAM_LOGOS_URL}${info.logoPath}`}
+          alt={String(id)}
           width={500}
           height={500}
           className="size-10 m-auto text-center w-fit"
