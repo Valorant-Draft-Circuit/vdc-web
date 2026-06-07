@@ -1,6 +1,6 @@
 import AccountList from "./AccountList";
 import { auth } from "@/lib/auth/auth";
-import { getRiotAccountsByUserId } from "@/lib/queries/user/getRiotAccountsByUserId";
+import { getRiotAccountsByUserId } from "@/lib/queries/user/user";
 
 export default async function ConnectedAccounts() {
   const session = await auth();

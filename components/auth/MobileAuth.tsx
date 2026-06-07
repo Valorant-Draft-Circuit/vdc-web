@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { getUserStatus } from "@/lib/common/auth/auth-utils";
-import { getManagerFranchiseSlug } from "@/lib/queries/franchises/getManagerFranchiseSlug";
+import { getManagerFranchiseSlug } from "@/lib/queries/franchises/franchises";
 import { getUser } from "@/lib/queries/user/user";
 import SignIn from "./SignIn";
 import SignOut from "./SignOut";

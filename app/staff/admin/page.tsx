@@ -1,5 +1,5 @@
 import LeagueDashboard from "@/components/staff/admin/PlayerDashboard";
-import { getAdminSummary } from "@/lib/queries/staff/getAdminSummary";
+import { getAdminSummary } from "@/lib/queries/staff/admin";
 import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 

@@ -2,7 +2,7 @@ import {
   AdminSummary,
   FreeAgentTierCount,
   SignedTierCount,
-} from "@/lib/queries/staff/getAdminSummary";
+} from "@/lib/queries/staff/admin";
 import { TIER_COLOR_MAP } from "@/lib/common/constants";
 
 export default function LeagueDashboard({ summary }: { summary: AdminSummary }) {

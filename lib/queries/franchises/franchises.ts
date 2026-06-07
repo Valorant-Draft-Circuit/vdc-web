@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { determineIfKnockout, packageMatch } from "@/lib/common/match";
 import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
@@ -326,6 +327,21 @@ async function getPastGames(franchise, season) {
     },
   });
 }
+
+export const getManagerFranchiseSlug = cache(async (userId: string) => {
+  const res = await prisma.franchise.findFirst({
+    where: {
+      OR: [
+        { gmID: userId },
+        { agm1ID: userId },
+        { agm2ID: userId },
+        { agm3ID: userId },
+      ],
+    },
+    select: { slug: true },
+  });
+  return res?.slug;
+});
 
 export function calculateTeamTotalMmr(roster) {
   let sum = 0;

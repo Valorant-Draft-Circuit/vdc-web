@@ -14,8 +14,10 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { listAllSeasons } from "@/lib/common/season";
 import { ControlPanel } from "@/prisma";
-import { getPlayerByRiotIGN } from "@/lib/queries/user/getPlayerByRiotIGN";
-import { getRiotIGNByDiscordId } from "@/lib/queries/user/getRiotIGNByDiscordId";
+import {
+  getPlayerByRiotIGN,
+  getRiotIGNByDiscordId,
+} from "@/lib/queries/user/user";
 import { getPlayerStatsBy } from "@/lib/queries/stats/stats";
 
 type PlayerIGN = {
