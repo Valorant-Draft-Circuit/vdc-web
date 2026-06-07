@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
 import { UserWithRelations } from "@/lib/queries/user/user";
+import { signupAction } from "./actions";
 
 export type SignUpInput = {
   accountID: string;
@@ -83,16 +84,6 @@ export default function SignUpForm({
   );
 }
 
-async function handleRegistration(data: SignUpInput) {
-  const res = await fetch("/api/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  return res.ok;
-}
-
 function SubmitSignUp() {
   enum CAPTCHA_STATUS {
     "ERROR",
@@ -107,10 +98,10 @@ function SubmitSignUp() {
 
   const onSubmit: SubmitHandler<SignUpInput> = async (data) => {
     setLoading(true);
-    const ok = await handleRegistration(data);
+    const result = await signupAction(data);
     setLoading(false);
 
-    if (ok) {
+    if (result.ok) {
       alert("Successfully signed up!");
       window.location.href = "/";
     } else {
