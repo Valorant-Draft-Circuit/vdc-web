@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 import { Flags, Player } from "@/prisma";
 import { getSignupState } from "@/lib/queries/control/control";
-import type { SignUpInput } from "./SignUpForm";
+import type { SignUpInput } from "@/components/signup/SignUpForm";
 
 type SignUpResult = { ok: true } | { ok: false; error: string };
 

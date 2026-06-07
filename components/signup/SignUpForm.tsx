@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
 import { UserWithRelations } from "@/lib/queries/user/user";
-import { signupAction } from "./actions";
+import { signupAction } from "@/app/signup/actions";
 
 export type SignUpInput = {
   accountID: string;
