@@ -2,7 +2,7 @@ import TeamPanel, {
   TeamPanelSkeleton,
 } from "@/components/franchises/teams/TeamPanel";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
-import { TTabElements } from "@/components/tabs/HorizontalTab";
+import { TabElement } from "@/components/tabs/types";
 import FlameLogo from "@/components/theme/FlameLogo";
 import {
   getFranchiseDetailsBySlugCached,
@@ -14,7 +14,7 @@ import {
   TIER_HEX_COLOR_MAP,
   TIER_ORDER,
 } from "@/lib/common/constants";
-import { toTailwindCustomHexCode } from "@/lib/common/utils";
+import { toTailwindCustomHexCode } from "@/lib/common/format";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -50,8 +50,7 @@ export default async function Page({ params, searchParams }: Props) {
   );
   if (!res) notFound();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const franchiseInfo: any = res;
+  const franchiseInfo = res;
 
   const primary = toTailwindCustomHexCode(franchiseInfo!.Brand!.colorPrimary);
   const secondary = toTailwindCustomHexCode(
@@ -171,7 +170,7 @@ function getAgms(franchiseInfo) {
 }
 
 function getActiveTeams(franchiseInfo) {
-  const activeFranchiseTeams: TTabElements[] = franchiseInfo.Teams.filter(
+  const activeFranchiseTeams: TabElement[] = franchiseInfo.Teams.filter(
     (team) => team.active,
   ).map((team) => ({
     id: team.id,

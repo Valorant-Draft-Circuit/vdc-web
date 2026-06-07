@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { GameType, Prisma, Tier } from "@prisma/client";
 
-export type TGame = Prisma.GamesGetPayload<{
+export type Game = Prisma.GamesGetPayload<{
   where: {
     tier;
     season: string;
@@ -31,7 +31,7 @@ export type TGame = Prisma.GamesGetPayload<{
 export async function getAllGamesBy(
   tier: Tier,
   seasonNumber: number
-): Promise<TGame[]> {
+): Promise<Game[]> {
   return prisma.games.findMany({
     where: {
       tier,

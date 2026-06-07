@@ -31,7 +31,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-type TCombineFilter = "all" | "eDE" | "eFA";
+type CombineFilter = "all" | "eDE" | "eFA";
 
 export default function StatsTable({
   data,
@@ -43,7 +43,7 @@ export default function StatsTable({
   tier?;
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [combineFilter, setCombineFilter] = useState<TCombineFilter>("all");
+  const [combineFilter, setCombineFilter] = useState<CombineFilter>("all");
   const [currentTierOnlyFilter, setCurrentTierOnlyFilter] =
     useState<boolean>(false);
 
@@ -226,7 +226,7 @@ function Filters({
         {filterOptions.map((filter) => (
           <button
             key={filter.value}
-            onClick={() => setCombineFilter(filter.value as TCombineFilter)}
+            onClick={() => setCombineFilter(filter.value as CombineFilter)}
             className={`p-1 xl:p-2 border rounded hover:cursor-pointer hover:text-vdcRed ${
               combineFilter === filter.value ? "text-vdcRed border-vdcRed" : ""
             }`}

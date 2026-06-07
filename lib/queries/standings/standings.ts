@@ -1,9 +1,17 @@
-import { TStandingProps } from "@/components/standings/StandingsCard";
 import { MatchType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Tier } from "@prisma/client";
-import { getAllActiveTeamsIn, TActiveTeam } from "../teams/teams";
-import { getAllGamesBy, TGame } from "../games/games";
+import { getAllActiveTeamsIn, ActiveTeam } from "../teams/teams";
+import { getAllGamesBy, Game } from "../games/games";
+
+export type Standing = {
+  franchiseSlug: string;
+  teamLogo: string | null;
+  teamName: string;
+  wins: number;
+  losses: number;
+  rwp: number;
+};
 
 export type TeamStats = {
   wins: number;
@@ -23,7 +31,7 @@ export type TeamStats = {
   };
 };
 
-export function getApexRankings(standings: TStandingProps[]) {
+export function getApexRankings(standings: Standing[]) {
   const highlight =
     standings.length === 4 || standings.length === 6
       ? 4
@@ -38,7 +46,7 @@ export function getApexRankings(standings: TStandingProps[]) {
 export async function getStandingsByTier(
   seasonNumber: number,
   tier: Tier
-): Promise<TStandingProps[]> {
+): Promise<Standing[]> {
   const [games, teams] = await Promise.all([
     getAllGamesBy(tier, seasonNumber),
     getAllActiveTeamsIn(tier),
@@ -62,7 +70,7 @@ export async function getStandingsByTier(
 
 export async function getFranchiseStandings(
   seasonNumber: number
-): Promise<TStandingProps[]> {
+): Promise<Standing[]> {
   const [allBo2Games, franchises] = await Promise.all([
     getAllBo2Games(seasonNumber),
     getFranchises(),
@@ -80,7 +88,7 @@ export async function getFranchiseStandings(
   return sortedStandings;
 }
 
-function compareStandings(left: TStandingProps, right: TStandingProps): number {
+function compareStandings(left: Standing, right: Standing): number {
   
 
   // 1) compare wins (more is good!)
@@ -141,7 +149,7 @@ function computeTeamRecord(teamId: number, games) {
 function buildFranchiseStanding(
   franchise: Awaited<ReturnType<typeof getFranchises>>[number],
   allGames
-): TStandingProps {
+): Standing {
   let wins = 0,
     losses = 0,
     roundsWon = 0,
@@ -226,7 +234,7 @@ async function getFranchises() {
   return res;
 }
 
-function calculateTeamStats(team: TActiveTeam, allGames: TGame[]) {
+function calculateTeamStats(team: ActiveTeam, allGames: Game[]) {
   const gamesPlayed = allGames.filter((g) =>
     [g.Match?.home, g.Match?.away].includes(team.id)
   );
@@ -253,7 +261,7 @@ function calculateTeamStats(team: TActiveTeam, allGames: TGame[]) {
   };
 }
 
-function calculateRoundsWon(gamesPlayed: TGame[], team: TActiveTeam) {
+function calculateRoundsWon(gamesPlayed: Game[], team: ActiveTeam) {
   return sum(
     gamesPlayed.map((game) =>
       game.Match?.home === team.id ? game.roundsWonHome : game.roundsWonAway
@@ -261,7 +269,7 @@ function calculateRoundsWon(gamesPlayed: TGame[], team: TActiveTeam) {
   );
 }
 
-function calculateRoundsLost(gamesPlayed: TGame[], team: TActiveTeam) {
+function calculateRoundsLost(gamesPlayed: Game[], team: ActiveTeam) {
   return sum(
     gamesPlayed.map((game) =>
       game.Match?.home === team.id ? game.roundsWonAway : game.roundsWonHome
@@ -269,7 +277,7 @@ function calculateRoundsLost(gamesPlayed: TGame[], team: TActiveTeam) {
   );
 }
 
-function applyTiebreakers(teamStats: TeamStats[], allGames: TGame[]) {
+function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
   // sort by wins
   const sorted = [...teamStats].sort((a, b) => b.wins - a.wins);
 

@@ -9,7 +9,7 @@ import {
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-type TMenuElement = { query: string; name: string };
+type MenuElement = { query: string; name: string };
 
 export default function ListBox({
   params,
@@ -17,7 +17,7 @@ export default function ListBox({
   defaultDropDownQuery,
 }: {
   params: string;
-  menuElements: TMenuElement[];
+  menuElements: MenuElement[];
   defaultDropDownQuery: string;
 }) {
   const paramsKey = params.toLowerCase();
@@ -32,7 +32,7 @@ export default function ListBox({
       (m) => m.query.toString().toLowerCase() === queryValue.toLowerCase(),
     ) ?? menuElements[0];
 
-  const handleChange = (next: TMenuElement) => {
+  const handleChange = (next: MenuElement) => {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(paramsKey, next.query.toString().toLowerCase());
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });

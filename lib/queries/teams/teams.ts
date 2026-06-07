@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma, Tier } from "@prisma/client";
 
-export type TActiveTeam = Prisma.TeamsGetPayload<{
+export type ActiveTeam = Prisma.TeamsGetPayload<{
   select: {
     id: true;
     name: true;
@@ -21,7 +21,7 @@ export type TActiveTeam = Prisma.TeamsGetPayload<{
  * @param tier
  * @returns All active teams in a given tier
  */
-export async function getAllActiveTeamsIn(tier: Tier): Promise<TActiveTeam[]> {
+export async function getAllActiveTeamsIn(tier: Tier): Promise<ActiveTeam[]> {
   return prisma.teams.findMany({
     where: { tier, active: true },
     select: {

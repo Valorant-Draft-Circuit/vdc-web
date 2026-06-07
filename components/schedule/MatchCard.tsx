@@ -8,22 +8,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type TTeam = {
+type Team = {
   slug: string;
   name: string;
   logo: string;
 };
 
-type TMatch = {
+type Match = {
   id: string;
-  Home: TTeam;
-  Away: TTeam;
+  Home: Team;
+  Away: Team;
   homeWins?: number;
   awayWins?: number;
   tier: Tier;
 };
 
-export default function MatchCard({ match }: { match: TMatch }) {
+export default function MatchCard({ match }: { match: Match }) {
   const goToMatch = () => router.push(`/match/${match.id}`);
   const router = useRouter();
 
@@ -39,7 +39,7 @@ export default function MatchCard({ match }: { match: TMatch }) {
   );
 }
 
-function HomeBadge({ home, tier }: { home: TTeam; tier: Tier }) {
+function HomeBadge({ home, tier }: { home: Team; tier: Tier }) {
   return (
     <Link
       onClick={(e) => {
@@ -65,7 +65,7 @@ function HomeBadge({ home, tier }: { home: TTeam; tier: Tier }) {
   );
 }
 
-function AwayBadge({ away, tier }: { away: TTeam; tier: Tier }) {
+function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
   return (
     <Link
       onClick={(e) => {

@@ -6,7 +6,7 @@ import {
   TRACKER_PROFILE_URL,
 } from "@/lib/common/constants";
 import Link from "next/link";
-import { parseRiotIGN } from "@/lib/common/utils";
+import { parseRiotIGN } from "@/lib/common/player";
 import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";

@@ -3,7 +3,7 @@ import { FireIcon, StarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
 import { JSX, SVGProps, useState } from "react";
 
-type TAccolade = {
+type Accolade = {
   id: number;
   userID: string;
   season: number;
@@ -13,7 +13,7 @@ type TAccolade = {
 };
 
 type AccoladeProps = {
-  metadata: TAccolade;
+  metadata: Accolade;
   icon: JSX.Element;
   bgColorFrom: string;
   bgColorTo: string;
@@ -38,7 +38,7 @@ function Accolade({ metadata, icon, bgColorFrom, bgColorTo }: AccoladeProps) {
   );
 }
 
-export function WIN({ metadata }: { metadata: TAccolade }) {
+export function WIN({ metadata }: { metadata: Accolade }) {
   return (
     <Accolade
       metadata={metadata}
@@ -51,7 +51,7 @@ export function WIN({ metadata }: { metadata: TAccolade }) {
   );
 }
 
-export function MVP({ metadata }: { metadata: TAccolade }) {
+export function MVP({ metadata }: { metadata: Accolade }) {
   return (
     <Accolade
       metadata={metadata}
@@ -64,7 +64,7 @@ export function MVP({ metadata }: { metadata: TAccolade }) {
   );
 }
 
-export function WIN_FM({ metadata }: { metadata: TAccolade }) {
+export function WIN_FM({ metadata }: { metadata: Accolade }) {
   return (
     <Accolade
       metadata={metadata}
@@ -77,7 +77,7 @@ export function WIN_FM({ metadata }: { metadata: TAccolade }) {
   );
 }
 
-export function AST({ metadata }: { metadata: TAccolade }) {
+export function AST({ metadata }: { metadata: Accolade }) {
   return (
     <Accolade
       metadata={metadata}

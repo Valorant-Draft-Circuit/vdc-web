@@ -1,7 +1,7 @@
 "use client";
 
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
-import { TSignUpInput } from "./SignUpForm";
+import { SignUpInput } from "./SignUpForm";
 import {
   Disclosure,
   DisclosureButton,
@@ -16,8 +16,8 @@ export default function Questions({
   watch,
   signupState,
 }: {
-  register: UseFormRegister<TSignUpInput>;
-  watch: UseFormWatch<TSignUpInput>;
+  register: UseFormRegister<SignUpInput>;
+  watch: UseFormWatch<SignUpInput>;
   signupState: string;
 }) {
   const rfaOnly = signupState === "RFA_ONLY";

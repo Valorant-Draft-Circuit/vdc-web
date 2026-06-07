@@ -9,21 +9,14 @@ import {
   ListboxOption,
 } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
-
-export type TTabElements = {
-  current?: boolean;
-  query: string;
-  name: string;
-  color: string;
-  content: React.ReactNode;
-};
+import { TabElement } from "./types";
 
 export default function VerticalTab({
   tabElements,
   params,
   defaultQuery,
 }: {
-  tabElements: TTabElements[];
+  tabElements: TabElement[];
   params: string;
   defaultQuery?: string;
 }) {
@@ -93,11 +86,11 @@ function MobileTabs({
   selected,
   onSelect,
 }: {
-  tabElements: TTabElements[];
+  tabElements: TabElement[];
   selected: number;
   onSelect: (index: number) => void;
 }) {
-  const selectedTab: TTabElements = tabElements[selected];
+  const selectedTab: TabElement = tabElements[selected];
 
   return (
     <div className="grid grid-cols-1 xl:hidden w-full">

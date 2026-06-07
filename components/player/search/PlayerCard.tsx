@@ -8,7 +8,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { isUserPlaying } from "@/lib/common/utils";
+import { isUserPlaying } from "@/lib/common/player";
 
 export default function PlayerCard({ player, mmrShow }) {
   const [isBannerValid, setIsBannerValid] = useState(false);

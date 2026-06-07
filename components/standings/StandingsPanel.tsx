@@ -6,7 +6,7 @@ import {
   getFranchiseStandings,
   getStandingsByTier,
 } from "@/lib/queries/standings/standings";
-import { isTier } from "@/lib/common/utils";
+import { isTier } from "@/lib/common/tier";
 
 export default async function StandingsPanel({
   query,

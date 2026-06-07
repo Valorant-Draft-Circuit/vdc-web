@@ -7,7 +7,7 @@ import {
   TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
 } from "@/lib/common/constants";
-import { toTailwindCustomHexCode } from "@/lib/common/utils";
+import { toTailwindCustomHexCode } from "@/lib/common/format";
 import { getMatch } from "@/lib/queries/match/match";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
@@ -16,7 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-type TPlayedMapBans = {
+type PlayedMapBans = {
   id: number;
   matchID: number;
   order: number;
@@ -85,7 +85,7 @@ export default async function Page({
   const awayTeamColor = toTailwindCustomHexCode(awayTeamBrand!.colorPrimary);
 
   const matchGames = matchInfo?.Games;
-  const playedMapBans: TPlayedMapBans[] = [];
+  const playedMapBans: PlayedMapBans[] = [];
 
   let homeWins = 0,
     awayWins = 0;

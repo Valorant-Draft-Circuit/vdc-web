@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
 
-export type TSignUpInput = {
+export type SignUpInput = {
   accountID: string;
   primaryValorantAccount: string;
   role: string;
@@ -26,7 +26,7 @@ export type TSignUpInput = {
 };
 
 export default function SignUpForm({ user, signupState }) {
-  const methods = useForm<TSignUpInput>();
+  const methods = useForm<SignUpInput>();
   if (user.Status.leagueStatus !== LeagueStatus.UNREGISTERED) {
     return (
       <div className="flex flex-col text-center m-auto text-6xl gap-2 pt-10">
@@ -76,7 +76,7 @@ export default function SignUpForm({ user, signupState }) {
   );
 }
 
-async function handleRegistration(data: TSignUpInput) {
+async function handleRegistration(data: SignUpInput) {
   const res = await fetch("/api/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -96,9 +96,9 @@ function SubmitSignUp() {
   const [status, setStatus] = useState<CAPTCHA_STATUS | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { handleSubmit } = useFormContext<TSignUpInput>();
+  const { handleSubmit } = useFormContext<SignUpInput>();
 
-  const onSubmit: SubmitHandler<TSignUpInput> = async (data) => {
+  const onSubmit: SubmitHandler<SignUpInput> = async (data) => {
     setLoading(true);
     const ok = await handleRegistration(data);
     setLoading(false);

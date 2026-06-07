@@ -12,17 +12,17 @@ import {
   TextAreaField,
 } from "./Fields";
 
-export type TConfigItem = {
+export type ConfigItem = {
   label: string;
   value: string;
   notes: string;
 };
 
 export default function ControlPanelForm() {
-  const [generalControls, setGeneralControls] = useState<TConfigItem[]>([]);
-  const [mmrControls, setMmrControls] = useState<TConfigItem[]>([]);
-  const [draftControls, setDraftControls] = useState<TConfigItem[]>([]);
-  const [banControls, setBanControls] = useState<TConfigItem[]>([]);
+  const [generalControls, setGeneralControls] = useState<ConfigItem[]>([]);
+  const [mmrControls, setMmrControls] = useState<ConfigItem[]>([]);
+  const [draftControls, setDraftControls] = useState<ConfigItem[]>([]);
+  const [banControls, setBanControls] = useState<ConfigItem[]>([]);
 
   const [loading, setLoading] = useState(true);
   const { control, handleSubmit, reset } = useForm<{ [key: string]: string }>();
@@ -33,8 +33,8 @@ export default function ControlPanelForm() {
       try {
         const res = await fetch("/api/internal/control");
         const { controlPanelMap } = await res.json();
-        const data: TConfigItem[] = controlPanelMap;
-        const groupMap: Record<string, TConfigItem[]> = {
+        const data: ConfigItem[] = controlPanelMap;
+        const groupMap: Record<string, ConfigItem[]> = {
           general: [],
           mmr: [],
           draft: [],

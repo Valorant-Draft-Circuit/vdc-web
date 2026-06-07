@@ -1,4 +1,4 @@
-import { determineTier } from "@/lib/common/utils";
+import { determineTier } from "@/lib/common/tier";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";

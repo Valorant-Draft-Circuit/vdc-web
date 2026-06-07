@@ -14,7 +14,7 @@ import {
 import { ChevronDownIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { TMaps } from "@/lib/common/valorant-api";
+import { Maps } from "@/lib/common/valorant-api";
 import { getMapsCached } from "@/lib/common/cache";
 
 export function SwitchField({ field, label }) {
@@ -99,7 +99,7 @@ export function InputField({ field, label }) {
 }
 
 export function MapPoolSelect({ field, label }) {
-  const [maps, setMaps] = useState<TMaps>();
+  const [maps, setMaps] = useState<Maps>();
   const [activeMaps, setActiveMaps] = useState<string[]>(() => {
     const value = field.value;
     if (typeof value === "string") {

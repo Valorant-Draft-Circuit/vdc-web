@@ -1,11 +1,11 @@
 "use client";
 
-import { TSummary } from "@/app/api/staff/admins/summary/route";
+import { AdminSummary } from "@/app/api/staff/admins/summary/route";
 import { TIER_COLOR_MAP } from "@/lib/common/constants";
 import { useEffect, useState } from "react";
 
 export default function LeagueDashboard() {
-  const [summary, setSummary] = useState<TSummary>();
+  const [summary, setSummary] = useState<AdminSummary>();
 
   useEffect(() => {
     async function fetchSummary() {

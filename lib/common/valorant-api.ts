@@ -1,9 +1,9 @@
 import { AGENTS, MAPS } from "./constants";
 
-export type TAgents = Record<string, string>;
-export type TMaps = Record<string, string>;
+export type Agents = Record<string, string>;
+export type Maps = Record<string, string>;
 
-export async function getAgents(): Promise<TAgents> {
+export async function getAgents(): Promise<Agents> {
   try {
     const res = await fetch("https://valorant-api.com/v1/agents");
 
@@ -19,7 +19,7 @@ export async function getAgents(): Promise<TAgents> {
       return AGENTS;
     }
 
-    const agents: TAgents = {};
+    const agents: Agents = {};
     for (const agent of data) {
       if (agent.displayName && agent.uuid) {
         agents[agent.displayName.toUpperCase()] = agent.uuid;
@@ -36,7 +36,7 @@ export async function getAgents(): Promise<TAgents> {
   }
 }
 
-export async function getMaps(): Promise<TMaps> {
+export async function getMaps(): Promise<Maps> {
   try {
     const res = await fetch("https://valorant-api.com/v1/maps");
     
@@ -52,7 +52,7 @@ export async function getMaps(): Promise<TMaps> {
       return MAPS;
     }
 
-    const maps: TMaps = {};
+    const maps: Maps = {};
     for (const map of data) {
       if (map.displayName && map.uuid && map.tacticalDescription) {
         maps[map.displayName.toUpperCase()] = map.uuid;

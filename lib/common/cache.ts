@@ -1,17 +1,16 @@
 import NodeCache from "node-cache";
 import { ControlPanel, Franchise, Team } from "@/prisma";
-// import { TFAQ, getFaq } from "../queries/about/faq";
 import { minutes, Times } from "./times";
-import { TStandingProps } from "@/components/standings/StandingsCard";
+import { Standing } from "../queries/standings/standings";
 import {
   getFranchiseStandings,
   getStandingsByTier,
 } from "../queries/standings/standings";
 import { Prisma, Tier } from "@prisma/client";
-import { getScheduleByTier, TSchedule } from "../queries/schedule/schedule";
+import { getScheduleByTier, Schedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
-import { getAgents, getMaps, TAgents, TMaps } from "./valorant-api";
-import { getMMRTierLines } from "./utils";
+import { getAgents, getMaps, Agents, Maps } from "./valorant-api";
+import { getMMRTierLines, MmrTierLines } from "./tier";
 
 let cache: NodeCache;
 initCache();
@@ -25,9 +24,9 @@ export function initCache() {
   }
 }
 
-export async function getAgentsCached(): Promise<TAgents> {
+export async function getAgentsCached(): Promise<Agents> {
   const key = "agents";
-  const hit = cache.get<TAgents>(key);
+  const hit = cache.get<Agents>(key);
   if (hit) return hit;
 
   const agents = await getAgents();
@@ -35,9 +34,9 @@ export async function getAgentsCached(): Promise<TAgents> {
   return agents;
 }
 
-export async function getMapsCached(): Promise<TMaps> {
+export async function getMapsCached(): Promise<Maps> {
   const key = "maps";
-  const hit = cache.get<TMaps>(key);
+  const hit = cache.get<Maps>(key);
   if (hit) return hit;
 
   const maps = await getMaps();
@@ -55,9 +54,9 @@ export async function getSeasonCached(): Promise<number> {
   return season;
 }
 
-// export async function getFaqCached(): Promise<TFAQ[]> {
+// export async function getFaqCached(): Promise<Faq[]> {
 //   const key = "faqs";
-//   const hit = cache.get<TFAQ[]>(key);
+//   const hit = cache.get<Faq[]>(key);
 //   if (hit) return hit;
 
 //   const faqs = await getFaq();
@@ -67,9 +66,9 @@ export async function getSeasonCached(): Promise<number> {
 
 export async function getFranchiseStandingsCached(
   season: number,
-): Promise<TStandingProps[]> {
+): Promise<Standing[]> {
   const key = "franchiseStandings";
-  const hit = cache.get<TStandingProps[]>(key);
+  const hit = cache.get<Standing[]>(key);
   if (hit !== undefined) return hit;
 
   const franchiseStandings = await getFranchiseStandings(season);
@@ -80,9 +79,9 @@ export async function getFranchiseStandingsCached(
 export async function getStandingsByCached(
   season: number,
   tier: Tier,
-): Promise<TStandingProps[]> {
+): Promise<Standing[]> {
   const key = `s${season}-${tier.toLocaleLowerCase()}-standing`;
-  const hit = cache.get<TStandingProps[]>(key);
+  const hit = cache.get<Standing[]>(key);
   if (hit !== undefined) return hit;
 
   const standingByTier = await getStandingsByTier(season, tier);
@@ -90,7 +89,7 @@ export async function getStandingsByCached(
   return standingByTier;
 }
 
-export type TTeam = Prisma.TeamsGetPayload<{
+export type TeamWithFranchise = Prisma.TeamsGetPayload<{
   include: {
     Franchise: {
       include: { Brand: true };
@@ -98,9 +97,9 @@ export type TTeam = Prisma.TeamsGetPayload<{
   };
 }>;
 
-export async function getAllTeamsByTierCached(tier: Tier): Promise<TTeam[]> {
+export async function getAllTeamsByTierCached(tier: Tier): Promise<TeamWithFranchise[]> {
   const key = `${tier}-teams`;
-  const hit = cache.get<TTeam[]>(key);
+  const hit = cache.get<TeamWithFranchise[]>(key);
   if (hit !== undefined) return hit;
 
   const allTeamsByTier = await Team.getAllActiveByTier(tier);
@@ -111,9 +110,9 @@ export async function getAllTeamsByTierCached(tier: Tier): Promise<TTeam[]> {
 export async function getScheduleByTierCached(
   tier: Tier,
   season: number,
-): Promise<TSchedule> {
+): Promise<Schedule> {
   const key = `s${season}-${tier}-schedule`;
-  const hit = cache.get<TSchedule>(key);
+  const hit = cache.get<Schedule>(key);
   if (hit !== undefined) return hit;
 
   const scheduleByTier = await getScheduleByTier(tier, season);
@@ -121,7 +120,7 @@ export async function getScheduleByTierCached(
   return scheduleByTier;
 }
 
-type TActiveFranchises = Prisma.FranchiseGetPayload<{
+type ActiveFranchises = Prisma.FranchiseGetPayload<{
   include: {
     Teams: true;
     Brand: true;
@@ -129,7 +128,7 @@ type TActiveFranchises = Prisma.FranchiseGetPayload<{
 }>[];
 export async function getAllActiveFranchisesCached() {
   const key = "activeFranchises";
-  const hit = cache.get<TActiveFranchises>(key);
+  const hit = cache.get<ActiveFranchises>(key);
   if (hit !== undefined) return hit;
 
   const activeFranchises = await Franchise.getAllActive();
@@ -137,12 +136,14 @@ export async function getAllActiveFranchisesCached() {
   return activeFranchises;
 }
 
+export type FranchiseDetails = Awaited<ReturnType<typeof getFranchiseDetails>>;
+
 export async function getFranchiseDetailsBySlugCached(
   slug: string,
   season: number,
-) {
+): Promise<FranchiseDetails> {
   const key = `s${season}-${slug}-franchise`;
-  const hit = cache.get(key);
+  const hit = cache.get<FranchiseDetails>(key);
   if (hit !== undefined) return hit;
 
   const franchise = await getFranchiseDetails(slug, season);
@@ -160,17 +161,9 @@ export async function getTeamByIdCached(id: number) {
   return team;
 }
 
-type TMmrTierLies = {
-  RECRUIT: { min: number; max: number };
-  PROSPECT: { min: number; max: number };
-  APPRENTICE: { min: number; max: number };
-  EXPERT: { min: number; max: number };
-  MYTHIC: { min: number; max: number };
-};
-
 export async function getMmmrTierLinesCached() {
   const key = "mmrTierLines";
-  const hit = cache.get<TMmrTierLies>(key);
+  const hit = cache.get<MmrTierLines>(key);
   if (hit !== undefined) return hit;
 
   const mmrTierLines = await getMMRTierLines();

@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { UseFormRegister } from "react-hook-form";
-import { TSignUpInput } from "./SignUpForm";
+import { SignUpInput } from "./SignUpForm";
 
 export default function Accounts({
   user,
   register,
 }: {
   user;
-  register: UseFormRegister<TSignUpInput>;
+  register: UseFormRegister<SignUpInput>;
 }) {
   return (
     <div className="text-sm flex flex-col py-2 gap-2">
