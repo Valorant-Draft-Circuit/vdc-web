@@ -60,7 +60,8 @@ export default async function Page({
   const matchInfo = await getMatch(matchId);
   if (!matchInfo) notFound();
 
-  const gameId = (await searchParams).game;
+  const gameParam = (await searchParams).game;
+  const gameId = typeof gameParam === "string" ? gameParam : undefined;
   const gameOverview = matchInfo?.Games.find((game) => game.gameID === gameId);
   const mapPick = matchInfo?.MapBans.find(
     (mapBan) => mapBan.map === gameOverview?.map
@@ -217,7 +218,7 @@ export default async function Page({
                 />
               )}
               <h1>Match Stats</h1>
-              <MatchStats matchId={matchId} gameId={gameId as string | undefined} />
+              <MatchStats matchId={matchId} gameId={gameId} />
             </div>
           </>
         )}
