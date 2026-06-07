@@ -12,14 +12,17 @@ import { GameType, Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+type Router = ReturnType<typeof useRouter>;
 import { useEffect, useState } from "react";
+import { StatsPayload } from "./PlayerSummary";
 
 export default function PlayerMatches({
   stats,
   gameType,
 }: {
-  stats;
-  gameType;
+  stats: StatsPayload[];
+  gameType: string | undefined;
 }) {
   const total = stats.length;
   return (
@@ -43,7 +46,15 @@ export default function PlayerMatches({
   );
 }
 
-function Match({ stat, gameType, matchCount }: { stat; gameType; matchCount }) {
+function Match({
+  stat,
+  gameType,
+  matchCount,
+}: {
+  stat: StatsPayload;
+  gameType: string | undefined;
+  matchCount: number;
+}) {
   const [maps, setMaps] = useState<Maps>();
   const router = useRouter();
 
@@ -78,7 +89,7 @@ function Match({ stat, gameType, matchCount }: { stat; gameType; matchCount }) {
     weekday: "short",
   });
 
-  const map: string = stat.Game.map;
+  const map = stat.Game.map ?? "";
   let mapUrl;
   if (map) {
     mapUrl = MAP_LIST_URL(maps[map.toUpperCase()]);
@@ -97,10 +108,10 @@ function ComebineGame({
   matchCount,
   mapUrl,
 }: {
-  stat;
-  date;
-  matchCount;
-  mapUrl;
+  stat: StatsPayload;
+  date: string;
+  matchCount: number;
+  mapUrl: string | undefined;
 }) {
   const tier = stat.Game.tier;
   const tierBgMap: Record<Tier, string> = {
@@ -135,8 +146,8 @@ function ComebineGame({
   const tierOutlineColor = tierOutlineMap[tier];
 
   const statPairs = [
-    ["A", stat.ratingAttack.toFixed(2)],
-    ["D", stat.ratingDefense.toFixed(2)],
+    ["A", (stat.ratingAttack ?? 0).toFixed(2)],
+    ["D", (stat.ratingDefense ?? 0).toFixed(2)],
 
     ["FK", stat.firstKills],
     ["FD", stat.firstDeaths],
@@ -219,10 +230,10 @@ function SeasonGame({
   router,
   date,
 }: {
-  stat;
-  maps;
-  router;
-  date;
+  stat: StatsPayload;
+  maps: Maps;
+  router: Router;
+  date: string;
 }) {
   if (!stat?.Game?.Match)
     return (
@@ -237,17 +248,17 @@ function SeasonGame({
     result = "Victory";
   }
   const teams = {
-    home: { id: stat.Game.Match.home },
-    away: { id: stat.Game.Match.away },
+    home: { id: stat.Game.Match!.home ?? 0 },
+    away: { id: stat.Game.Match!.away ?? 0 },
   };
-  const matchDay = stat.Game.Match.matchDay;
-  const map: string = stat.Game.map;
+  const matchDay = stat.Game.Match!.matchDay;
+  const map = stat.Game.map ?? "";
   let mapUrl;
   if (map) {
     mapUrl = MAP_LIST_URL(maps[map.toUpperCase()]);
   }
   const goToGame = () =>
-    router.push(`/match/${stat.Game.Match.matchID}?game=${stat.Game.gameID}`);
+    router.push(`/match/${stat.Game.Match!.matchID}?game=${stat.Game.gameID}`);
   return (
     <div className="relative rounded-md">
       <Image
@@ -294,19 +305,25 @@ function SeasonGame({
   );
 }
 
-function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
-  const atk = stats.ratingAttack;
-  const def = stats.ratingDefense;
+function IndividualStats({
+  stats,
+  mapUrl,
+}: {
+  stats: StatsPayload;
+  mapUrl: string | undefined;
+}) {
+  const atk = stats.ratingAttack ?? 0;
+  const def = stats.ratingDefense ?? 0;
   const rating = ((atk + def) / 2).toFixed(2);
-  let damageStats, damageStatsName;
+  let damageStats: string | number, damageStatsName: string;
   if (stats.Game.rounds) {
     damageStatsName = "ADR";
-    damageStats = (stats.damage / stats.Game.rounds).toFixed(2);
+    damageStats = ((stats.damage ?? 0) / stats.Game.rounds).toFixed(2);
   } else {
     damageStatsName = "TOT DMG";
-    damageStats = stats.damage;
+    damageStats = stats.damage ?? 0;
   }
-  const hs = stats.hsPercent.toFixed(2);
+  const hs = (stats.hsPercent ?? 0).toFixed(2);
   const statsList = [
     { name: "Rating", value: rating },
     { name: "ACS", value: stats.acs },
@@ -330,7 +347,13 @@ function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
   );
 }
 
-function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
+function IndividualOverview({
+  stat,
+  mapUrl,
+}: {
+  stat: StatsPayload;
+  mapUrl: string | undefined;
+}) {
   const [agents, setAgents] = useState<Agents>();
   useEffect(() => {
     let isMounted = true;
@@ -357,10 +380,10 @@ function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
     return;
   }
 
-  const k = stat.kills;
-  const d = stat.deaths;
-  const a = stat.assists;
-  const agent: string = stat.agent;
+  const k = stat.kills ?? 0;
+  const d = stat.deaths ?? 0;
+  const a = stat.assists ?? 0;
+  const agent = stat.agent ?? "";
 
   const kda = ((k + a) / d).toFixed(2);
   return (
@@ -392,7 +415,7 @@ function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
   );
 }
 
-function GameInfo({ stat }: { stat }) {
+function GameInfo({ stat }: { stat: StatsPayload }) {
   const playerTeam = stat.team;
   const game = stat.Game;
   const map = game.map;
@@ -400,7 +423,7 @@ function GameInfo({ stat }: { stat }) {
   let isHome = false;
   let teamScore;
   let opponentScore;
-  if (playerTeam === game.Match.home) isHome = true;
+  if (playerTeam === game.Match!.home) isHome = true;
   if (isHome) {
     teamScore = game.roundsWonHome;
     opponentScore = game.roundsWonAway;
@@ -420,7 +443,11 @@ function GameInfo({ stat }: { stat }) {
   );
 }
 
-function Lobby({ teams }: { teams }) {
+function Lobby({
+  teams,
+}: {
+  teams: { home: { id: number }; away: { id: number } };
+}) {
   const home = teams.home;
   const away = teams.away;
   return (
@@ -437,7 +464,7 @@ type TeamInfo = {
   tier: Tier;
 };
 
-function TeamLogo({ team }: { team }) {
+function TeamLogo({ team }: { team: { id: number } }) {
   const [teamURL, setTeamURL] = useState("");
   const [teamInfo, setTeamInfo] = useState<TeamInfo>();
 
@@ -480,7 +507,7 @@ function TeamLogo({ team }: { team }) {
       >
         <Image
           src={`${TEAM_LOGOS_URL}${teamURL}`}
-          alt={team.id}
+          alt={String(team.id)}
           width={500}
           height={500}
           className="size-10 m-auto text-center w-fit"

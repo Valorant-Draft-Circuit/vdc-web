@@ -12,6 +12,10 @@ export type Schedule = {
   bo5Season: Record<string, PackagedMatch[]>;
 };
 
+export type UpcomingMatchRow = Awaited<
+  ReturnType<typeof getUpcomingMatches>
+>[number];
+
 export async function getEveryUpcomingMatch() {
   const upcomingMatches = await getUpcomingMatches({ filter: true });
   return upcomingMatches;

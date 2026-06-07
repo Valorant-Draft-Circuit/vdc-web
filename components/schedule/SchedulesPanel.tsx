@@ -182,7 +182,17 @@ export default function SchedulePanel({
   );
 }
 
-function PreviousDayButton({ matchDays, activeDay, scrollToDay }) {
+type DayNavProps = {
+  matchDays: string[];
+  activeDay: string | null;
+  scrollToDay: (day: string) => void;
+};
+
+function PreviousDayButton({
+  matchDays,
+  activeDay,
+  scrollToDay,
+}: DayNavProps) {
   return (
     <button
       className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
@@ -197,7 +207,15 @@ function PreviousDayButton({ matchDays, activeDay, scrollToDay }) {
     </button>
   );
 }
-function NearestButton({ activeDay, nearestDay, scrollToDay }) {
+function NearestButton({
+  activeDay,
+  nearestDay,
+  scrollToDay,
+}: {
+  activeDay: string | null;
+  nearestDay: string | null;
+  scrollToDay: (day: string) => void;
+}) {
   return (
     <button
       className="px-4 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"
@@ -210,7 +228,7 @@ function NearestButton({ activeDay, nearestDay, scrollToDay }) {
     </button>
   );
 }
-function NextDayButton({ matchDays, activeDay, scrollToDay }) {
+function NextDayButton({ matchDays, activeDay, scrollToDay }: DayNavProps) {
   return (
     <button
       className="px-6 py-2 bg-gray-100 dark:bg-vdcGrey rounded border-1 border-vdcBlack disabled:opacity-50 disabled:hover:cursor-not-allowed hover:cursor-pointer hover:opacity-90"

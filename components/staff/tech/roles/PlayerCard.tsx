@@ -1,7 +1,14 @@
 import { ImageWithFallback } from "@/components/player/search/PlayerCard";
 import Link from "next/link";
 
-export default function PlayerCard({ user }) {
+type PlayerCardUser = {
+  id: string | undefined;
+  image: string | null | undefined;
+  discordName: string | null | undefined;
+  riotIGN: string | null | undefined;
+};
+
+export default function PlayerCard({ user }: { user: PlayerCardUser }) {
   return (
     <Link
       key={user.id}
@@ -11,7 +18,7 @@ export default function PlayerCard({ user }) {
       <div className="flex flex-row bg-gradient-to-br from-slate-100 to-slate-300 dark:from-vdcGrey dark:to-vdcBlack gap-4 items-center rounded-xl h-32 w-88">
         <div className="ml-4">
           <ImageWithFallback
-            src={user.image}
+            src={user.image ?? "/vdc-flame.svg"}
             fallbackSrc={"/vdc-flame.svg"}
             className="mx-auto size-18 rounded-full"
             alt={`${user.discordName} avatar`}

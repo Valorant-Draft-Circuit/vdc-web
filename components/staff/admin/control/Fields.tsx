@@ -14,10 +14,16 @@ import {
 import { ChevronDownIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { ControllerRenderProps } from "react-hook-form";
 import { Maps } from "@/lib/common/valorant-api";
 import { getMapsCached } from "@/lib/common/cache";
 
-export function SwitchField({ field, label }) {
+type FieldProps = {
+  field: ControllerRenderProps;
+  label: string;
+};
+
+export function SwitchField({ field, label }: FieldProps) {
   return (
     <Field>
       <Label className={"mb-2 uppercase text-vdcRed"}>
@@ -26,8 +32,8 @@ export function SwitchField({ field, label }) {
       <div className="flex flex-row gap-2 text-xs">
         <h1 className="my-auto">F</h1>
         <Switch
-          onChange={(val: boolean) => field.onChange(val)}
           {...field}
+          onChange={(val: boolean) => field.onChange(val)}
           className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-vdcGrey transition data-checked:bg-vdcRed data-hover:cursor-pointer"
         >
           <span className="size-4 translate-x-1 rounded-full bg-vdcWhite transition group-data-checked:translate-x-6" />
@@ -38,7 +44,7 @@ export function SwitchField({ field, label }) {
   );
 }
 
-export function TextAreaField({ field, label }) {
+export function TextAreaField({ field, label }: FieldProps) {
   return (
     <Field>
       <Label className={"mb-1 uppercase text-vdcRed"}>
@@ -56,7 +62,11 @@ export function TextAreaField({ field, label }) {
   );
 }
 
-export function SelectField({ field, label, options }) {
+export function SelectField({
+  field,
+  label,
+  options,
+}: FieldProps & { options: string[] }) {
   return (
     <Field>
       <Label className={"mb-1 uppercase text-vdcRed"}>
@@ -80,7 +90,7 @@ export function SelectField({ field, label, options }) {
   );
 }
 
-export function InputField({ field, label }) {
+export function InputField({ field, label }: FieldProps) {
   return (
     <Field>
       <Label className={"mb-1 uppercase text-vdcRed"}>
@@ -98,7 +108,7 @@ export function InputField({ field, label }) {
   );
 }
 
-export function MapPoolSelect({ field, label }) {
+export function MapPoolSelect({ field, label }: FieldProps) {
   const [maps, setMaps] = useState<Maps>();
   const [activeMaps, setActiveMaps] = useState<string[]>(() => {
     const value = field.value;

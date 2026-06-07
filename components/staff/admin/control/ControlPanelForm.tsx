@@ -2,7 +2,7 @@
 
 import { CONTROL_GROUPS } from "@/lib/common/constants";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Control, useForm } from "react-hook-form";
 import { ConfigSection, ConfigSectionSkeleton } from "./ConfigSection";
 import {
   InputField,
@@ -16,6 +16,10 @@ export type ConfigItem = {
   label: string;
   value: string;
   notes: string;
+};
+
+type ControlsSectionProps = {
+  control: Control;
 };
 
 export default function ControlPanelForm() {
@@ -128,7 +132,10 @@ export function parseOptions(notes: string): string[] | null {
     .map((opt) => opt.trim().replace(/^["']|["']$/g, ""));
 }
 
-export function GeneralControls({ generalControls, control }) {
+export function GeneralControls({
+  generalControls,
+  control,
+}: ControlsSectionProps & { generalControls: ConfigItem[] }) {
   return (
     <ConfigSection
       title="General Controls"
@@ -148,7 +155,10 @@ export function GeneralControls({ generalControls, control }) {
   );
 }
 
-function DraftControls({ draftControls, control }) {
+function DraftControls({
+  draftControls,
+  control,
+}: ControlsSectionProps & { draftControls: ConfigItem[] }) {
   return (
     <ConfigSection
       title="Draft Controls"
@@ -161,7 +171,10 @@ function DraftControls({ draftControls, control }) {
   );
 }
 
-function MmrControls({ mmrControls, control }) {
+function MmrControls({
+  mmrControls,
+  control,
+}: ControlsSectionProps & { mmrControls: ConfigItem[] }) {
   return (
     <ConfigSection
       title="MMR Controls"
@@ -171,7 +184,10 @@ function MmrControls({ mmrControls, control }) {
   );
 }
 
-function BanControls({ banControls, control }) {
+function BanControls({
+  banControls,
+  control,
+}: ControlsSectionProps & { banControls: ConfigItem[] }) {
   return (
     <ConfigSection
       title="Ban Order Controls"

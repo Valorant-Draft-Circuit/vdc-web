@@ -2,6 +2,7 @@ import DiscordButton from "../buttons/DiscordButton";
 import Image from "next/image";
 import SignUpButton from "../buttons/SignUpButton";
 import { LeagueStatus } from "@prisma/client";
+import { Session } from "next-auth";
 import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
 import { getUser } from "@/lib/queries/user/user";
@@ -9,7 +10,11 @@ import { getSignupState } from "@/lib/queries/control/control";
 import { matchDayTimeWithFallback } from "@/lib/common/times";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
-export default async function HeroSection({ session }) {
+export default async function HeroSection({
+  session,
+}: {
+  session: Session | null;
+}) {
   return (
     <div className="xl:p-4">
       <div className="relative isolate overflow-hidden py-28 xl:py-12 4xl:py-32 text-center xl:rounded-3xl sm:px-16 4xl:px-24 flex flex-col lg:flex-row space-y-10">
@@ -75,7 +80,7 @@ function Join() {
   );
 }
 
-async function Joined({ session }) {
+async function Joined({ session }: { session: Session }) {
   if (!session.user?.id) {
     return (
       <div className="flex flex-col gap-5">

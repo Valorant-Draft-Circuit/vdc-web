@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { listAllSeasons } from "@/lib/common/season";
 import { ControlPanel } from "@/prisma";
+import { PlayerProfile } from "@/app/api/player/[riotIGN]/route";
 
 type PlayerIGN = {
   encoded: string;
@@ -120,6 +121,7 @@ export default async function Page({ params, searchParams }: Props) {
   ];
 
   const playerInfo = await getPlayerByRiot(playerIGN.encoded);
+  if (!playerInfo) return <PlayerNotFound player={playerIGN.decoded} />;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
@@ -162,14 +164,12 @@ async function handleDiscordIDSearch(discordID: string) {
   }
 }
 
-async function getPlayerByRiot(riotIGN) {
+async function getPlayerByRiot(riotIGN: string): Promise<PlayerProfile | null> {
   const res = await fetch(`${process.env.URL}/api/player/${riotIGN}`);
   if (res.ok) {
-    const data: string = await res.json();
-    return data;
-  } else {
-    return <PlayerNotFound player={riotIGN} />;
+    return (await res.json()) as PlayerProfile;
   }
+  return null;
 }
 
 // async function getPlayerStatsByCurrentSeason(riotIGN) {

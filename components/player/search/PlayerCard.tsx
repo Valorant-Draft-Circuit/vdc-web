@@ -5,12 +5,19 @@ import {
   TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
 } from "@/lib/common/constants";
+import { MeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/route";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { isUserPlaying } from "@/lib/common/player";
 
-export default function PlayerCard({ player, mmrShow }) {
+export default function PlayerCard({
+  player,
+  mmrShow,
+}: {
+  player: MeiliPlayer;
+  mmrShow: boolean;
+}) {
   const [isBannerValid, setIsBannerValid] = useState(false);
   useEffect(() => {
     async function checkBanner() {
@@ -31,7 +38,7 @@ export default function PlayerCard({ player, mmrShow }) {
       {isBannerValid && (
         <Image
           alt={player.discordName}
-          src={player.banner}
+          src={player.banner ?? ""}
           fill
           sizes="100vw"
           className="absolute pointer-events-none inset-0 object-cover -z-10 brightness-40 dark:brightness-20 rounded-xl"
@@ -105,7 +112,9 @@ export default function PlayerCard({ player, mmrShow }) {
   );
 }
 
-export const ImageWithFallback = (props) => {
+export const ImageWithFallback = (
+  props: React.ComponentProps<typeof Image> & { fallbackSrc: string },
+) => {
   const { src, fallbackSrc, ...rest } = props;
   const [imgSrc, setImgSrc] = useState(src);
   return (

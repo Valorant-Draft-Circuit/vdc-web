@@ -120,12 +120,13 @@ export async function getScheduleByTierCached(
   return scheduleByTier;
 }
 
-type ActiveFranchises = Prisma.FranchiseGetPayload<{
+export type ActiveFranchise = Prisma.FranchiseGetPayload<{
   include: {
     Teams: true;
     Brand: true;
   };
-}>[];
+}>;
+type ActiveFranchises = ActiveFranchise[];
 export async function getAllActiveFranchisesCached() {
   const key = "activeFranchises";
   const hit = cache.get<ActiveFranchises>(key);

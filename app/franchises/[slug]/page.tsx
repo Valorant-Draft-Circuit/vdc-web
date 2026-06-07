@@ -143,7 +143,13 @@ export default async function Page({ params, searchParams }: Props) {
   );
 }
 
-function FMLink({ name, id }: { name; id }) {
+function FMLink({
+  name,
+  id,
+}: {
+  name: string | null | undefined;
+  id: string | null | undefined;
+}) {
   return (
     <Link
       href={`https://discord.com/users/${id}`}

@@ -90,7 +90,13 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
   );
 }
 
-function MatchScore({ homeWins, awayWins }: { homeWins?; awayWins? }) {
+function MatchScore({
+  homeWins,
+  awayWins,
+}: {
+  homeWins?: number;
+  awayWins?: number;
+}) {
   const [revealed, setRevealed] = useState(false);
   let pastGame = true;
   if (homeWins === 0 && awayWins === 0) {

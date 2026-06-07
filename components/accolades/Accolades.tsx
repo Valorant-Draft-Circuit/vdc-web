@@ -107,7 +107,13 @@ function MaterialSymbolsCrown(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function AccoladeDescription({ desc, show }) {
+function AccoladeDescription({
+  desc,
+  show,
+}: {
+  desc: string;
+  show: boolean;
+}) {
   return (
     <>
       {show && (

@@ -48,7 +48,7 @@ export default async function Page() {
   );
 }
 
-function LeagueState({ leagueState }) {
+function LeagueState({ leagueState }: { leagueState: string }) {
   let statusColor;
   switch (leagueState) {
     case "OFFSEASON":

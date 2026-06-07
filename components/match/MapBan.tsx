@@ -2,12 +2,35 @@
 
 import { MAP_LIST_URL, MAPS, TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { XMarkIcon, TrashIcon } from "@heroicons/react/16/solid";
-import { MapBanType } from "@prisma/client";
+import { MapBansSide, MapBanType } from "@prisma/client";
+import { MatchTeam } from "@/lib/queries/match/match";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function MapBan({ mapBan, teams, delay = 0 }) {
+type MapBanInput = {
+  id: number;
+  matchID: number;
+  order: number;
+  type: MapBanType;
+  team: number | null;
+  map: string | null;
+  side: MapBansSide | null;
+  gameId?: string;
+};
+
+export default function MapBan({
+  mapBan,
+  teams,
+  delay = 0,
+}: {
+  mapBan: MapBanInput;
+  teams: {
+    home: MatchTeam | null | undefined;
+    away: MatchTeam | null | undefined;
+  };
+  delay?: number;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -26,9 +49,9 @@ export default function MapBan({ mapBan, teams, delay = 0 }) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const mapUrl = MAP_LIST_URL(MAPS[mapBan.map.toUpperCase()]);
+  const mapUrl = MAP_LIST_URL(MAPS[mapBan.map?.toUpperCase() ?? ""]);
   const { home, away } = teams;
-  const decidingTeam = mapBan.team === home.id ? home : away;
+  const decidingTeam = mapBan.team === home?.id ? home : away;
   const isBan = mapBan.type === MapBanType.BAN;
   const isDiscard = mapBan.type === MapBanType.DISCARD;
 
@@ -42,10 +65,10 @@ export default function MapBan({ mapBan, teams, delay = 0 }) {
           "border-1 border-vdcRed rounded-lg"
         }`}
       style={{ transitionDelay: `${delay}ms` }}
-      onClick={() => updateParam("game", mapBan.gameId)}
+      onClick={() => updateParam("game", mapBan.gameId ?? "")}
     >
       <Image
-        alt={mapBan.map}
+        alt={mapBan.map ?? ""}
         src={mapUrl}
         width={5000}
         height={5000}
@@ -70,8 +93,8 @@ export default function MapBan({ mapBan, teams, delay = 0 }) {
 
         <div className="mt-auto xl:mt-10 self-end xl:self-center">
           <Image
-            alt={decidingTeam?.name}
-            src={`${TEAM_LOGOS_URL}${decidingTeam?.Franchise.Brand.logo}`}
+            alt={decidingTeam?.name ?? ""}
+            src={`${TEAM_LOGOS_URL}${decidingTeam?.Franchise.Brand?.logo}`}
             width={5000}
             height={5000}
             className="size-10 xl:size-20"

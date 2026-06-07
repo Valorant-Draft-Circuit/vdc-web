@@ -1,4 +1,4 @@
-export default function Divider({ title }: { title }) {
+export default function Divider({ title }: { title: string }) {
   return (
     <div className="relative">
       <div aria-hidden="true" className="absolute inset-0 flex items-center">

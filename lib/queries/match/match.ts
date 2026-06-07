@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
+export type MatchDetail = NonNullable<Awaited<ReturnType<typeof getMatch>>>;
+export type MatchTeam = NonNullable<MatchDetail["Home"]>;
+
 export async function getMatch(id: string) {
   const match = await prisma.matches.findUnique({
     where: {

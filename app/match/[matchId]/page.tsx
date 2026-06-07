@@ -8,7 +8,7 @@ import {
   TIER_COLOR_MAP,
 } from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
-import { getMatch } from "@/lib/queries/match/match";
+import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
@@ -210,7 +210,7 @@ export default async function Page({
               </div>
             )}
             <div className="flex flex-col gap-4 p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
-              {gameOverview && (
+              {gameOverviewWithTeam && (
                 <MatchOverview
                   gameOverview={gameOverviewWithTeam}
                   teams={teams}
@@ -226,11 +226,26 @@ export default async function Page({
   );
 }
 
-async function MatchOverview({ gameOverview, teams }) {
+type MatchTeams = {
+  home: MatchTeam | null | undefined;
+  away: MatchTeam | null | undefined;
+};
+
+type GameOverviewWithPick = MatchDetail["Games"][number] & {
+  mapPick: number | null | undefined;
+};
+
+async function MatchOverview({
+  gameOverview,
+  teams,
+}: {
+  gameOverview: GameOverviewWithPick;
+  teams: MatchTeams;
+}) {
   const maps = await getMapsCached();
   const map = gameOverview.map;
   const bgImage = map
-    ? SECONDARY_MAP_LIST_URL(maps[gameOverview.map.toUpperCase()])
+    ? SECONDARY_MAP_LIST_URL(maps[map.toUpperCase()])
     : "/map-placeholder.webp";
   return (
     <>
@@ -276,9 +291,21 @@ async function MatchOverview({ gameOverview, teams }) {
   );
 }
 
-function OverviewScore({ team, score, isHome, pick, winner }) {
-  const mapPick = pick === team.id;
-  const isWinner = team.id === winner;
+function OverviewScore({
+  team,
+  score,
+  isHome,
+  pick,
+  winner,
+}: {
+  team: MatchTeam | null | undefined;
+  score: number;
+  isHome: boolean;
+  pick: number | null | undefined;
+  winner: number | null;
+}) {
+  const mapPick = pick === team?.id;
+  const isWinner = team?.id === winner;
   return (
     <div
       className={`flex flex-row gap-2 xl:gap-5 ${
@@ -286,8 +313,8 @@ function OverviewScore({ team, score, isHome, pick, winner }) {
       }`}
     >
       <Image
-        alt={team.id}
-        src={`${TEAM_LOGOS_URL}${team.Franchise.Brand.logo}`}
+        alt={String(team?.id)}
+        src={`${TEAM_LOGOS_URL}${team?.Franchise.Brand?.logo}`}
         width={50000}
         height={50000}
         className="size-10 xl:size-15 m-auto"
@@ -313,13 +340,19 @@ function OverviewScore({ team, score, isHome, pick, winner }) {
   );
 }
 
-function TeamIdentity({ team, teamBrand }) {
+function TeamIdentity({
+  team,
+  teamBrand,
+}: {
+  team: MatchTeam | null | undefined;
+  teamBrand: MatchTeam["Franchise"]["Brand"] | undefined;
+}) {
   const franchiseSlug = team?.Franchise.slug;
 
   return (
     <div className="flex flex-col text-center w-1/3 hover:brightness-80">
       <h1 className="text-vdcWhite italic">{team?.Franchise.slug}</h1>
-      <Link href={`/franchises/${franchiseSlug}?team=${team.tier}`}>
+      <Link href={`/franchises/${franchiseSlug}?team=${team?.tier}`}>
         <Image
           alt={`${teamBrand?.logo}`}
           src={`${TEAM_LOGOS_URL}${teamBrand?.logo}`}

@@ -1,8 +1,9 @@
 "use client";
 
 import { avg, sum } from "@/lib/common/math";
+import { ProcessedPlayerStat } from "./PlayerSummary";
 
-export function PlayerStats({ stats }: { stats }) {
+export function PlayerStats({ stats }: { stats: ProcessedPlayerStat[] }) {
   const summedStats = {
     totalKills: sum(stats.map((ps) => ps.kills)),
     totalAssists: sum(stats.map((ps) => ps.assists)),

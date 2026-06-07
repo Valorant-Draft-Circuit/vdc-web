@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { UseFormRegister } from "react-hook-form";
+import { UserWithRelations } from "@/lib/queries/user/user";
 import { SignUpInput } from "./SignUpForm";
 
 export default function Accounts({
   user,
   register,
 }: {
-  user;
+  user: UserWithRelations;
   register: UseFormRegister<SignUpInput>;
 }) {
   return (
@@ -23,7 +24,7 @@ export default function Accounts({
           className="hidden"
         />
         <input
-          value={user.name}
+          value={user.name ?? ""}
           readOnly
           className="w-full xl:w-1/3 text-vdcRed dark:text-gray-400 rounded-sm border p-1 font-semibold hover:cursor-not-allowed"
         />
@@ -57,7 +58,7 @@ export default function Accounts({
   );
 }
 
-function ValAccounts({ user }: { user }) {
+function ValAccounts({ user }: { user: UserWithRelations }) {
   return (
     <>
       <optgroup label="Your connected accounts:">
@@ -71,7 +72,7 @@ function ValAccounts({ user }: { user }) {
   );
 }
 
-function AccountHelper({ user }: { user }) {
+function AccountHelper({ user }: { user: UserWithRelations }) {
   if (user.Accounts.length === 0) {
     return (
       <>

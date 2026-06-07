@@ -1,10 +1,17 @@
 "use client";
 
+import { Tier } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import StatsTable from "./StatsTable";
 import { useEffect, useState } from "react";
 
-export default function StatsPanel({ defaultQueries }) {
+type DefaultStatsQueries = { season: number; tier: Tier };
+
+export default function StatsPanel({
+  defaultQueries,
+}: {
+  defaultQueries: DefaultStatsQueries;
+}) {
   const [data, setData] = useState();
   const searchParams = useSearchParams();
   const seasonQuery =

@@ -1,6 +1,11 @@
 import { avg } from "@/lib/common/math";
+import { ProcessedPlayerStat } from "./PlayerSummary";
 
-export default function PlayerRating({ stats }: { stats }) {
+export default function PlayerRating({
+  stats,
+}: {
+  stats: ProcessedPlayerStat[];
+}) {
   const ratings = {
     ratingAttack: avg(stats.map((ps) => ps.ratingAttack)),
     ratingDefense: avg(stats.map((ps) => ps.ratingDefense)),

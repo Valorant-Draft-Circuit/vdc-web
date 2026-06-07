@@ -1,11 +1,16 @@
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
+import { ActiveFranchise } from "@/lib/common/cache";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function FranchiseCard({ franchise }: { franchise }) {
-  const primary = toTailwindCustomHexCode(franchise.Brand.colorPrimary);
-  const secondary = toTailwindCustomHexCode(franchise.Brand.colorSecondary);
+export default function FranchiseCard({
+  franchise,
+}: {
+  franchise: ActiveFranchise;
+}) {
+  const primary = toTailwindCustomHexCode(franchise.Brand!.colorPrimary);
+  const secondary = toTailwindCustomHexCode(franchise.Brand!.colorSecondary);
 
   return (
     <Link href={`/franchises/${franchise.slug}`}>
@@ -17,7 +22,7 @@ export default function FranchiseCard({ franchise }: { franchise }) {
         <div className="flex flex-row gap-4 text-center xl:gap-6">
           <div className="drop-shadow-lg flex">
             <Image
-              src={`${TEAM_LOGOS_URL}${franchise.Brand.logo}`}
+              src={`${TEAM_LOGOS_URL}${franchise.Brand!.logo}`}
               alt={franchise.slug}
               height={250}
               width={250}

@@ -1,6 +1,6 @@
 import { DISCORD_USER_HOWTO_URL } from "@/lib/common/constants";
 
-export default function PlayerNotFound({ player }: { player }) {
+export default function PlayerNotFound({ player }: { player: string }) {
   return (
     <div className="flex min-h-screen justify-center items-center">
       <div className="py-10 max-w-7xl xl:py-12 flex flex-col gap-5 text-center">
