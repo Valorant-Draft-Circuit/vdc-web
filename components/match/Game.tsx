@@ -1,11 +1,22 @@
 "use client";
 
 import { MAP_LIST_URL, MAPS, TIER_COLOR_MAP } from "@/lib/common/constants";
+import { MatchDetail } from "@/lib/queries/match/match";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Game({ game, gameNumber, delay = 0 }) {
+type GameRow = MatchDetail["Games"][number];
+
+export default function Game({
+  game,
+  gameNumber,
+  delay = 0,
+}: {
+  game: GameRow;
+  gameNumber: number;
+  delay?: number;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -38,8 +49,8 @@ export default function Game({ game, gameNumber, delay = 0 }) {
     >
       {map && (
         <Image
-          alt={game.map}
-          src={MAP_LIST_URL(MAPS[game.map.toUpperCase()])}
+          alt={game.map ?? ""}
+          src={MAP_LIST_URL(MAPS[map!.toUpperCase()])}
           width={5000}
           height={5000}
           className="absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-55 dark:brightness-50"

@@ -4,10 +4,14 @@ import PlayerCard from "./PlayerCard";
 import MatchCard from "@/components/schedule/MatchCard";
 import Divider from "@/components/theme/Divider";
 import { ControlPanel } from "@/prisma";
-import { calculateTeamTotalMmr } from "@/lib/queries/franchises/franchises";
+import {
+  calculateTeamTotalMmr,
+  FranchiseTeam,
+} from "@/lib/queries/franchises/franchises";
+import { Standing } from "@/lib/queries/standings/standings";
 import TeamStatsPanel from "./TeamStats";
 
-export default async function TeamPanel({ team }: { team }) {
+export default async function TeamPanel({ team }: { team: FranchiseTeam }) {
   const season = await getSeasonCached();
 
   const standings = await getStandingsByCached(season, team.tier);
@@ -91,9 +95,9 @@ function MatchSection({
   matches,
   emptyText,
 }: {
-  title;
-  matches;
-  emptyText;
+  title: string;
+  matches: FranchiseTeam["futureGames"] | FranchiseTeam["pastGames"];
+  emptyText: string;
 }) {
   return (
     <PanelSection title={title}>
@@ -125,12 +129,20 @@ function EmptyMessage({ text }: { text: string }) {
   );
 }
 
-function TeamStats({ stats, rank, isApexRank }: { stats; rank; isApexRank }) {
+function TeamStats({
+  stats,
+  rank,
+  isApexRank,
+}: {
+  stats: Standing | undefined;
+  rank: number;
+  isApexRank: boolean;
+}) {
   const entries = [
     { label: "RANK: ", value: rank >= 0 ? rank + 1 : "N/A" },
     { label: "W: ", value: stats?.wins || 0 },
     { label: "L: ", value: stats?.losses || 0 },
-    { label: "RWP: ", value: `${(stats?.rwp * 100).toFixed(0) || 0}%` },
+    { label: "RWP: ", value: `${((stats?.rwp ?? 0) * 100).toFixed(0) || 0}%` },
   ];
 
   return (

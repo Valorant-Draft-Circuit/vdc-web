@@ -1,6 +1,10 @@
 "use client";
 
-import { AdminSummary } from "@/app/api/staff/admins/summary/route";
+import {
+  AdminSummary,
+  FreeAgentTierCount,
+  SignedTierCount,
+} from "@/app/api/staff/admins/summary/route";
 import { TIER_COLOR_MAP } from "@/lib/common/constants";
 import { useEffect, useState } from "react";
 
@@ -32,7 +36,7 @@ export default function LeagueDashboard() {
   );
 }
 
-function OverallSummary({ summary }) {
+function OverallSummary({ summary }: { summary?: AdminSummary }) {
   const signed = summary?.signedPlayerCount ?? 0;
   const freeAgents = summary?.freeAgentCount ?? 0;
   const sum = signed + freeAgents;
@@ -47,7 +51,7 @@ function OverallSummary({ summary }) {
   );
 }
 
-function SignedPlayersSummary({ summary }) {
+function SignedPlayersSummary({ summary }: { summary?: AdminSummary }) {
   return (
     <div className="rounded-xl flex flex-col bg-indigo-50 p-5">
       <h2 className="text-md text-vdcBlack">
@@ -62,7 +66,7 @@ function SignedPlayersSummary({ summary }) {
   );
 }
 
-function SignedPlayersByTier({ tierData }) {
+function SignedPlayersByTier({ tierData }: { tierData: SignedTierCount }) {
   return (
     <div className="rounded-md">
       <h1 className={`text-${TIER_COLOR_MAP[tierData.tier]} text-lg`}>
@@ -75,7 +79,7 @@ function SignedPlayersByTier({ tierData }) {
   );
 }
 
-function FreeAgentSummary({ summary }) {
+function FreeAgentSummary({ summary }: { summary?: AdminSummary }) {
   return (
     <div className="rounded-xl flex flex-col bg-indigo-50 p-5">
       <h2 className="text-md text-vdcBlack">
@@ -90,7 +94,7 @@ function FreeAgentSummary({ summary }) {
   );
 }
 
-function FreeAgentsByTier({ tierData }) {
+function FreeAgentsByTier({ tierData }: { tierData: FreeAgentTierCount }) {
   return (
     <div className="rounded-md">
       <h1 className={`text-${TIER_COLOR_MAP[tierData.tier]} text-lg`}>

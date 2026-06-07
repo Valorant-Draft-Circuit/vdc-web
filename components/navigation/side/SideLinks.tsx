@@ -12,7 +12,7 @@ import { navLinks } from "../NavBar";
 import MobileAuth from "../../auth/MobileAuth";
 import { SessionProvider } from "next-auth/react";
 
-export default function SideLinks({ preview }) {
+export default function SideLinks({ preview }: { preview: boolean }) {
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 

@@ -8,9 +8,14 @@ import { GameType, Prisma } from "@prisma/client";
 import PlayerMatches from "./PlayerMatches";
 import { InformationCircleIcon } from "@heroicons/react/16/solid";
 
-type StatsPayload = Prisma.PlayerStatsGetPayload<{
+export type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
 }>;
+
+export type ProcessedPlayerStat = StatsPayload & {
+  rounds: number;
+  totalDamage: number | null;
+};
 
 export default function PlayerSummary() {
   const [stats, setStats] = useState<StatsPayload[] | null>(null);

@@ -1,6 +1,12 @@
 import { ControlPanel, Player } from "@/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+export type PlayerProfile = NonNullable<
+  Awaited<ReturnType<typeof Player.getBy>>
+>;
+
+type PlayerProfileAccount = PlayerProfile["Accounts"][number];
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ riotIGN: string }> },
@@ -9,7 +15,7 @@ export async function GET(
   const shouldIncludeMmr = await ControlPanel.getMMRDisplayState();
   const player = await Player.getBy({ ign: riotIGN });
 
-  const transformAccount = (account) => {
+  const transformAccount = (account: PlayerProfileAccount | null) => {
     if (!account) return account;
 
     if (shouldIncludeMmr) {

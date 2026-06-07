@@ -1,4 +1,4 @@
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, ControllerRenderProps } from "react-hook-form";
 import { SelectField, InputField } from "./Fields";
 import { parseOptions, ConfigItem } from "./ControlPanelForm";
 
@@ -6,7 +6,11 @@ type ConfigSectionProps = {
   title: string;
   controls: ConfigItem[];
   control: Control;
-  renderField?: (field, label, notes) => React.ReactNode;
+  renderField?: (
+    field: ControllerRenderProps,
+    label: string,
+    notes: string,
+  ) => React.ReactNode;
 };
 
 export function ConfigSection({

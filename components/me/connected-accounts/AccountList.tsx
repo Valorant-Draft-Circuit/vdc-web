@@ -194,7 +194,7 @@ function RefreshAccounts({ refresh }: { refresh: () => Promise<void> }) {
   );
 }
 
-function DeleteTooltip({ show }) {
+function DeleteTooltip({ show }: { show: boolean }) {
   return (
     <>
       {show && (

@@ -1,8 +1,15 @@
 "use client";
 
+import { Tier } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 
-export default function StatsTitle({ defaultQueries }) {
+type DefaultStatsQueries = { season: number; tier: Tier };
+
+export default function StatsTitle({
+  defaultQueries,
+}: {
+  defaultQueries: DefaultStatsQueries;
+}) {
   const searchParams = useSearchParams();
   const season =
     searchParams.get("season")?.toLowerCase() || defaultQueries.season;

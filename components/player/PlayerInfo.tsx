@@ -10,11 +10,18 @@ import { parseRiotIGN } from "@/lib/common/player";
 import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
+import { PlayerProfile } from "@/app/api/player/[riotIGN]/route";
 
-export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
-  const encodedIGN = encodeURIComponent(playerInfo.PrimaryRiotAccount.riotIGN);
+export default async function PlayerInfo({
+  playerInfo,
+}: {
+  playerInfo: PlayerProfile;
+}) {
+  const encodedIGN = encodeURIComponent(
+    playerInfo.PrimaryRiotAccount!.riotIGN!,
+  );
   const [riotIGN, riotTag] = parseRiotIGN(
-    playerInfo.PrimaryRiotAccount.riotIGN
+    playerInfo.PrimaryRiotAccount!.riotIGN!,
   );
   const mmrShow = await ControlPanel.getMMRDisplayState();
 
@@ -22,10 +29,10 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   let playerTeam;
   let tierColor: string;
 
-  const leagueStatus = playerInfo.Status.leagueStatus;
+  const leagueStatus = playerInfo.Status!.leagueStatus;
 
   if (leagueStatus === LeagueStatus.SIGNED) {
-    playerTeam = playerInfo.Team;
+    playerTeam = playerInfo.Team!;
     tierColor = TIER_COLOR_MAP[playerTeam.tier];
     isPlayerSigned = true;
   } else if (leagueStatus === LeagueStatus.GENERAL_MANAGER) {
@@ -46,7 +53,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   )[0].providerAccountId;
 
   let showMmr = mmrShow;
-  if (!playerInfo.PrimaryRiotAccount.MMR) {
+  if (!playerInfo.PrimaryRiotAccount!.MMR) {
     showMmr = false;
   }
   const playerAccolades = getAccolades(playerInfo.Accolades);
@@ -62,8 +69,8 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
               href={`https://discord.com/users/${discordAccountId}`}
             >
               <Image
-                alt={playerInfo.name}
-                src={playerInfo.image}
+                alt={playerInfo.name ?? ""}
+                src={playerInfo.image ?? ""}
                 className={`size-20 rounded-md border-5 border-${tierColor} overflow-hidden text-sm`}
                 width={250}
                 height={250}
@@ -106,7 +113,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
             </div>
             {showMmr && (
               <div className="text-sm text-gray-300">
-                <h1>MMR: {playerInfo.PrimaryRiotAccount.MMR.mmrEffective}</h1>
+                <h1>MMR: {playerInfo.PrimaryRiotAccount!.MMR!.mmrEffective}</h1>
               </div>
             )}
           </div>
@@ -123,7 +130,7 @@ export default async function PlayerInfo({ playerInfo }: { playerInfo }) {
   );
 }
 
-function QuickLinks({ ign, discordId }) {
+function QuickLinks({ ign, discordId }: { ign: string; discordId: string }) {
   return (
     <>
       <a target="_blank" href={`${TRACKER_PROFILE_URL}/${ign}`}>
@@ -156,13 +163,13 @@ function QuickLinks({ ign, discordId }) {
   );
 }
 
-function ProfileBanner({ playerInfo }) {
+function ProfileBanner({ playerInfo }: { playerInfo: PlayerProfile }) {
   const hasBanner = playerInfo.banner;
   if (hasBanner) {
     return (
       <Image
-        alt={playerInfo.name}
-        src={playerInfo.banner}
+        alt={playerInfo.name ?? ""}
+        src={playerInfo.banner ?? ""}
         fill
         sizes="100vw"
         className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-35 dark:brightness-20"
@@ -171,8 +178,8 @@ function ProfileBanner({ playerInfo }) {
   }
   return (
     <Image
-      alt={playerInfo.name}
-      src={playerInfo.image}
+      alt={playerInfo.name ?? ""}
+      src={playerInfo.image ?? ""}
       width={5000}
       height={5000}
       className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-50 opacity-80 drop-shadow-lg"

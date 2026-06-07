@@ -8,18 +8,33 @@ import {
   ShieldExclamationIcon,
 } from "@heroicons/react/24/solid";
 import { ContractStatus } from "@prisma/client";
+import { FranchiseTeam } from "@/lib/queries/franchises/franchises";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function PlayerCard({ player, mmrShow }: { player; mmrShow }) {
+type RosterPlayer = FranchiseTeam["Roster"][number];
+
+export default function PlayerCard({
+  player,
+  mmrShow,
+}: {
+  player: RosterPlayer;
+  mmrShow: boolean;
+}) {
   const discordAccount = player.Accounts[0];
   const goToProfile = () =>
     router.push(`/player/${discordAccount.providerAccountId}`);
   const router = useRouter();
-  const playerMmr = player.PrimaryRiotAccount.MMR.mmrEffective;
+  const playerMmr = player.PrimaryRiotAccount?.MMR?.mmrEffective;
 
-  function ContextIcons({ pStatus, captain }) {
+  function ContextIcons({
+    pStatus,
+    captain,
+  }: {
+    pStatus: ContractStatus | null;
+    captain: RosterPlayer["Captain"];
+  }) {
     if (pStatus === ContractStatus.INACTIVE_RESERVE) {
       return (
         <div className="group relative">
@@ -69,14 +84,14 @@ export default function PlayerCard({ player, mmrShow }: { player; mmrShow }) {
         <div className="flex flex-row gap-3">
           <div className="relative flex flex-row">
             <Image
-              src={player.image}
-              alt={player.name}
+              src={player.image ?? ""}
+              alt={player.name ?? ""}
               width={250}
               height={250}
               className="inline-block size-8 rounded-full my-auto text-xs"
             />
             <ContextIcons
-              pStatus={player.Status.contractStatus}
+              pStatus={player.Status?.contractStatus ?? null}
               captain={player.Captain}
             />
           </div>

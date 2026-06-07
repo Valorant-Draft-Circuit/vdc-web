@@ -5,19 +5,25 @@ import {
   getSignedPlayerCountByTier,
   getTotalFreeAgentCount,
 } from "@/lib/queries/staff/admin";
-import { LeagueStatus } from "@prisma/client";
+import { LeagueStatus, Tier } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-export type TierCount = {
-  Tier: number;
+export type SignedTierCount = {
+  tier: Tier;
+  count: number;
+};
+
+export type FreeAgentTierCount = {
+  tier: Tier;
+  faCount: number;
+  rfaCount: number;
 };
 
 export type AdminSummary = {
   signedPlayerCount: number;
-  signedPlayerCountByTier: TierCount;
+  signedPlayerCountByTier: SignedTierCount[];
   freeAgentCount: number;
-  freeAgentCountByTier: TierCount;
-  rfaCountByTier: TierCount;
+  freeAgentCountByTier: FreeAgentTierCount[];
 };
 
 export async function GET() {

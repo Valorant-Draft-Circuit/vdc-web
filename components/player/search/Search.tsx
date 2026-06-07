@@ -18,7 +18,7 @@ import { STATUS_LABELS, TIERS_LIST } from "@/lib/common/constants";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 // import { LeagueStatus } from "@prisma/client";
 
-export default function PlayerSearch({ mmrShow }) {
+export default function PlayerSearch({ mmrShow }: { mmrShow: boolean }) {
   const defaultStatus = [
     // LeagueStatus.GENERAL_MANAGER,
     // LeagueStatus.SIGNED,
@@ -138,7 +138,19 @@ export default function PlayerSearch({ mmrShow }) {
   );
 }
 
-function Filters({ tierFilter, setTierFilter, statusFilter, setStatusFilter }) {
+type FilterProps = {
+  tierFilter: string;
+  setTierFilter: (v: string) => void;
+  statusFilter: string[];
+  setStatusFilter: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+function Filters({
+  tierFilter,
+  setTierFilter,
+  statusFilter,
+  setStatusFilter,
+}: FilterProps) {
   return (
     <div className="flex flex-wrap gap-2 text-sm xl:mt-0">
       <Select
@@ -163,7 +175,10 @@ function Filters({ tierFilter, setTierFilter, statusFilter, setStatusFilter }) {
   );
 }
 
-function StatusFilter({ statusFilter, setStatusFilter }) {
+function StatusFilter({
+  statusFilter,
+  setStatusFilter,
+}: Pick<FilterProps, "statusFilter" | "setStatusFilter">) {
   return (
     <Menu>
       <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-100 dark:bg-vdcGrey px-3 py-1.5 text-vdcGrey dark:text-vdcWhite shadow-inner focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:opacity-90 data-open:brightness-80 transition-all ease-in duration-75">

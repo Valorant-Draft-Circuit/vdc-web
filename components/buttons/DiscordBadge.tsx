@@ -1,6 +1,12 @@
 import Image from "next/image";
 
-export default function DiscordBadge({ image, name }: { image; name }) {
+export default function DiscordBadge({
+  image,
+  name,
+}: {
+  image: string;
+  name: string;
+}) {
   return (
     <div className="flex flex-row rounded-md p-2 bg-radial from-[#5865F2] to-[rgb(93,106,255)] ">
       <Image

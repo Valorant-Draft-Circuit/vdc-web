@@ -11,7 +11,10 @@ import {
   Column,
   ColumnDef,
   ColumnFiltersState,
+  HeaderGroup,
+  Row,
   RowData,
+  Table,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -259,7 +262,15 @@ function Filters({
   );
 }
 
-function TableCol({ headerGroup, table }) {
+type TableRowData = FormattedStat | FormattedGameStat | FormattedTeamStat;
+
+function TableCol({
+  headerGroup,
+  table,
+}: {
+  headerGroup: HeaderGroup<TableRowData>;
+  table: Table<TableRowData>;
+}) {
   const sortingState = table.getState().sorting;
   const primarySortId = sortingState[0]?.id;
 
@@ -320,7 +331,7 @@ function TableCol({ headerGroup, table }) {
   );
 }
 
-function TableRow({ row, idx }) {
+function TableRow({ row, idx }: { row: Row<TableRowData>; idx: number }) {
   return (
     <tr
       key={row.id}
@@ -330,7 +341,7 @@ function TableRow({ row, idx }) {
     >
       {row.getVisibleCells().map((cell) => {
         if (cell.column.id === "name") {
-          const encodedPlayer = encodeURIComponent(cell.getValue());
+          const encodedPlayer = encodeURIComponent(cell.getValue() as string);
           return (
             <td
               key={cell.id}
@@ -363,7 +374,7 @@ function TableRow({ row, idx }) {
   );
 }
 
-function Filter({ column }: { column: Column<unknown> }) {
+function Filter({ column }: { column: Column<TableRowData> }) {
   const columnFilterValue = column.getFilterValue();
   return (
     <DebouncedInput

@@ -3,6 +3,44 @@ import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
 import { ContractStatus, GameType } from "@prisma/client";
 
+type FranchiseRaw = NonNullable<Awaited<ReturnType<typeof getFranchise>>>;
+type FranchiseTeamRaw = FranchiseRaw["Teams"][number];
+type FranchiseTeamRosterPlayer = FranchiseTeamRaw["Roster"][number];
+type PackagedMatch = ReturnType<typeof packageMatch>;
+
+export type FranchiseDetails = Omit<FranchiseRaw, "Teams"> & {
+  Teams: FranchiseTeam[];
+};
+export type FranchiseTeam = Omit<FranchiseTeamRaw, "Roster"> & {
+  Roster: RosterPlayer[];
+  futureGames: PackagedMatch[];
+  pastGames: PackagedMatch[];
+};
+export type RosterPlayer = FranchiseTeamRosterPlayer & {
+  riotName: string | null;
+  enrichedStats: PlayerEnrichedStats | null;
+};
+type PlayerEnrichedStats = {
+  matchesPlayed: number;
+  acs: number | null;
+  attackRating: number | null;
+  defenseRating: number | null;
+  totalKills: number | null;
+  totalDeaths: number | null;
+  totalAssists: number | null;
+  totalPlants: number | null;
+  totalDefuses: number | null;
+  totalEcoKills: number | null;
+  totalAntiecoKills: number | null;
+  totalTradeKills: number | null;
+  totalTradeDeaths: number | null;
+  totalClutches: number | null;
+  kast: number | null;
+  firstKills: number | null;
+  firstDeaths: number | null;
+  hs: number | null;
+};
+
 export default async function getFranchiseDetails(slug, season) {
   const franchise = await getFranchise(slug);
   if (!franchise) return null;

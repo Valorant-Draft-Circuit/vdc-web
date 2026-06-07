@@ -13,6 +13,7 @@ import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { useRef, useState } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
+import { UserWithRelations } from "@/lib/queries/user/user";
 
 export type SignUpInput = {
   accountID: string;
@@ -25,9 +26,15 @@ export type SignUpInput = {
   rfaOnly: string;
 };
 
-export default function SignUpForm({ user, signupState }) {
+export default function SignUpForm({
+  user,
+  signupState,
+}: {
+  user: UserWithRelations;
+  signupState: string;
+}) {
   const methods = useForm<SignUpInput>();
-  if (user.Status.leagueStatus !== LeagueStatus.UNREGISTERED) {
+  if (user.Status!.leagueStatus !== LeagueStatus.UNREGISTERED) {
     return (
       <div className="flex flex-col text-center m-auto text-6xl gap-2 pt-10">
         <h1 className="text-vdcRed ">ALREADY SIGNED UP</h1>

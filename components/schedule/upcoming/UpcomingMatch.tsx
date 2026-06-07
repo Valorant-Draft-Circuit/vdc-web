@@ -2,13 +2,14 @@
 
 import { TEAM_LOGOS_URL, TIER_COLOR_MAP } from "@/lib/common/constants";
 import { getTimeUntil } from "@/lib/common/times";
+import { UpcomingMatchRow } from "@/lib/queries/schedule/schedule";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function UpcomingMatch({ match }) {
+export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
   const timeUntil = getTimeUntil(match.dateScheduled);
-  const homeTeam = match.Home.Franchise;
-  const awayTeam = match.Away.Franchise;
+  const homeTeam = match.Home!.Franchise;
+  const awayTeam = match.Away!.Franchise;
   const matchType = match.matchType;
 
   return (
@@ -32,7 +33,7 @@ export default function UpcomingMatch({ match }) {
           className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
         >
           <Image
-            src={`${TEAM_LOGOS_URL}${homeTeam.Brand.logo}`}
+            src={`${TEAM_LOGOS_URL}${homeTeam.Brand!.logo}`}
             alt={homeTeam.slug}
             width={500}
             height={500}
@@ -50,7 +51,7 @@ export default function UpcomingMatch({ match }) {
           className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
         >
           <Image
-            src={`${TEAM_LOGOS_URL}${awayTeam.Brand.logo}`}
+            src={`${TEAM_LOGOS_URL}${awayTeam.Brand!.logo}`}
             alt={awayTeam.slug}
             width={500}
             height={500}

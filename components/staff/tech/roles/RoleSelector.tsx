@@ -11,7 +11,15 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { ROLES } from "@/lib/common/constants";
 
-export default function RoleSelector({ defaultRoles, vdcId }) {
+type Role = (typeof ROLES)[number];
+
+export default function RoleSelector({
+  defaultRoles,
+  vdcId,
+}: {
+  defaultRoles: Role[];
+  vdcId: string | undefined;
+}) {
   const [selectedRoles, setSelectedRoles] = useState(defaultRoles);
   const [query, setQuery] = useState("");
   const [saving, setSaving] = useState(false);

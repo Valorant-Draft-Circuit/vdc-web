@@ -1,6 +1,10 @@
 "use client";
 
-import { UseFormRegister, UseFormWatch } from "react-hook-form";
+import {
+  RegisterOptions,
+  UseFormRegister,
+  UseFormWatch,
+} from "react-hook-form";
 import { SignUpInput } from "./SignUpForm";
 import {
   Disclosure,
@@ -164,7 +168,7 @@ export default function Questions({
           q.show && (
             <div key={q.id} className="py-2">
               <RadioGroup
-                name={q.id}
+                name={q.id as keyof SignUpInput}
                 register={register}
                 label={q.label}
                 options={q.options}
@@ -177,7 +181,21 @@ export default function Questions({
   );
 }
 
-const RadioGroup = ({ name, register, label, options, rules }) => {
+type RadioOption = { value: string; label: string };
+
+const RadioGroup = ({
+  name,
+  register,
+  label,
+  options,
+  rules,
+}: {
+  name: keyof SignUpInput;
+  register: UseFormRegister<SignUpInput>;
+  label: React.ReactNode;
+  options: RadioOption[];
+  rules?: RegisterOptions<SignUpInput>;
+}) => {
   return (
     <div className="flex flex-col gap-1">
       <label>
