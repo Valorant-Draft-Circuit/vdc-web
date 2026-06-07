@@ -1,5 +1,6 @@
 import Game from "@/components/match/Game";
 import MapBan from "@/components/match/MapBan";
+import GameStats from "@/components/match/GameStats";
 import MatchStats from "@/components/match/MatchStats";
 import { getMapsCached } from "@/lib/common/cache";
 import {
@@ -218,7 +219,11 @@ export default async function Page({
                 />
               )}
               <h1>Match Stats</h1>
-              <MatchStats matchId={matchId} gameId={gameId} />
+              {gameId ? (
+                <GameStats gameId={gameId} />
+              ) : (
+                <MatchStats matchId={matchId} />
+              )}
             </div>
           </>
         )}
