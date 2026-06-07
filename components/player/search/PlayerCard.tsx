@@ -5,7 +5,7 @@ import {
   TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
 } from "@/lib/common/constants";
-import { MeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/route";
+import { MeiliPlayer } from "@/lib/types/meilisearch";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";

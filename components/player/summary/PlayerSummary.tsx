@@ -3,6 +3,10 @@ import { InformationCircleIcon } from "@heroicons/react/16/solid";
 import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
 import PlayerMatches from "./PlayerMatches";
+import {
+  getTeamLogoMap,
+  type TeamLogoMap,
+} from "@/lib/queries/teams/getTeamLogoById";
 
 export type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
@@ -18,7 +22,7 @@ type Props = {
   gameType: string | undefined;
 };
 
-export default function PlayerSummary({ stats, gameType }: Props) {
+export default async function PlayerSummary({ stats, gameType }: Props) {
   if (!stats || stats.length === 0) {
     return <NoStats />;
   }
@@ -30,6 +34,7 @@ export default function PlayerSummary({ stats, gameType }: Props) {
   }));
 
   const isCombine = gameType?.toUpperCase() === GameType.COMBINE;
+  const teamMap: TeamLogoMap = isCombine ? {} : await buildTeamMap(stats);
 
   return (
     <div className="flex flex-col xl:px-0 gap-2">
@@ -41,11 +46,26 @@ export default function PlayerSummary({ stats, gameType }: Props) {
           <PlayerStats stats={processedPlayerStats} />
         </div>
         <div className="w-full">
-          <PlayerMatches stats={stats} gameType={gameType?.toUpperCase()} />
+          <PlayerMatches
+            stats={stats}
+            gameType={gameType?.toUpperCase()}
+            teamMap={teamMap}
+          />
         </div>
       </div>
     </div>
   );
+}
+
+async function buildTeamMap(stats: StatsPayload[]) {
+  const teamIds: number[] = [];
+  for (const s of stats) {
+    const home = s.Game.Match?.home;
+    const away = s.Game.Match?.away;
+    if (typeof home === "number") teamIds.push(home);
+    if (typeof away === "number") teamIds.push(away);
+  }
+  return getTeamLogoMap(teamIds);
 }
 
 function CombineDisclaimer() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { MeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/route";
+import { MeiliPlayer } from "@/lib/types/meilisearch";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { Input } from "@headlessui/react";
 import { useEffect, useState } from "react";

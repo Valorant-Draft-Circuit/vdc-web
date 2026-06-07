@@ -60,21 +60,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export type MeiliPlayer = {
-  id: string;
-  discordId: string;
-  discordName: string;
-  riotIGN: string;
-  tier: string;
-  mmrEffective: string;
-  teamName: string;
-  franchiseSlug: string;
-  franchiseLogo: string;
-  leagueStatus: string;
-  image: string;
-  banner: string | null;
-};
-
 async function getPlayers() {
   const users = await prisma.user.findMany({
     select: {
