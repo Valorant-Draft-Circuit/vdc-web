@@ -4,7 +4,7 @@ import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { determineTier } from "@/lib/common/utils";
+import { determineTier } from "@/lib/common/tier";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export type TMeiliPlayer = {
+export type MeiliPlayer = {
   id: string;
   discordId: string;
   discordName: string;

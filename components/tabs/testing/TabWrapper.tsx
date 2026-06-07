@@ -4,21 +4,14 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import MobileTabs from "./MobileTabs";
-
-export type TTabElements = {
-  current?: boolean;
-  query: string;
-  name: string;
-  color: string;
-  content: React.ReactNode;
-};
+import { TabElement } from "../types";
 
 export default function TabWrapper({
   tabElements,
   params,
   tabListOrientation = "horizontal",
 }: {
-  tabElements: TTabElements[];
+  tabElements: TabElement[];
   params: string;
   tabListOrientation?: "horizontal" | "vertical";
 }) {

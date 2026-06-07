@@ -7,14 +7,14 @@ import {
   ListboxOption,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
-import { TTabElements } from "../HorizontalTab";
+import { TabElement } from "../types";
 
 export default function MobileTabs({
   tabElements,
   selected,
   onSelect,
 }: {
-  tabElements: TTabElements[];
+  tabElements: TabElement[];
   selected: number;
   onSelect: (index: number) => void;
 }) {

@@ -8,11 +8,11 @@ import SignOut from "./SignOut";
 
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../theme/LoadingSpinner";
-import { TUser } from "@/lib/queries/user/user";
+import { UserWithRelations } from "@/lib/queries/user/user";
 import { getUserStatus } from "@/lib/common/auth/auth-utils";
 
 export default function MobileAuth() {
-  const [user, setUser] = useState<TUser>();
+  const [user, setUser] = useState<UserWithRelations>();
   const [slug, setSlug] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();

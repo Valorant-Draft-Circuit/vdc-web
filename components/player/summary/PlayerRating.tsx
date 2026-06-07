@@ -1,4 +1,4 @@
-import { avg } from "@/lib/common/utils";
+import { avg } from "@/lib/common/math";
 
 export default function PlayerRating({ stats }: { stats }) {
   const ratings = {

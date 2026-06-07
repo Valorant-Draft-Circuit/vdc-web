@@ -1,6 +1,6 @@
 "use client";
 
-import { TMeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/route";
+import { MeiliPlayer } from "@/app/api/internal/meilisearch/documents/players/route";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import {
   Checkbox,
@@ -27,7 +27,7 @@ export default function PlayerSearch({ mmrShow }) {
   ];
 
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<TMeiliPlayer[]>([]);
+  const [searchResults, setSearchResults] = useState<MeiliPlayer[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -59,7 +59,7 @@ export default function PlayerSearch({ mmrShow }) {
         filter: buildFilter(),
       });
 
-      const hits = res.hits as TMeiliPlayer[];
+      const hits = res.hits as MeiliPlayer[];
       if (pageNumber === 0) {
         setSearchResults(hits);
       } else {

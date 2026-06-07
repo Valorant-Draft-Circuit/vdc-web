@@ -2,12 +2,12 @@
 
 import { prisma } from "@/lib/prisma";
 
-export type TFAQ = {
+export type Faq = {
   question: string;
   answer: string;
 };
 
-export async function getFaq(): Promise<TFAQ[]> {
+export async function getFaq(): Promise<Faq[]> {
   const res = await prisma.fAQ.findMany({
     where: {
       visible: true,

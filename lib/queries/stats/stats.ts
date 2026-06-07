@@ -1,9 +1,6 @@
-import {
-  avg,
-  determineTierWithTierLines,
-  getMMRTierLines,
-  hasFlags,
-} from "@/lib/common/utils";
+import { avg } from "@/lib/common/math";
+import { determineTierWithTierLines, getMMRTierLines } from "@/lib/common/tier";
+import { hasFlags } from "@/lib/common/flags";
 import { prisma } from "@/lib/prisma";
 import { Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
@@ -222,7 +219,7 @@ export type FormattedTeamStat = {
   kdr: number | null;
 };
 
-type TStatsQuery = {
+type StatsQuery = {
   tier?: Tier;
   season?: number;
   gameType?: GameType;
@@ -231,18 +228,18 @@ type TStatsQuery = {
   teamId?: number;
 };
 
-type TPlayerStatsQuery = {
+type PlayerStatsQuery = {
   season: number;
   riotIgn: string;
   gameType: GameType;
 };
 
-export async function getPlayerStatsBy(playerStatsQuery: TPlayerStatsQuery) {
+export async function getPlayerStatsBy(playerStatsQuery: PlayerStatsQuery) {
   const playerStats = await getPlayerStats(playerStatsQuery);
   return playerStats;
 }
 
-export async function getStatsBy(statsQuery: TStatsQuery) {
+export async function getStatsBy(statsQuery: StatsQuery) {
   let playerStats;
   if (statsQuery.gameId) {
     playerStats = await getPlayerStatsByGame(statsQuery.gameId);
@@ -260,7 +257,7 @@ export async function getStatsBy(statsQuery: TStatsQuery) {
   }
 }
 
-async function getPlayerStats(playerStatsQuery: TPlayerStatsQuery) {
+async function getPlayerStats(playerStatsQuery: PlayerStatsQuery) {
   const userId = await prisma.account.findFirst({
     where: { riotIGN: playerStatsQuery.riotIgn },
     select: { userId: true },
@@ -494,7 +491,7 @@ export async function getPlayerStatsByGame(
   }));
 }
 
-async function getOverallPlayerStats(query: TStatsQuery) {
+async function getOverallPlayerStats(query: StatsQuery) {
   return await prisma.playerStats.groupBy({
     where: {
       Game: {

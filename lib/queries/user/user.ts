@@ -1,9 +1,9 @@
 import { auth } from "@/lib/auth/auth";
-import { determineTier } from "@/lib/common/utils";
+import { determineTier } from "@/lib/common/tier";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
 import { Prisma } from "@prisma/client";
-export type TUser = Prisma.UserGetPayload<{
+export type UserWithRelations = Prisma.UserGetPayload<{
   include: {
     Accounts: {
       where: {

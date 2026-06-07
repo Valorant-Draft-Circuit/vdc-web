@@ -5,7 +5,7 @@ import { Tier } from "@prisma/client";
 import ScheduleCard from "./ScheduleCard";
 import { useEffect, useState, useRef } from "react";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
-import { TSchedule } from "@/lib/queries/schedule/schedule";
+import { Schedule } from "@/lib/queries/schedule/schedule";
 
 export default function SchedulePanel({
   tier,
@@ -15,7 +15,7 @@ export default function SchedulePanel({
   season?: number;
 }) {
   const [matchDays, setMatchDays] = useState<string[]>([]);
-  const [schedule, setSchedule] = useState<TSchedule>();
+  const [schedule, setSchedule] = useState<Schedule>();
   const [nearestDay, setNearestDay] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});

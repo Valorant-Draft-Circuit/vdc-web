@@ -1,6 +1,6 @@
 "use client";
 
-import { avg, sum } from "@/lib/common/utils";
+import { avg, sum } from "@/lib/common/math";
 
 export function PlayerStats({ stats }: { stats }) {
   const summedStats = {

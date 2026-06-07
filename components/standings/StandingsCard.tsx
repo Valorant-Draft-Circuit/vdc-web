@@ -1,15 +1,7 @@
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { Standing } from "@/lib/queries/standings/standings";
 import Image from "next/image";
 import Link from "next/link";
-
-export type TStandingProps = {
-  franchiseSlug: string;
-  teamLogo: string | null;
-  teamName: string;
-  wins: number;
-  losses: number;
-  rwp: number;
-};
 
 export default function StandingsCard({
   standing,
@@ -17,7 +9,7 @@ export default function StandingsCard({
   apexRanks,
   query,
 }: {
-  standing: TStandingProps;
+  standing: Standing;
   ranking: number;
   apexRanks: number;
   query: string;

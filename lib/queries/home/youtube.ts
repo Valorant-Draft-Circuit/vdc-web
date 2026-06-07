@@ -5,7 +5,7 @@ const CHANNEL_ID = "UCcNoS_eA8_cnBj4jmyHjlkQ";
 const PLACEHOLDER_URL =
   "https://www.youtube.com/embed/dQw4w9WgXcQ?si=_m6csars22cbelza";
 
-type TYouTubeSearchResponse = {
+type YouTubeSearchResponse = {
   items?: Array<{
     id: { videoId: string };
   }>;
@@ -16,7 +16,7 @@ export async function getLatestYouTubeVideo(): Promise<string> {
 
   try {
     const res = await fetch(url, { next: { revalidate: Times.HOUR } });
-    const data = (await res.json()) as TYouTubeSearchResponse;
+    const data = (await res.json()) as YouTubeSearchResponse;
 
     if (data.items?.length) {
       const videoId = data.items[0].id.videoId;

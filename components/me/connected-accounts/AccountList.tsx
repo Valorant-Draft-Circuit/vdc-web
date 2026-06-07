@@ -9,14 +9,14 @@ import {
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type TRiotAccount = {
+type RiotAccount = {
   providerAccountId: string;
   riotIGN: string;
 };
 
-type TPlayerRiotAccounts = {
+type PlayerRiotAccounts = {
   primaryRiotAccountID: string;
-  Accounts: TRiotAccount[];
+  Accounts: RiotAccount[];
 };
 
 async function fetchPlayerRiotAccounts() {
@@ -35,7 +35,7 @@ async function fetchPlayerRiotAccounts() {
 //   return res.ok;
 // }
 
-function sortAccounts(accounts: TRiotAccount[], primaryRiotAccount: string) {
+function sortAccounts(accounts: RiotAccount[], primaryRiotAccount: string) {
   return accounts
     .slice()
     .sort((a, b) =>
@@ -49,7 +49,7 @@ function sortAccounts(accounts: TRiotAccount[], primaryRiotAccount: string) {
 
 export default function AccountList() {
   const [playerRiotAccounts, setPlayerRiotAccounts] =
-    useState<TPlayerRiotAccounts>();
+    useState<PlayerRiotAccounts>();
   const [primaryRiotAccount, setPrimaryRiotAccount] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -113,7 +113,7 @@ function Account({
   primaryRiotAccount,
 }: // onRemoved,
 {
-  account: TRiotAccount;
+  account: RiotAccount;
   primaryRiotAccount: string;
   // onRemoved: () => Promise<void>;
 }) {

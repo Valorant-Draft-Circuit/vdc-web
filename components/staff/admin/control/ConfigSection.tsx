@@ -1,10 +1,10 @@
 import { Control, Controller } from "react-hook-form";
 import { SelectField, InputField } from "./Fields";
-import { parseOptions, TConfigItem } from "./ControlPanelForm";
+import { parseOptions, ConfigItem } from "./ControlPanelForm";
 
 type ConfigSectionProps = {
   title: string;
-  controls: TConfigItem[];
+  controls: ConfigItem[];
   control: Control;
   renderField?: (field, label, notes) => React.ReactNode;
 };

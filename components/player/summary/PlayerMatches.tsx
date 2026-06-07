@@ -7,7 +7,7 @@ import {
   MAPS,
   TEAM_LOGOS_URL,
 } from "@/lib/common/constants";
-import { TAgents, TMaps } from "@/lib/common/valorant-api";
+import { Agents, Maps } from "@/lib/common/valorant-api";
 import { GameType, Tier } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function PlayerMatches({
 }
 
 function Match({ stat, gameType, matchCount }: { stat; gameType; matchCount }) {
-  const [maps, setMaps] = useState<TMaps>();
+  const [maps, setMaps] = useState<Maps>();
   const router = useRouter();
 
   useEffect(() => {
@@ -331,7 +331,7 @@ function IndividualStats({ stats, mapUrl }: { stats; mapUrl }) {
 }
 
 function IndividualOverview({ stat, mapUrl }: { stat; mapUrl }) {
-  const [agents, setAgents] = useState<TAgents>();
+  const [agents, setAgents] = useState<Agents>();
   useEffect(() => {
     let isMounted = true;
     async function loadAgents() {
@@ -432,14 +432,14 @@ function Lobby({ teams }: { teams }) {
   );
 }
 
-type TTeamInfo = {
+type TeamInfo = {
   slug: string;
   tier: Tier;
 };
 
 function TeamLogo({ team }: { team }) {
   const [teamURL, setTeamURL] = useState("");
-  const [teamInfo, setTeamInfo] = useState<TTeamInfo>();
+  const [teamInfo, setTeamInfo] = useState<TeamInfo>();
 
   useEffect(() => {
     async function fetchTeam() {

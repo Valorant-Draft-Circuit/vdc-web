@@ -8,12 +8,12 @@ import { GameType, Prisma } from "@prisma/client";
 import PlayerMatches from "./PlayerMatches";
 import { InformationCircleIcon } from "@heroicons/react/16/solid";
 
-type TStatsPayload = Prisma.PlayerStatsGetPayload<{
+type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
 }>;
 
 export default function PlayerSummary() {
-  const [stats, setStats] = useState<TStatsPayload[] | null>(null);
+  const [stats, setStats] = useState<StatsPayload[] | null>(null);
   const [loading, setLoading] = useState(true);
   const { player } = useParams();
   const searchParams = useSearchParams();

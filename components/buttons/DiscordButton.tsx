@@ -2,12 +2,12 @@ import { signIn } from "@/lib/auth/auth";
 import { DISCORD_LINK } from "@/lib/common/constants";
 import Image from "next/image";
 
-type TDiscordButton = {
+type DiscordButtonProps = {
   text: string;
   signInButton: boolean;
 };
 
-export default function DiscordButton({ text, signInButton }: TDiscordButton) {
+export default function DiscordButton({ text, signInButton }: DiscordButtonProps) {
   if (signInButton) {
     return (
       <>

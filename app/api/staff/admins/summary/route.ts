@@ -8,16 +8,16 @@ import {
 import { LeagueStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-export type TTierCount = {
+export type TierCount = {
   Tier: number;
 };
 
-export type TSummary = {
+export type AdminSummary = {
   signedPlayerCount: number;
-  signedPlayerCountByTier: TTierCount;
+  signedPlayerCountByTier: TierCount;
   freeAgentCount: number;
-  freeAgentCountByTier: TTierCount;
-  rfaCountByTier: TTierCount;
+  freeAgentCountByTier: TierCount;
+  rfaCountByTier: TierCount;
 };
 
 export async function GET() {

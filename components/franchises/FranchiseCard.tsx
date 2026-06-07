@@ -1,5 +1,5 @@
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
-import { toTailwindCustomHexCode } from "@/lib/common/utils";
+import { toTailwindCustomHexCode } from "@/lib/common/format";
 import Image from "next/image";
 import Link from "next/link";
 

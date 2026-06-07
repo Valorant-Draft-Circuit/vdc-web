@@ -4,14 +4,15 @@ import PlayerMaps from "@/components/player/PlayerMaps";
 import PlayerNotFound from "@/components/player/PlayerNotFound";
 import PlayerSummary from "@/components/player/summary/PlayerSummary";
 import ListBox from "@/components/tabs/DropDown";
-import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
+import HorizontalTab from "@/components/tabs/HorizontalTab";
+import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { listAllSeasons } from "@/lib/common/utils";
+import { listAllSeasons } from "@/lib/common/season";
 import { ControlPanel } from "@/prisma";
 
-type TPlayerIGN = {
+type PlayerIGN = {
   encoded: string;
   decoded: string;
 };
@@ -56,7 +57,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   if (NUMBER_REGEX.test(player)) return await handleDiscordIDSearch(player);
 
-  const playerIGN: TPlayerIGN = { encoded: "", decoded: "" };
+  const playerIGN: PlayerIGN = { encoded: "", decoded: "" };
   if (player.includes(ENCODED_DIVIDER)) playerIGN.encoded = player;
   else if (player.includes("-")) {
     const playerSplit = player.split("-");
@@ -97,7 +98,7 @@ export default async function Page({ params, searchParams }: Props) {
     redirect(`/player/${player}?${next.toString()}`);
   }
 
-  const tabElements: TTabElements[] = [
+  const tabElements: TabElement[] = [
     {
       query: "Summary",
       color: "vdcRed",

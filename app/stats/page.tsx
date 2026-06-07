@@ -1,10 +1,11 @@
 import StatsPanel from "@/components/stats/StatsPanel";
 import StatsTitle from "@/components/stats/StatsTitle";
 import ListBox from "@/components/tabs/DropDown";
-import HorizontalTab, { TTabElements } from "@/components/tabs/HorizontalTab";
+import HorizontalTab from "@/components/tabs/HorizontalTab";
+import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
-import { listAllSeasons } from "@/lib/common/utils";
+import { listAllSeasons } from "@/lib/common/season";
 import { getUserTier } from "@/lib/queries/user/user";
 import { ControlPanel } from "@/prisma";
 import { GameType, Tier } from "@prisma/client";
@@ -69,7 +70,7 @@ export default async function Page({ searchParams }: Props) {
     tier: userTier || Tier.MYTHIC,
   };
 
-  const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+  const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     name: tier,
     query: tier,
     color: TIER_COLOR_MAP[tier],

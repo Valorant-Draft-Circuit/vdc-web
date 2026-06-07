@@ -1,6 +1,7 @@
 import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
 import SchedulePanel from "@/components/schedule/SchedulesPanel";
-import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
+import VerticalTab from "@/components/tabs/VerticalTab";
+import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { getUserTier } from "@/lib/queries/user/user";
@@ -33,7 +34,7 @@ export default async function Page({ searchParams }: Props) {
     redirect(`/schedule?tier=${defaultTier}`);
   }
 
-  const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+  const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     name: tier,
     query: tier,
     color: TIER_COLOR_MAP[tier],

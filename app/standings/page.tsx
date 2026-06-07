@@ -1,5 +1,6 @@
 import StandingsPanel from "@/components/standings/StandingsPanel";
-import VerticalTab, { TTabElements } from "@/components/tabs/VerticalTab";
+import VerticalTab from "@/components/tabs/VerticalTab";
+import { TabElement } from "@/components/tabs/types";
 import React, { Suspense } from "react";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
@@ -36,7 +37,7 @@ export default async function Standings({ searchParams }: Props) {
     redirect(`/standings?by=${defaultBy}`);
   }
 
-  const tabs: TTabElements[] = TIERS_LIST.map((tier) => ({
+  const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     query: tier,
     name: tier,
     color: TIER_COLOR_MAP[tier],

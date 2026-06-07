@@ -1,18 +1,15 @@
-import {
-  determineIfKnockout,
-  formatDate,
-  packageMatch,
-} from "@/lib/common/utils";
+import { determineIfKnockout, packageMatch } from "@/lib/common/match";
+import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
 import { MatchType, Tier } from "@prisma/client";
-type TPackagedMatch = ReturnType<typeof packageMatch>;
+type PackagedMatch = ReturnType<typeof packageMatch>;
 
-export type TSchedule = {
-  preSeason: Record<string, TPackagedMatch[]>;
-  regularSeason: Record<string, TPackagedMatch[]>;
-  bo3Season: Record<string, TPackagedMatch[]>;
-  bo5Season: Record<string, TPackagedMatch[]>;
+export type Schedule = {
+  preSeason: Record<string, PackagedMatch[]>;
+  regularSeason: Record<string, PackagedMatch[]>;
+  bo3Season: Record<string, PackagedMatch[]>;
+  bo5Season: Record<string, PackagedMatch[]>;
 };
 
 export async function getEveryUpcomingMatch() {
@@ -123,13 +120,13 @@ export async function getScheduleByTier(tier: Tier, season: number) {
   return matches;
 }
 
-interface GetUpcomingMatchesOptions {
+type GetUpcomingMatchesOptions = {
   tier?: Tier;
   season?: number;
   filter?: boolean;
-}
+};
 
-type TUpcomingWhereClause = {
+type UpcomingWhereClause = {
   tier?: Tier;
   season: number;
   matchType: MatchType[];
@@ -142,7 +139,7 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const currentSeason = await ControlPanel.getSeason();
   const { tier, season, filter } = options;
 
-  const whereClause: TUpcomingWhereClause = {
+  const whereClause: UpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
     matchType: [
