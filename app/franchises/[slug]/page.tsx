@@ -57,7 +57,7 @@ export default async function Page({ params, searchParams }: Props) {
     franchiseInfo!.Brand!.colorSecondary,
   );
   const agmList = getAgms(franchiseInfo);
-  const activeTeams = getActiveTeams(franchiseInfo);
+  const tabMeta = getTeamTabMeta(franchiseInfo);
 
   let defaultQuery = "";
   if (userTier) {
@@ -68,14 +68,28 @@ export default async function Page({ params, searchParams }: Props) {
     defaultQuery = franchiseHasTier ? userTier : "";
   }
 
-  if (activeTeams.length > 0) {
-    const validTeams = new Set(activeTeams.map((t) => t.query.toLowerCase()));
+  if (tabMeta.length > 0) {
+    const validTeams = new Set(tabMeta.map((t) => t.query.toLowerCase()));
     const teamOk = typeof sp.team === "string" && validTeams.has(sp.team);
     if (!teamOk) {
-      const defaultTeam = (defaultQuery || activeTeams[0].query).toLowerCase();
+      const defaultTeam = (defaultQuery || tabMeta[0].query).toLowerCase();
       redirect(`/franchises/${slug}?team=${defaultTeam}`);
     }
   }
+
+  const activeTeam = sp.team as string;
+  const activeTeams: TabElement[] = tabMeta.map((meta) => ({
+    id: meta.id,
+    query: meta.query,
+    color: meta.color,
+    name: meta.name,
+    content:
+      meta.query.toLowerCase() === activeTeam ? (
+        <Suspense fallback={<TeamPanelSkeleton />}>
+          <TeamPanel team={meta.team} />
+        </Suspense>
+      ) : null,
+  }));
 
   return (
     <div className="mx-auto max-w-400 pb-10 xl:px-8 xl:py-12">
@@ -129,13 +143,11 @@ export default async function Page({ params, searchParams }: Props) {
               No active teams for this franchise.
             </div>
           ) : (
-            <Suspense fallback={<TeamPanelSkeleton />}>
-              <HorizontalTab
-                tabElements={activeTeams}
-                params="team"
-                defaultQuery={defaultQuery}
-              />
-            </Suspense>
+            <HorizontalTab
+              tabElements={activeTeams}
+              params="team"
+              defaultQuery={defaultQuery}
+            />
           )}
         </div>
       </div>
@@ -175,19 +187,18 @@ function getAgms(franchiseInfo) {
     }));
 }
 
-function getActiveTeams(franchiseInfo) {
-  const activeFranchiseTeams: TabElement[] = franchiseInfo.Teams.filter(
-    (team) => team.active,
-  ).map((team) => ({
-    id: team.id,
-    query: team.tier,
-    color: TIER_COLOR_MAP[team.tier],
-    name: team.name,
-    content: <TeamPanel team={team} />,
-  }));
-  return [...activeFranchiseTeams].sort(
-    (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query),
-  );
+function getTeamTabMeta(franchiseInfo) {
+  return franchiseInfo.Teams.filter((team) => team.active)
+    .map((team) => ({
+      id: team.id,
+      query: team.tier,
+      color: TIER_COLOR_MAP[team.tier],
+      name: team.name,
+      team,
+    }))
+    .sort(
+      (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query),
+    );
 }
 
 async function franchiseContainsTier(franchise, tier) {

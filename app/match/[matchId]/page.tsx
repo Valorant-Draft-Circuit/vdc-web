@@ -1,5 +1,6 @@
 import Game from "@/components/match/Game";
 import MapBan from "@/components/match/MapBan";
+import GameStats from "@/components/match/GameStats";
 import MatchStats from "@/components/match/MatchStats";
 import { getMapsCached } from "@/lib/common/cache";
 import {
@@ -60,8 +61,10 @@ export default async function Page({
   const matchInfo = await getMatch(matchId);
   if (!matchInfo) notFound();
 
-  const gameId = (await searchParams).game;
-  const gameOverview = matchInfo?.Games.find((game) => game.gameID === gameId);
+  const gameParam = (await searchParams).game;
+  const gameOverview = matchInfo?.Games.find(
+    (game) => typeof gameParam === "string" && game.gameID === gameParam,
+  );
   const mapPick = matchInfo?.MapBans.find(
     (mapBan) => mapBan.map === gameOverview?.map
   )?.team;
@@ -217,7 +220,11 @@ export default async function Page({
                 />
               )}
               <h1>Match Stats</h1>
-              <MatchStats />
+              {gameOverview ? (
+                <GameStats gameId={gameOverview.gameID} />
+              ) : (
+                <MatchStats matchId={matchId} />
+              )}
             </div>
           </>
         )}

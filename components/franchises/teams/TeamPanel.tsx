@@ -54,7 +54,7 @@ export default async function TeamPanel({ team }: { team: FranchiseTeam }) {
         </PanelSection>
         <div className="flex-1 flex-col">
           <PanelSection title="Team Stats">
-            <TeamStatsPanel />
+            <TeamStatsPanel teamId={team.id} season={season} />
           </PanelSection>
         </div>
       </div>

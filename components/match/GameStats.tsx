@@ -1,8 +1,8 @@
 import StatsTable from "../stats/StatsTable";
 import { getStatsBy } from "@/lib/queries/stats/stats";
 
-export default async function MatchStats({ matchId }: { matchId: string }) {
-  const data = await getStatsBy({ matchId });
+export default async function GameStats({ gameId }: { gameId: string }) {
+  const data = await getStatsBy({ gameId });
   if (data.length === 0) return <NoStatsFound />;
   return <StatsTable data={data} />;
 }

@@ -1,35 +1,12 @@
-"use client";
-
 import StatsTable from "@/components/stats/StatsTable";
-import { FormattedTeamStat } from "@/lib/queries/stats/stats";
-import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { getStatsBy } from "@/lib/queries/stats/stats";
 
-export default function TeamStatsPanel() {
-  const [data, setData] = useState<FormattedTeamStat[]>();
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const slug = params.slug;
-  const teamParam = searchParams.get("team");
+type Props = {
+  teamId: number;
+  season: number;
+};
 
-  useEffect(() => {
-    async function fetchStats() {
-      let res;
-
-      try {
-        res = await fetch(`/api/stats/franchise/${slug}/tier/${teamParam}`);
-        if (!res.ok) {
-          throw new Error(`Error fetching stats: ${res.status}`);
-        }
-        const data = await res.json();
-        setData(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchStats();
-  }, [teamParam]);
-
+export default async function TeamStatsPanel({ teamId, season }: Props) {
+  const data = await getStatsBy({ teamId, season });
   return <StatsTable data={data} />;
 }

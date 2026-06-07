@@ -1,5 +1,5 @@
 import SchedulePanelSkeleton from "@/components/schedule/SchedulePanelSkeleton";
-import SchedulePanel from "@/components/schedule/SchedulesPanel";
+import SchedulePanelLoader from "@/components/schedule/SchedulePanelLoader";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
@@ -34,22 +34,26 @@ export default async function Page({ searchParams }: Props) {
     redirect(`/schedule?tier=${defaultTier}`);
   }
 
+  const activeTier = sp.tier as string;
   const tabs: TabElement[] = TIERS_LIST.map((tier) => ({
     name: tier,
     query: tier,
     color: TIER_COLOR_MAP[tier],
-    content: <SchedulePanel tier={tier} season={CURRENT_SEASON} />,
+    content:
+      tier.toLowerCase() === activeTier ? (
+        <Suspense fallback={<SchedulePanelSkeleton />}>
+          <SchedulePanelLoader tier={tier} season={CURRENT_SEASON} />
+        </Suspense>
+      ) : null,
   }));
 
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
-      <Suspense fallback={<SchedulePanelSkeleton />}>
-        <VerticalTab
-          tabElements={tabs}
-          params={"tier"}
-          defaultQuery={userTier}
-        />
-      </Suspense>
+      <VerticalTab
+        tabElements={tabs}
+        params={"tier"}
+        defaultQuery={userTier}
+      />
     </div>
   );
 }
