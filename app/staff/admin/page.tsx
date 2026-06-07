@@ -1,11 +1,15 @@
 import LeagueDashboard from "@/components/staff/admin/PlayerDashboard";
+import { getAdminSummary } from "@/lib/queries/staff/getAdminSummary";
 import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 
 
 export default async function Page() {
-  const currentSeason = await ControlPanel.getSeason();
-  const leagueState = await ControlPanel.getLeagueState();
+  const [currentSeason, leagueState, summary] = await Promise.all([
+    ControlPanel.getSeason(),
+    ControlPanel.getLeagueState(),
+    getAdminSummary(),
+  ]);
 
   return (
     <div className="min-h-full">
@@ -33,7 +37,7 @@ export default async function Page() {
 
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-white dark:bg-vdcGrey rounded-lg">
             <div>
-              <LeagueDashboard />
+              <LeagueDashboard summary={summary} />
             </div>
           </div>
           <h1 className="text-vdcRed py-2 mx-auto max-w-7xl">

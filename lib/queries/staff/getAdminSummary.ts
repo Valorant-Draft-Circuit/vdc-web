@@ -1,12 +1,11 @@
 import { TIERS_LIST } from "@/lib/common/constants";
+import { LeagueStatus, Tier } from "@prisma/client";
 import {
   getFreeAgentCountByTier,
   getSignedPlayerCount,
   getSignedPlayerCountByTier,
   getTotalFreeAgentCount,
-} from "@/lib/queries/staff/admin";
-import { LeagueStatus, Tier } from "@prisma/client";
-import { NextResponse } from "next/server";
+} from "./admin";
 
 export type SignedTierCount = {
   tier: Tier;
@@ -26,35 +25,37 @@ export type AdminSummary = {
   freeAgentCountByTier: FreeAgentTierCount[];
 };
 
-export async function GET() {
-  const signedPlayerCount = await getSignedPlayerCount();
-  const freeAgentCount = await getTotalFreeAgentCount();
-  const signedCountByTier = await Promise.all(
-    TIERS_LIST.map(async (tier) => {
-      return {
+export async function getAdminSummary(): Promise<AdminSummary> {
+  const [
+    signedPlayerCount,
+    freeAgentCount,
+    signedPlayerCountByTier,
+    freeAgentCountByTier,
+  ] = await Promise.all([
+    getSignedPlayerCount(),
+    getTotalFreeAgentCount(),
+    Promise.all(
+      TIERS_LIST.map(async (tier) => ({
         tier,
         count: await getSignedPlayerCountByTier(tier),
-      };
-    })
-  );
-  const freeAgentCountByTier = await Promise.all(
-    TIERS_LIST.map(async (tier) => {
-      return {
+      })),
+    ),
+    Promise.all(
+      TIERS_LIST.map(async (tier) => ({
         tier,
         faCount: await getFreeAgentCountByTier(LeagueStatus.FREE_AGENT, tier),
         rfaCount: await getFreeAgentCountByTier(
           LeagueStatus.RESTRICTED_FREE_AGENT,
-          tier
+          tier,
         ),
-      };
-    })
-  );
+      })),
+    ),
+  ]);
 
-  const payload = {
-    signedPlayerCount: signedPlayerCount,
-    signedPlayerCountByTier: signedCountByTier,
-    freeAgentCount: freeAgentCount,
-    freeAgentCountByTier: freeAgentCountByTier,
+  return {
+    signedPlayerCount,
+    signedPlayerCountByTier,
+    freeAgentCount,
+    freeAgentCountByTier,
   };
-  return NextResponse.json(payload);
 }
