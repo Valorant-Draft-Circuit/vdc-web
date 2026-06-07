@@ -12,7 +12,7 @@ import {
   TextAreaField,
 } from "./Fields";
 import { updateControlPanelAction } from "@/app/staff/admin/control/actions";
-import type { ControlPanelItem } from "@/lib/queries/control/getAllControlPanel";
+import type { ControlPanelItem } from "@/lib/queries/control/control";
 
 export type ConfigItem = {
   label: string;

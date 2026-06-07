@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { RiotAccountRow } from "@/lib/queries/user/getRiotAccountsByUserId";
+import type { RiotAccountRow } from "@/lib/queries/user/user";
 
 function sortAccounts(accounts: RiotAccountRow[], primaryRiotAccount: string) {
   return accounts

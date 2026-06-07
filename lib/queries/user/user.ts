@@ -1,8 +1,10 @@
+import { cache } from "react";
 import { auth } from "@/lib/auth/auth";
 import { determineTier } from "@/lib/common/tier";
 import { prisma } from "@/lib/prisma";
-import { ControlPanel } from "@/prisma";
+import { ControlPanel, Player } from "@/prisma";
 import { Prisma } from "@prisma/client";
+
 export type UserWithRelations = Prisma.UserGetPayload<{
   include: {
     Accounts: {
@@ -22,6 +24,16 @@ export type UserWithRelations = Prisma.UserGetPayload<{
     Status: true;
   };
 }>;
+
+export type RiotAccountRow = {
+  providerAccountId: string;
+  riotIGN: string | null;
+};
+
+export type PlayerRiotAccounts = {
+  primaryRiotAccountID: string | null;
+  Accounts: RiotAccountRow[];
+};
 
 export async function getUserTier(props?: { isStats: boolean }) {
   const session = await auth();
@@ -80,3 +92,31 @@ export async function getUser(id: string) {
 
   return user;
 }
+
+export const getPlayerByRiotIGN = cache(async (riotIGN: string) => {
+  const player = await Player.getBy({ ign: riotIGN });
+  return player ?? null;
+});
+
+export const getRiotIGNByDiscordId = cache(async (discordId: string) => {
+  const riotIGN = await Player.getIGNby({ discordID: discordId });
+  return riotIGN ?? null;
+});
+
+export const getRiotAccountsByUserId = cache(
+  async (userId: string): Promise<PlayerRiotAccounts | null> => {
+    return prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        primaryRiotAccountID: true,
+        Accounts: {
+          where: { provider: "riot" },
+          select: {
+            providerAccountId: true,
+            riotIGN: true,
+          },
+        },
+      },
+    });
+  },
+);

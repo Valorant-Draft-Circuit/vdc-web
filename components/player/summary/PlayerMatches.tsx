@@ -21,7 +21,7 @@ import { StatsPayload } from "./PlayerSummary";
 import type {
   TeamLogoInfo,
   TeamLogoMap,
-} from "@/lib/queries/teams/getTeamLogoById";
+} from "@/lib/queries/teams/teams";
 
 export default function PlayerMatches({
   stats,

@@ -1,5 +1,5 @@
 import ControlPanelForm from "@/components/staff/admin/control/ControlPanelForm";
-import { getAllControlPanel } from "@/lib/queries/control/getAllControlPanel";
+import { getAllControlPanel } from "@/lib/queries/control/control";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

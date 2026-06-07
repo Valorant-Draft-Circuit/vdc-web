@@ -6,7 +6,7 @@ import PlayerMatches from "./PlayerMatches";
 import {
   getTeamLogoMap,
   type TeamLogoMap,
-} from "@/lib/queries/teams/getTeamLogoById";
+} from "@/lib/queries/teams/teams";
 
 export type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
