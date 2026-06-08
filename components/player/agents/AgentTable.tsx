@@ -166,6 +166,17 @@ export default function AgentTable({
               : "hover:bg-gray-300 dark:hover:bg-vdcGrey/40";
             const stickyHover = "group-hover:bg-gray-200 dark:group-hover:bg-vdcGrey";
 
+            const dataCells: Array<[SortCol, string | number]> = [
+              ["gp", row.gamesPlayed],
+              ["winrate", `${winPct.toFixed(0)}%`],
+              ["rating", rating.toFixed(2)],
+              ["acs", row.averages.acs.toFixed(0)],
+              ["kd", kd.toFixed(2)],
+              ["adr", adr.toFixed(0)],
+              ["kast", `${row.averages.kast.toFixed(0)}%`],
+              ["hs", `${row.averages.hsPercent.toFixed(0)}%`],
+            ];
+
             return (
               <tr
                 key={row.agent}
@@ -210,14 +221,9 @@ export default function AgentTable({
                     )}
                   </Link>
                 </td>
-                <Cell value={row.gamesPlayed} />
-                <Cell value={`${winPct.toFixed(0)}%`} />
-                <Cell value={rating.toFixed(2)} />
-                <Cell value={row.averages.acs.toFixed(0)} />
-                <Cell value={kd.toFixed(2)} />
-                <Cell value={adr.toFixed(0)} />
-                <Cell value={`${row.averages.kast.toFixed(0)}%`} />
-                <Cell value={`${row.averages.hsPercent.toFixed(0)}%`} />
+                {dataCells.map(([key, value]) => (
+                  <Cell key={key} value={value} />
+                ))}
               </tr>
             );
           })}
