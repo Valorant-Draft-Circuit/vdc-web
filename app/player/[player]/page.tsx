@@ -19,6 +19,9 @@ import {
   getRiotIGNByDiscordId,
 } from "@/lib/queries/user/user";
 import { getPlayerStatsBy } from "@/lib/queries/stats/stats";
+import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
+import { getPlayerAgentBreakdown } from "@/lib/queries/stats/getPlayerAgentBreakdown";
+import { agentToUrlSlug } from "@/lib/common/agents";
 
 type PlayerIGN = {
   encoded: string;
@@ -33,8 +36,16 @@ type Props = {
 const NUMBER_REGEX = /^\d+$/;
 const ENCODED_DIVIDER = encodeURIComponent("#");
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { player } = await params;
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Props): Promise<Metadata> {
+  const [{ player }, sp, currentSeason] = await Promise.all([
+    params,
+    searchParams,
+    getSeasonCached(),
+  ]);
+
   let playerIGN: string;
   if (NUMBER_REGEX.test(player)) {
     const riotIGN = await getRiotIGNByDiscordId(player);
@@ -42,10 +53,66 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } else {
     playerIGN = decodeURIComponent(player);
   }
-  return {
-    title: `VDC | ${playerIGN}'s Player Page`,
-    description: `${playerIGN} information`,
+
+  const baseTitle = `VDC | ${playerIGN}'s Player Page`;
+  const baseDescription = `${playerIGN} information`;
+  const fallback: Metadata = {
+    title: baseTitle,
+    description: baseDescription,
   };
+
+  if (sp.by !== "agents" || typeof sp.agent !== "string") {
+    return fallback;
+  }
+
+  try {
+    const season =
+      typeof sp.season === "string" ? parseInt(sp.season) : currentSeason;
+    const gameType: GameType =
+      sp.type === "combine" ? GameType.COMBINE : GameType.SEASON;
+    const catalog = await getAgentCatalog();
+    const breakdown = await getPlayerAgentBreakdown({
+      riotIgn: playerIGN,
+      season,
+      gameType,
+      catalog,
+    });
+
+    const selected = breakdown.find(
+      (e) => agentToUrlSlug(e.catalog?.displayName ?? e.agent) === sp.agent,
+    );
+    if (!selected || !selected.catalog) return fallback;
+
+    const rating =
+      (selected.averages.ratingAttack + selected.averages.ratingDefense) / 2;
+    const winPct =
+      selected.gamesPlayed === 0
+        ? 0
+        : (selected.wins / selected.gamesPlayed) * 100;
+    const agentName = selected.catalog.displayName;
+    const ogTitle = `${agentName} on ${playerIGN} | VDC`;
+    const ogDescription = `${rating.toFixed(2)} rating · ${selected.gamesPlayed} games · ${winPct.toFixed(0)}% WR as ${agentName}`;
+    const ogImage = selected.catalog.fullPortraitUrl;
+
+    return {
+      title: ogTitle,
+      description: ogDescription,
+      openGraph: {
+        title: ogTitle,
+        description: ogDescription,
+        type: "profile",
+        images: ogImage ? [{ url: ogImage }] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: ogTitle,
+        description: ogDescription,
+        images: ogImage ? [ogImage] : undefined,
+      },
+    };
+  } catch {
+    return fallback;
+  }
 }
 
 export default async function Page({ params, searchParams }: Props) {
@@ -122,7 +189,15 @@ export default async function Page({ params, searchParams }: Props) {
       query: "Agents",
       color: "vdcRed",
       name: "Agents",
-      content: <PlayerAgents />,
+      content: (
+        <PlayerAgents
+          riotIGN={playerIGN.decoded}
+          season={season}
+          gameType={gameTypeParam}
+          basePath={`/player/${player}`}
+          searchParams={sp}
+        />
+      ),
     },
     {
       query: "Maps",
