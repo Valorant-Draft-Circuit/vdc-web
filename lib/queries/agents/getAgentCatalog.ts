@@ -31,24 +31,20 @@ const ROLE_NAME_MAP: Record<string, RoleName> = {
   Initiator: "INITIATOR",
 };
 
-function toCatalogEntry(agent: ApiAgent): [string, AgentCatalogEntry] {
-  const normalized = normalizeAgentName(agent.displayName.toUpperCase());
+function toCatalogEntry(agent: ApiAgent): AgentCatalogEntry {
   const roleName = agent.role ? ROLE_NAME_MAP[agent.role.displayName] : undefined;
-  return [
-    normalized,
-    {
-      uuid: agent.uuid,
-      displayName: agent.displayName,
-      displayIconUrl: agent.displayIcon ?? "",
-      fullPortraitUrl: agent.fullPortrait ?? "",
-      isFullPortraitRightFacing: agent.isFullPortraitRightFacing,
-      backgroundGradientColors: agent.backgroundGradientColors ?? [],
-      role:
-        agent.role && roleName && agent.role.displayIcon
-          ? { uuid: agent.role.uuid, name: roleName, iconUrl: agent.role.displayIcon }
-          : null,
-    },
-  ];
+  return {
+    uuid: agent.uuid,
+    displayName: agent.displayName,
+    displayIconUrl: agent.displayIcon ?? "",
+    fullPortraitUrl: agent.fullPortrait ?? "",
+    isFullPortraitRightFacing: agent.isFullPortraitRightFacing,
+    backgroundGradientColors: agent.backgroundGradientColors ?? [],
+    role:
+      agent.role && roleName && agent.role.displayIcon
+        ? { uuid: agent.role.uuid, name: roleName, iconUrl: agent.role.displayIcon }
+        : null,
+  };
 }
 
 export const getAgentCatalog = cache(async (): Promise<AgentCatalog> => {
@@ -58,8 +54,14 @@ export const getAgentCatalog = cache(async (): Promise<AgentCatalog> => {
       { next: { revalidate: 86400 } },
     );
     if (!res.ok) return {};
+
     const json: { data: ApiAgent[] } = await res.json();
-    return Object.fromEntries(json.data.map(toCatalogEntry));
+    const catalog: AgentCatalog = {};
+    for (const agent of json.data) {
+      const key = normalizeAgentName(agent.displayName.toUpperCase());
+      catalog[key] = toCatalogEntry(agent);
+    }
+    return catalog;
   } catch {
     return {};
   }
