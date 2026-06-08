@@ -19,6 +19,17 @@ export default function ShareableHero({ children }: Props) {
     if (!ref.current) return;
     setStatus("copying");
     setError(null);
+
+    const liveEl = ref.current.querySelector<HTMLElement>(
+      '[data-capture-label="live"]',
+    );
+    const captureEl = ref.current.querySelector<HTMLElement>(
+      '[data-capture-label="capture"]',
+    );
+
+    if (liveEl) liveEl.hidden = true;
+    if (captureEl) captureEl.hidden = false;
+
     try {
       const blob = await toBlob(ref.current, {
         cacheBust: true,
@@ -33,6 +44,9 @@ export default function ShareableHero({ children }: Props) {
     } catch (e) {
       setStatus("idle");
       setError(e instanceof Error ? e.message : "Copy failed");
+    } finally {
+      if (liveEl) liveEl.hidden = false;
+      if (captureEl) captureEl.hidden = true;
     }
   }
 
