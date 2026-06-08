@@ -122,7 +122,7 @@ export default function HeroAgentCard({
             {stats.map(([label, value]) => (
               <div
                 key={label}
-                className="flex items-center justify-between rounded bg-slate-100/40 dark:bg-vdcBlack/40 backdrop-blur-sm px-2 py-1 text-xs"
+                className="flex items-center justify-between rounded bg-slate-100/40 dark:bg-vdcBlack/40 backdrop-blur-[1px] px-2 py-1 text-xs"
               >
                 <h1 className="text-vdcRed font-semibold">{label}</h1>
                 <h1 className="text-vdcBlack dark:text-vdcWhite">{value}</h1>
