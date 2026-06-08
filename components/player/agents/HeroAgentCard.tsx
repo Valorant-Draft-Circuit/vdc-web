@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { GameType } from "@prisma/client";
 import type { PlayerAgentBreakdown } from "@/lib/queries/stats/getPlayerAgentBreakdown";
@@ -9,9 +10,15 @@ type Props = {
   entry: PlayerAgentBreakdown;
   teamMap: TeamLogoMap;
   gameType: GameType;
+  captureLabel?: ReactNode;
 };
 
-export default function HeroAgentCard({ entry, teamMap, gameType }: Props) {
+export default function HeroAgentCard({
+  entry,
+  teamMap,
+  gameType,
+  captureLabel,
+}: Props) {
   const { catalog, averages, totals, gamesPlayed, wins, rounds } = entry;
   const rating = (averages.ratingAttack + averages.ratingDefense) / 2;
   const winPct = gamesPlayed === 0 ? 0 : (wins / gamesPlayed) * 100;
@@ -70,9 +77,21 @@ export default function HeroAgentCard({ entry, teamMap, gameType }: Props) {
               />
             )}
             <div className="flex flex-col">
-              <h1 className="text-[10px] tracking-wider text-vdcBlack dark:text-gray-400">
+              <h1
+                data-capture-label="live"
+                className="text-[10px] tracking-wider text-vdcBlack dark:text-gray-400"
+              >
                 Viewing
               </h1>
+              {captureLabel && (
+                <div
+                  data-capture-label="capture"
+                  hidden
+                  className="text-[10px] tracking-wider text-vdcBlack dark:text-gray-400 flex flex-col gap-0.5"
+                >
+                  {captureLabel}
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-vdcBlack dark:text-vdcWhite leading-tight">
                   {catalog?.displayName ?? entry.agent}
