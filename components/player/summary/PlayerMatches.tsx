@@ -493,13 +493,14 @@ function TeamLogo({
     );
   }
 
+  const teamTierSlug = info.tier.toLowerCase();
   return (
     <div className="flex flex-row text-xs drop-shadow-md hover:brightness-90 hover:cursor-pointer">
       <Link
         onClick={(e) => {
           e.stopPropagation();
         }}
-        href={`/franchises/${info.slug}?team=${info.tier}`}
+        href={`/franchises/${info.slug}?team=${teamTierSlug}`}
       >
         <Image
           src={`${TEAM_LOGOS_URL}${info.logoPath}`}
