@@ -20,6 +20,7 @@ export const VDC_BLUE = "#3498db";
 export const VDC_GREEN = "#2ecc71";
 export const VDC_YELLOW = "#f1c40f";
 export const VDC_ORANGE = "#FF9266";
+export const VDC_RED = "#de3845";
 
 export const TIER_HEX_COLOR_MAP: Record<Tier, string> = {
   MYTHIC: VDC_PURPLE,
@@ -177,3 +178,19 @@ export const ROLES = Object.entries(Roles)
     label,
     value: BigInt(value as unknown as string),
   }));
+
+export type RoleName = "DUELIST" | "SENTINEL" | "CONTROLLER" | "INITIATOR";
+
+export const ROLE_COLOR_MAP: Record<RoleName, string> = {
+  DUELIST: "vdcRed",
+  CONTROLLER: "vdcBlue",
+  SENTINEL: "vdcGreen",
+  INITIATOR: "vdcOrange",
+};
+
+export const ROLE_HEX_COLOR_MAP: Record<RoleName, string> = {
+  DUELIST: VDC_RED,
+  CONTROLLER: VDC_BLUE,
+  SENTINEL: VDC_GREEN,
+  INITIATOR: VDC_ORANGE,
+};

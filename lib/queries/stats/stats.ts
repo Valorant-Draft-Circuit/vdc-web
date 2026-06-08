@@ -1,6 +1,7 @@
 import { avg } from "@/lib/common/math";
 import { determineTierWithTierLines, getMMRTierLines } from "@/lib/common/tier";
 import { hasFlags } from "@/lib/common/flags";
+import { normalizeAgentName } from "@/lib/common/agents";
 import { prisma } from "@/lib/prisma";
 import { Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
@@ -388,11 +389,7 @@ async function getAggregatedPlayerStatsByMatch(
         };
       }
       if (stat.agent) {
-        let normalizedAgent = stat.agent;
-        if (stat.agent === "KAYO") {
-          normalizedAgent = "KAY/O";
-        }
-        acc[u].agents.add(normalizedAgent);
+        acc[u].agents.add(normalizeAgentName(stat.agent));
       }
 
       Object.keys(acc[u]._sum).forEach((key) => {
@@ -475,13 +472,9 @@ export async function getPlayerStatsByGame(
     {};
 
   for (const { userID, agent, Team } of playerData) {
-    let normalizedAgent = agent;
-    if (agent === "KAYO") {
-      normalizedAgent = "KAY/O";
-    }
     if (!mergedMap[userID])
       mergedMap[userID] = { agents: [], team: Team?.name ?? null };
-    if (agent) mergedMap[userID].agents.push(normalizedAgent);
+    if (agent) mergedMap[userID].agents.push(normalizeAgentName(agent));
   }
 
   return groupedStats.map((stat) => ({

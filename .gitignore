@@ -40,3 +40,8 @@ pnpm-workspace.yaml
 
 # local design notes
 /docs
+/.superpowers
+
+# agents
+AGENTS.md
+.mcp.json
