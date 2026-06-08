@@ -121,7 +121,9 @@ export default function AgentTable({
                 <th
                   key={c.key}
                   className={`sticky top-0 border-b italic border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-xs xl:text-sm backdrop-blur-sm z-10 ${
-                    isFirst ? "left-0 z-30 bg-white dark:bg-vdcBlack" : ""
+                    isFirst
+                      ? "left-0 z-30 bg-white dark:bg-vdcBlack min-w-[180px]"
+                      : ""
                   }`}
                 >
                   <button
@@ -183,7 +185,7 @@ export default function AgentTable({
                 className={`group ${rowBg} ${rowHover} transition-colors`}
               >
                 <td
-                  className={`relative border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-2 text-xs xl:text-sm dark:text-white sticky left-0 z-10 transition-colors ${firstCellBg} ${stickyHover}`}
+                  className={`relative border-b border-r border-gray-200 dark:border-gray-600 whitespace-nowrap px-3 py-2 text-xs xl:text-sm dark:text-white sticky left-0 z-10 min-w-[180px] transition-colors ${firstCellBg} ${stickyHover}`}
                 >
                   {isSelected && (
                     <span

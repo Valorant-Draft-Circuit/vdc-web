@@ -52,7 +52,7 @@ export default function HeroAgentCard({ entry, teamMap, gameType }: Props) {
           alt={catalog.displayName}
           fill
           sizes="(min-width: 1280px) 768px, 100vw"
-          className="absolute pointer-events-none inset-0 object-cover object-[right_25%] brightness-50 dark:brightness-35 scale-110 origin-top-right translate-x-[30%]"
+          className="absolute pointer-events-none inset-0 object-cover xl:object-[right_25%] brightness-50 dark:brightness-35 xl:scale-110 xl:origin-top-right xl:translate-x-[30%]"
         />
       )}
       <div className="absolute inset-0 pointer-events-none bg-linear-to-r from-vdcWhite/95 via-vdcWhite/60 to-transparent dark:from-vdcBlack/95 dark:via-vdcBlack/60" />

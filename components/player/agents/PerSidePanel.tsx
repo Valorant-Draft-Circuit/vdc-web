@@ -38,7 +38,7 @@ export default function PerSidePanel({ entry, variant = "hero" }: Props) {
       size: "small",
     },
     {
-      label: "Round W%",
+      label: "Round WR%",
       value: `${roundWinPct.toFixed(0)}%`,
       size: "small",
     },
