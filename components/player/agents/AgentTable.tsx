@@ -145,7 +145,7 @@ export default function AgentTable({
           </tr>
         </thead>
         <tbody>
-          {sortedRows.map((row, idx) => {
+          {sortedRows.map((row) => {
             const slug = agentToUrlSlug(row.catalog?.displayName ?? row.agent);
             const winPct =
               row.gamesPlayed === 0 ? 0 : (row.wins / row.gamesPlayed) * 100;
