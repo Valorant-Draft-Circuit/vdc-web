@@ -28,17 +28,20 @@ export default async function PlayerInfo({
   let isPlayerSigned = false;
   let playerTeam;
   let tierColor: string;
+  let teamTierSlug: string | undefined;
 
   const leagueStatus = playerInfo.Status!.leagueStatus;
 
   if (leagueStatus === LeagueStatus.SIGNED) {
     playerTeam = playerInfo.Team!;
     tierColor = TIER_COLOR_MAP[playerTeam.tier];
+    teamTierSlug = playerTeam.tier.toLowerCase();
     isPlayerSigned = true;
   } else if (leagueStatus === LeagueStatus.GENERAL_MANAGER) {
     if (playerInfo.Team) {
       playerTeam = playerInfo.Team;
       tierColor = TIER_COLOR_MAP[playerTeam.tier];
+      teamTierSlug = playerTeam.tier.toLowerCase();
       isPlayerSigned = true;
     } else {
       playerTeam = "GM/AGM";
@@ -92,7 +95,7 @@ export default async function PlayerInfo({
               <h2 className="text-vdcWhite text-sm">
                 {isPlayerSigned ? (
                   <Link
-                    href={`/franchises/${playerTeam.Franchise.slug}?team=${playerTeam.tier}`}
+                    href={`/franchises/${playerTeam.Franchise.slug}?team=${teamTierSlug}`}
                     className="hover:text-vdcRed hover:underline"
                   >
                     {playerTeam.Franchise.slug} | {playerTeam.name}

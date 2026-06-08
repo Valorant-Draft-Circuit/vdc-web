@@ -355,11 +355,12 @@ function TeamIdentity({
   teamBrand: MatchTeam["Franchise"]["Brand"] | undefined;
 }) {
   const franchiseSlug = team?.Franchise.slug;
+  const teamTierSlug = team?.tier.toLowerCase();
 
   return (
     <div className="flex flex-col text-center w-1/3 hover:brightness-80">
       <h1 className="text-vdcWhite italic">{team?.Franchise.slug}</h1>
-      <Link href={`/franchises/${franchiseSlug}?team=${team?.tier}`}>
+      <Link href={`/franchises/${franchiseSlug}?team=${teamTierSlug}`}>
         <Image
           alt={`${teamBrand?.logo}`}
           src={`${TEAM_LOGOS_URL}${teamBrand?.logo}`}
