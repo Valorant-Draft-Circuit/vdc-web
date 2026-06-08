@@ -34,7 +34,9 @@ export default async function AuthSection() {
   return (
     <div className="flex flex-row space-x-2">
       <div className="flex flex-col text-vdcWhite p-2 items-end text-sm ">
-        <h1 className="italic">{user?.name}</h1>
+        <Link href="/player/me" className="hover:text-vdcRed hover:underline">
+          <h1 className="italic">{user?.name}</h1>
+        </Link>
         <h1>{status}</h1>
       </div>
       <div className="flex m-auto">

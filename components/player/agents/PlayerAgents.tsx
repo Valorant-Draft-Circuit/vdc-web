@@ -5,6 +5,7 @@ import type { TeamLogoMap } from "@/lib/queries/teams/teams";
 import AgentTable from "./AgentTable";
 import HeroAgentCard from "./HeroAgentCard";
 import RoleDistribution from "./RoleDistribution";
+import ShareableHero from "./ShareableHero";
 
 type Props = {
   breakdown: PlayerAgentBreakdown[];
@@ -29,7 +30,9 @@ export default function PlayerAgents({
     <div className="flex flex-col gap-3">
       {gameType === GameType.COMBINE && <CombineDisclaimer />}
       <RoleDistribution breakdown={breakdown} />
-      <HeroAgentCard entry={selected} teamMap={teamMap} gameType={gameType} />
+      <ShareableHero>
+        <HeroAgentCard entry={selected} teamMap={teamMap} gameType={gameType} />
+      </ShareableHero>
       <AgentTable
         rows={breakdown}
         selectedSlug={selectedSlug}
