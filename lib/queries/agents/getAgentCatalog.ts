@@ -21,7 +21,11 @@ type ApiAgent = {
   fullPortrait: string | null;
   isFullPortraitRightFacing: boolean;
   backgroundGradientColors: string[] | null;
-  role: { uuid: string; displayName: string; displayIcon: string | null } | null;
+  role: {
+    uuid: string;
+    displayName: string;
+    displayIcon: string | null;
+  } | null;
 };
 
 const ROLE_NAME_MAP: Record<string, RoleName> = {
@@ -32,7 +36,9 @@ const ROLE_NAME_MAP: Record<string, RoleName> = {
 };
 
 function toCatalogEntry(agent: ApiAgent): AgentCatalogEntry {
-  const roleName = agent.role ? ROLE_NAME_MAP[agent.role.displayName] : undefined;
+  const roleName = agent.role
+    ? ROLE_NAME_MAP[agent.role.displayName]
+    : undefined;
   return {
     uuid: agent.uuid,
     displayName: agent.displayName,
@@ -42,7 +48,11 @@ function toCatalogEntry(agent: ApiAgent): AgentCatalogEntry {
     backgroundGradientColors: agent.backgroundGradientColors ?? [],
     role:
       agent.role && roleName && agent.role.displayIcon
-        ? { uuid: agent.role.uuid, name: roleName, iconUrl: agent.role.displayIcon }
+        ? {
+            uuid: agent.role.uuid,
+            name: roleName,
+            iconUrl: agent.role.displayIcon,
+          }
         : null,
   };
 }
