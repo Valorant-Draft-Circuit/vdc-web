@@ -1,4 +1,4 @@
-import { LeagueStatus } from "@prisma/client";
+import { LeagueStatus, Tier } from "@prisma/client";
 
 export function isUserPlaying(player) {
   if (
@@ -101,4 +101,125 @@ export function summarizePlayerTeamsBySeason(
     (a, b) => b.mostRecentDate.getTime() - a.mostRecentDate.getTime(),
   );
   return summaries;
+}
+
+type FreeAgentGameStat = {
+  team: number | null;
+  ratingAttack: number | null;
+  ratingDefense: number | null;
+  acs: number | null;
+  kast: number | null;
+  kills: number | null;
+  deaths: number | null;
+  assists: number | null;
+  damage: number | null;
+  Game: {
+    tier: Tier;
+    datePlayed: Date;
+    winner: number | null;
+    rounds: number;
+  };
+};
+
+export type FreeAgentSeasonSummary = {
+  gamesPlayed: number;
+  teamIds: number[];
+  tiers: Tier[];
+  lastPlayed: Date | null;
+  wins: number;
+  losses: number;
+  avgRating: number;
+  avgAcs: number;
+  avgKast: number;
+  kda: number;
+  adr: number;
+};
+
+const TIER_RANK: Record<Tier, number> = {
+  MYTHIC: 5,
+  EXPERT: 4,
+  APPRENTICE: 3,
+  PROSPECT: 2,
+  RECRUIT: 1,
+  MIXED: 0,
+};
+
+/**
+ * Aggregates a player's current-season games into the scouting summary shown on
+ * the Free Agent card: how much/where they have played and how they performed,
+ * drawn from every game in the season sample (sub appearances, combines, etc.).
+ */
+export function summarizeFreeAgentSeason(
+  stats: ReadonlyArray<FreeAgentGameStat>,
+): FreeAgentSeasonSummary {
+  const teamIds = new Set<number>();
+  const tiers = new Set<Tier>();
+  let lastPlayed: Date | null = null;
+  let wins = 0;
+  let losses = 0;
+
+  let ratingSum = 0;
+  let ratingCount = 0;
+  let acsSum = 0;
+  let acsCount = 0;
+  let kastSum = 0;
+  let kastCount = 0;
+  let totalKills = 0;
+  let totalDeaths = 0;
+  let totalAssists = 0;
+  let totalDamage = 0;
+  let totalRounds = 0;
+
+  for (const stat of stats) {
+    if (typeof stat.team === "number") teamIds.add(stat.team);
+    tiers.add(stat.Game.tier);
+
+    if (lastPlayed === null || stat.Game.datePlayed > lastPlayed) {
+      lastPlayed = stat.Game.datePlayed;
+    }
+
+    const winner = stat.Game.winner;
+    if (winner === stat.team) wins += 1;
+    else if (winner !== null) losses += 1;
+
+    if (stat.ratingAttack !== null && stat.ratingDefense !== null) {
+      ratingSum += (stat.ratingAttack + stat.ratingDefense) / 2;
+      ratingCount += 1;
+    }
+    if (stat.acs !== null) {
+      acsSum += stat.acs;
+      acsCount += 1;
+    }
+    if (stat.kast !== null) {
+      kastSum += stat.kast;
+      kastCount += 1;
+    }
+
+    totalKills += stat.kills ?? 0;
+    totalDeaths += stat.deaths ?? 0;
+    totalAssists += stat.assists ?? 0;
+    totalDamage += stat.damage ?? 0;
+    totalRounds += stat.Game.rounds;
+  }
+
+  const tiersHighestFirst = Array.from(tiers).sort(
+    (a, b) => TIER_RANK[b] - TIER_RANK[a],
+  );
+
+  return {
+    gamesPlayed: stats.length,
+    teamIds: Array.from(teamIds),
+    tiers: tiersHighestFirst,
+    lastPlayed,
+    wins,
+    losses,
+    avgRating: ratingCount === 0 ? 0 : ratingSum / ratingCount,
+    avgAcs: acsCount === 0 ? 0 : acsSum / acsCount,
+    avgKast: kastCount === 0 ? 0 : kastSum / kastCount,
+    kda:
+      totalDeaths === 0
+        ? totalKills + totalAssists
+        : (totalKills + totalAssists) / totalDeaths,
+    adr: totalRounds === 0 ? 0 : totalDamage / totalRounds,
+  };
 }
