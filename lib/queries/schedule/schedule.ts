@@ -2,8 +2,37 @@ import { determineIfKnockout, packageMatch } from "@/lib/common/match";
 import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
-import { MatchType, Tier } from "@prisma/client";
+import { MatchType, Prisma, Tier } from "@prisma/client";
 type PackagedMatch = ReturnType<typeof packageMatch>;
+
+const upcomingMatchTypes = [
+  MatchType.PRE_SEASON,
+  MatchType.BO2,
+  MatchType.BO3,
+  MatchType.BO5,
+];
+
+const upcomingMatchInclude = {
+  Home: {
+    include: {
+      Franchise: {
+        include: {
+          Brand: true,
+        },
+      },
+    },
+  },
+  Away: {
+    include: {
+      Franchise: {
+        include: {
+          Brand: true,
+        },
+      },
+    },
+  },
+  Games: true,
+} satisfies Prisma.MatchesInclude;
 
 export type Schedule = {
   preSeason: Record<string, PackagedMatch[]>;
@@ -18,6 +47,26 @@ export type UpcomingMatchRow = Awaited<
 
 export async function getEveryUpcomingMatch() {
   const upcomingMatches = await getUpcomingMatches({ filter: true });
+  return upcomingMatches;
+}
+
+export async function getUpcomingMatchesForTeam(teamId: number, limit = 3) {
+  const currentSeason = await ControlPanel.getSeason();
+
+  const upcomingMatches = await prisma.matches.findMany({
+    where: {
+      season: currentSeason,
+      matchType: { in: upcomingMatchTypes },
+      dateScheduled: { gte: new Date() },
+      Home: { active: true },
+      Away: { active: true },
+      OR: [{ home: teamId }, { away: teamId }],
+    },
+    take: limit,
+    include: upcomingMatchInclude,
+    orderBy: [{ dateScheduled: "asc" }],
+  });
+
   return upcomingMatches;
 }
 
@@ -146,12 +195,7 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
   const whereClause: UpcomingWhereClause = {
     tier,
     season: !season ? currentSeason : season,
-    matchType: [
-      MatchType.PRE_SEASON,
-      MatchType.BO2,
-      MatchType.BO3,
-      MatchType.BO5,
-    ],
+    matchType: upcomingMatchTypes,
     Home: { active: true },
     Away: { active: true },
   };
@@ -171,27 +215,7 @@ async function getUpcomingMatches(options: GetUpcomingMatchesOptions = {}) {
       matchType: { in: whereClause.matchType },
     },
     take: take,
-    include: {
-      Home: {
-        include: {
-          Franchise: {
-            include: {
-              Brand: true,
-            },
-          },
-        },
-      },
-      Away: {
-        include: {
-          Franchise: {
-            include: {
-              Brand: true,
-            },
-          },
-        },
-      },
-      Games: true,
-    },
+    include: upcomingMatchInclude,
     orderBy: [{ dateScheduled: "asc" }],
   });
 

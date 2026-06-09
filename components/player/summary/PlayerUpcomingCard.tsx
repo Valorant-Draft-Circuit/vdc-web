@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
+import { getUpcomingMatchesForTeam } from "@/lib/queries/schedule/schedule";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 
 const MAX_ROWS = 3;
@@ -10,16 +10,7 @@ type Props = {
 };
 
 export default async function PlayerUpcomingCard({ teamId }: Props) {
-  const allUpcoming = await getEveryUpcomingMatch();
-
-  const teamMatches = allUpcoming
-    .filter((match) => match.Home?.id === teamId || match.Away?.id === teamId)
-    .sort(
-      (a, b) =>
-        new Date(a.dateScheduled).getTime() -
-        new Date(b.dateScheduled).getTime(),
-    )
-    .slice(0, MAX_ROWS);
+  const teamMatches = await getUpcomingMatchesForTeam(teamId, MAX_ROWS);
 
   if (teamMatches.length === 0) return null;
 
@@ -85,6 +76,9 @@ function UpcomingRow({
           </span>
           <h1 className="text-xs">{dateLabel}</h1>
         </div>
+        <span className="hidden xl:inline text-[10px] text-gray-500 dark:text-gray-400">
+          vs
+        </span>
         <Image
           src={logoSrc}
           alt={String(opponentId)}
@@ -92,9 +86,6 @@ function UpcomingRow({
           height={500}
           className="size-6 rounded-sm"
         />
-        <span className="hidden xl:inline text-[10px] text-gray-500 dark:text-gray-400">
-          vs
-        </span>
         <h1 className="text-sm">{opponentName}</h1>
         {matchDay !== null && (
           <h2 className="ml-auto text-[10px] text-gray-500 dark:text-gray-400">
