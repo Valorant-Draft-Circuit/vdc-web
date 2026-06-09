@@ -2,10 +2,11 @@ import { GameType, Prisma } from "@prisma/client";
 import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
 import PlayerMatches from "./PlayerMatches";
-import {
-  getTeamLogoMap,
-  type TeamLogoMap,
-} from "@/lib/queries/teams/teams";
+import PlayerTeamCard from "./PlayerTeamCard";
+import PlayerFormCard from "./PlayerFormCard";
+import PlayerUpcomingCard from "./PlayerUpcomingCard";
+import { deriveTeamIdFromStats } from "@/lib/common/player";
+import { getTeamLogoMap, type TeamLogoMap } from "@/lib/queries/teams/teams";
 import CombineDisclaimer from "@/components/player/CombineDisclaimer";
 
 export type StatsPayload = Prisma.PlayerStatsGetPayload<{
@@ -20,9 +21,16 @@ export type ProcessedPlayerStat = StatsPayload & {
 type Props = {
   stats: StatsPayload[] | null;
   gameType: string | undefined;
+  season: number;
+  currentSeason: number;
 };
 
-export default async function PlayerSummary({ stats, gameType }: Props) {
+export default async function PlayerSummary({
+  stats,
+  gameType,
+  season,
+  currentSeason,
+}: Props) {
   if (!stats || stats.length === 0) {
     return <NoStats />;
   }
@@ -36,14 +44,28 @@ export default async function PlayerSummary({ stats, gameType }: Props) {
   const isCombine = gameType?.toUpperCase() === GameType.COMBINE;
   const teamMap: TeamLogoMap = isCombine ? {} : await buildTeamMap(stats);
 
+  const teamId = isCombine ? null : deriveTeamIdFromStats(stats);
+  const isCurrentSeason = season === currentSeason;
+
   return (
     <div className="flex flex-col xl:px-0 gap-2">
       {isCombine && <CombineDisclaimer />}
 
       <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
         <div className="flex flex-col gap-2 xl:w-1/2">
+          {!isCombine && teamId !== null && (
+            <PlayerTeamCard teamId={teamId} season={season} />
+          )}
           <PlayerRating stats={processedPlayerStats} />
           <PlayerStats stats={processedPlayerStats} />
+          {!isCombine && (
+            <>
+              <PlayerFormCard stats={processedPlayerStats} />
+              {teamId !== null && isCurrentSeason && (
+                <PlayerUpcomingCard teamId={teamId} />
+              )}
+            </>
+          )}
         </div>
         <div className="w-full">
           <PlayerMatches

@@ -179,6 +179,7 @@ export default async function Page({ params, searchParams }: Props) {
           <PlayerSummaryWithStats
             riotIGN={playerIGN.decoded}
             season={season}
+            currentSeason={currentSeason}
             gameType={gameTypeParam}
             gameTypeParam={sp.type as string}
           />
@@ -249,11 +250,13 @@ async function handleDiscordIDSearch(discordID: string) {
 async function PlayerSummaryWithStats({
   riotIGN,
   season,
+  currentSeason,
   gameType,
   gameTypeParam,
 }: {
   riotIGN: string;
   season: number;
+  currentSeason: number;
   gameType: GameType;
   gameTypeParam: string;
 }) {
@@ -262,5 +265,12 @@ async function PlayerSummaryWithStats({
     season,
     gameType,
   });
-  return <PlayerSummary stats={stats ?? null} gameType={gameTypeParam} />;
+  return (
+    <PlayerSummary
+      stats={stats ?? null}
+      gameType={gameTypeParam}
+      season={season}
+      currentSeason={currentSeason}
+    />
+  );
 }
