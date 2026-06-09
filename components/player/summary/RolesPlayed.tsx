@@ -1,14 +1,11 @@
 import Image from "next/image";
 import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 import { normalizeAgentName } from "@/lib/common/agents";
-import { ROLE_HEX_COLOR_MAP, type RoleName } from "@/lib/common/constants";
-
-const ROLE_ORDER: RoleName[] = [
-  "DUELIST",
-  "CONTROLLER",
-  "SENTINEL",
-  "INITIATOR",
-];
+import {
+  ROLE_HEX_COLOR_MAP,
+  ROLE_ORDER,
+  type RoleName,
+} from "@/lib/common/constants";
 
 type RoleTally = { games: number; iconUrl: string | null };
 

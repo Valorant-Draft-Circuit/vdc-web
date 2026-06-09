@@ -1,15 +1,12 @@
 import Image from "next/image";
-import { ROLE_HEX_COLOR_MAP, type RoleName } from "@/lib/common/constants";
+import {
+  ROLE_HEX_COLOR_MAP,
+  ROLE_ORDER,
+  type RoleName,
+} from "@/lib/common/constants";
 import type { PlayerAgentBreakdown } from "@/lib/queries/stats/getPlayerAgentBreakdown";
 
 type Props = { breakdown: PlayerAgentBreakdown[] };
-
-const ROLE_ORDER: RoleName[] = [
-  "DUELIST",
-  "CONTROLLER",
-  "SENTINEL",
-  "INITIATOR",
-];
 
 export default function RoleDistribution({ breakdown }: Props) {
   const totals: Record<RoleName, number> = {
