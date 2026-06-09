@@ -26,10 +26,10 @@ export default async function Page() {
             height={5000}
             className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] brightness-20"
           />
-          <h1 className="text-3xl italic font-semibold tracking-tight text-pretty text-vdcRed xl:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-pretty text-vdcRed xl:text-4xl">
             franchises
           </h1>
-          <h2 className="mt-4 text-base/7 text-pretty text-vdcWhite italic">
+          <h2 className="mt-4 text-base/7 text-pretty text-vdcWhite ">
             These following franchises and their teams battle for the VDC S
             {currentSeason} trophy in each tier. <br />
             Click on a franchise to learn more about them!

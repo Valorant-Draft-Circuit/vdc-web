@@ -143,7 +143,7 @@ export default function Questions({
             </a>
             ?
           </h2>
-          <p className="italic text-xs">
+          <p className="text-xs">
             By signing up you hereby agree to abide by ALL of the league&apos;s
             rules/behavioral guidelines and will accept the consequences that
             come with for not adhereing to any and all of the rules.
@@ -236,11 +236,11 @@ function RoleExplanations(props: { rfaOnly: boolean }) {
   return (
     <dl className="divide-y divide-gray-900/10 dark:divide-vdcGrey">
       {props.rfaOnly ? (
-        <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
+        <h2 className="font-roboto text-vdcRed dark:text-gray-400">
           &quot;What does RFA mean?&quot;
         </h2>
       ) : (
-        <h2 className="font-roboto italic text-vdcRed dark:text-gray-400">
+        <h2 className="font-roboto text-vdcRed dark:text-gray-400">
           &quot;Whats the difference?!&quot;
         </h2>
       )}
@@ -250,7 +250,7 @@ function RoleExplanations(props: { rfaOnly: boolean }) {
             <Disclosure key={role.id} as="div" className="py-2">
               <dt>
                 <DisclosureButton className="group flex w-full items-start justify-between text-left text-vdcBlack dark:text-vdcWhite hover:cursor-pointer">
-                  <span className="my-auto italic">
+                  <span className="my-auto ">
                     <h1>{role.id}</h1>
                   </span>
                   <span className="ml-6 flex h-7 items-center">

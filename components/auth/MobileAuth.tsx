@@ -12,7 +12,7 @@ export default async function MobileAuth() {
   if (!session) {
     return (
       <div className="flex flex-col gap-2">
-        <h1 className="text-gray-200 italic px-4 text-lg">Not signed in.</h1>
+        <h1 className="text-gray-200 px-4 text-lg">Not signed in.</h1>
         <SignIn />
       </div>
     );
@@ -43,13 +43,13 @@ export default async function MobileAuth() {
           </Link>
         </div>
         <div className="flex flex-col text-gray-300 p-2 text-sm gap-1">
-          <h1 className="italic">{userName}</h1>
-          <h2 className="italic uppercase">{displayStatus}</h2>
+          <h1 className="">{userName}</h1>
+          <h2 className="uppercase">{displayStatus}</h2>
         </div>
       </div>
 
       <Link href={"/me"}>
-        <h1 className="text-gray-300 italic text-lg hover:text-vdcRed">
+        <h1 className="text-gray-300 text-lg hover:text-vdcRed">
           My Profile
         </h1>
       </Link>

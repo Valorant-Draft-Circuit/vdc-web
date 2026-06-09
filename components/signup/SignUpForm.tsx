@@ -39,7 +39,7 @@ export default function SignUpForm({
     return (
       <div className="flex flex-col text-center m-auto text-6xl gap-2 pt-10">
         <h1 className="text-vdcRed ">ALREADY SIGNED UP</h1>
-        <h2 className="text-lg font-roboto italic">
+        <h2 className="text-lg font-roboto ">
           No need to sign up again. (woohoo!)
         </h2>
       </div>

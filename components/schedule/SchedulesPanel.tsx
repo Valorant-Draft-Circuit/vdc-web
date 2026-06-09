@@ -120,7 +120,7 @@ export default function SchedulePanel({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col md:flex-row gap-4 sticky top-0 z-20 justify-between">
-        <h1 className="text-vdcRed italic text-3xl md:text-2xl xl:text-3xl text-center my-auto">
+        <h1 className="text-vdcRed text-3xl md:text-2xl xl:text-3xl text-center my-auto">
           Season {season} Schedule
         </h1>
         <div className="flex flex-row m-auto md:m-0 gap-5">

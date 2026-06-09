@@ -24,7 +24,7 @@ export default async function Layout({
       <div className="flex flex-col gap-5 py-10 px-5">
         <header>
           <div className="flex flex-row mx-auto max-w-7xl px-6 justify-between">
-            <h1 className="text-3xl italic text-vdcRed">Tech Lead Page</h1>
+            <h1 className="text-3xl text-vdcRed">Tech Lead Page</h1>
           </div>
         </header>
         <main>

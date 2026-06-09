@@ -97,7 +97,7 @@ export default function PlayerCard({
           </div>
           <div className="w-64 my-auto border-r-1 border-vdcBlack truncate">
             <h2
-              className="italic text-xs xl:text-sm hover:cursor-pointer hover:text-vdcRed hover:underline text-start"
+              className="text-xs xl:text-sm hover:cursor-pointer hover:text-vdcRed hover:underline text-start"
               onClick={goToProfile}
             >
               {player.riotName}

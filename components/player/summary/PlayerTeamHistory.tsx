@@ -43,7 +43,7 @@ export default async function PlayerTeamHistory({
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 xl:px-6 flex flex-row items-center gap-1.5">
-        <h1 className="text-sm italic">Teams</h1>
+        <h1 className="text-sm">Teams</h1>
         <TeamsDisclaimer />
       </div>
       <TeamHistoryCarousel slides={slides} />

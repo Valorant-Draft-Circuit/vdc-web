@@ -107,7 +107,7 @@ export default async function Page({ params, searchParams }: Props) {
             className="absolute pointer-events-none inset-0 size-full object-contain sm:right-5 z-0 sm:object-right xl:z-10 justify-self-end brightness-70 drop-shadow-lg"
           />
           <div className="flex flex-col z-20 tracking-tight text-pretty drop-shadow-lg rounded-2xl p-3 sm:w-1/2 text-vdcWhite gap-2">
-            <h1 className="text-2xl lg:text-3xl italic">
+            <h1 className="text-2xl lg:text-3xl ">
               {franchiseInfo!.slug} | {franchiseInfo!.name}
             </h1>
             <h2 className="font-roboto text-xs">
@@ -139,7 +139,7 @@ export default async function Page({ params, searchParams }: Props) {
         </div>
         <div className="xl:max-w-5xl flex flex-col gap-5">
           {activeTeams.length === 0 ? (
-            <div className="text-center italic text-vdcGrey dark:text-vdcWhite py-10">
+            <div className="text-center text-vdcGrey dark:text-vdcWhite py-10">
               No active teams for this franchise.
             </div>
           ) : (

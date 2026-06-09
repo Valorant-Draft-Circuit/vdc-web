@@ -105,7 +105,7 @@ function MatchSection({
         <div className="grid grid-cols-1 gap-2 p-2">
           {matches.map((match, index) => (
             <div key={index}>
-              <div className="pb-2 italic text-vdcGrey dark:text-gray-300 text-sm xl:text-md">
+              <div className="pb-2 text-vdcGrey dark:text-gray-300 text-sm xl:text-md">
                 <h1>{match.date}</h1>
               </div>
               <MatchCard match={match} />

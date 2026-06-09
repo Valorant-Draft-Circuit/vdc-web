@@ -4,7 +4,7 @@ export default function PlayerNotFound({ player }: { player: string }) {
   return (
     <div className="flex min-h-screen justify-center items-center">
       <div className="py-10 max-w-7xl xl:py-12 flex flex-col gap-5 text-center">
-        <h1 className="text-vdcRed italic text-3xl">
+        <h1 className="text-vdcRed text-3xl">
           Player <span className="normal-case">{player}</span> not found :(
         </h1>
         <div className="flex flex-col gap-1">

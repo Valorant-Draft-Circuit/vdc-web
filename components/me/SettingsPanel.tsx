@@ -4,10 +4,10 @@ export default async function SettingsPanel() {
         <div className="bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50% py-8 mx-2 rounded-2xl flex flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
             <div className="flex flex-col w-full"> 
                 <div className="items-end mx-10 text-start ">
-                    <h1 className="italic text-3xl text-vdcBlack"> 
+                    <h1 className="text-3xl text-vdcBlack"> 
                         Settings 
                     </h1>
-                    <p className="text-vdcWhite text-md italic px-10 text-wrap"> 
+                    <p className="text-vdcWhite text-md px-10 text-wrap"> 
                         Customize your VDC website experience 
                     </p>
                 </div>

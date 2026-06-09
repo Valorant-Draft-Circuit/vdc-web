@@ -48,11 +48,11 @@ export default async function Page({ params, searchParams }: Props) {
     return (
       <div className="flex min-h-screen justify-center items-center">
         <div className="py-10 max-w-7xl xl:py-12 flex flex-col gap-10 text-center">
-          <h1 className="text-vdcRed italic text-3xl">
+          <h1 className="text-vdcRed text-3xl">
             Unfortunately we are not on season {season} yet!
           </h1>
           <Link href="/schedule">
-            <h2 className="italic text-3xl hover:text-vdcRed">
+            <h2 className="text-3xl hover:text-vdcRed">
               Click here for the current season schedule!
             </h2>
           </Link>
@@ -69,7 +69,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
-      <h1 className="text-vdcRed italic text-3xl text-center xl:ml-30">
+      <h1 className="text-vdcRed text-3xl text-center xl:ml-30">
         Season {season} Match History
       </h1>
       <VerticalTab tabElements={tabs} params="by" />

@@ -17,7 +17,7 @@ export default function ScheduleCard({
 
   return (
     <div className="overflow-hidden rounded-lg shadow-sm bg-vdcRed p-3 px-auto">
-      <div className="px-4 pb-2 sm:px-6 italic text-vdcWhite text-md xl:text-xl xl:pb-0">
+      <div className="px-4 pb-2 sm:px-6 text-vdcWhite text-md xl:text-xl xl:pb-0">
         <h1>
           {formattedDate} - {matchType}
         </h1>

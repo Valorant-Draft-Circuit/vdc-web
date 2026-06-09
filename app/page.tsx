@@ -36,7 +36,7 @@ export default async function Home() {
       {!session ? (
         <div className="overflow-hidden rounded-lg">
           <div className="px-4 py-2 sm:px-6">
-            <h1 className="text-vdcRed italic text-lg lg:text-xl">
+            <h1 className="text-vdcRed text-lg lg:text-xl">
               How do I play?
             </h1>
           </div>
@@ -48,7 +48,7 @@ export default async function Home() {
       <div className="flex flex-col xl:flex-row 4xl:flex-col">
         <div className="overflow-hidden xl:w-3/4 4xl:w-full">
           <div className="px-4 py-2 mt-5 sm:px-6 text-lg lg:text-xl">
-            <h1 className="italic">Latest News</h1>
+            <h1 className="">Latest News</h1>
           </div>
           <div className="px-4 py-2 sm:p-6">
             <Suspense
@@ -66,7 +66,7 @@ export default async function Home() {
         </div>
         <div className="overflow-hidden xl:w-1/2 4xl:w-full">
           <div className="px-4 py-2 sm:px-6">
-            <h1 className="italic text-lg lg:text-xl">
+            <h1 className="text-lg lg:text-xl">
               <a
                 href={CHANNEL_URL}
                 className="hover:text-vdcRed"
@@ -94,7 +94,7 @@ export default async function Home() {
       </div>
       <div className="overflow-hidden rounded-lg">
         <div className="px-4 py-2 sm:px-6">
-          <h1 className="text-vdcRed italic text-lg lg:text-xl">
+          <h1 className="text-vdcRed text-lg lg:text-xl">
             {/* TODO: Think of some other section, maybe stats? */}
           </h1>
         </div>

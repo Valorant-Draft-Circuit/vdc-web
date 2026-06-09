@@ -39,7 +39,7 @@ export default async function FreeAgentCard({ stats, mmr }: Props) {
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 xl:px-6 flex flex-row items-center gap-2">
-        <h1 className="text-sm italic">Free Agent</h1>
+        <h1 className="text-sm">Free Agent</h1>
       </div>
 
       <div className="px-4 py-3 sm:px-6 flex flex-col gap-3">

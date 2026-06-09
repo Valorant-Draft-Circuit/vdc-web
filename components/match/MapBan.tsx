@@ -78,7 +78,7 @@ export default function MapBan({
             : "brightness-55 dark:brightness-50"
         }`}
       />
-      <div className="flex flex-row xl:flex-col italic gap-5 p-5 justify-between">
+      <div className="flex flex-row xl:flex-col gap-5 p-5 justify-between">
         <div className="flex flex-row xl:flex-col gap-5 drop-shadow-lg text-vdcWhite my-auto xl:m-auto xl:text-center">
           <h1>{mapBan.map}</h1>
           <h1>{mapBan.type}</h1>

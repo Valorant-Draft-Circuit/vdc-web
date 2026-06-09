@@ -28,7 +28,7 @@ export default function StandingsCard({
             <h1
               className={`${
                 ranking <= apexRanks ? "text-vdcRed" : ""
-              } italic text-5xl xl:text-6xl min-w-5 xl:min-w-17`}
+              } text-5xl xl:text-6xl min-w-5 xl:min-w-17`}
             >
               {ranking}
             </h1>
@@ -43,16 +43,16 @@ export default function StandingsCard({
             />
           </div>
           <div className="flex flex-col my-auto">
-            <h1 className="md:hidden italic text-2xl">
+            <h1 className="md:hidden text-2xl">
               {standing.franchiseSlug}
             </h1>
-            <h1 className="hidden md:block italic text-lg xl:text-2xl">
+            <h1 className="hidden md:block text-lg xl:text-2xl">
               {standing.teamName}
             </h1>
-            <h1 className="italic text-sm xl:text-sm">
+            <h1 className="text-sm xl:text-sm">
               {standing.wins}W {standing.losses}L
             </h1>
-            <h1 className="italic text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
+            <h1 className="text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
           </div>
         </div>
       </Link>

@@ -29,7 +29,7 @@ export default function FranchiseCard({
               className="w-24 h-auto xl:w-30"
             />
           </div>
-          <div className="flex flex-col text-start my-auto italic w-full text-md sm:m-auto drop-shadow-2xl text-vdcWhite">
+          <div className="flex flex-col text-start my-auto w-full text-md sm:m-auto drop-shadow-2xl text-vdcWhite">
             <h1 className="xl:hidden">{franchise.slug}</h1>
             <h1 className="text-lg">{franchise.name}</h1>
           </div>
