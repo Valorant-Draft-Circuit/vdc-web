@@ -81,7 +81,7 @@ export default function TabWrapper({
                       : "text-center mx-auto"
                   } focus:not-data-focus:outline-none data-hover:cursor-pointer data-hover:text-${color} data-selected:text-${color}`}
                 >
-                  <h1 className="italic">{name}</h1>
+                  <h1 className="">{name}</h1>
                 </Tab>
               ))}
             </TabList>

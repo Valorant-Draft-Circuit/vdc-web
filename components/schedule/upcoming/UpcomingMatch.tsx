@@ -19,7 +19,7 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
         TIER_COLOR_MAP[match.tier]
       } from-3% to-gray-100 dark:to-vdcBlack to-0% text-center gap-2 flex-shrink-0 hover:brightness-90`}
     >
-      <h1 className="italic">
+      <h1 className="">
         {match.tier} - {matchType}
       </h1>
       <div className="flex flex-row m-auto gap-10">
@@ -40,7 +40,7 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
             className="size-15"
           />
         </Link>
-        <h1 className="italic text-vdcRed text-4xl m-auto">VS</h1>
+        <h1 className="text-vdcRed text-4xl m-auto">VS</h1>
         <Link
           onClick={(e) => {
             e.stopPropagation();
@@ -59,7 +59,7 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
           />
         </Link>
       </div>
-      <h2 className="italic">{timeUntil}</h2>
+      <h2 className="">{timeUntil}</h2>
     </Link>
   );
 }
@@ -71,7 +71,7 @@ export function ViewFullSchedule() {
       className="flex flex-col p-10 rounded-2xl bg-gray-100 dark:bg-vdcBlack text-center gap-2 flex-shrink-0 hover:brightness-90 hover:underline decoration-vdcRed"
     >
       <div className="flex flex-row m-auto gap-10">
-        <h1 className="italic text-vdcRed m-auto ">View Full Schedule!</h1>
+        <h1 className="text-vdcRed m-auto ">View Full Schedule!</h1>
       </div>
     </Link>
   );

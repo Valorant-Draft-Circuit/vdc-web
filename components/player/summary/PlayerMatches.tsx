@@ -36,7 +36,7 @@ export default function PlayerMatches({
   return (
     <div className="divide-y">
       <div className="px-4 py-2 xl:px-6">
-        <h1 className="text-sm italic">{gameType} Match History</h1>
+        <h1 className="text-sm">{gameType} Match History</h1>
       </div>
       <div>
         <ul role="list" className="flex flex-col gap-2 pt-2">
@@ -202,7 +202,7 @@ function ComebineGame({
             <h1
               className={`${
                 mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
-              } text-xs italic`}
+              } text-xs `}
             >
               {date} - {tier} COMBINE #{matchCount}
             </h1>
@@ -210,7 +210,7 @@ function ComebineGame({
               <h1
                 className={`${
                   mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
-                } text-xs italic`}
+                } text-xs `}
               >
                 {stat.Game.map}
               </h1>
@@ -218,7 +218,7 @@ function ComebineGame({
           </div>
           <div className="flex flex-row py-2 justify-between w-full">
             <IndividualOverview stat={stat} mapUrl={mapUrl} />
-            <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs italic">
+            <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs ">
               {statPairs.map(([label, value], i) => (
                 <h1 key={i} className="flex flex-col xl:flex-row xl:gap-2">
                   {label}: <span className="text-gray-400 text-center xl:text-start">{value}</span>
@@ -299,7 +299,7 @@ function SeasonGame({
             <h1
               className={`${
                 mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
-              } text-xs italic`}
+              } text-xs `}
             >
               {result} - {date} - MD{matchDay}
             </h1>
@@ -347,7 +347,7 @@ function IndividualStats({
   return (
     <div className="grid grid-cols-4 gap-2 w-full px-2 pt-1 mx-auto">
       {statsList.map((stat, index) => (
-        <div key={index} className="flex flex-col text-xs text-center italic">
+        <div key={index} className="flex flex-col text-xs text-center ">
           <h1 className={`${mapUrl ? "text-gray-200" : "dark:text-gray-200"}`}>
             {stat.name}
           </h1>
@@ -466,7 +466,7 @@ function Lobby({
   return (
     <div className="m-auto flex flex-row text-center gap-1 xl:gap-2">
       <TeamLogo id={teams.home.id} info={teamMap[teams.home.id]} />
-      <h1 className="text-xs my-auto italic text-gray-400">VS</h1>
+      <h1 className="text-xs my-auto text-gray-400">VS</h1>
       <TeamLogo id={teams.away.id} info={teamMap[teams.away.id]} />
     </div>
   );

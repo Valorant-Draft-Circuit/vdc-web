@@ -120,7 +120,7 @@ export default function AgentTable({
               return (
                 <th
                   key={c.key}
-                  className={`sticky top-0 border-b italic border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-xs xl:text-sm backdrop-blur-sm z-10 ${
+                  className={`sticky top-0 border-b border-gray-300 bg-gray-100 dark:bg-vdcBlack dark:text-vdcWhite p-4 text-xs xl:text-sm backdrop-blur-sm z-10 ${
                     isFirst
                       ? "left-0 z-30 bg-white dark:bg-vdcBlack min-w-[180px]"
                       : ""

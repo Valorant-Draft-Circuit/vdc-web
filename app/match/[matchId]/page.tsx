@@ -144,11 +144,11 @@ export default async function Page({
           <div className="relative flex flex-col w-full">
             <div className="flex flex-row justify-between">
               <TeamIdentity team={homeTeam} teamBrand={homeTeamBrand} />
-              <div className="flex flex-col text-2xl italic text-center">
+              <div className="flex flex-col text-2xl text-center">
                 <h1 className={`text-${tierColor} text-lg`}>
                   {matchInfo?.tier}
                 </h1>
-                <div className="flex flex-row gap-5 italic m-auto text-4xl text-vdcRed">
+                <div className="flex flex-row gap-5 m-auto text-4xl text-vdcRed">
                   <h1>{homeWins}</h1>
                   <h1>/</h1>
                   <h1>{awayWins}</h1>
@@ -359,7 +359,7 @@ function TeamIdentity({
 
   return (
     <div className="flex flex-col text-center w-1/3 hover:brightness-80">
-      <h1 className="text-vdcWhite italic">{team?.Franchise.slug}</h1>
+      <h1 className="text-vdcWhite ">{team?.Franchise.slug}</h1>
       <Link href={`/franchises/${franchiseSlug}?team=${teamTierSlug}`}>
         <Image
           alt={`${teamBrand?.logo}`}
@@ -369,7 +369,7 @@ function TeamIdentity({
           className="size-25 xl:size-50 drop-shadow-lg m-auto"
         />
       </Link>
-      <h1 className="text-vdcWhite italic truncate">{team?.name}</h1>
+      <h1 className="text-vdcWhite truncate">{team?.name}</h1>
     </div>
   );
 }

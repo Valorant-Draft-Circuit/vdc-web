@@ -33,7 +33,7 @@ export function DropDown({ title, links }: DropDownProps) {
     >
       <div className="relative w-auto h-auto">
         <button className="flex items-center uppercase text-sm">
-          <h1 className="italic 4xl:text-xl">{title}</h1>
+          <h1 className="4xl:text-xl">{title}</h1>
           <ChevronDownIcon
             className={`${
               open ? "rotate-180" : ""
@@ -55,7 +55,7 @@ export function DropDown({ title, links }: DropDownProps) {
                 currentPath === `${link.href}` ? "text-vdcRed" : "text-gray-200"
               } px-3 py-2 flex flex-row text-gray-200 hover:text-vdcRed text-sm space-x-1`}
             >
-              <h1 className="italic break-keep 4xl:text-xl">{link.name}</h1>
+              <h1 className="break-keep 4xl:text-xl">{link.name}</h1>
               {link.ext ? <ArrowTopRightOnSquareIcon className="w-4" /> : null}
             </Link>
           ))}
@@ -93,7 +93,7 @@ export function VerticalDropDown({
         />
         <div className="flex items-center gap-3">
           <div className="w-5">{icon}</div>
-          <h1 className="italic text-lg">{title}</h1>
+          <h1 className="text-lg">{title}</h1>
         </div>
       </button>
       <ul
@@ -112,7 +112,7 @@ export function VerticalDropDown({
                 pathname === link.href ? "text-vdcRed" : ""
               }`}
             >
-              <h1 className="italic">{link.name}</h1>
+              <h1 className="">{link.name}</h1>
               {link.ext ? <ArrowTopRightOnSquareIcon className="w-4" /> : null}
             </Link>
           </li>

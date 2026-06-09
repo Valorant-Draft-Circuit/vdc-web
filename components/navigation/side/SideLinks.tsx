@@ -59,8 +59,8 @@ export default function SideLinks({
           </div>
           <div className="flex flex-row gap-5 pb-2">
             <ThemeSwitch />
-            <h1 className="italic text-vdcWhite dark:hidden">Light Mode!</h1>
-            <h1 className="italic text-vdcWhite hidden dark:block">
+            <h1 className="text-vdcWhite dark:hidden">Light Mode!</h1>
+            <h1 className="text-vdcWhite hidden dark:block">
               Dark Mode!
             </h1>
           </div>

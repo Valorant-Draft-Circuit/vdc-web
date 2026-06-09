@@ -59,7 +59,7 @@ export default function Game({
 
       <div className="overflow-hidden">
         <div
-          className={`flex flex-row xl:flex-col italic gap-5 px-5 py-10 text-vdcWhite rounded-lg ${
+          className={`flex flex-row xl:flex-col gap-5 px-5 py-10 text-vdcWhite rounded-lg ${
             !map && "bg-linear-to-br to-vdcBlack from-" + tierColor
           }`}
         >

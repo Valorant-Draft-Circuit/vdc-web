@@ -26,7 +26,7 @@ export default async function PlayerUpcomingCard({ teamId }: Props) {
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 xl:px-6">
-        <h1 className="text-sm italic">Upcoming</h1>
+        <h1 className="text-sm">Upcoming</h1>
       </div>
       <ul role="list">
         {teamMatches.map((match) => {
@@ -80,7 +80,7 @@ function UpcomingRow({
     <li className="flex flex-row items-center gap-3 px-4 py-2 xl:px-6 hover:bg-vdcBlack/30">
       <Link href={`/match/${matchID}`} className="contents">
         <div className="flex flex-col w-14">
-          <span className="text-[10px] italic text-gray-500 dark:text-gray-400">
+          <span className="text-[10px] text-gray-500 dark:text-gray-400">
             {dayOfWeek}
           </span>
           <h1 className="text-xs">{dateLabel}</h1>
@@ -92,12 +92,12 @@ function UpcomingRow({
           height={500}
           className="size-6 rounded-sm"
         />
-        <span className="hidden xl:inline text-[10px] italic text-gray-500 dark:text-gray-400">
+        <span className="hidden xl:inline text-[10px] text-gray-500 dark:text-gray-400">
           vs
         </span>
         <h1 className="text-sm">{opponentName}</h1>
         {matchDay !== null && (
-          <h2 className="ml-auto text-[10px] italic text-gray-500 dark:text-gray-400">
+          <h2 className="ml-auto text-[10px] text-gray-500 dark:text-gray-400">
             MD{matchDay}
           </h2>
         )}

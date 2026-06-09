@@ -11,7 +11,7 @@ export default function CombineDisclaimer() {
           />
         </div>
         <div className="ml-3 flex-1 md:flex md:justify-between">
-          <p className="text-sm text-vdcBlack dark:text-vdcWhite font-roboto italic">
+          <p className="text-sm text-vdcBlack dark:text-vdcWhite font-roboto ">
             Combine stats are stored differently than regular season stats. Some
             data might be different or missing entirely.
           </p>

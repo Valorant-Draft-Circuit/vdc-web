@@ -27,7 +27,7 @@ export default async function StandingsPanel({
 
   if (standings.length === 0) {
     return (
-      <div className="flex flex-col italic text-2xl text-center min-w-5 m-auto xl:mr-24">
+      <div className="flex flex-col text-2xl text-center min-w-5 m-auto xl:mr-24">
         <div className="flex flex-col gap-3 xl:bg-auto">
           <h1>No standings Found for {query}</h1>
           <h2 className="text-xl">

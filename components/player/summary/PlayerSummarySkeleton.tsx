@@ -29,7 +29,7 @@ function SkeletonCard({
         />
       </div>
       <div
-        className="px-4 py-3 sm:p-6 italic text-center gap-2 animate-pulse"
+        className="px-4 py-3 sm:p-6 text-center gap-2 animate-pulse"
         style={{ display: "grid", gridTemplateColumns: `repeat(${bodyCols}, 1fr)` }}
       >
         {Array.from({ length: bodyCols }).map((_, i) => (

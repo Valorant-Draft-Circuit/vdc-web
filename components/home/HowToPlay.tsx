@@ -2,13 +2,13 @@ import Link from "next/link";
 import DiscordButton from "../buttons/DiscordButton";
 import { DISCORD_LINK } from "@/lib/common/constants";
 const StepTitle = ({ children }: { children: React.ReactNode }) => (
-  <h1 className="text-vdcWhite italic text-center mx-5 text-md xl:mx-0 xl:px-4">
+  <h1 className="text-vdcWhite text-center mx-5 text-md xl:mx-0 xl:px-4">
     {children}
   </h1>
 );
 
 const StepDesc = ({ children }: { children: React.ReactNode }) => (
-  <h1 className="text-vdcBlack dark:text-vdcWhite italic">{children}</h1>
+  <h1 className="text-vdcBlack dark:text-vdcWhite ">{children}</h1>
 );
 
 const steps = [
@@ -100,7 +100,7 @@ export default function HowToPlay() {
           <div key={step} className="relative flex flex-col mx-8 py-3 mb-12">
             <div className="absolute z-10 bottom-42 w-full xl:-top-0">
               <div className="flex flex-row justify-between">
-                <h1 className="text-vdcRed text-8xl italic xl:text-7xl drop-shadow-xl">
+                <h1 className="text-vdcRed text-8xl xl:text-7xl drop-shadow-xl">
                   {step}
                 </h1>
                 <div className="bg-vdcRed rounded-lg px-5 py-3 drop-shadow-xl my-auto">
@@ -111,7 +111,7 @@ export default function HowToPlay() {
             <div className="bg-gradient-to-t dark:bg-vdcGrey dark:bg-none from-gray-200 to-transparent  mx-8 rounded-xl shadow-lg xl:w-72 xl:h-54 xl:mx-4">
               <div className="my-16 text-center xl:pt-2">
                 {typeof desc === "string" ? (
-                  <div className="text-vdcBlack italic text-lg">{desc}</div>
+                  <div className="text-vdcBlack text-lg">{desc}</div>
                 ) : (
                   desc
                 )}

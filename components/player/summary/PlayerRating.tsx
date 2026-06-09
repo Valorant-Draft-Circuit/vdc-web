@@ -20,7 +20,7 @@ export default function PlayerRating({
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 xl:px-6">
-        <h1 className="text-sm italic">Rating</h1>
+        <h1 className="text-sm">Rating</h1>
       </div>
       <div className="px-4 py-3 sm:p-6">
         <StatChips stats={ratingChips} className="grid grid-cols-3 gap-2" />

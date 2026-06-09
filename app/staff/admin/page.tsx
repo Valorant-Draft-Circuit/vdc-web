@@ -16,7 +16,7 @@ export default async function Page() {
       <div className="flex flex-col gap-5 py-10 px-5">
         <header>
           <div className="flex flex-row mx-auto max-w-7xl sm:px-6 justify-between">
-            <h1 className="text-3xl italic text-vdcRed">
+            <h1 className="text-3xl text-vdcRed">
               Admin Dashboard / SEASON {currentSeason}
             </h1>
             <LeagueState leagueState={leagueState} />

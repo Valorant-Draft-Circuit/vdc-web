@@ -9,8 +9,8 @@ export default async function DashboardPanel() {
     <div className="bg-gradient-to-r from-vdcRed from-50% to-vdcWhite to-50% py-8 mx-2 rounded-2xl flex flex-row space-y-2 shadow-2xl lg:px-0 lg:px lg:ml-0 lg:justify-between lg:my-auto lg:max-w-12/12">
       <div className="flex flex-col w-full">
         <div className="items-end mx-10 text-start ">
-          <h1 className="italic text-3xl text-vdcBlack">Dashboard</h1>
-          <p className="text-vdcWhite text-md italic px-10 text-wrap">
+          <h1 className="text-3xl text-vdcBlack">Dashboard</h1>
+          <p className="text-vdcWhite text-md px-10 text-wrap">
             Everything you&apos;ve ever wanted to know about yourself in VDC.
           </p>
         </div>
@@ -24,7 +24,7 @@ export default async function DashboardPanel() {
                     /> */}
         </div>
       </div>
-      <div className="px-auto sm:p-6 flex flex-col gap-2 w-full italic text-vdcRed">
+      <div className="px-auto sm:p-6 flex flex-col gap-2 w-full text-vdcRed">
         <div>
           <h1> My Stats </h1>
           <StatsCard />

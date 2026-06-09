@@ -68,7 +68,7 @@ export default async function HeroSection({
 function Join() {
   return (
     <>
-      <h2 className="italic text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
+      <h2 className="text-vdcRed lg:text-vdcBlack xl:text-vdcRed text-2xl">
         Join the Fight.
       </h2>
       {!PREVIEW && (
@@ -84,7 +84,7 @@ async function Joined({ session }: { session: Session }) {
   if (!session.user?.id) {
     return (
       <div className="flex flex-col gap-5">
-        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           Something went wrong...
           <br />
           Please relog.
@@ -99,7 +99,7 @@ async function Joined({ session }: { session: Session }) {
   if (signupState === "CLOSED") {
     return (
       <>
-        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           Sign ups are <br />
           not yet open. <br />
           Check back later!
@@ -110,7 +110,7 @@ async function Joined({ session }: { session: Session }) {
   if (user!.Status!.leagueStatus === LeagueStatus.SUSPENDED) {
     return (
       <>
-        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           {user!.name} has
           <br />
           been suspended.
@@ -123,7 +123,7 @@ async function Joined({ session }: { session: Session }) {
   ) {
     return (
       <div className="flex flex-col gap-5">
-        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           You want to play, <br />
           {user!.name}?
         </h2>
@@ -133,7 +133,7 @@ async function Joined({ session }: { session: Session }) {
   } else if (user!.Status!.leagueStatus === LeagueStatus.PENDING) {
     return (
       <div className="flex flex-col gap-5">
-        <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
           {user!.name}, You are
           <br />
           pending approval!
@@ -154,7 +154,7 @@ async function Joined({ session }: { session: Session }) {
   // TODO: set button to go to wherever user specified in user settings
   return (
     <>
-      <h2 className="italic text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+      <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
         {user!.name} has
         <br />
         Joined the Draft.

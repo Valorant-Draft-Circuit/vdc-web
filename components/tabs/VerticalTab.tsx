@@ -64,7 +64,7 @@ export default function VerticalTab({
                   key={name}
                   className={`rounded-lg text-xl text-vdcBlack dark:text-vdcWhite py-1 text-start w-42 px-2 data-hover:bg-gray-300 dark:data-hover:bg-vdcBlack focus:not-data-focus:outline-none data-hover:text-${color} data-hover:cursor-pointer data-selected:bg-gray-300 dark:data-selected:bg-vdcBlack data-selected:text-${color}`}
                 >
-                  <h1 className="italic">{name}</h1>
+                  <h1 className="">{name}</h1>
                 </Tab>
               ))}
             </TabList>
@@ -103,7 +103,7 @@ function MobileTabs({
       >
         <div className="relative col-start-1 row-start-1">
           <ListboxButton
-            className={`w-full italic rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl  text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
+            className={`w-full rounded-md data-hover:cursor-pointer py-2 pl-3 pr-8 text-center text-xl  text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
             <h1 className="truncate">{selectedTab.name}</h1>
             <ChevronUpDownIcon
@@ -128,7 +128,7 @@ function MobileTabs({
                 {({ selected }) => (
                   <>
                     <h1
-                      className={`block truncate italic text-center ${
+                      className={`block truncate text-center ${
                         selected ? "font-semibold" : "font-normal"
                       }`}
                     >

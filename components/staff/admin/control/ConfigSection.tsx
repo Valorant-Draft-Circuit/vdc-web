@@ -21,7 +21,7 @@ export function ConfigSection({
 }: ConfigSectionProps) {
   return (
     <div className="rounded-md border border-gray-200 dark:border-gray-400 p-3 flex flex-col divide-y dark:divide-gray-400">
-      <h2 className="text-2xl pb-3 italic uppercase">{title}</h2>
+      <h2 className="text-2xl pb-3 uppercase">{title}</h2>
       <div className="space-y-6 p-6 grid grid-cols-1 xl:grid-cols-2 gap-x-10 gap-y-2">
         {controls.map(({ label, notes }) => {
           const options = parseOptions(notes);

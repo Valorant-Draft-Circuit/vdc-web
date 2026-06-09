@@ -31,7 +31,7 @@ export default function MobileTabs({
       >
         <div className="relative">
           <ListboxButton
-            className={`w-full italic rounded-md py-2 pl-3 pr-8 text-center text-xl text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
+            className={`w-full rounded-md py-2 pl-3 pr-8 text-center text-xl text-vdcBlack outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-${selectedTab.color} text-${selectedTab.color}`}
           >
             <h1 className="truncate">{selectedTab.name}</h1>
             <ChevronUpDownIcon
@@ -55,7 +55,7 @@ export default function MobileTabs({
                 {({ selected }) => (
                   <>
                     <h1
-                      className={`block truncate italic text-center ${
+                      className={`block truncate text-center ${
                         selected ? "font-semibold" : "font-normal"
                       }`}
                     >

@@ -49,7 +49,7 @@ function HomeBadge({ home, tier }: { home: Team; tier: Tier }) {
       className="hover:scale-105 hover:brightness-90 rounded-md transition-transform m-auto"
     >
       <div className="flex-shrink-0 w-20 sm:w-50 flex items-center justify-end space-x-2 xl:space-x-5">
-        <h1 className="italic hidden sm:block text-sm sm:text-md xl:text-xl text-end break-words">
+        <h1 className="hidden sm:block text-sm sm:text-md xl:text-xl text-end break-words">
           {home.name}
         </h1>
 
@@ -82,7 +82,7 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
           height={250}
           className="w-12 h-auto sm:w-15 xl:w-16 drop-shadow-md ml-0"
         />
-        <h1 className="italic hidden sm:block text-sm sm:text-md xl:text-xl break-words">
+        <h1 className="hidden sm:block text-sm sm:text-md xl:text-xl break-words">
           {away.name}
         </h1>
       </div>
@@ -105,7 +105,7 @@ function MatchScore({
   if (!pastGame) {
     return (
       <div className="flex w-25 xl:w-30 text-center m-auto">
-        <h1 className="italic m-auto text-2xl lg:text-4xl text-vdcRed">VS</h1>
+        <h1 className="m-auto text-2xl lg:text-4xl text-vdcRed">VS</h1>
       </div>
     );
   }
@@ -125,13 +125,13 @@ function MatchScore({
       <div
         className={
           revealed
-            ? "flex flex-row italic gap-3 xl:gap-5 m-auto text-lg sm:text-2xl xl:text-3xl my-auto items-center"
+            ? "flex flex-row gap-3 xl:gap-5 m-auto text-lg sm:text-2xl xl:text-3xl my-auto items-center"
             : "hidden"
         }
       >
-        <h1 className="italic">{homeWins}</h1>
-        <h1 className="italic text-2xl lg:text-4xl text-vdcRed">VS</h1>
-        <h1 className="italic">{awayWins}</h1>
+        <h1 className="">{homeWins}</h1>
+        <h1 className="text-2xl lg:text-4xl text-vdcRed">VS</h1>
+        <h1 className="">{awayWins}</h1>
       </div>
     </div>
   );

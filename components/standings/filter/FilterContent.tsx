@@ -25,7 +25,7 @@ export default function FilterContent({
         <CheckIcon className="hidden size-4 fill-vdcBlack group-data-checked:block" />
       </Checkbox>
       <Label htmlFor={id}>
-        <h1 className="italic">{filterBy}</h1>
+        <h1 className="">{filterBy}</h1>
       </Label>
     </div>
   );

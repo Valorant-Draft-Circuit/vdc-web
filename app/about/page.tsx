@@ -65,7 +65,7 @@ export default async function Page() {
               height={5000}
               className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_10%] brightness-20"
             />
-            <h1 className="text-3xl italic font-semibold tracking-tight text-pretty text-vdcRed xl:text-4xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-pretty text-vdcRed xl:text-4xl">
               Frequently asked questions
             </h1>
             <h2 className="mt-4 text-base/7 text-pretty text-vdcWhite">
@@ -73,7 +73,7 @@ export default async function Page() {
               <a
                 href={DISCORD_LINK}
                 target="_blank"
-                className="font-semibold text-vdcRed hover:text-red-500 italic underline"
+                className="font-semibold text-vdcRed hover:text-red-500 underline"
               >
                 discord
               </a>{" "}
@@ -89,7 +89,7 @@ export default async function Page() {
               >
                 <dt>
                   <DisclosureButton className="group flex w-full items-start justify-between text-left text-vdcBlack dark:text-vdcWhite hover:translate-x-5 transition ease-in duration-75 hover:cursor-pointer">
-                    <span className="text-base/7 italic">
+                    <span className="text-base/7 ">
                       <h1>{faq.question}</h1>
                     </span>
                     <span className="ml-6 flex h-7 items-center">

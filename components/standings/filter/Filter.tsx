@@ -14,7 +14,7 @@ export default async function Filter({ tier }: { tier: Tier }) {
         <Popover>
           <PopoverButton className="flex flex-row focus:outline-none bg-gray-200 dark:bg-vdcGrey px-5 py-2 rounded-md hover:cursor-pointer hover:scale-105 transition duration-200 ease-in-out">
             <FunnelIcon className="text-vdcBlack dark:text-vdcWhite h-5 w-5 my-auto" />
-            <h1 className="italic">Filter</h1>
+            <h1 className="">Filter</h1>
           </PopoverButton>
           <PopoverPanel
             transition

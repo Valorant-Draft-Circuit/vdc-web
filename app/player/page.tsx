@@ -15,10 +15,10 @@ export default async function Page() {
             height={5000}
             className="absolute inset-0 -z-10 size-full object-cover sm:object-top lg:object-[10%_50%] brightness-20"
           />
-          <h1 className="text-3xl italic font-semibold tracking-tight  text-vdcRed xl:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight  text-vdcRed xl:text-4xl">
             Player Search
           </h1>
-          <h2 className="mt-4 text-base/7 text-vdcWhite italic">
+          <h2 className="mt-4 text-base/7 text-vdcWhite ">
             Need to scout? Looking for sub? Someone kept killing you over and
             over and over and over? Look &apos;em up here!
           </h2>

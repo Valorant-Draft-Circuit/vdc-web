@@ -59,7 +59,7 @@ export default function ListBox({
               value={element}
               className="relative rounded-sm group flex cursor-default items-center gap-2 px-3 py-1.5 hover:bg-slate-200 dark:hover:bg-vdcGrey"
             >
-              <h1 className="text-sm/6 text-vdcGrey dark:text-vdcWhite italic">
+              <h1 className="text-sm/6 text-vdcGrey dark:text-vdcWhite ">
                 {element.name}
               </h1>
               <div className="absolute right-0 pr-3">

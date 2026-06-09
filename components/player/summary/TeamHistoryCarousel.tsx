@@ -101,7 +101,7 @@ function TeamSlide({ slide }: { slide: TeamHistorySlide }) {
       </Link>
       <div className="flex flex-col min-w-0">
         <h1 className="text-sm text-wrap">{slide.name}</h1>
-        <h2 className="text-xs italic text-gray-500 dark:text-gray-400">
+        <h2 className="text-xs text-gray-500 dark:text-gray-400">
           {slide.tier}
         </h2>
       </div>
