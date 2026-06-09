@@ -3,12 +3,15 @@ export function toTailwindCustomHexCode(color) {
   return `#${colorHex}`;
 }
 
-export function formatDate(date: Date) {
-  // TODO: remove this when we figure out whats going on with date issue
+// TODO: remove this when we figure out whats going on with date issue
+export function correctMatchDate(date: Date) {
   const newDate = new Date(date);
   newDate.setDate(newDate.getDate() - 1);
+  return newDate;
+}
 
-  return newDate.toLocaleDateString("en-US", {
+export function formatDate(date: Date) {
+  return correctMatchDate(date).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
