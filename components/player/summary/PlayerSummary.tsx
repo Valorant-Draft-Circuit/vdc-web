@@ -3,6 +3,9 @@ import PlayerRating from "./PlayerRating";
 import { PlayerStats } from "./PlayerStats";
 import PlayerMatches from "./PlayerMatches";
 import PlayerTeamCard from "./PlayerTeamCard";
+import PlayerTeamHistory from "./PlayerTeamHistory";
+import FreeAgentCard from "./FreeAgentCard";
+import RolesPlayed from "./RolesPlayed";
 import PlayerFormCard from "./PlayerFormCard";
 import PlayerUpcomingCard from "./PlayerUpcomingCard";
 import { deriveTeamIdFromStats } from "@/lib/common/player";
@@ -23,6 +26,8 @@ type Props = {
   gameType: string | undefined;
   season: number;
   currentSeason: number;
+  hasTeam: boolean;
+  mmr: number | null;
 };
 
 export default async function PlayerSummary({
@@ -30,6 +35,8 @@ export default async function PlayerSummary({
   gameType,
   season,
   currentSeason,
+  hasTeam,
+  mmr,
 }: Props) {
   if (!stats || stats.length === 0) {
     return <NoStats />;
@@ -53,11 +60,21 @@ export default async function PlayerSummary({
 
       <div className="flex flex-col xl:flex-row px-2 xl:px-0 gap-2">
         <div className="flex flex-col gap-2 xl:w-1/2">
-          {!isCombine && teamId !== null && (
-            <PlayerTeamCard teamId={teamId} season={season} />
-          )}
+          {!isCombine &&
+            (isCurrentSeason ? (
+              hasTeam ? (
+                teamId !== null && (
+                  <PlayerTeamCard teamId={teamId} season={season} />
+                )
+              ) : (
+                <FreeAgentCard stats={stats} mmr={mmr} />
+              )
+            ) : (
+              <PlayerTeamHistory stats={processedPlayerStats} />
+            ))}
           <PlayerRating stats={processedPlayerStats} />
           <PlayerStats stats={processedPlayerStats} />
+          <RolesPlayed stats={processedPlayerStats} />
           {!isCombine && (
             <>
               <PlayerFormCard stats={processedPlayerStats} />

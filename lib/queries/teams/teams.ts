@@ -86,3 +86,45 @@ export async function getTeamLogoMap(
   }
   return map;
 }
+
+export type TeamCardInfo = {
+  name: string;
+  tier: Tier;
+  slug: string;
+  logoPath: string | null;
+};
+
+export type TeamCardMap = Record<number, TeamCardInfo | undefined>;
+
+export async function getTeamCardsByIds(
+  teamIds: Iterable<number>,
+): Promise<TeamCardMap> {
+  const uniqueIds = Array.from(new Set(teamIds));
+  if (uniqueIds.length === 0) return {};
+
+  const teams = await prisma.teams.findMany({
+    where: { id: { in: uniqueIds } },
+    select: {
+      id: true,
+      name: true,
+      tier: true,
+      Franchise: {
+        select: {
+          slug: true,
+          Brand: { select: { logo: true } },
+        },
+      },
+    },
+  });
+
+  const map: TeamCardMap = {};
+  for (const team of teams) {
+    map[team.id] = {
+      name: team.name,
+      tier: team.tier,
+      slug: team.Franchise.slug,
+      logoPath: team.Franchise.Brand?.logo ?? null,
+    };
+  }
+  return map;
+}

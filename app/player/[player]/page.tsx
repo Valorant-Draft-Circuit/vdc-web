@@ -169,6 +169,12 @@ export default async function Page({ params, searchParams }: Props) {
   const season = parseInt(sp.season as string);
   const gameTypeParam = (sp.type as string).toUpperCase() as GameType;
 
+  const playerInfo = await getPlayerByRiotIGN(playerIGN.decoded);
+  if (!playerInfo) return <PlayerNotFound player={playerIGN.decoded} />;
+
+  const hasTeam = playerInfo.Team != null;
+  const mmr = playerInfo.PrimaryRiotAccount?.MMR?.mmrEffective ?? null;
+
   const tabElements: TabElement[] = [
     {
       query: "Summary",
@@ -182,6 +188,8 @@ export default async function Page({ params, searchParams }: Props) {
             currentSeason={currentSeason}
             gameType={gameTypeParam}
             gameTypeParam={sp.type as string}
+            hasTeam={hasTeam}
+            mmr={mmr}
           />
         </Suspense>
       ),
@@ -208,11 +216,9 @@ export default async function Page({ params, searchParams }: Props) {
     },
   ];
 
-  const playerInfo = await getPlayerByRiotIGN(playerIGN.decoded);
-  if (!playerInfo) return <PlayerNotFound player={playerIGN.decoded} />;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
+      <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <div className="p-2 flex flex-col xl:gap-5">
           <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">
@@ -253,12 +259,16 @@ async function PlayerSummaryWithStats({
   currentSeason,
   gameType,
   gameTypeParam,
+  hasTeam,
+  mmr,
 }: {
   riotIGN: string;
   season: number;
   currentSeason: number;
   gameType: GameType;
   gameTypeParam: string;
+  hasTeam: boolean;
+  mmr: number | null;
 }) {
   const stats = await getPlayerStatsBy({
     riotIgn: riotIGN,
@@ -271,6 +281,8 @@ async function PlayerSummaryWithStats({
       gameType={gameTypeParam}
       season={season}
       currentSeason={currentSeason}
+      hasTeam={hasTeam}
+      mmr={mmr}
     />
   );
 }

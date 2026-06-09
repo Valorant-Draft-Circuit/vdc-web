@@ -1,7 +1,6 @@
-"use client";
-
 import { avg, sum } from "@/lib/common/math";
 import { ProcessedPlayerStat } from "./PlayerSummary";
+import StatChips from "./StatChips";
 
 export function PlayerStats({ stats }: { stats: ProcessedPlayerStat[] }) {
   const summedStats = {
@@ -21,41 +20,29 @@ export function PlayerStats({ stats }: { stats: ProcessedPlayerStat[] }) {
   const kpr = summedStats.totalKills / summedStats.rounds || 0;
   const apr = summedStats.totalAssists / summedStats.rounds || 0;
   const dpr = summedStats.totalDeaths / summedStats.rounds || 0;
-  const formattedStats = {
-    ACS: summedStats.acs.toFixed(2),
-    ADR: (summedStats.totalDamage / summedStats.rounds || 0).toFixed(2),
-    KDA: ((kpr + apr) / dpr).toFixed(2),
-    CLUT: summedStats.clutches,
-    "FK%": `${(
-      (summedStats.firstKills * 100) / summedStats.rounds || 0
-    ).toFixed(2)}%`,
-    "FD%": `${(
-      (summedStats.firstDeaths * 100) / summedStats.rounds || 0
-    ).toFixed(2)}%`,
-    "KAST%": `${(summedStats.avgkast || 0).toFixed(2)}%`,
-    "HS%": `${(summedStats.hsPercent || 0).toFixed(2)}%`,
-  };
 
-  const statsList = Object.entries(formattedStats).map(([key, value]) => ({
-    name: key,
-    value: value,
-  }));
+  const adr = summedStats.totalDamage / summedStats.rounds || 0;
+  const fkPercent = (summedStats.firstKills * 100) / summedStats.rounds || 0;
+  const fdPercent = (summedStats.firstDeaths * 100) / summedStats.rounds || 0;
+
+  const statChips: Array<[string, string]> = [
+    ["ACS", summedStats.acs.toFixed(0)],
+    ["ADR", adr.toFixed(0)],
+    ["KDA", ((kpr + apr) / dpr).toFixed(2)],
+    ["CLUT", String(summedStats.clutches)],
+    ["FK%", `${fkPercent.toFixed(0)}%`],
+    ["FD%", `${fdPercent.toFixed(0)}%`],
+    ["KAST%", `${(summedStats.avgkast || 0).toFixed(0)}%`],
+    ["HS%", `${(summedStats.hsPercent || 0).toFixed(0)}%`],
+  ];
 
   return (
     <div className="divide-y divide-gray-600 dark:divide-vdcBlack bg-slate-100 dark:bg-vdcGrey overflow-hidden rounded-sm shadow-sm">
       <div className="px-4 py-2 sm:px-6">
         <h1 className="text-sm italic">Stats</h1>
       </div>
-      <div className="px-4 py-3 sm:p-6 grid grid-cols-2 text-sm gap-3 divide-gray-200 border-vdcBlack">
-        {statsList.map((stat, index) => (
-          <div
-            className="flex flex-row text-center text-sm justify-between"
-            key={index}
-          >
-            <h1 className="text-vdcRed">{stat.name}:</h1>
-            <h2>{stat.value}</h2>
-          </div>
-        ))}
+      <div className="px-4 py-3 sm:p-6">
+        <StatChips stats={statChips} />
       </div>
     </div>
   );

@@ -181,6 +181,13 @@ export const ROLES = Object.entries(Roles)
 
 export type RoleName = "DUELIST" | "SENTINEL" | "CONTROLLER" | "INITIATOR";
 
+export const ROLE_ORDER: RoleName[] = [
+  "DUELIST",
+  "CONTROLLER",
+  "SENTINEL",
+  "INITIATOR",
+];
+
 export const ROLE_COLOR_MAP: Record<RoleName, string> = {
   DUELIST: "vdcRed",
   CONTROLLER: "vdcBlue",
