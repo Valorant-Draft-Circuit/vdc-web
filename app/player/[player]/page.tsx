@@ -212,7 +212,7 @@ export default async function Page({ params, searchParams }: Props) {
   if (!playerInfo) return <PlayerNotFound player={playerIGN.decoded} />;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-4xl flex flex-col gap-5">
+      <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <div className="p-2 flex flex-col xl:gap-5">
           <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">

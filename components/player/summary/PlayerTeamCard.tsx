@@ -40,27 +40,29 @@ export default async function PlayerTeamCard({ teamId, season }: Props) {
       <div className="px-4 py-2 xl:px-6">
         <h1 className="text-sm italic">Team</h1>
       </div>
-      <div className="px-4 py-3 sm:p-6 flex flex-row justify-evenly gap-3">
-        <TeamLogo
-          logoPath={logoPath}
-          franchiseHref={franchiseHref}
-          teamId={teamId}
-        />
-        <div className="flex flex-col">
-          <h1 className="text-sm">{team.name}</h1>
-          <h2 className="text-xs italic text-gray-500 dark:text-gray-400 flex flex-row items-center gap-2">
-            {team.tier}
-            {teamRank !== null && (
-              <span className="text-vdcRed not-italic font-bold text-[10px] tracking-wide px-2 py-0.5 rounded-full bg-vdcRed/15">
-                #{teamRank} of {totalTeams}
-              </span>
-            )}
-          </h2>
-        </div>
-        <div className="text-lg flex flex-row items-center gap-1">
-          <h2 className="text-vdcGreen">{wins}</h2>
-          <h2 className="text-gray-400">-</h2>
-          <h2 className="text-vdcRed">{losses}</h2>
+      <div className="px-4 py-3 sm:px-6">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full">
+          <TeamLogo
+            logoPath={logoPath}
+            franchiseHref={franchiseHref}
+            teamId={teamId}
+          />
+          <div className="flex flex-col min-w-0">
+            <h1 className="text-sm text-wrap">{team.name}</h1>
+            <h2 className="text-xs italic text-gray-500 dark:text-gray-400 flex flex-row flex-wrap items-center gap-2">
+              {team.tier}
+              {teamRank !== null && (
+                <span className="text-vdcRed not-italic font-bold text-[10px] tracking-wide px-2 py-0.5 rounded-full bg-vdcRed/15">
+                  #{teamRank} of {totalTeams}
+                </span>
+              )}
+            </h2>
+          </div>
+          <div className="text-lg flex flex-row items-center gap-1 tabular-nums justify-self-end">
+            <h2 className="text-vdcGreen">{wins}</h2>
+            <h2 className="text-gray-400">-</h2>
+            <h2 className="text-vdcRed">{losses}</h2>
+          </div>
         </div>
       </div>
     </div>
@@ -77,15 +79,21 @@ function TeamLogo({
   teamId: number;
 }) {
   const src = logoPath ? `${TEAM_LOGOS_URL}${logoPath}` : "/vdc-flame.svg";
-  const img = (
+  const image = (
     <Image
       src={src}
       alt={String(teamId)}
-      width={500}
-      height={500}
-      className="size-10 rounded-md"
+      fill
+      sizes="40px"
+      className="rounded-md object-contain"
     />
   );
-  if (!franchiseHref) return img;
-  return <Link href={franchiseHref}>{img}</Link>;
+  if (!franchiseHref) {
+    return <div className="relative block size-10 shrink-0">{image}</div>;
+  }
+  return (
+    <Link href={franchiseHref} className="relative block size-10 shrink-0">
+      {image}
+    </Link>
+  );
 }
