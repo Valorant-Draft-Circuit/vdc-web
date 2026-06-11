@@ -11,6 +11,10 @@ import { getScheduleByTier, Schedule } from "../queries/schedule/schedule";
 import getFranchiseDetails from "../queries/franchises/franchises";
 import { getAgents, getMaps, Agents, Maps } from "./valorant-api";
 import { getMMRTierLines, MmrTierLines } from "./tier";
+import {
+  getMatchNightRecap,
+  MatchNightRecap,
+} from "../queries/home/matchNight";
 
 let cache: NodeCache;
 initCache();
@@ -170,4 +174,16 @@ export async function getMmmrTierLinesCached() {
   const mmrTierLines = await getMMRTierLines();
   cache.set(key, mmrTierLines, Times.DAY);
   return mmrTierLines;
+}
+
+export async function getMatchNightRecapCached(
+  season: number,
+): Promise<MatchNightRecap | null> {
+  const key = `s${season}-matchNightRecap`;
+  const hit = cache.get<MatchNightRecap | null>(key);
+  if (hit !== undefined) return hit;
+
+  const recap = await getMatchNightRecap(season);
+  cache.set(key, recap, minutes(30));
+  return recap;
 }

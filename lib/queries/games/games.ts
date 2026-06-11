@@ -17,6 +17,7 @@ export type Game = Prisma.GamesGetPayload<{
       select: {
         home: true;
         away: true;
+        matchDay: true;
       };
     };
   };
@@ -48,6 +49,7 @@ export async function getAllGamesBy(
         select: {
           home: true,
           away: true,
+          matchDay: true,
         },
       },
     },

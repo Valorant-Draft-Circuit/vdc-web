@@ -9,6 +9,8 @@ import UpcomingMatch, {
   ViewFullSchedule,
 } from "@/components/schedule/upcoming/UpcomingMatch";
 import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
+import MatchNightRecapLoader from "@/components/home/recap/MatchNightRecapLoader";
+import MatchNightRecapSkeleton from "@/components/home/recap/MatchNightRecapSkeleton";
 
 export default async function Home() {
   const session = await auth();
@@ -45,6 +47,9 @@ export default async function Home() {
           </div>
         </div>
       ) : null}
+      <Suspense fallback={<MatchNightRecapSkeleton />}>
+        <MatchNightRecapLoader />
+      </Suspense>
       <div className="flex flex-col xl:flex-row 4xl:flex-col">
         <div className="overflow-hidden xl:w-3/4 4xl:w-full">
           <div className="px-4 py-2 mt-5 sm:px-6 text-lg lg:text-xl">
@@ -91,14 +96,6 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="overflow-hidden rounded-lg">
-        <div className="px-4 py-2 sm:px-6">
-          <h1 className="text-vdcRed text-lg lg:text-xl">
-            {/* TODO: Think of some other section, maybe stats? */}
-          </h1>
-        </div>
-        <div className="px-2 py-2">{/* TODO: Think of something to put */}</div>
       </div>
     </>
   );
