@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TEAM_LOGOS_URL, TIER_HEX_COLOR_MAP } from "@/lib/common/constants";
-import { RecapMover } from "@/lib/common/matchNight";
+import { RecapMover } from "@/lib/common/matchNight/types";
 
 type Props = {
   movers: RecapMover[];
@@ -56,13 +56,13 @@ export default function StandingsMoversCard({ movers, showTierDots }: Props) {
                   #{mover.previousRank} → #{mover.currentRank}
                 </h2>
               </span>
-              <span
+              <h1
                 className={`tabular-nums font-semibold ${
                   mover.delta > 0 ? "text-vdcGreen" : "text-vdcRed"
                 }`}
               >
                 {mover.delta > 0 ? "▲" : "▼"} {Math.abs(mover.delta)}
-              </span>
+              </h1>
             </li>
           ))}
         </ul>

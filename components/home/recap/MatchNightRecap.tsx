@@ -9,8 +9,11 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
-import { formatDate } from "@/lib/common/format";
-import { RecapStat, RecapView, RecapViewKey } from "@/lib/common/matchNight";
+import {
+  RecapStat,
+  RecapView,
+  RecapViewKey,
+} from "@/lib/common/matchNight/types";
 import { Maps } from "@/lib/common/valorant-api";
 import { MatchNightRecap as MatchNightRecapData } from "@/lib/queries/home/matchNight";
 import MapReportCard from "./MapReportCard";
@@ -161,6 +164,8 @@ function viewKeyLabel(key: RecapViewKey): string {
 
 function headerTitle(view: RecapView): string {
   if (view.key === "OVERALL") return "All Tiers";
-  if (view.matchDay === null || view.nightDate === null) return "No games yet";
-  return `Match Day ${view.matchDay} · ${formatDate(view.nightDate)}`;
+  if (view.matchDay === null || view.nightDateLabel === null) {
+    return "No games yet";
+  }
+  return `Match Day ${view.matchDay} · ${view.nightDateLabel}`;
 }
