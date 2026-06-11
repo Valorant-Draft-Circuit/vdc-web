@@ -2,16 +2,16 @@ import { cache } from "react";
 import { GameType, MapBanType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { TIERS_LIST } from "@/lib/common/constants";
+import { formatDate } from "@/lib/common/format";
+import { buildMapReport } from "@/lib/common/matchNight/mapReport";
+import { buildStandingsMovers, sortMovers } from "@/lib/common/matchNight/movers";
+import { buildTopPerformers } from "@/lib/common/matchNight/performers";
 import {
-  buildMapReport,
-  buildStandingsMovers,
-  buildTopPerformers,
   NightStatRow,
   RecapMapEntry,
   RecapMover,
   RecapView,
-  sortMovers,
-} from "@/lib/common/matchNight";
+} from "@/lib/common/matchNight/types";
 import { getAllGamesBy } from "../games/games";
 import { getAllActiveTeamsIn } from "../teams/teams";
 import { rankTeams } from "../standings/standings";
@@ -32,6 +32,7 @@ type TierNight = {
   view: RecapView;
   playedMaps: RecapMapEntry[];
   bannedMaps: RecapMapEntry[];
+  matchCount: number;
   allMovers: RecapMover[];
 };
 
@@ -120,18 +121,24 @@ async function getTierNight(season: number, tier: Tier): Promise<TierNight> {
       awayTeamLogo: ban.Match.Away?.Franchise.Brand?.logo ?? null,
     },
   }));
+  const matchCount = new Set(
+    nightGames.map((game) => game.Match?.matchID)
+  ).size;
+
+  const nightDate = latestScheduledDate(nightGames);
 
   return {
     view: {
       key: tier,
       matchDay,
-      nightDate: latestScheduledDate(nightGames),
+      nightDateLabel: nightDate !== null ? formatDate(nightDate) : null,
       performers: buildTopPerformers(statRows),
-      mapReport: buildMapReport(playedMaps, bannedMaps),
+      mapReport: buildMapReport(playedMaps, bannedMaps, matchCount),
       movers: allMovers.slice(0, TOP_MOVERS_SHOWN),
     },
     playedMaps,
     bannedMaps,
+    matchCount,
     allMovers,
   };
 }
@@ -236,17 +243,20 @@ function buildOverallView(playedTierNights: TierNight[]): RecapView {
   const pooledMovers = sortMovers(
     playedTierNights.flatMap((night) => night.allMovers)
   );
-  const nightTimes = playedTierNights
-    .map((night) => night.view.nightDate)
-    .filter((date): date is Date => date !== null)
-    .map((date) => date.getTime());
-
+  const pooledMatchCount = playedTierNights.reduce(
+    (total, night) => total + night.matchCount,
+    0
+  );
   return {
     key: "OVERALL",
     matchDay: null,
-    nightDate: nightTimes.length > 0 ? new Date(Math.max(...nightTimes)) : null,
+    nightDateLabel: null,
     performers: pooledPerformers,
-    mapReport: buildMapReport(pooledPlayedMaps, pooledBannedMaps),
+    mapReport: buildMapReport(
+      pooledPlayedMaps,
+      pooledBannedMaps,
+      pooledMatchCount
+    ),
     movers: pooledMovers.slice(0, TOP_MOVERS_SHOWN),
   };
 }
@@ -256,13 +266,14 @@ function emptyTierNight(tier: Tier): TierNight {
     view: {
       key: tier,
       matchDay: null,
-      nightDate: null,
+      nightDateLabel: null,
       performers: [],
       mapReport: { mostPlayed: null, mostBanned: null },
       movers: [],
     },
     playedMaps: [],
     bannedMaps: [],
+    matchCount: 0,
     allMovers: [],
   };
 }

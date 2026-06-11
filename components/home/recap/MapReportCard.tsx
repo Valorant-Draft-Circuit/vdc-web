@@ -11,7 +11,7 @@ import {
   RecapMapCount,
   RecapMapGame,
   RecapMapReport,
-} from "@/lib/common/matchNight";
+} from "@/lib/common/matchNight/types";
 import { Maps } from "@/lib/common/valorant-api";
 import MatchupLink from "./MatchupLink";
 

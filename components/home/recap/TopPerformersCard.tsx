@@ -4,7 +4,7 @@ import {
   RecapPerformer,
   RecapPerformerGame,
   RecapStat,
-} from "@/lib/common/matchNight";
+} from "@/lib/common/matchNight/types";
 import MatchupLink from "./MatchupLink";
 
 const STAT_OPTIONS: Array<{ key: RecapStat; label: string }> = [
@@ -57,9 +57,9 @@ export default function TopPerformersCard({
       </div>
 
       {topPerformers.length === 0 ? (
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <h1 className="text-sm text-gray-600 dark:text-gray-300">
           No games recorded.
-        </p>
+        </h1>
       ) : (
         <ol className="flex flex-col">
           {topPerformers.map((performer, index) => {
@@ -99,9 +99,9 @@ export default function TopPerformersCard({
                     </MatchupLink>
                   )}
                 </span>
-                <span className="tabular-nums font-semibold text-vdcBlack dark:text-vdcWhite">
+                <h1 className="tabular-nums font-semibold text-vdcBlack dark:text-vdcWhite">
                   {formatStatValue(performer, activeStat)}
-                </span>
+                </h1>
               </li>
             );
           })}
