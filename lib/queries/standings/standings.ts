@@ -55,8 +55,7 @@ export async function getStandingsByTier(
     return [];
   }
 
-  const teamStats = teams.map((team) => calculateTeamStats(team, games));
-  const rankedTeams = applyTiebreakers(teamStats, games);
+  const rankedTeams = rankTeams(teams, games);
 
   return rankedTeams.map((team) => ({
     franchiseSlug: team.Franchise.slug,
@@ -66,6 +65,15 @@ export async function getStandingsByTier(
     losses: team.losses,
     rwp: Math.round(team.rwp * 100) / 100,
   }));
+}
+
+/**
+ * Rank a set of teams against a set of games using the league
+ * tiebreaker rules (wins, head-to-head, RWP, alphabetical).
+ */
+export function rankTeams(teams: ActiveTeam[], games: Game[]): TeamStats[] {
+  const teamStats = teams.map((team) => calculateTeamStats(team, games));
+  return applyTiebreakers(teamStats, games);
 }
 
 export async function getFranchiseStandings(
