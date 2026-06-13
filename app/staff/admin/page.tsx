@@ -1,51 +1,49 @@
-import LeagueDashboard from "@/components/staff/admin/PlayerDashboard";
-import { getAdminSummary } from "@/lib/queries/staff/admin";
+import KpiRow from "@/components/staff/admin/ops/KpiRow";
+import OpsInsights from "@/components/staff/admin/ops/OpsInsights";
+import QuoteBanner from "@/components/staff/admin/ops/QuoteBanner";
+import RosterCompositionPanel from "@/components/staff/admin/ops/RosterCompositionPanel";
+import {
+  getAdminSummary,
+  getOpsInsights,
+  getRosterComposition,
+} from "@/lib/queries/staff/admin";
 import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 
-
 export default async function Page() {
-  const [currentSeason, leagueState, summary] = await Promise.all([
-    ControlPanel.getSeason(),
+  const currentSeason = await ControlPanel.getSeason();
+  const [leagueState, summary, composition, insights] = await Promise.all([
     ControlPanel.getLeagueState(),
     getAdminSummary(),
+    getRosterComposition(),
+    getOpsInsights(currentSeason),
   ]);
 
   return (
     <div className="min-h-full">
-      <div className="flex flex-col gap-5 py-10 px-5">
-        <header>
-          <div className="flex flex-row mx-auto max-w-7xl sm:px-6 justify-between">
+      <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10">
+        <header className="flex flex-col gap-3">
+          <div className="flex flex-row items-center justify-between">
             <h1 className="text-3xl text-vdcRed">
               Admin Dashboard / SEASON {currentSeason}
             </h1>
             <LeagueState leagueState={leagueState} />
           </div>
-        </header>
-        <main>
-          <div className="flex mx-auto max-w-7xl md:justify-end md:px-5">
+          <div className="flex items-center justify-between gap-3">
+            <QuoteBanner />
             <Link
-              href={"/staff/admin/control"}
-              className="inline-flex text-sm items-center rounded-md bg-vdcRed px-3 py-2.5 font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 hover:cursor-pointer"
+              href="/staff/admin/control"
+              className="inline-flex items-center rounded-md bg-vdcRed px-3 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500 hover:cursor-pointer"
             >
               <h1>Control Panel</h1>
             </Link>
           </div>
-          <h1 className="text-vdcRed py-2 mx-auto max-w-7xl">
-            League Dashboard
-          </h1>
+        </header>
 
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-white dark:bg-vdcGrey rounded-lg">
-            <div>
-              <LeagueDashboard summary={summary} />
-            </div>
-          </div>
-          <h1 className="text-vdcRed py-2 mx-auto max-w-7xl">
-            Pending Signups
-          </h1>
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-white dark:bg-vdcGrey rounded-lg">
-            <h1 className="text-center">WIP</h1>
-          </div>
+        <main className="flex flex-col gap-5">
+          <KpiRow summary={summary} />
+          <RosterCompositionPanel composition={composition} />
+          <OpsInsights insights={insights} />
         </main>
       </div>
     </div>
