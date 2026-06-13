@@ -28,14 +28,16 @@ export default function UnreportedMatchesPanel({
               >
                 {match.tier} MD{match.matchDay ?? "?"} · {match.homeName} v{" "}
                 {match.awayName}{" "}
-                <span className="text-gray-400">
+                <h2 className="text-gray-400">
                   {match.reported}/{match.expected}
-                </span>
+                </h2>
               </Link>
             </li>
           ))}
           {remaining > 0 && (
-            <li className="text-gray-400">…and {remaining} more</li>
+            <li className="text-gray-400">
+              <h3>…and {remaining} more</h3>
+            </li>
           )}
         </ul>
       )}

@@ -44,12 +44,14 @@ export default function SignupQueuePanel({ queue }: { queue: SignupQueue }) {
                 href={`/player/${encodeURIComponent(player.name ?? player.id)}`}
                 className="text-vdcBlue hover:underline"
               >
-                {player.name ?? player.id}
+                <h2>{player.name ?? player.id}</h2>
               </Link>
             </li>
           ))}
           {remaining > 0 && (
-            <li className="text-gray-400">…and {remaining} more</li>
+            <li className="text-gray-400">
+              <h3>…and {remaining} more</h3>
+            </li>
           )}
         </ul>
       )}

@@ -91,7 +91,7 @@ function CompositionRow({ row }: { row: TierComposition }) {
             {health.band}
           </h1>
         ) : (
-          <span className="text-xs text-gray-400">N/A</span>
+          <h1 className="text-xs text-gray-400">N/A</h1>
         )}
       </span>
     </div>
