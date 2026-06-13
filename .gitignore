@@ -45,3 +45,6 @@ pnpm-workspace.yaml
 # agents
 AGENTS.md
 .mcp.json
+
+# Brainstorming visual companion (local only)
+.superpowers/

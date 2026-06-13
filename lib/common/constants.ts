@@ -1,6 +1,6 @@
 import { Roles } from "@/prisma";
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
-import { LeagueStatus, Tier } from "@prisma/client";
+import { LeagueStatus, MatchType, Tier } from "@prisma/client";
 
 const BUCKET_URL = "https://uni-objects.nyc3.cdn.digitaloceanspaces.com/vdc/";
 export const DISCORD_LINK = "https://go.vdc.gg/discord";
@@ -201,3 +201,28 @@ export const ROLE_HEX_COLOR_MAP: Record<RoleName, string> = {
   SENTINEL: VDC_GREEN,
   INITIATOR: VDC_ORANGE,
 };
+
+export const MIN_GAMES_BY_MATCH_TYPE: Partial<Record<MatchType, number>> = {
+  [MatchType.BO2]: 2,
+  [MatchType.BO3]: 2,
+  [MatchType.BO5]: 3,
+};
+
+export const FA_POOL_BAR_CAP = 2;
+
+export type FaPoolBandLabel = "Critical" | "Thin" | "Fair" | "Healthy" | "Strong";
+
+export type FaPoolBand = {
+  maxExclusive: number;
+  label: FaPoolBandLabel;
+  barClass: string;
+  pillClass: string;
+};
+
+export const FA_POOL_HEALTH_BANDS: FaPoolBand[] = [
+  { maxExclusive: 0.75, label: "Critical", barClass: "bg-red-600", pillClass: "bg-red-600 text-white" },
+  { maxExclusive: 1, label: "Thin", barClass: "bg-orange-600", pillClass: "bg-orange-600 text-white" },
+  { maxExclusive: 1.5, label: "Fair", barClass: "bg-amber-500", pillClass: "bg-amber-500 text-black" },
+  { maxExclusive: 2, label: "Healthy", barClass: "bg-lime-500", pillClass: "bg-lime-500 text-black" },
+  { maxExclusive: Infinity, label: "Strong", barClass: "bg-green-600", pillClass: "bg-green-600 text-white" },
+];
