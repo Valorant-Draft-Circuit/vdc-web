@@ -38,13 +38,13 @@ function TeamRow({
         highlight ? "bg-vdcRed/10" : ""
       }`}
     >
-      <span
+      <h1
         className={`w-4 text-xs text-center flex-none ${
           dim ? "text-gray-400" : "text-gray-500"
         }`}
       >
         {side.team.seed}
-      </span>
+      </h1>
       <TeamLogo logo={side.team.logo} alt={side.team.franchiseSlug} />
       <Link
         href={`/franchises/${side.team.franchiseSlug}?team=${tier}`}
@@ -52,15 +52,15 @@ function TeamRow({
           highlight ? "font-bold" : ""
         } ${dim ? "text-gray-400" : ""}`}
       >
-        {side.team.name}
+        <h2>{side.team.name}</h2>
       </Link>
-      <span
+      <h1
         className={`w-4 text-center text-sm font-bold flex-none ${
           highlight ? "text-vdcRed" : dim ? "text-gray-400" : ""
         }`}
       >
         {side.score}
-      </span>
+      </h1>
     </div>
   );
 }
@@ -68,14 +68,14 @@ function TeamRow({
 function EmptyRow({ team }: { team?: SeriesSide["team"] }) {
   return (
     <div className="flex items-center gap-2 px-3 py-2">
-      <span className="w-4 text-xs text-center flex-none text-gray-400">
+      <h2 className="w-4 text-xs text-center flex-none text-gray-400">
         {team?.seed ?? "-"}
-      </span>
+      </h2>
       <div className="w-5 h-5 rounded bg-gray-200 dark:bg-gray-800 flex-none" />
-      <span className="flex-1 truncate text-sm italic text-gray-400">
+      <h2 className="flex-1 truncate text-sm italic text-gray-400">
         {team?.name ?? "TBD"}
-      </span>
-      <span className="w-4 text-center text-sm flex-none text-gray-400">·</span>
+      </h2>
+      <h2 className="w-4 text-center text-sm flex-none text-gray-400">·</h2>
     </div>
   );
 }
@@ -89,7 +89,7 @@ export default function MatchupCard({
 }) {
   if (slot.kind === "tbd") {
     return (
-      <div className="bracket-match relative rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+      <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
         <EmptyRow />
         <div className="border-t border-gray-200 dark:border-gray-700" />
         <EmptyRow />
@@ -99,21 +99,23 @@ export default function MatchupCard({
 
   if (slot.kind === "bye") {
     return (
-      <div className="bracket-match relative rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 px-3 py-2">
-          <span className="w-4 text-xs text-center flex-none text-gray-500">
+          <h3 className="w-4 text-xs text-center flex-none text-gray-500">
             {slot.team.seed}
-          </span>
+          </h3>
           <TeamLogo logo={slot.team.logo} alt={slot.team.franchiseSlug} />
           <Link
             href={`/franchises/${slot.team.franchiseSlug}?team=${tier}`}
-            className="flex-1 truncate text-sm hover:underline"
+            className="flex-1 truncate"
           >
-            {slot.team.name}
+            <h2 className="truncate text-sm hover:underline">
+              {slot.team.name}
+            </h2>
           </Link>
-          <span className="text-[10px] uppercase tracking-wide text-gray-400 flex-none">
+          <h1 className="text-[10px] uppercase tracking-wide text-gray-400 flex-none">
             Bye
-          </span>
+          </h1>
         </div>
       </div>
     );
@@ -124,17 +126,10 @@ export default function MatchupCard({
 
   return (
     <div
-      className={`bracket-match relative rounded-lg border ${
-        isFinal
-          ? "border-vdcYellow"
-          : "border-gray-200 dark:border-gray-700"
+      className={`relative rounded-lg border ${
+        isFinal ? "border-vdcYellow" : "border-gray-200 dark:border-gray-700"
       }`}
     >
-      {/* Full-card link to the match sits beneath the content layer, which is
-          pointer-events-none so clicks fall through here, while the team-name
-          links re-enable pointer events. Keep the content layer free of
-          utilities that create a stacking context (e.g. shadow), or it would
-          capture these clicks. */}
       {slot.matchId != null && (
         <Link
           href={`/match/${slot.matchId}`}
@@ -143,7 +138,7 @@ export default function MatchupCard({
         />
       )}
       {(isFinal || slot.status === "live") && (
-        <span
+        <h2
           className={`absolute -top-2 left-3 z-10 text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded ${
             slot.status === "live"
               ? "bg-green-600 text-white"
@@ -153,7 +148,7 @@ export default function MatchupCard({
           {slot.status === "live"
             ? `In Progress ${slot.home.score}-${slot.away.score}`
             : "Best of 5"}
-        </span>
+        </h2>
       )}
       <div className="relative pointer-events-none">
         <TeamRow side={slot.home} tier={tier} showWinner={showWinner} />
