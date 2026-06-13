@@ -31,16 +31,20 @@ export type TeamStats = {
   };
 };
 
+/**
+ * Number of teams that make the playoffs for a tier of the given size,
+ * per rulebook section 16.2. Single source of truth for both standings
+ * highlighting and the playoffs bracket.
+ */
+export function getPlayoffTeamCount(teamCount: number): number {
+  if (teamCount === 4 || teamCount === 6) return 4;
+  if (teamCount === 8 || teamCount === 10) return 6;
+  if (teamCount === 12 || teamCount === 14) return 8;
+  return 10;
+}
+
 export function getApexRankings(standings: Standing[]) {
-  const highlight =
-    standings.length === 4 || standings.length === 6
-      ? 4
-      : standings.length === 8 || standings.length === 10
-      ? 6
-      : standings.length === 12 || standings.length === 14
-      ? 8
-      : 10;
-  return highlight;
+  return getPlayoffTeamCount(standings.length);
 }
 
 export async function getStandingsByTier(

@@ -85,3 +85,37 @@ p {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+/* Playoffs bracket connectors. Each .bk-elbow fills the vertical span of the two
+   feeder slots it joins; the two feeders sit at 25%/75%, the output at 50%. */
+.bk-elbow::before,
+.bk-elbow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background-color: rgb(148 163 184 / 0.55);
+}
+.bk-elbow::before {
+  top: 25%;
+}
+.bk-elbow::after {
+  top: 75%;
+}
+.bk-elbow-v {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  height: 50%;
+  width: 2px;
+  background-color: rgb(148 163 184 / 0.55);
+}
+.bk-elbow-o {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 50%;
+  height: 2px;
+  background-color: rgb(148 163 184 / 0.55);
+}
