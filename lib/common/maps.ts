@@ -1,6 +1,25 @@
+import { ROLE_ORDER, type RoleName } from "@/lib/common/constants";
 import type { PlayerMapBreakdown } from "@/lib/queries/stats/getPlayerMapBreakdown";
 
 export type MapRow = PlayerMapBreakdown & { splashUrl: string | null };
+
+export type RoleCounts = Record<RoleName, number>;
+
+export function emptyRoleCounts(): RoleCounts {
+  return { DUELIST: 0, CONTROLLER: 0, SENTINEL: 0, INITIATOR: 0 };
+}
+
+export function selectPrimaryRole(counts: RoleCounts): RoleName | null {
+  let best: RoleName | null = null;
+  let bestCount = 0;
+  for (const role of ROLE_ORDER) {
+    if (counts[role] > bestCount) {
+      best = role;
+      bestCount = counts[role];
+    }
+  }
+  return best;
+}
 
 export const CALLOUT_MIN_GAMES = 2;
 

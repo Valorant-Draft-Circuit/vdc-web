@@ -4,6 +4,7 @@ import { getMapsCached } from "@/lib/common/cache";
 import { MAP_LIST_URL } from "@/lib/common/constants";
 import { selectMapCallouts, type MapRow } from "@/lib/common/maps";
 import type { Maps } from "@/lib/common/valorant-api";
+import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 import { getPlayerMapBreakdown } from "@/lib/queries/stats/getPlayerMapBreakdown";
 import MapCallouts from "./MapCallouts";
 import MapCoverage from "./MapCoverage";
@@ -26,8 +27,9 @@ export default async function PlayerMapsLoader({
   season,
   gameType,
 }: Props) {
+  const catalog = await getAgentCatalog();
   const [breakdown, maps] = await Promise.all([
-    getPlayerMapBreakdown({ riotIgn: riotIGN, season, gameType }),
+    getPlayerMapBreakdown({ riotIgn: riotIGN, season, gameType, catalog }),
     getMapsCached(),
   ]);
 

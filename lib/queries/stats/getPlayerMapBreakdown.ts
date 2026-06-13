@@ -1,6 +1,14 @@
 import { cache } from "react";
 import { GameType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { normalizeAgentName } from "@/lib/common/agents";
+import type { RoleName } from "@/lib/common/constants";
+import {
+  emptyRoleCounts,
+  selectPrimaryRole,
+  type RoleCounts,
+} from "@/lib/common/maps";
+import type { AgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 
 export type PlayerMapBreakdown = {
   map: string;
@@ -8,6 +16,7 @@ export type PlayerMapBreakdown = {
   wins: number;
   rounds: number;
   roundsWon: number;
+  primaryRole: { name: RoleName; iconUrl: string } | null;
   totals: {
     kills: number;
     deaths: number;
@@ -34,6 +43,8 @@ type Accumulator = {
   totals: AccTotals;
   averageSums: AccAverages;
   averageCounts: Record<keyof AccAverages, number>;
+  roleCounts: RoleCounts;
+  roleIcons: Record<RoleName, string | null>;
 };
 
 function emptyAccumulator(map: string): Accumulator {
@@ -46,6 +57,13 @@ function emptyAccumulator(map: string): Accumulator {
     totals: { kills: 0, deaths: 0, assists: 0 },
     averageSums: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0 },
     averageCounts: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0 },
+    roleCounts: emptyRoleCounts(),
+    roleIcons: {
+      DUELIST: null,
+      CONTROLLER: null,
+      SENTINEL: null,
+      INITIATOR: null,
+    },
   };
 }
 
@@ -54,6 +72,7 @@ export const getPlayerMapBreakdown = cache(
     riotIgn: string;
     season: number;
     gameType: GameType;
+    catalog: AgentCatalog;
   }): Promise<PlayerMapBreakdown[]> => {
     const account = await prisma.account.findFirst({
       where: { riotIGN: args.riotIgn },
@@ -68,6 +87,7 @@ export const getPlayerMapBreakdown = cache(
       },
       select: {
         team: true,
+        agent: true,
         kills: true,
         deaths: true,
         assists: true,
@@ -122,6 +142,14 @@ export const getPlayerMapBreakdown = cache(
       addToAverage("ratingAttack", r.ratingAttack);
       addToAverage("ratingDefense", r.ratingDefense);
 
+      const role = r.agent
+        ? args.catalog[normalizeAgentName(r.agent)]?.role
+        : null;
+      if (role) {
+        acc.roleCounts[role.name] += 1;
+        if (!acc.roleIcons[role.name]) acc.roleIcons[role.name] = role.iconUrl;
+      }
+
       byMap.set(map, acc);
     }
 
@@ -129,12 +157,22 @@ export const getPlayerMapBreakdown = cache(
 
     const result: PlayerMapBreakdown[] = [];
     for (const acc of byMap.values()) {
+      const primaryRoleName = selectPrimaryRole(acc.roleCounts);
+      const primaryRoleIcon = primaryRoleName
+        ? acc.roleIcons[primaryRoleName]
+        : null;
+      const primaryRole =
+        primaryRoleName && primaryRoleIcon
+          ? { name: primaryRoleName, iconUrl: primaryRoleIcon }
+          : null;
+
       result.push({
         map: acc.map,
         gamesPlayed: acc.gamesPlayed,
         wins: acc.wins,
         rounds: acc.rounds,
         roundsWon: acc.roundsWon,
+        primaryRole,
         totals: acc.totals,
         averages: {
           acs: mean(acc.averageSums.acs, acc.averageCounts.acs),

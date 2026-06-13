@@ -187,6 +187,15 @@ export default function MapTable({ rows, isCombine }: Props) {
                     <span className="w-12 h-8 rounded bg-vdcBlack/30" />
                   )}
                   <h2 className="truncate">{row.map}</h2>
+                  {row.primaryRole && (
+                    <Image
+                      src={row.primaryRole.iconUrl}
+                      alt={row.primaryRole.name}
+                      width={16}
+                      height={16}
+                      className="w-4 h-4 invert dark:invert-0"
+                    />
+                  )}
                 </div>
               </td>
               {dataColumns.map((c) => (
