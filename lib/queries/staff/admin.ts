@@ -242,7 +242,12 @@ const MANUAL_REVIEW_LIST_CAP = 8;
 
 export type SignupFunnelEntry = { status: LeagueStatus; count: number };
 
-export type SignupQueuePlayer = { id: string; name: string | null };
+export type SignupQueuePlayer = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  discordId: string | null;
+};
 
 export type SignupQueue = {
   funnel: SignupFunnelEntry[];
@@ -261,12 +266,28 @@ export async function getSignupQueue(): Promise<SignupQueue> {
   const manualReviewCount =
     funnel.find((entry) => entry.status === LeagueStatus.MANUAL_REVIEW)?.count ?? 0;
 
-  const manualReviewPlayers = await prisma.user.findMany({
+  const reviewUsers = await prisma.user.findMany({
     where: { Status: { leagueStatus: LeagueStatus.MANUAL_REVIEW } },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      Accounts: {
+        where: { provider: "discord" },
+        select: { providerAccountId: true },
+        take: 1,
+      },
+    },
     orderBy: { createdAt: "asc" },
     take: MANUAL_REVIEW_LIST_CAP,
   });
+
+  const manualReviewPlayers: SignupQueuePlayer[] = reviewUsers.map((user) => ({
+    id: user.id,
+    name: user.name,
+    image: user.image,
+    discordId: user.Accounts[0]?.providerAccountId ?? null,
+  }));
 
   return { funnel, manualReviewCount, manualReviewPlayers };
 }

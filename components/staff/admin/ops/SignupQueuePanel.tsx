@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ImageWithFallback } from "@/components/player/search/PlayerCard";
 import { SignupQueue } from "@/lib/queries/staff/admin";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -38,16 +39,44 @@ export default function SignupQueuePanel({ queue }: { queue: SignupQueue }) {
         <h2 className="text-sm text-gray-400">Nothing to review.</h2>
       ) : (
         <ul className="text-sm">
-          {queue.manualReviewPlayers.map((player) => (
-            <li key={player.id}>
-              <Link
-                href={`/player/${encodeURIComponent(player.name ?? player.id)}`}
-                className="text-vdcBlue hover:underline"
-              >
-                <h2>{player.name ?? player.id}</h2>
-              </Link>
-            </li>
-          ))}
+          {queue.manualReviewPlayers.map((player) => {
+            const label = player.name ?? player.id;
+            const avatar = (
+              <ImageWithFallback
+                src={player.image ?? "/vdc-flame.svg"}
+                fallbackSrc="/vdc-flame.svg"
+                alt={`${label} avatar`}
+                width={24}
+                height={24}
+                className="size-6 shrink-0 rounded-full"
+              />
+            );
+
+            if (!player.discordId) {
+              return (
+                <li key={player.id} className="flex items-center gap-2 py-0.5">
+                  {avatar}
+                  <h2 className="truncate text-gray-600 dark:text-gray-300">
+                    {label}
+                  </h2>
+                </li>
+              );
+            }
+
+            return (
+              <li key={player.id}>
+                <Link
+                  href={`https://discord.com/users/${player.discordId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 py-0.5 text-vdcBlue hover:underline"
+                >
+                  {avatar}
+                  <h2 className="truncate">{label}</h2>
+                </Link>
+              </li>
+            );
+          })}
           {remaining > 0 && (
             <li className="text-gray-400">
               <h3>…and {remaining} more</h3>
