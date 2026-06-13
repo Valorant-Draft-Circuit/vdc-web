@@ -212,7 +212,13 @@ export default async function Page({ params, searchParams }: Props) {
       query: "Maps",
       color: "vdcRed",
       name: "Maps",
-      content: <PlayerMaps />,
+      content: (
+        <PlayerMaps
+          riotIGN={playerIGN.decoded}
+          season={season}
+          gameType={gameTypeParam}
+        />
+      ),
     },
   ];
 
