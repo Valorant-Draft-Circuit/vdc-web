@@ -28,8 +28,14 @@ export default function UpcomingMissingVetosPanel({
                 className="text-vdcBlue hover:underline"
               >
                 <h2>
-                  {match.tier} MD{match.matchDay ?? "?"} · {match.homeName} vs{" "}
-                  {match.awayName}{" "}
+                  {match.tier} MD{match.matchDay ?? "?"} · {match.homeName}
+                  {match.homeSlug && (
+                    <span className="text-gray-400"> ({match.homeSlug})</span>
+                  )}{" "}
+                  vs {match.awayName}
+                  {match.awaySlug && (
+                    <span className="text-gray-400"> ({match.awaySlug})</span>
+                  )}{" "}
                   <span className="text-gray-400">
                     {format(match.dateScheduled, "MMM d")}
                   </span>{" "}
