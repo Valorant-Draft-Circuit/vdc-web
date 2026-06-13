@@ -89,7 +89,7 @@ export default function MatchupCard({
 }) {
   if (slot.kind === "tbd") {
     return (
-      <div className="bracket-match rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+      <div className="bracket-match relative rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
         <EmptyRow />
         <div className="border-t border-gray-200 dark:border-gray-700" />
         <EmptyRow />
@@ -99,7 +99,7 @@ export default function MatchupCard({
 
   if (slot.kind === "bye") {
     return (
-      <div className="bracket-match rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="bracket-match relative rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 px-3 py-2">
           <span className="w-4 text-xs text-center flex-none text-gray-500">
             {slot.team.seed}
@@ -130,6 +130,11 @@ export default function MatchupCard({
           : "border-gray-200 dark:border-gray-700"
       }`}
     >
+      {/* Full-card link to the match sits beneath the content layer, which is
+          pointer-events-none so clicks fall through here, while the team-name
+          links re-enable pointer events. Keep the content layer free of
+          utilities that create a stacking context (e.g. shadow), or it would
+          capture these clicks. */}
       {slot.matchId != null && (
         <Link
           href={`/match/${slot.matchId}`}
@@ -146,7 +151,7 @@ export default function MatchupCard({
           }`}
         >
           {slot.status === "live"
-            ? `Live ${slot.home.score}-${slot.away.score}`
+            ? `In Progress ${slot.home.score}-${slot.away.score}`
             : "Best of 5"}
         </span>
       )}
