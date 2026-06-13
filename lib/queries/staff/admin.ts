@@ -242,7 +242,12 @@ const MANUAL_REVIEW_LIST_CAP = 8;
 
 export type SignupFunnelEntry = { status: LeagueStatus; count: number };
 
-export type SignupQueuePlayer = { id: string; name: string | null };
+export type SignupQueuePlayer = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  discordId: string | null;
+};
 
 export type SignupQueue = {
   funnel: SignupFunnelEntry[];
@@ -261,12 +266,28 @@ export async function getSignupQueue(): Promise<SignupQueue> {
   const manualReviewCount =
     funnel.find((entry) => entry.status === LeagueStatus.MANUAL_REVIEW)?.count ?? 0;
 
-  const manualReviewPlayers = await prisma.user.findMany({
+  const reviewUsers = await prisma.user.findMany({
     where: { Status: { leagueStatus: LeagueStatus.MANUAL_REVIEW } },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      Accounts: {
+        where: { provider: "discord" },
+        select: { providerAccountId: true },
+        take: 1,
+      },
+    },
     orderBy: { createdAt: "asc" },
     take: MANUAL_REVIEW_LIST_CAP,
   });
+
+  const manualReviewPlayers: SignupQueuePlayer[] = reviewUsers.map((user) => ({
+    id: user.id,
+    name: user.name,
+    image: user.image,
+    discordId: user.Accounts[0]?.providerAccountId ?? null,
+  }));
 
   return { funnel, manualReviewCount, manualReviewPlayers };
 }
@@ -279,6 +300,8 @@ export type UnreportedMatch = {
   matchDay: number | null;
   homeName: string;
   awayName: string;
+  homeSlug: string | null;
+  awaySlug: string | null;
   reported: number;
   expected: number;
 };
@@ -302,8 +325,8 @@ export async function getUnreportedMatches(season: number): Promise<UnreportedMa
       tier: true,
       matchDay: true,
       matchType: true,
-      Home: { select: { name: true } },
-      Away: { select: { name: true } },
+      Home: { select: { name: true, Franchise: { select: { slug: true } } } },
+      Away: { select: { name: true, Franchise: { select: { slug: true } } } },
       _count: { select: { Games: true } },
     },
     orderBy: { dateScheduled: "asc" },
@@ -316,6 +339,8 @@ export async function getUnreportedMatches(season: number): Promise<UnreportedMa
       matchDay: row.matchDay,
       homeName: row.Home?.name ?? "TBD",
       awayName: row.Away?.name ?? "TBD",
+      homeSlug: row.Home?.Franchise.slug ?? null,
+      awaySlug: row.Away?.Franchise.slug ?? null,
       reported: row._count.Games,
       expected: MIN_GAMES_BY_MATCH_TYPE[row.matchType] ?? 0,
     }))
@@ -333,6 +358,8 @@ export type UpcomingMatchMissingVeto = {
   matchDay: number | null;
   homeName: string;
   awayName: string;
+  homeSlug: string | null;
+  awaySlug: string | null;
   dateScheduled: Date;
 };
 
@@ -359,8 +386,8 @@ export async function getUpcomingMissingVetos(season: number): Promise<UpcomingM
       tier: true,
       matchDay: true,
       dateScheduled: true,
-      Home: { select: { name: true } },
-      Away: { select: { name: true } },
+      Home: { select: { name: true, Franchise: { select: { slug: true } } } },
+      Away: { select: { name: true, Franchise: { select: { slug: true } } } },
     },
     orderBy: { dateScheduled: "asc" },
   });
@@ -371,6 +398,8 @@ export async function getUpcomingMissingVetos(season: number): Promise<UpcomingM
     matchDay: row.matchDay,
     homeName: row.Home?.name ?? "TBD",
     awayName: row.Away?.name ?? "TBD",
+    homeSlug: row.Home?.Franchise.slug ?? null,
+    awaySlug: row.Away?.Franchise.slug ?? null,
     dateScheduled: row.dateScheduled,
   }));
 

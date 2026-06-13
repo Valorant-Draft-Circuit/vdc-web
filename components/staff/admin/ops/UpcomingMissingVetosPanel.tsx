@@ -27,16 +27,26 @@ export default function UpcomingMissingVetosPanel({
                 href={`/match/${match.matchID}`}
                 className="text-vdcBlue hover:underline"
               >
-                {match.tier} MD{match.matchDay ?? "?"} · {match.homeName} v{" "}
-                {match.awayName}{" "}
-                <span className="text-gray-400">
-                  {format(match.dateScheduled, "MMM d")}
-                </span>
+                <h2>
+                  {match.tier} MD{match.matchDay ?? "?"} · {match.homeName}
+                  {match.homeSlug && (
+                    <span className="text-gray-400"> ({match.homeSlug})</span>
+                  )}{" "}
+                  vs {match.awayName}
+                  {match.awaySlug && (
+                    <span className="text-gray-400"> ({match.awaySlug})</span>
+                  )}{" "}
+                  <span className="text-gray-400">
+                    {format(match.dateScheduled, "MMM d")}
+                  </span>{" "}
+                </h2>
               </Link>
             </li>
           ))}
           {remaining > 0 && (
-            <li className="text-gray-400">…and {remaining} more</li>
+            <li className="text-gray-400">
+              <h3>…and {remaining} more</h3>
+            </li>
           )}
         </ul>
       )}
