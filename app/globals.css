@@ -85,3 +85,14 @@ p {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+/* Playoffs bracket connector stubs (approximate). */
+.bracket-round:not(:last-child) .bracket-match::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 1.25rem;
+  height: 1px;
+  background-color: #9ca3af;
+}
