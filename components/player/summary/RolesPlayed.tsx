@@ -5,7 +5,7 @@ import {
   ROLE_HEX_COLOR_MAP,
   ROLE_ORDER,
   type RoleName,
-} from "@/lib/common/constants";
+} from "@/lib/common/constants/roles";
 
 type RoleTally = { games: number; iconUrl: string | null };
 

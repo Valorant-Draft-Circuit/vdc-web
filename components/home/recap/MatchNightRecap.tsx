@@ -8,7 +8,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
-import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import {
   RecapStat,
   RecapView,

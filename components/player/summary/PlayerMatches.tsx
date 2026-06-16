@@ -2,13 +2,9 @@
 
 import LoadingSpinner from "@/components/theme/LoadingSpinner";
 import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
-import {
-  AGENTS,
-  AGENTURL,
-  MAP_LIST_URL,
-  MAPS,
-  TEAM_LOGOS_URL,
-} from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
+import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
 import { Agents, Maps } from "@/lib/common/valorant-api";
 import { GameType, Tier } from "@prisma/client";
 import Image from "next/image";

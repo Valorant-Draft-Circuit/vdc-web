@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 
 export type TeamHistorySlide = {
   teamId: number;

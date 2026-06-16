@@ -1,10 +1,10 @@
 import Image from "next/image";
 import {
-  STATUS_LABELS,
   TEAM_LOGOS_URL,
-  TIER_COLOR_MAP,
   TRACKER_PROFILE_URL,
-} from "@/lib/common/constants";
+} from "@/lib/common/constants/urls";
+import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { STATUS_LABELS } from "@/lib/common/constants/leagueStatus";
 import Link from "next/link";
 import { parseRiotIGN } from "@/lib/common/player";
 import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
@@ -52,7 +52,7 @@ export default async function PlayerInfo({
     tierColor = "vdcBlack";
   }
   const discordAccountId = playerInfo.Accounts.filter(
-    (account) => account.provider === "discord"
+    (account) => account.provider === "discord",
   )[0].providerAccountId;
 
   let showMmr = mmrShow;
@@ -199,10 +199,10 @@ function TierBadge(tier) {
           tierString === Tier.PROSPECT
             ? "to-yellow-600"
             : tierString === Tier.APPRENTICE
-            ? "to-green-600"
-            : tierString === Tier.EXPERT
-            ? "to-blue-600"
-            : "to-purple-600"
+              ? "to-green-600"
+              : tierString === Tier.EXPERT
+                ? "to-blue-600"
+                : "to-purple-600"
         } flex flex-row px-2 py-1 bg-linear-to-br from-vdcWhite rounded-md text-xs text-vdcBlack gap-1`}
       >
         <h1>{tierString}</h1>

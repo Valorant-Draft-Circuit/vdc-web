@@ -3,7 +3,7 @@ import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import React, { Suspense } from "react";
 import { getSeasonCached } from "@/lib/common/cache";
-import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import StandingsPanelSkeleton from "@/components/standings/StandingsPanelSkeleton";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";

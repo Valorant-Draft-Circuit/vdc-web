@@ -10,7 +10,10 @@ import {
   InformationCircleIcon,
   LinkIcon,
 } from "@heroicons/react/24/solid";
-import { BEHAVIOR_GUIDELINE_URL, RULEBOOK_URL } from "@/lib/common/constants";
+import {
+  BEHAVIOR_GUIDELINE_URL,
+  RULEBOOK_URL,
+} from "@/lib/common/constants/urls";
 import { Roles } from "@/prisma";
 import { FM_ACCESS_LIST } from "@/app/staff/franchise-management/layout";
 
@@ -22,6 +25,7 @@ export const navLinks = [
       { name: "Schedule", href: "/schedule" },
       { name: "Standings", href: "/standings" },
       { name: "Playoffs", href: "/playoffs" },
+      { name: "Pick'ems", href: "/pickems" },
       { name: "Stats", href: "/stats" },
       { name: "Players", href: "/player" },
       { name: "Franchises", href: "/franchises" },
@@ -72,6 +76,16 @@ export const staffLinks = {
     { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
   ],
 };
+
+export function getNavLinks(pickemEnabled: boolean) {
+  if (pickemEnabled) {
+    return navLinks;
+  }
+  return navLinks.map((navItem) => ({
+    ...navItem,
+    links: navItem.links.filter((link) => link.href !== "/pickems"),
+  }));
+}
 
 export default function NavBar() {
   const preview = Boolean(process.env.PREVIEW);

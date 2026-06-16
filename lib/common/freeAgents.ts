@@ -1,8 +1,4 @@
-import {
-  FA_POOL_BAR_CAP,
-  FA_POOL_HEALTH_BANDS,
-  FaPoolBandLabel,
-} from "@/lib/common/constants";
+import { FA_POOL_BAR_CAP, FA_POOL_HEALTH_BANDS, FaPoolBandLabel } from "@/lib/common/constants/freeAgents";
 
 export type FaPoolHealth = {
   band: FaPoolBandLabel;

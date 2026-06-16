@@ -12,7 +12,7 @@ import {
   DisclosurePanel,
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { BEHAVIOR_GUIDELINE_URL } from "@/lib/common/constants";
+import { BEHAVIOR_GUIDELINE_URL } from "@/lib/common/constants/urls";
 import { getLocalMatchDayTime } from "@/lib/common/times";
 
 export default function Questions({

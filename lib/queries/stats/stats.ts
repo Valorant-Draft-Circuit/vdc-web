@@ -252,7 +252,6 @@ export async function getStatsBy(statsQuery: StatsQuery) {
     playerStats = await getStatsByTeam(statsQuery.teamId, statsQuery.season);
     return await formatStats({ playerStats, statType: "teamStats" });
   } else {
-    console.log(statsQuery.tier);
     playerStats = await getOverallPlayerStats(statsQuery);
     return await formatStats({ playerStats, gameType: statsQuery.gameType });
   }

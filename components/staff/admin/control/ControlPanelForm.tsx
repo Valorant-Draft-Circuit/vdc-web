@@ -1,10 +1,11 @@
 "use client";
 
-import { CONTROL_GROUPS } from "@/lib/common/constants";
+import { CONTROL_GROUPS } from "@/lib/common/constants/controls";
 import { useMemo, useState } from "react";
 import { Control, useForm } from "react-hook-form";
 import { ConfigSection } from "./ConfigSection";
 import {
+  DateField,
   InputField,
   MapPoolSelect,
   SelectField,
@@ -45,6 +46,7 @@ export default function ControlPanelForm({
       mmr: [],
       draft: [],
       ban: [],
+      pickems: [],
     };
     items.forEach((item, i) => {
       const idx = i + 1;
@@ -91,6 +93,10 @@ export default function ControlPanelForm({
       <DraftControls draftControls={groupedControls.draft} control={control} />
       <MmrControls mmrControls={groupedControls.mmr} control={control} />
       <BanControls banControls={groupedControls.ban} control={control} />
+      <PickemControls
+        pickemControls={groupedControls.pickems}
+        control={control}
+      />
       <button
         type="submit"
         disabled={isSaving}
@@ -172,6 +178,26 @@ function BanControls({
       title="Ban Order Controls"
       controls={banControls}
       control={control}
+    />
+  );
+}
+
+function PickemControls({
+  pickemControls,
+  control,
+}: ControlsSectionProps & { pickemControls: ConfigItem[] }) {
+  return (
+    <ConfigSection
+      title="Pick'ems Controls"
+      controls={pickemControls}
+      control={control}
+      renderField={(field, label) =>
+        label.toUpperCase() === "PICKEM_ADVANCE_LOCK" ? (
+          <DateField field={field} label={label} />
+        ) : (
+          <SwitchField field={field} label={label} />
+        )
+      }
     />
   );
 }

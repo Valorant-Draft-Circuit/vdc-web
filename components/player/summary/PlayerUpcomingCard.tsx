@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getUpcomingMatchesForTeam } from "@/lib/queries/schedule/schedule";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { correctMatchDate } from "@/lib/common/format";
 
 const MAX_ROWS = 3;

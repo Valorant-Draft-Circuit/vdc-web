@@ -1,6 +1,7 @@
 "use client";
 
-import { TEAM_LOGOS_URL, TIER_COLOR_MAP } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { getTimeUntil } from "@/lib/common/times";
 import { UpcomingMatchRow } from "@/lib/queries/schedule/schedule";
 import Image from "next/image";

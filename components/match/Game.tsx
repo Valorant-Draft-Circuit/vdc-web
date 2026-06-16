@@ -1,6 +1,7 @@
 "use client";
 
-import { MAP_LIST_URL, MAPS, TIER_COLOR_MAP } from "@/lib/common/constants";
+import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
 import { MatchDetail } from "@/lib/queries/match/match";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -41,9 +42,9 @@ export default function Game({
       className={`relative xl:w-full transform transition-all duration-300 ease-out
         ${animateIn ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}
         ${game.gameID && "hover:cursor-pointer hover:brightness-90"} ${
-        params.get("game") === game.gameID &&
-        "border-1 border-vdcRed rounded-lg"
-      }`}
+          params.get("game") === game.gameID &&
+          "border-1 border-vdcRed rounded-lg"
+        }`}
       style={{ transitionDelay: `${delay}ms` }}
       onClick={() => updateParam("game", game.gameID)}
     >

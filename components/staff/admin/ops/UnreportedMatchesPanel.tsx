@@ -38,14 +38,14 @@ export default function UnreportedMatchesPanel({
                   <div className="flex items-baseline gap-x-1">
                     <h2 className="text-vdcBlue">{match.homeName}</h2>
                     {match.homeSlug && (
-                      <h3 className="text-gray-400">({match.homeSlug})</h3>
+                      <p className="text-gray-400">({match.homeSlug})</p>
                     )}
                   </div>
                   <h2 className="text-gray-400">v</h2>
                   <div className="flex items-baseline gap-x-1">
                     <h2 className="text-vdcBlue">{match.awayName}</h2>
                     {match.awaySlug && (
-                      <h3 className="text-gray-400">({match.awaySlug})</h3>
+                      <p className="text-gray-400">({match.awaySlug})</p>
                     )}
                   </div>
                 </div>

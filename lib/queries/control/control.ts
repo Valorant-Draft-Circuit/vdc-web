@@ -22,7 +22,7 @@ export async function getSignupState() {
 }
 
 export async function getAllControlPanel(): Promise<ControlPanelItem[]> {
-  const rows = await prisma.controlPanel.findMany();
+  const rows = await prisma.controlPanel.findMany({ orderBy: { id: "asc" } });
   return rows.map((row) => ({
     label: row.name,
     value: row.value,

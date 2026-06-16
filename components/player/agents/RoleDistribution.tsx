@@ -1,9 +1,5 @@
 import Image from "next/image";
-import {
-  ROLE_HEX_COLOR_MAP,
-  ROLE_ORDER,
-  type RoleName,
-} from "@/lib/common/constants";
+import { ROLE_HEX_COLOR_MAP, ROLE_ORDER, type RoleName } from "@/lib/common/constants/roles";
 import type { PlayerAgentBreakdown } from "@/lib/queries/stats/getPlayerAgentBreakdown";
 
 type Props = { breakdown: PlayerAgentBreakdown[] };

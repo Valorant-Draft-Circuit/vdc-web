@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { normalizeAgentName } from "@/lib/common/agents";
-import type { RoleName } from "@/lib/common/constants";
+import type { RoleName } from "@/lib/common/constants/roles";
 
 export type AgentCatalogEntry = {
   uuid: string;

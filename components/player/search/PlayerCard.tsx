@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  STATUS_LABELS,
-  TEAM_LOGOS_URL,
-  TIER_COLOR_MAP,
-} from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { STATUS_LABELS } from "@/lib/common/constants/leagueStatus";
 import { MeiliPlayer } from "@/lib/types/meilisearch";
 import Link from "next/link";
 import Image from "next/image";

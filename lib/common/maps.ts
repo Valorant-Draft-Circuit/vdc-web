@@ -1,4 +1,4 @@
-import { ROLE_ORDER, type RoleName } from "@/lib/common/constants";
+import { ROLE_ORDER, type RoleName } from "@/lib/common/constants/roles";
 import type { PlayerMapBreakdown } from "@/lib/queries/stats/getPlayerMapBreakdown";
 
 export type MapRow = PlayerMapBreakdown & { splashUrl: string | null };
