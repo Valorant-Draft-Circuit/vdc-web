@@ -1,5 +1,6 @@
 "use client";
 
+import { type CSSProperties } from "react";
 import { MatchType } from "@prisma/client";
 import { legalScores, type Score } from "@/lib/pickems/picks";
 
@@ -27,24 +28,25 @@ export default function MatchPills({
           value !== undefined &&
           value.home === score.home &&
           value.away === score.away;
+        const pillStyle = { "--accent": accent } as CSSProperties;
         const selectedClasses = isSelected
-          ? "text-white"
-          : "border-gray-300 bg-transparent dark:border-gray-600";
+          ? "text-white enabled:hover:brightness-95"
+          : "border-gray-300 bg-transparent dark:border-gray-600 enabled:hover:border-[var(--accent)] enabled:hover:text-[var(--accent)]";
         const selectedStyle = isSelected
-          ? { backgroundColor: accent, borderColor: accent }
-          : undefined;
+          ? { ...pillStyle, backgroundColor: accent, borderColor: accent }
+          : pillStyle;
         return (
           <button
             key={`${score.home}-${score.away}`}
             type="button"
             disabled={locked}
             onClick={() => onPick(score)}
-            className={`flex w-[46px] items-center justify-center rounded-md border px-0 py-1.5 text-sm font-bold enabled:hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectedClasses}`}
+            className={`flex w-[46px] items-center justify-center rounded-md border px-0 py-1.5 text-sm font-bold transition-colors enabled:hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectedClasses}`}
             style={selectedStyle}
           >
-            <p>
+            <h2>
               {score.home}-{score.away}
-            </p>
+            </h2>
           </button>
         );
       })}

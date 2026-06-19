@@ -45,6 +45,7 @@ export default function LeaderboardScopes({ scope, view, groups }: Props) {
 
   const scopeMenu = [
     { query: "global", name: "Global" },
+    { query: "groups", name: "Group Ranking" },
     ...groups.map((group) => ({
       query: `group:${group.id}`,
       name: group.name,
@@ -80,6 +81,13 @@ export default function LeaderboardScopes({ scope, view, groups }: Props) {
             className={scope === "global" ? RED_ACTIVE : RED_INACTIVE}
           >
             <h1>Global</h1>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("scope", "groups")}
+            className={scope === "groups" ? RED_ACTIVE : RED_INACTIVE}
+          >
+            <h1>Group Ranking</h1>
           </button>
           {groups.map((group) => {
             const key = `group:${group.id}`;

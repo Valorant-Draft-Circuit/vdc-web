@@ -1,6 +1,5 @@
 import TeamMark from "@/components/pickems/common/TeamMark";
 import { legalScores } from "@/lib/pickems/picks";
-import { formatDayShort } from "@/lib/pickems/format";
 import type {
   ReadonlyMatch,
   ReadonlySlate,
@@ -8,7 +7,7 @@ import type {
 
 function resultText(match: ReadonlyMatch): string {
   if (!match.result.resolved) {
-    return "awaiting result";
+    return "Awaiting Results";
   }
   const actual = `Actual ${match.result.homeScore}-${match.result.awayScore}`;
   if (match.pick === null) {
@@ -71,13 +70,13 @@ function ResultMatchRow({
               ? { backgroundColor: accent, borderColor: accent }
               : undefined;
             return (
-              <p
+              <h2
                 key={`${score.home}-${score.away}`}
                 className={`w-[46px] rounded-md border py-1.5 text-center text-sm font-bold ${pickPillClass(isPick, match.pickStatus)}`}
                 style={pendingStyle}
               >
                 {score.home}-{score.away}
-              </p>
+              </h2>
             );
           })}
         </div>
@@ -118,7 +117,7 @@ export default function ResultSlateGrid({
                 Match Day {slate.matchDay}
               </h2>
               <p className="text-[11px] font-normal text-vdcGrey dark:text-gray-400">
-                {formatDayShort(slate.lockTime)}
+                {slate.dateLabel}
               </p>
             </div>
             <h2 className="text-right text-[10px] font-normal text-vdcGrey dark:text-gray-400">

@@ -14,20 +14,21 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
   const matchType = match.matchType;
 
   return (
-    <Link
-      href={`/match/${match.matchID}`}
-      className={`flex flex-col p-5 rounded-2xl bg-gradient-to-b from-${
+    <div
+      className={`relative flex flex-col p-5 rounded-2xl bg-gradient-to-b from-${
         TIER_COLOR_MAP[match.tier]
       } from-3% to-gray-100 dark:to-vdcBlack to-0% text-center gap-2 flex-shrink-0 hover:brightness-90`}
     >
+      <Link
+        href={`/match/${match.matchID}`}
+        aria-label={`View match: ${match.tier} ${matchType}`}
+        className="absolute inset-0 z-0 rounded-2xl"
+      />
       <h1 className="">
         {match.tier} - {matchType}
       </h1>
-      <div className="flex flex-row m-auto gap-10">
+      <div className="relative z-10 flex flex-row m-auto gap-10">
         <Link
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
           href={`/franchises/${
             homeTeam.slug
           }?team=${match.tier.toLocaleLowerCase()}`}
@@ -43,9 +44,6 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
         </Link>
         <h1 className="text-vdcRed text-4xl m-auto">VS</h1>
         <Link
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
           href={`/franchises/${
             awayTeam.slug
           }?team=${match.tier.toLocaleLowerCase()}`}
@@ -61,7 +59,7 @@ export default function UpcomingMatch({ match }: { match: UpcomingMatchRow }) {
         </Link>
       </div>
       <h2 className="">{timeUntil}</h2>
-    </Link>
+    </div>
   );
 }
 

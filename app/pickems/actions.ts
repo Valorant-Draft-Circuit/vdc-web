@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { getSeasonCached } from "@/lib/common/cache";
 import { correctMatchDate } from "@/lib/common/format";
 import { isLegalScore } from "@/lib/pickems/picks";
+import { slateLockTime } from "@/lib/pickems/format";
 import { AGENT_UUIDS } from "@/lib/common/constants/agents";
 import {
   getAdvanceBoard,
@@ -55,7 +56,7 @@ export async function submitMatchPicks(input: {
       _min: { dateScheduled: true },
     });
     const slateLock = slate._min.dateScheduled;
-    if (slateLock && correctMatchDate(slateLock) <= new Date()) {
+    if (slateLock && slateLockTime(correctMatchDate(slateLock)) <= new Date()) {
       return { ok: false, error: "This slate is locked" };
     }
 
@@ -64,10 +65,13 @@ export async function submitMatchPicks(input: {
       create: {
         userID: userId,
         matchID: pick.matchId,
-        homeScore: pick.homeScore,
-        awayScore: pick.awayScore,
+        predictedHomeScore: pick.homeScore,
+        predictedAwayScore: pick.awayScore,
       },
-      update: { homeScore: pick.homeScore, awayScore: pick.awayScore },
+      update: {
+        predictedHomeScore: pick.homeScore,
+        predictedAwayScore: pick.awayScore,
+      },
     });
   }
   revalidatePath("/pickems");
@@ -117,8 +121,8 @@ export async function submitAdvancePick(input: {
         userID: userId,
         season,
         tier: input.tier,
-        team: team.teamId,
-        seed: team.seed,
+        predictedTeam: team.teamId,
+        predictedSeed: team.seed,
       })),
     }),
   ]);

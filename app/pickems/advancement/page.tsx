@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { Tier } from "@prisma/client";
 import { LockClosedIcon } from "@heroicons/react/16/solid";
 
@@ -7,14 +8,11 @@ import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getUserTier } from "@/lib/queries/user/user";
-import {
-  getAdvanceBoard,
-  getAdvanceLock,
-} from "@/lib/queries/pickems/getAdvanceBoard";
-import { getMyPicks } from "@/lib/queries/pickems/getUserPicks";
+import { getAdvanceLock } from "@/lib/queries/pickems/getAdvanceBoard";
 import { lockCountdown } from "@/lib/pickems/format";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
-import AdvancePicker from "@/components/pickems/advancement/AdvancePicker";
+import AdvanceBoardPanel from "@/components/pickems/advancement/AdvanceBoardPanel";
+import AdvancePickerSkeleton from "@/components/pickems/advancement/AdvancePickerSkeleton";
 import HubButton from "@/components/pickems/common/HubButton";
 
 export const metadata: Metadata = {
@@ -53,11 +51,7 @@ export default async function AdvancementPage({ searchParams }: Props) {
   const season = seasonParam;
   const userId = session?.user?.id ?? null;
 
-  const [board, advanceLock, myPicks] = await Promise.all([
-    getAdvanceBoard(tier, season),
-    getAdvanceLock(tier, season),
-    userId ? getMyPicks(userId, season, tier) : Promise.resolve(null),
-  ]);
+  const advanceLock = await getAdvanceLock(tier, season);
 
   const now = new Date();
   const locked = advanceLock === null || advanceLock <= now;
@@ -91,10 +85,10 @@ export default async function AdvancementPage({ searchParams }: Props) {
             {tier}
           </h2>
         </div>
-        <p className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400">
+        <h1 className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400">
           <LockClosedIcon className="size-3" />
           {lockLabel}
-        </p>
+        </h1>
       </div>
 
       <PickemTierTabs
@@ -103,21 +97,19 @@ export default async function AdvancementPage({ searchParams }: Props) {
         basePath="/pickems/advancement"
       />
 
-      {board.teams.length === 0 ? (
-        <p className="py-10 text-center text-sm text-vdcGrey dark:text-gray-400">
-          No teams found for this tier and season.
-        </p>
-      ) : (
-        <AdvancePicker
-          key={`${tier}-${season}`}
-          board={board}
-          initial={myPicks?.advance}
+      <Suspense
+        key={`${tier}-${season}`}
+        fallback={<AdvancePickerSkeleton accent={accent} />}
+      >
+        <AdvanceBoardPanel
           tier={tier}
+          season={season}
+          userId={userId}
           locked={locked}
           accent={accent}
           canSave={userId !== null}
         />
-      )}
+      </Suspense>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { correctMatchDate } from "@/lib/common/format";
-import { formatDayShort } from "@/lib/pickems/format";
+import { formatDayShort, slateLockTime } from "@/lib/pickems/format";
 
 export type TeamRef = {
   id: number;
@@ -113,13 +113,14 @@ export const getSlates = cache(
         continue;
       }
       const matches = raw.map(toSlateMatch);
-      const lockTime = matches[0].dateScheduled;
+      const firstMatchTime = matches[0].dateScheduled;
+      const lockTime = slateLockTime(firstMatchTime);
       slates.push({
         season,
         tier,
         matchDay,
         lockTime,
-        dateLabel: formatDayShort(lockTime),
+        dateLabel: formatDayShort(firstMatchTime),
         matches,
       });
     }

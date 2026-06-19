@@ -9,8 +9,10 @@ import {
   type LeaderboardScope,
 } from "@/lib/queries/pickems/getLeaderboard";
 import { getMyGroups } from "@/lib/queries/pickems/getGroups";
+import { getGroupLeaderboard } from "@/lib/queries/pickems/getGroupLeaderboard";
 import LeaderboardScopes from "@/components/pickems/leaderboard/LeaderboardScopes";
 import LeaderboardTable from "@/components/pickems/leaderboard/LeaderboardTable";
+import GroupLeaderboardTable from "@/components/pickems/leaderboard/GroupLeaderboardTable";
 import GroupScopeTitle from "@/components/pickems/groups/GroupScopeTitle";
 import HubButton from "@/components/pickems/common/HubButton";
 
@@ -60,18 +62,21 @@ export default async function LeaderboardPage({ searchParams }: Props) {
       ? Number(sp.season)
       : currentSeason;
 
+  const isGroupRanking = scopeParam === "groups";
   const { scope, key: scopeKey } = parseScope(scopeParam);
   const { tier, view } = parseView(viewParam);
   const viewerId = session?.user?.id ?? null;
 
-  const [rows, groups] = await Promise.all([
-    getLeaderboard(season, tier, scope),
+  const [rows, groupRows, groups] = await Promise.all([
+    isGroupRanking ? Promise.resolve([]) : getLeaderboard(season, tier, scope),
+    isGroupRanking ? getGroupLeaderboard(season, tier) : Promise.resolve([]),
     viewerId ? getMyGroups(viewerId, season) : Promise.resolve([]),
   ]);
 
   const linkTier = view === "overall" ? "mythic" : view;
+  const activeScopeKey = isGroupRanking ? "groups" : scopeKey;
   const activeGroup =
-    scope.kind === "group"
+    !isGroupRanking && scope.kind === "group"
       ? (groups.find((group) => group.id === scope.groupId) ?? null)
       : null;
 
@@ -89,7 +94,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
         </h2>
       </div>
 
-      <LeaderboardScopes scope={scopeKey} view={view} groups={groups} />
+      <LeaderboardScopes scope={activeScopeKey} view={view} groups={groups} />
 
       {activeGroup && (
         <GroupScopeTitle
@@ -100,16 +105,21 @@ export default async function LeaderboardPage({ searchParams }: Props) {
         />
       )}
 
-      <LeaderboardTable
-        rows={rows}
-        viewerId={viewerId}
-        season={season}
-        linkTier={linkTier}
-      />
+      {isGroupRanking ? (
+        <GroupLeaderboardTable rows={groupRows} season={season} view={view} />
+      ) : (
+        <LeaderboardTable
+          rows={rows}
+          viewerId={viewerId}
+          season={season}
+          linkTier={linkTier}
+        />
+      )}
 
       <p className="text-[11px] text-vdcGrey dark:text-gray-400">
-        Ties broken by accuracy. Overall = sum of points across every tier you
-        played.
+        {isGroupRanking
+          ? "Group score = average points of members who made picks. The Members column shows participants out of total. Ties broken by total points."
+          : "Ties broken by accuracy. Overall = sum of points across every tier you played."}
       </p>
     </div>
   );

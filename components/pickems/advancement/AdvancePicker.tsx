@@ -22,33 +22,6 @@ type Props = {
   canSave: boolean;
 };
 
-type TeamGroup = { label: string; teams: AdvanceTeam[] };
-
-function groupLabel(group: number | null): string {
-  if (group === null) {
-    return "Teams";
-  }
-  return `Group ${String.fromCharCode(64 + group)}`;
-}
-
-function groupTeams(teams: AdvanceTeam[]): TeamGroup[] {
-  const teamsByGroup = new Map<number | null, AdvanceTeam[]>();
-  for (const team of teams) {
-    if (!teamsByGroup.has(team.group)) {
-      teamsByGroup.set(team.group, []);
-    }
-    teamsByGroup.get(team.group)!.push(team);
-  }
-
-  const sortedKeys = [...teamsByGroup.keys()].sort(
-    (a, b) => (a ?? 99) - (b ?? 99),
-  );
-  return sortedKeys.map((key) => ({
-    label: groupLabel(key),
-    teams: teamsByGroup.get(key)!,
-  }));
-}
-
 export default function AdvancePicker({
   board,
   initial,
@@ -65,6 +38,11 @@ export default function AdvancePicker({
     return map;
   }, [board.teams]);
 
+  const sortedTeams = useMemo(
+    () => [...board.teams].sort((a, b) => a.name.localeCompare(b.name)),
+    [board.teams],
+  );
+
   const [selected, setSelected] = useState<number[]>(() =>
     (initial ?? [])
       .slice()
@@ -74,7 +52,6 @@ export default function AdvancePicker({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const groups = useMemo(() => groupTeams(board.teams), [board.teams]);
   const slots = Array.from(
     { length: board.n },
     (_, index) => selected[index] ?? null,
@@ -140,10 +117,10 @@ export default function AdvancePicker({
           className="mb-2 flex justify-between text-[11px] font-extrabold uppercase tracking-wide"
           style={{ color: accent }}
         >
-          <p>Playoff slots</p>
-          <p>
+          <h1>Playoff slots</h1>
+          <h1>
             {filled} / {board.n} filled
-          </p>
+          </h1>
         </div>
         <div
           className="grid justify-center gap-3"
@@ -202,35 +179,26 @@ export default function AdvancePicker({
       </div>
 
       <div
-        className="mt-1 flex flex-col gap-3"
+        className="mt-1 flex flex-wrap gap-1.5"
         style={{ "--tier-accent": accent } as CSSProperties}
       >
-        {groups.map((group) => (
-          <div key={group.label}>
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-vdcGrey dark:text-gray-400">
-              {group.label}
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {group.teams.map((team) => {
-                const used = selected.includes(team.id);
-                const usedStyle = used ? { opacity: 0.3 } : undefined;
-                return (
-                  <button
-                    key={team.id}
-                    type="button"
-                    disabled={locked || used}
-                    onClick={() => addTeam(team.id)}
-                    className="flex items-center gap-1.5 rounded-full border border-black/10 bg-gray-100 py-1.5 pl-1.5 pr-3 text-xs font-semibold transition-colors enabled:hover:cursor-pointer enabled:hover:border-[var(--tier-accent)] enabled:hover:text-[var(--tier-accent)] disabled:cursor-not-allowed dark:border-white/10 dark:bg-vdcGrey"
-                    style={usedStyle}
-                  >
-                    <TeamLogo logo={team.logo} teamName={team.name} />
-                    <h2>{team.name}</h2>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+        {sortedTeams.map((team) => {
+          const used = selected.includes(team.id);
+          const usedStyle = used ? { opacity: 0.3 } : undefined;
+          return (
+            <button
+              key={team.id}
+              type="button"
+              disabled={locked || used}
+              onClick={() => addTeam(team.id)}
+              className="flex items-center gap-1.5 rounded-full border border-black/10 bg-gray-100 py-1.5 pl-1.5 pr-3 text-xs font-semibold transition-colors enabled:hover:cursor-pointer enabled:hover:border-[var(--tier-accent)] enabled:hover:text-[var(--tier-accent)] disabled:cursor-not-allowed dark:border-white/10 dark:bg-vdcGrey"
+              style={usedStyle}
+            >
+              <TeamLogo logo={team.logo} teamName={team.name} />
+              <h2>{team.name}</h2>
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">

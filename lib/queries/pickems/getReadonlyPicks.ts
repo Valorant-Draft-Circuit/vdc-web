@@ -30,6 +30,7 @@ export type ReadonlyMatch = {
 export type ReadonlySlate = {
   matchDay: number;
   lockTime: Date;
+  dateLabel: string;
   matches: ReadonlyMatch[];
   slatePoints: number;
   correct: number;
@@ -185,6 +186,7 @@ function buildLockedSlate(
   return {
     matchDay: slate.matchDay,
     lockTime: slate.lockTime,
+    dateLabel: slate.dateLabel,
     matches,
     slatePoints,
     correct,

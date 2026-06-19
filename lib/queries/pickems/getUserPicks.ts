@@ -15,24 +15,31 @@ export const getMyPicks = cache(
     const [matchPicks, advancePicks] = await Promise.all([
       prisma.pickemMatchPick.findMany({
         where: { userID: userId, Match: { season, tier } },
-        select: { matchID: true, homeScore: true, awayScore: true },
+        select: {
+          matchID: true,
+          predictedHomeScore: true,
+          predictedAwayScore: true,
+        },
       }),
       prisma.pickemAdvancePick.findMany({
         where: { userID: userId, season, tier },
-        select: { team: true, seed: true },
-        orderBy: { seed: "asc" },
+        select: { predictedTeam: true, predictedSeed: true },
+        orderBy: { predictedSeed: "asc" },
       }),
     ]);
     return {
       match: matchPicks.map(
         (p): StoredMatchPick => ({
           matchId: p.matchID,
-          homeScore: p.homeScore,
-          awayScore: p.awayScore,
+          homeScore: p.predictedHomeScore,
+          awayScore: p.predictedAwayScore,
         }),
       ),
       advance: advancePicks.map(
-        (p): StoredAdvancePick => ({ teamId: p.team, seed: p.seed }),
+        (p): StoredAdvancePick => ({
+          teamId: p.predictedTeam,
+          seed: p.predictedSeed,
+        }),
       ),
     };
   },

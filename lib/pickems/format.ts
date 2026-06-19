@@ -1,6 +1,14 @@
 const MS_PER_HOUR = 1000 * 60 * 60;
 const MS_PER_MINUTE = 1000 * 60;
 
+export const SLATE_LOCK_LEAD_HOURS = 12;
+
+export function slateLockTime(firstMatchTime: Date): Date {
+  return new Date(
+    firstMatchTime.getTime() - SLATE_LOCK_LEAD_HOURS * MS_PER_HOUR,
+  );
+}
+
 export function formatDayShort(date: Date): string {
   return date.toLocaleDateString("en-US", {
     weekday: "short",

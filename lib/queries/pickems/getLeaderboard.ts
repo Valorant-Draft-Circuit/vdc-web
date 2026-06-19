@@ -128,8 +128,8 @@ async function scoreTier(
       PickemMatchPicks: {
         select: {
           userID: true,
-          homeScore: true,
-          awayScore: true,
+          predictedHomeScore: true,
+          predictedAwayScore: true,
           Player: { select: { name: true, image: true } },
         },
       },
@@ -162,8 +162,8 @@ async function scoreTier(
       }
       slatesPlayedByUser.get(pick.userID)!.add(matchDay);
       realPickByKey.set(realPickKey(pick.userID, match.matchID), {
-        home: pick.homeScore,
-        away: pick.awayScore,
+        home: pick.predictedHomeScore,
+        away: pick.predictedAwayScore,
       });
       nameByUser.set(pick.userID, pick.Player.name);
       imageByUser.set(pick.userID, pick.Player.image);
@@ -207,7 +207,7 @@ async function scoreTier(
 
   const advancePicks = await prisma.pickemAdvancePick.findMany({
     where: { season, tier },
-    select: { userID: true, team: true, seed: true },
+    select: { userID: true, predictedTeam: true, predictedSeed: true },
   });
   const advanceByUser = new Map<string, SeededTeam[]>();
   for (const pick of advancePicks) {
@@ -219,7 +219,7 @@ async function scoreTier(
     }
     advanceByUser
       .get(pick.userID)!
-      .push({ teamId: pick.team, seed: pick.seed });
+      .push({ teamId: pick.predictedTeam, seed: pick.predictedSeed });
   }
 
   const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(

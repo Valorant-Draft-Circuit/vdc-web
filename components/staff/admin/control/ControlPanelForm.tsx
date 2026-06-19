@@ -16,6 +16,7 @@ import { updateControlPanelAction } from "@/app/staff/admin/control/actions";
 import type { ControlPanelItem } from "@/lib/queries/control/control";
 
 export type ConfigItem = {
+  id: number;
   label: string;
   value: string;
   notes: string;
@@ -33,6 +34,7 @@ export default function ControlPanelForm({
   const items: ConfigItem[] = useMemo(
     () =>
       initialControls.map((item) => ({
+        id: item.id,
         label: item.label,
         value: item.value,
         notes: item.notes ?? "",
@@ -48,10 +50,9 @@ export default function ControlPanelForm({
       ban: [],
       pickems: [],
     };
-    items.forEach((item, i) => {
-      const idx = i + 1;
+    items.forEach((item) => {
       for (const [groupName, controlSet] of Object.entries(CONTROL_GROUPS)) {
-        if (controlSet.has(idx)) {
+        if (controlSet.has(item.id)) {
           groupMap[groupName].push(item);
           break;
         }

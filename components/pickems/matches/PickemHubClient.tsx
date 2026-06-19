@@ -137,7 +137,7 @@ export default function PickemHubClient({
               disabled={saveDisabled}
               className="rounded-lg bg-vdcRed px-5 py-2 text-sm font-bold uppercase text-white disabled:opacity-50"
             >
-              {saveButtonText()}
+              <h1>{saveButtonText()}</h1>
             </button>
           </div>
         </div>
