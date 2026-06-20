@@ -7,10 +7,10 @@ export default async function News() {
   return (
     <div className="flex flex-col xl:flex-row space-y-4 xl:space-x-4">
       {newsList.map(
-        ({ title, date, featured_image, url, featured_image_alt }, i) => (
+        ({ title, date, featured_image, url, featured_image_alt }) => (
           <div
             className="xl:w-full hover:scale-101 transition duration-150 ease-in-out"
-            key={i}
+            key={title}
           >
             <a href={url ?? ""} target="_blank">
               <div className="shrink-0 ">

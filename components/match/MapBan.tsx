@@ -1,7 +1,6 @@
 "use client";
 
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
+import { MAP_LIST_URL, MAPS, TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { XMarkIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { MatchTeam } from "@/lib/queries/match/match";

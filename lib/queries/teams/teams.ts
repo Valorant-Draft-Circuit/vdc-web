@@ -128,29 +128,3 @@ export async function getTeamCardsByIds(
   }
   return map;
 }
-
-// Teams that actually played a given season+tier (from that season's Matches),
-// regardless of current `active` flag - so past-season standings recompute correctly.
-export async function getTeamsInSeason(
-  tier: Tier,
-  season: number,
-): Promise<ActiveTeam[]> {
-  const matches = await prisma.matches.findMany({
-    where: { tier, season },
-    select: { home: true, away: true },
-  });
-  const teamIds = new Set<number>();
-  for (const m of matches) {
-    if (m.home !== null) teamIds.add(m.home);
-    if (m.away !== null) teamIds.add(m.away);
-  }
-  if (teamIds.size === 0) return [];
-  return prisma.teams.findMany({
-    where: { id: { in: Array.from(teamIds) } },
-    select: {
-      id: true,
-      name: true,
-      Franchise: { select: { slug: true, Brand: { select: { logo: true } } } },
-    },
-  });
-}

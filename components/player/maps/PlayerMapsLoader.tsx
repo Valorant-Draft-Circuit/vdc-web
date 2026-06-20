@@ -1,7 +1,7 @@
 import { GameType } from "@prisma/client";
 import CombineDisclaimer from "@/components/player/CombineDisclaimer";
 import { getMapsCached } from "@/lib/common/cache";
-import { MAP_LIST_URL } from "@/lib/common/constants/maps";
+import { MAP_LIST_URL } from "@/lib/common/constants";
 import { selectMapCallouts, type MapRow } from "@/lib/common/maps";
 import type { Maps } from "@/lib/common/valorant-api";
 import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";

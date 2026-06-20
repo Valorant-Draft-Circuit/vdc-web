@@ -2,7 +2,7 @@ import { cache } from "react";
 import { GameType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { normalizeAgentName } from "@/lib/common/agents";
-import type { RoleName } from "@/lib/common/constants/roles";
+import type { RoleName } from "@/lib/common/constants";
 import {
   emptyRoleCounts,
   selectPrimaryRole,

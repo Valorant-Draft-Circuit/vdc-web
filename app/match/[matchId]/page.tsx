@@ -3,9 +3,11 @@ import MapBan from "@/components/match/MapBan";
 import GameStats from "@/components/match/GameStats";
 import MatchStats from "@/components/match/MatchStats";
 import { getMapsCached } from "@/lib/common/cache";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
-import { SECONDARY_MAP_LIST_URL } from "@/lib/common/constants/maps";
+import {
+  SECONDARY_MAP_LIST_URL,
+  TEAM_LOGOS_URL,
+  TIER_COLOR_MAP,
+} from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
 import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";

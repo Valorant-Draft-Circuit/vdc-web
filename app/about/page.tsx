@@ -1,4 +1,4 @@
-import { DISCORD_LINK } from "@/lib/common/constants/urls";
+import { DISCORD_LINK } from "@/lib/common/constants";
 import {
   Disclosure,
   DisclosureButton,

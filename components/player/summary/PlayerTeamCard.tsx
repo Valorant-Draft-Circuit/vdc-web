@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getStandingsByTier } from "@/lib/queries/standings/standings";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { Tier } from "@prisma/client";
 
 type Props = {

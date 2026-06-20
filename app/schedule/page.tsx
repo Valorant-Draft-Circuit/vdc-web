@@ -3,7 +3,7 @@ import SchedulePanelLoader from "@/components/schedule/SchedulePanelLoader";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
-import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
 import { getUserTier } from "@/lib/queries/user/user";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -49,7 +49,11 @@ export default async function Page({ searchParams }: Props) {
 
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
-      <VerticalTab tabElements={tabs} params={"tier"} defaultQuery={userTier} />
+      <VerticalTab
+        tabElements={tabs}
+        params={"tier"}
+        defaultQuery={userTier}
+      />
     </div>
   );
 }

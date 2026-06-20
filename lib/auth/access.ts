@@ -1,5 +1,5 @@
 import { Roles } from "@/prisma";
-import { SUPERUSER_ROLES } from "../common/constants/roles";
+import { SUPERUSER_ROLES } from "../common/constants";
 import { prisma } from "@/prisma/prismadb";
 
 export function isAuthorizedForMeilisearch(roleValue): boolean {

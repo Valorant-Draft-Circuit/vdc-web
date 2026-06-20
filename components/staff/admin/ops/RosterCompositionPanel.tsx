@@ -1,7 +1,6 @@
 import { TierComposition } from "@/lib/queries/staff/admin";
 import { getFaPoolHealth } from "@/lib/common/freeAgents";
-import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
-import { FA_POOL_HEALTH_BANDS } from "@/lib/common/constants/freeAgents";
+import { FA_POOL_HEALTH_BANDS, TIER_COLOR_MAP } from "@/lib/common/constants";
 
 const BAND_RANGE_LABEL: Record<string, string> = {
   Critical: "< 0.75",
@@ -44,7 +43,7 @@ export default function RosterCompositionPanel({
       {conversionTiers.length > 0 && (
         <div className="mt-4 rounded-md bg-red-50 p-3 text-xs text-red-800 dark:bg-red-950 dark:text-red-200">
           {conversionTiers.map((row) => (
-            <p key={row.tier}>
+            <h3 key={row.tier}>
               <span
                 className={`text-${TIER_COLOR_MAP[row.tier]} font-semibold`}
               >
@@ -52,7 +51,7 @@ export default function RosterCompositionPanel({
               </span>{" "}
               pool is Critical (&lt; 0.75 FA/team). Rulebook flags this tier for
               RFA conversions.
-            </p>
+            </h3>
           ))}
         </div>
       )}

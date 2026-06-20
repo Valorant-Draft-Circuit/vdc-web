@@ -1,4 +1,4 @@
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { Standing } from "@/lib/queries/standings/standings";
 import Image from "next/image";
 import Link from "next/link";

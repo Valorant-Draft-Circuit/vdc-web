@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MatchType } from "@prisma/client";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { Slot, SeriesSide } from "@/lib/common/bracket";
 
 function TeamLogo({ logo, alt }: { logo: string | null; alt: string }) {
@@ -101,9 +101,9 @@ export default function MatchupCard({
     return (
       <div className="rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 px-3 py-2">
-          <p className="w-4 text-xs text-center flex-none text-gray-500">
+          <h3 className="w-4 text-xs text-center flex-none text-gray-500">
             {slot.team.seed}
-          </p>
+          </h3>
           <TeamLogo logo={slot.team.logo} alt={slot.team.franchiseSlug} />
           <Link
             href={`/franchises/${slot.team.franchiseSlug}?team=${tier}`}

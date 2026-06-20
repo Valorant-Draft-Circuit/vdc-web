@@ -1,4 +1,4 @@
-import { MAPS, MAP_LIST_URL } from "@/lib/common/constants/maps";
+import { MAPS, MAP_LIST_URL } from "@/lib/common/constants";
 import {
   Field,
   Input,
@@ -33,7 +33,6 @@ export function SwitchField({ field, label }: FieldProps) {
         <h1 className="my-auto">F</h1>
         <Switch
           {...field}
-          checked={field.value === true || field.value === "true"}
           onChange={(val: boolean) => field.onChange(val)}
           className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-vdcGrey transition data-checked:bg-vdcRed data-hover:cursor-pointer"
         >
@@ -104,53 +103,6 @@ export function InputField({ field, label }: FieldProps) {
             "w-full rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcGrey dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
           }
         ></Input>
-      </div>
-    </Field>
-  );
-}
-
-export function DateField({ field, label }: FieldProps) {
-  const toInput = (iso: string): string => {
-    if (!iso) return "";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "";
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-  return (
-    <Field>
-      <Label className={"mb-1 uppercase text-vdcRed"}>
-        <h1>{label.replaceAll("_", " ")}</h1>
-      </Label>
-      <div className="flex items-center gap-3">
-        <Input
-          type="datetime-local"
-          name={field.name}
-          ref={field.ref}
-          onBlur={field.onBlur}
-          value={toInput(field.value as string)}
-          onChange={(e) =>
-            field.onChange(
-              e.target.value ? new Date(e.target.value).toISOString() : "",
-            )
-          }
-          className={
-            "rounded-lg bg-gray-100 text-vdcBlack dark:bg-vdcGrey dark:text-vdcWhite px-3 py-1.5 font-semibold focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2"
-          }
-        />
-        {field.value ? (
-          <button
-            type="button"
-            onClick={() => field.onChange("")}
-            className="text-xs text-vdcRed underline"
-          >
-            Clear (use auto lock)
-          </button>
-        ) : (
-          <h2 className="text-xs text-gray-500">
-            Auto locks at the first regular season game
-          </h2>
-        )}
       </div>
     </Field>
   );

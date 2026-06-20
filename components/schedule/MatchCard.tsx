@@ -1,6 +1,6 @@
 "use client";
 
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
 import Image from "next/image";

@@ -1,9 +1,8 @@
 import { DropDown } from "./DropDowns";
-import { getNavLinks, staffLinks } from "./NavBar";
+import { navLinks, staffLinks } from "./NavBar";
 import HomeLink from "./HomeLink";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
-import { getPickemEnabled } from "@/lib/queries/pickems/getAdvanceBoard";
 
 export default async function NavLinks() {
   const session = await auth();
@@ -15,13 +14,12 @@ export default async function NavLinks() {
   const filteredStaffLinks = staffLinks.links.filter((link) =>
     hasAccess(userRoles, link.roles),
   );
-  const visibleNavLinks = getNavLinks(await getPickemEnabled());
 
   return (
     <div className="flex flex-col text-xl sm:ml-24 space-y-1 ">
       <HomeLink />
       <div className="hidden sm:flex space-x-10">
-        {visibleNavLinks.map((navItem) => (
+        {navLinks.map((navItem) => (
           <DropDown
             key={navItem.name}
             title={navItem.name}
