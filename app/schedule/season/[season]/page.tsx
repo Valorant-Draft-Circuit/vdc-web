@@ -3,7 +3,7 @@ import SchedulePanelLoader from "@/components/schedule/SchedulePanelLoader";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
-import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";

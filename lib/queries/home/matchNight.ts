@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { GameType, MapBanType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { TIERS_LIST } from "@/lib/common/constants";
+import { TIERS_LIST } from "@/lib/common/constants/tiers";
 import { formatDate } from "@/lib/common/format";
 import { buildMapReport } from "@/lib/common/matchNight/mapReport";
 import { buildStandingsMovers, sortMovers } from "@/lib/common/matchNight/movers";

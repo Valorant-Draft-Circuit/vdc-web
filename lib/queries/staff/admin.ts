@@ -1,5 +1,6 @@
 import { getMmmrTierLinesCached } from "@/lib/common/cache";
-import { MIN_GAMES_BY_MATCH_TYPE, TIERS_LIST } from "@/lib/common/constants";
+import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { MIN_GAMES_BY_MATCH_TYPE } from "@/lib/common/constants/matchFormat";
 import {
   SeasonBoundary,
   SignupTrend,

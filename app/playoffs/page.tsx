@@ -6,7 +6,7 @@ import HorizontalTab from "@/components/tabs/HorizontalTab";
 import ListBox from "@/components/tabs/DropDown";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
-import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { listAllSeasons } from "@/lib/common/season";
 import { getUserTier } from "@/lib/queries/user/user";
 import PlayoffBracket from "@/components/playoffs/PlayoffBracket";
@@ -41,7 +41,10 @@ export default async function Playoffs({ searchParams }: Props) {
 
   if (!seasonOk || !tierOk) {
     const next = new URLSearchParams();
-    next.set("season", seasonOk ? (sp.season as string) : currentSeason.toString());
+    next.set(
+      "season",
+      seasonOk ? (sp.season as string) : currentSeason.toString(),
+    );
     next.set("tier", tierOk ? (sp.tier as string) : defaultTier);
     redirect(`/playoffs?${next.toString()}`);
   }
@@ -78,7 +81,11 @@ export default async function Playoffs({ searchParams }: Props) {
           defaultDropDownQuery={currentSeason.toString()}
         />
       </div>
-      <HorizontalTab tabElements={tabs} params="tier" defaultQuery={userTier ?? undefined} />
+      <HorizontalTab
+        tabElements={tabs}
+        params="tier"
+        defaultQuery={userTier ?? undefined}
+      />
     </div>
   );
 }

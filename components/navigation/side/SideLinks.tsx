@@ -8,15 +8,18 @@ import { useState, useEffect, type ReactNode } from "react";
 import FlameLogo from "../../theme/FlameLogo";
 import ThemeSwitch from "../../theme/ThemeSwitch";
 import { VerticalDropDown } from "../DropDowns";
-import { navLinks } from "../NavBar";
+import { getNavLinks } from "../NavBar";
 
 export default function SideLinks({
   preview,
+  pickemEnabled,
   mobileAuth,
 }: {
   preview: boolean;
+  pickemEnabled: boolean;
   mobileAuth: ReactNode;
 }) {
+  const visibleNavLinks = getNavLinks(pickemEnabled);
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 
@@ -65,7 +68,7 @@ export default function SideLinks({
             </h1>
           </div>
 
-          {navLinks.map((navItem, index) => (
+          {visibleNavLinks.map((navItem, index) => (
             <VerticalDropDown
               key={index}
               title={navItem.name}

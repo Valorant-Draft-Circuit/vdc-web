@@ -118,7 +118,7 @@ function AccoladeDescription({
     <>
       {show && (
         <div className="absolute z-10 bottom-full w-32 h-auto mb-1 left-1/2 -translate-x-1/2 text-center bg-black text-white text-xs rounded px-2 py-1 shadow-lg">
-          <h3>{desc}</h3>
+          <p>{desc}</p>
         </div>
       )}
     </>

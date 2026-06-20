@@ -1,4 +1,4 @@
-import { TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
 import { ActiveFranchise } from "@/lib/common/cache";
 import Image from "next/image";
