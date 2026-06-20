@@ -92,8 +92,10 @@ export const getPickemEnabled = cache(async (): Promise<boolean> => {
     where: { id: ControlPanelID.PICKEM_ENABLED },
     select: { value: true },
   });
+  // Fail closed: stay disabled until an admin row explicitly turns it on, so the
+  // feature is dark on a database that lacks the pickem tables/control rows.
   if (!row?.value) {
-    return true;
+    return false;
   }
   return row.value === "true";
 });

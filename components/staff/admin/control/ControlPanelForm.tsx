@@ -94,10 +94,12 @@ export default function ControlPanelForm({
       <DraftControls draftControls={groupedControls.draft} control={control} />
       <MmrControls mmrControls={groupedControls.mmr} control={control} />
       <BanControls banControls={groupedControls.ban} control={control} />
-      <PickemControls
-        pickemControls={groupedControls.pickems}
-        control={control}
-      />
+      {groupedControls.pickems.length > 0 && (
+        <PickemControls
+          pickemControls={groupedControls.pickems}
+          control={control}
+        />
+      )}
       <button
         type="submit"
         disabled={isSaving}
