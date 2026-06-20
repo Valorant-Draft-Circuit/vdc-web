@@ -1,4 +1,4 @@
-import { DISCORD_USER_HOWTO_URL } from "@/lib/common/constants/urls";
+import { DISCORD_USER_HOWTO_URL } from "@/lib/common/constants";
 
 export default function PlayerNotFound({ player }: { player: string }) {
   return (
@@ -13,7 +13,7 @@ export default function PlayerNotFound({ player }: { player: string }) {
         </div>
         <div className="flex flex-col gap-1">
           <h2 className="text-xl">Player Discord IDs</h2>
-          <p>
+          <h3>
             (Not sure how to get a player&apos;s Discord ID? click{" "}
             <a
               target="_blank"
@@ -23,16 +23,16 @@ export default function PlayerNotFound({ player }: { player: string }) {
               here!
             </a>
             )
-          </p>
+          </h3>
         </div>
         <h1 className="text-vdcRed text-3xl">OR</h1>
         <div className="flex flex-col gap-1 text-xl">
           <h2>RiotIGN#Tag but replace the &quot;#&quot; with &quot;-&quot;</h2>
-          <p>
+          <h3>
             ex) RiotIGN<span className="text-vdcRed font-bold">#</span>VDC =
             RiotIGN
             <span className="text-vdcRed font-bold">-</span>VDC
-          </p>
+          </h3>
         </div>
       </div>
     </div>

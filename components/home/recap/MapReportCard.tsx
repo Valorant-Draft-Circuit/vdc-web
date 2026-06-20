@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
-import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
-import { MAP_LIST_URL } from "@/lib/common/constants/maps";
+import {
+  MAP_LIST_URL,
+  TIER_HEX_COLOR_MAP,
+  TIERS_LIST,
+} from "@/lib/common/constants";
 import {
   RecapMapCount,
   RecapMapGame,

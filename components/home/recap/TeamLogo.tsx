@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants";
 
 export default function TeamLogo({
   logo,

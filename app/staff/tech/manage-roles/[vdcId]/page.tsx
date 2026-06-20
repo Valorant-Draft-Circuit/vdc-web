@@ -1,7 +1,7 @@
 import PlayerCard from "@/components/staff/tech/roles/PlayerCard";
 import PlayerRoleSearch from "@/components/staff/tech/roles/PlayerRoleSearch";
 import RoleSelector from "@/components/staff/tech/roles/RoleSelector";
-import { ROLES } from "@/lib/common/constants/roles";
+import { ROLES } from "@/lib/common/constants";
 import { getUser } from "@/lib/queries/user/user";
 
 export default async function Page({
@@ -21,7 +21,7 @@ export default async function Page({
     image: user?.image,
     discordName: userName,
     riotIGN: user?.Accounts.find(
-      (account) => account.providerAccountId === user.primaryRiotAccountID,
+      (account) => account.providerAccountId === user.primaryRiotAccountID
     )?.riotIGN,
   };
 

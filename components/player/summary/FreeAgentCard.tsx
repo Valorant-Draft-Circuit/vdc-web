@@ -4,8 +4,7 @@ import { Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 import { summarizeFreeAgentSeason } from "@/lib/common/player";
 import { getTeamLogoMap } from "@/lib/queries/teams/teams";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { TEAM_LOGOS_URL, TIER_COLOR_MAP } from "@/lib/common/constants";
 
 type FreeAgentStat = {
   team: number | null;

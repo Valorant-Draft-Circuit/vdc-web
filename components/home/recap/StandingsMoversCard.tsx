@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { TEAM_LOGOS_URL, TIER_HEX_COLOR_MAP } from "@/lib/common/constants";
 import { RecapMover } from "@/lib/common/matchNight/types";
 
 type Props = {

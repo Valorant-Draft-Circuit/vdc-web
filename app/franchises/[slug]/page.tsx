@@ -8,12 +8,12 @@ import {
   getFranchiseDetailsBySlugCached,
   getSeasonCached,
 } from "@/lib/common/cache";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import {
+  TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
   TIER_HEX_COLOR_MAP,
   TIER_ORDER,
-} from "@/lib/common/constants/tiers";
+} from "@/lib/common/constants";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
 import Image from "next/image";
 import Link from "next/link";
@@ -196,7 +196,9 @@ function getTeamTabMeta(franchiseInfo) {
       name: team.name,
       team,
     }))
-    .sort((a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query));
+    .sort(
+      (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query),
+    );
 }
 
 async function franchiseContainsTier(franchise, tier) {

@@ -1,11 +1,10 @@
 "use client";
 
-import { CONTROL_GROUPS } from "@/lib/common/constants/controls";
+import { CONTROL_GROUPS } from "@/lib/common/constants";
 import { useMemo, useState } from "react";
 import { Control, useForm } from "react-hook-form";
 import { ConfigSection } from "./ConfigSection";
 import {
-  DateField,
   InputField,
   MapPoolSelect,
   SelectField,
@@ -16,7 +15,6 @@ import { updateControlPanelAction } from "@/app/staff/admin/control/actions";
 import type { ControlPanelItem } from "@/lib/queries/control/control";
 
 export type ConfigItem = {
-  id: number;
   label: string;
   value: string;
   notes: string;
@@ -34,7 +32,6 @@ export default function ControlPanelForm({
   const items: ConfigItem[] = useMemo(
     () =>
       initialControls.map((item) => ({
-        id: item.id,
         label: item.label,
         value: item.value,
         notes: item.notes ?? "",
@@ -48,11 +45,11 @@ export default function ControlPanelForm({
       mmr: [],
       draft: [],
       ban: [],
-      pickems: [],
     };
-    items.forEach((item) => {
+    items.forEach((item, i) => {
+      const idx = i + 1;
       for (const [groupName, controlSet] of Object.entries(CONTROL_GROUPS)) {
-        if (controlSet.has(item.id)) {
+        if (controlSet.has(idx)) {
           groupMap[groupName].push(item);
           break;
         }
@@ -94,12 +91,6 @@ export default function ControlPanelForm({
       <DraftControls draftControls={groupedControls.draft} control={control} />
       <MmrControls mmrControls={groupedControls.mmr} control={control} />
       <BanControls banControls={groupedControls.ban} control={control} />
-      {groupedControls.pickems.length > 0 && (
-        <PickemControls
-          pickemControls={groupedControls.pickems}
-          control={control}
-        />
-      )}
       <button
         type="submit"
         disabled={isSaving}
@@ -181,26 +172,6 @@ function BanControls({
       title="Ban Order Controls"
       controls={banControls}
       control={control}
-    />
-  );
-}
-
-function PickemControls({
-  pickemControls,
-  control,
-}: ControlsSectionProps & { pickemControls: ConfigItem[] }) {
-  return (
-    <ConfigSection
-      title="Pick'ems Controls"
-      controls={pickemControls}
-      control={control}
-      renderField={(field, label) =>
-        label.toUpperCase() === "PICKEM_ADVANCE_LOCK" ? (
-          <DateField field={field} label={label} />
-        ) : (
-          <SwitchField field={field} label={label} />
-        )
-      }
     />
   );
 }
