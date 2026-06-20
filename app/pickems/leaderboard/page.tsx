@@ -15,6 +15,7 @@ import LeaderboardTable from "@/components/pickems/leaderboard/LeaderboardTable"
 import GroupLeaderboardTable from "@/components/pickems/leaderboard/GroupLeaderboardTable";
 import GroupScopeTitle from "@/components/pickems/groups/GroupScopeTitle";
 import HubButton from "@/components/pickems/common/HubButton";
+import { requirePickemsEnabled } from "@/lib/pickems/guard";
 
 export const metadata: Metadata = {
   title: "VDC | Pick'ems Leaderboard",
@@ -49,6 +50,8 @@ function parseView(raw: string | undefined): {
 }
 
 export default async function LeaderboardPage({ searchParams }: Props) {
+  await requirePickemsEnabled();
+
   const [sp, currentSeason, session] = await Promise.all([
     searchParams,
     getSeasonCached(),

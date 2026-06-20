@@ -6,6 +6,7 @@ import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getReadonlyPicks } from "@/lib/queries/pickems/getReadonlyPicks";
+import { requirePickemsEnabled } from "@/lib/pickems/guard";
 import ReadonlyPicks from "@/components/pickems/matches/ReadonlyPicks";
 import HubButton from "@/components/pickems/common/HubButton";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
@@ -33,6 +34,8 @@ export default async function ReadonlyPicksPage({
   params,
   searchParams,
 }: Props) {
+  await requirePickemsEnabled();
+
   const [{ userId }, sp, currentSeason] = await Promise.all([
     params,
     searchParams,

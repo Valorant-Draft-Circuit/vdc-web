@@ -14,6 +14,7 @@ import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import AdvanceBoardPanel from "@/components/pickems/advancement/AdvanceBoardPanel";
 import AdvancePickerSkeleton from "@/components/pickems/advancement/AdvancePickerSkeleton";
 import HubButton from "@/components/pickems/common/HubButton";
+import { requirePickemsEnabled } from "@/lib/pickems/guard";
 
 export const metadata: Metadata = {
   title: "VDC | Pick'ems Advancement",
@@ -27,6 +28,8 @@ type Props = {
 const VALID_TIERS = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
 
 export default async function AdvancementPage({ searchParams }: Props) {
+  await requirePickemsEnabled();
+
   const [sp, currentSeason, userTier, session] = await Promise.all([
     searchParams,
     getSeasonCached(),

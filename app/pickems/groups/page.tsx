@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { getMyGroups } from "@/lib/queries/pickems/getGroups";
+import { requirePickemsEnabled } from "@/lib/pickems/guard";
 import GroupsPanel from "@/components/pickems/groups/GroupsPanel";
 import HubButton from "@/components/pickems/common/HubButton";
 
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function GroupsPage() {
+  await requirePickemsEnabled();
+
   const [season, session] = await Promise.all([getSeasonCached(), auth()]);
   const userId = session?.user?.id ?? null;
 

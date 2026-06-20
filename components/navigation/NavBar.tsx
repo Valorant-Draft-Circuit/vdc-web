@@ -83,7 +83,9 @@ export function getNavLinks(pickemEnabled: boolean) {
   }
   return navLinks.map((navItem) => ({
     ...navItem,
-    links: navItem.links.filter((link) => link.href !== "/pickems"),
+    links: navItem.links.map((link) =>
+      link.href === "/pickems" ? { ...link, href: "/pickems/about" } : link,
+    ),
   }));
 }
 

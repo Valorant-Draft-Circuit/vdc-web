@@ -14,6 +14,7 @@ import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getUserTier } from "@/lib/queries/user/user";
+import { requirePickemsEnabled } from "@/lib/pickems/guard";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import PickemHubBoard from "@/components/pickems/matches/PickemHubBoard";
 import PickemHubBoardSkeleton from "@/components/pickems/matches/PickemHubBoardSkeleton";
@@ -33,6 +34,8 @@ const GHOST_PILL =
   "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-300 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-vdcGrey transition-colors hover:cursor-pointer hover:border-vdcGrey hover:text-vdcBlack dark:border-gray-600 dark:text-gray-400 dark:hover:text-vdcWhite";
 
 export default async function PickemsHub({ searchParams }: Props) {
+  await requirePickemsEnabled();
+
   const [sp, currentSeason, userTier, session] = await Promise.all([
     searchParams,
     getSeasonCached(),

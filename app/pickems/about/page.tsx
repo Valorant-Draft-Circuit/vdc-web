@@ -1,20 +1,35 @@
 import { Metadata } from "next";
 import HubButton from "@/components/pickems/common/HubButton";
+import { getPickemEnabled } from "@/lib/queries/pickems/getAdvanceBoard";
 
 export const metadata: Metadata = {
   title: "VDC | How Pick'ems work",
   description: "Rules and scoring for VDC Pick'ems.",
 };
 
-export default function PickemsAboutPage() {
+export default async function PickemsAboutPage() {
+  const enabled = await getPickemEnabled();
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold">
           How PICK<b className="text-vdcRed">&apos;</b>EMS work
         </h1>
-        <HubButton />
+        {enabled && <HubButton />}
       </div>
+
+      {!enabled && (
+        <div className="rounded-xl border border-vdcRed/40 bg-vdcRed/10 px-4 py-3">
+          <h2 className="text-sm font-bold text-vdcRed">
+            Pick&apos;ems is not yet available
+          </h2>
+          <p className="mt-1 text-sm text-vdcBlack dark:text-vdcWhite">
+            It&apos;s coming soon! Read here on how it will work once it goes
+            live!
+          </p>
+        </div>
+      )}
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-bold">Two ways to predict</h2>
@@ -36,7 +51,7 @@ export default function PickemsAboutPage() {
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-bold">Scoring</h2>
-        <p className="text-sm font-bold text-vdcRed">Match picks</p>
+        <h1 className="text-sm font-bold text-vdcRed">Match picks</h1>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
           <li>+1 for the correct winner (or correctly calling a draw)</li>
           <li>+2 for the exact series score</li>
@@ -44,7 +59,7 @@ export default function PickemsAboutPage() {
             A perfect pick (correct winner and exact score) is worth 3 points
           </li>
         </ul>
-        <p className="mt-1 text-sm font-bold text-vdcRed">Advancement</p>
+        <h1 className="mt-1 text-sm font-bold text-vdcRed">Advancement</h1>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
           <li>+2 for each team you place in the playoff cutoff</li>
           <li>+1 more for each team whose exact seed you call</li>
