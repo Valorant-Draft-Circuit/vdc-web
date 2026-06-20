@@ -3,7 +3,7 @@ import { determineTierWithTierLines, getMMRTierLines } from "@/lib/common/tier";
 import { hasFlags } from "@/lib/common/flags";
 import { normalizeAgentName } from "@/lib/common/agents";
 import { prisma } from "@/lib/prisma";
-import { Flags } from "@/prisma";
+import { ControlPanel, Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
 
 export const HEADERS = [
@@ -279,9 +279,13 @@ async function getPlayerStats(playerStatsQuery: PlayerStatsQuery) {
 }
 
 async function getStatsByTeam(teamId: number, season: number) {
+  const leagueState = await ControlPanel.getLeagueState();
+  const gameType =
+    leagueState === "COMBINES" ? GameType.COMBINE : GameType.SEASON;
+
   return prisma.playerStats.groupBy({
     where: {
-      Game: { season: season },
+      Game: { season: season, gameType: gameType },
       Player: {
         team: teamId,
       },
