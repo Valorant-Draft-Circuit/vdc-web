@@ -171,6 +171,11 @@ async function getFranchise(slug) {
           Accounts: { where: { provider: "discord" } },
         },
       },
+      AGM4: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
     },
   });
 }
@@ -336,6 +341,7 @@ export const getManagerFranchiseSlug = cache(async (userId: string) => {
         { agm1ID: userId },
         { agm2ID: userId },
         { agm3ID: userId },
+        { agm4ID: userId },
       ],
     },
     select: { slug: true },
