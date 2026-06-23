@@ -173,7 +173,12 @@ function FMLink({
 }
 
 function getAgms(franchiseInfo) {
-  const agmSlots = [franchiseInfo.AGM1, franchiseInfo.AGM2, franchiseInfo.AGM3];
+  const agmSlots = [
+    franchiseInfo.AGM1,
+    franchiseInfo.AGM2,
+    franchiseInfo.AGM3,
+    franchiseInfo.AGM4,
+  ];
   return agmSlots
     .filter(
       (
@@ -196,9 +201,7 @@ function getTeamTabMeta(franchiseInfo) {
       name: team.name,
       team,
     }))
-    .sort(
-      (a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query),
-    );
+    .sort((a, b) => TIER_ORDER.indexOf(a.query) - TIER_ORDER.indexOf(b.query));
 }
 
 async function franchiseContainsTier(franchise, tier) {

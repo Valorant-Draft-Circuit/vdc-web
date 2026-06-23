@@ -171,6 +171,11 @@ async function getFranchise(slug) {
           Accounts: { where: { provider: "discord" } },
         },
       },
+      AGM4: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
     },
   });
 }
