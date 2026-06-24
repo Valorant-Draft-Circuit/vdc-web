@@ -341,6 +341,7 @@ export const getManagerFranchiseSlug = cache(async (userId: string) => {
         { agm1ID: userId },
         { agm2ID: userId },
         { agm3ID: userId },
+        { agm4ID: userId },
       ],
     },
     select: { slug: true },
