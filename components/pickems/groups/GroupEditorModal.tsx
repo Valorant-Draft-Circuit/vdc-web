@@ -80,6 +80,11 @@ export default function GroupEditorModal({
             autoFocus
             className="rounded-lg border border-black/10 bg-vdcWhite px-3 py-2 text-sm text-vdcBlack dark:border-white/10 dark:bg-vdcBlack dark:text-vdcWhite"
           />
+          <h2 className="text-xs text-gray-500 dark:text-gray-400">
+            Group names must follow the behavior guidelines. A rule-breaking
+            name will get the group deleted and may result in moderation action
+            against you.
+          </h2>
           <h2 className="text-[11px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
             Pick an agent
           </h2>

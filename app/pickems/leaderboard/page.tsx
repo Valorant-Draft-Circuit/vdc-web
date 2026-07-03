@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
-import { GROUP_MODERATION_ROLES } from "@/lib/common/constants/roles";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
   getLeaderboard,
   type LeaderboardScope,
@@ -86,7 +86,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
 
   const canModerate =
     viewerId && (isGroupRanking || isGroupScope)
-      ? hasAccess(await getUserRoles(viewerId), GROUP_MODERATION_ROLES)
+      ? hasAccess(await getUserRoles(viewerId), MODERATION_ROLES)
       : false;
 
   const linkTier = view === "overall" ? "mythic" : view;
