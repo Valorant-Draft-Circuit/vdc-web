@@ -8,12 +8,12 @@ import {
   getFranchiseDetailsBySlugCached,
   getSeasonCached,
 } from "@/lib/common/cache";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import {
-  TEAM_LOGOS_URL,
   TIER_COLOR_MAP,
   TIER_HEX_COLOR_MAP,
   TIER_ORDER,
-} from "@/lib/common/constants";
+} from "@/lib/common/constants/tiers";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
 import Image from "next/image";
 import Link from "next/link";

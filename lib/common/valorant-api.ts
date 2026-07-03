@@ -1,4 +1,5 @@
-import { AGENTS, MAPS } from "./constants";
+import { AGENTS } from "./constants/agents";
+import { MAPS } from "./constants/maps";
 
 export type Agents = Record<string, string>;
 export type Maps = Record<string, string>;

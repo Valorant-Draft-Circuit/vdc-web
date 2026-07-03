@@ -1,5 +1,5 @@
 "use client";
-import { AGENTS, AGENTURL } from "@/lib/common/constants";
+import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
 import {
   FIELDS,
   FormattedGameStat,
@@ -120,7 +120,6 @@ export default function StatsTable({
 
   const filteredData = useMemo(() => {
     if (!data) return [];
-    console.log(currentTierOnlyFilter);
 
     let dataToReturn = data;
 

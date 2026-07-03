@@ -79,7 +79,7 @@ export default function SignupQueuePanel({ queue }: { queue: SignupQueue }) {
           })}
           {remaining > 0 && (
             <li className="text-gray-400">
-              <h3>…and {remaining} more</h3>
+              <p>…and {remaining} more</p>
             </li>
           )}
         </ul>

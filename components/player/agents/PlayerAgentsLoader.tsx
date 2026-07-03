@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { GameType } from "@prisma/client";
 import { agentToUrlSlug } from "@/lib/common/agents";
-import { TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 import {
   getPlayerAgentBreakdown,

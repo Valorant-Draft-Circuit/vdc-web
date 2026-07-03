@@ -6,9 +6,9 @@ export default function Soon() {
       <div className="flex flex-col m-auto gap-y-10">
         <div>
           <h1>COMING SOON</h1>
-          <h3 className="text-lg text-black dark:text-white font-roboto">
+          <p className="text-lg text-black dark:text-white font-roboto">
             VDC Tech Team is working hard to bring you guys more features!
-          </h3>
+          </p>
         </div>
         <Image
           className="m-auto"

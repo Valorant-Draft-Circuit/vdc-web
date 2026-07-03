@@ -14,7 +14,8 @@ import {
 } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import PlayerCard from "./PlayerCard";
-import { STATUS_LABELS, TIERS_LIST } from "@/lib/common/constants";
+import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { STATUS_LABELS } from "@/lib/common/constants/leagueStatus";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 // import { LeagueStatus } from "@prisma/client";
 

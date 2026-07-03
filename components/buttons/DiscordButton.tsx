@@ -1,5 +1,5 @@
 import { signIn } from "@/lib/auth/auth";
-import { DISCORD_LINK } from "@/lib/common/constants";
+import { DISCORD_LINK } from "@/lib/common/constants/urls";
 import Image from "next/image";
 
 type DiscordButtonProps = {
@@ -7,14 +7,17 @@ type DiscordButtonProps = {
   signInButton: boolean;
 };
 
-export default function DiscordButton({ text, signInButton }: DiscordButtonProps) {
+export default function DiscordButton({
+  text,
+  signInButton,
+}: DiscordButtonProps) {
   if (signInButton) {
     return (
       <>
         <form
           action={async () => {
             "use server";
-            await signIn('discord', { redirectTo: '/'});
+            await signIn("discord", { redirectTo: "/" });
           }}
         >
           <button

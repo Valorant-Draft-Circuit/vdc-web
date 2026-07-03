@@ -9,7 +9,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { ROLES } from "@/lib/common/constants";
+import { ROLES } from "@/lib/common/constants/roles";
 import { updateRolesAction } from "@/app/staff/tech/manage-roles/[vdcId]/actions";
 
 type Role = (typeof ROLES)[number];
@@ -144,10 +144,10 @@ export default function RoleSelector({
         </button>
         <div className="text-sm">
           {status === "success" && (
-            <h3 className="text-green-600 font-medium">Roles updated!</h3>
+            <p className="text-green-600 font-medium">Roles updated!</p>
           )}
           {status === "error" && (
-            <h3 className="text-red-600 font-medium">Error updating roles.</h3>
+            <p className="text-red-600 font-medium">Error updating roles.</p>
           )}
         </div>
       </div>

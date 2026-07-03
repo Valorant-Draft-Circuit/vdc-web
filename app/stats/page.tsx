@@ -4,7 +4,7 @@ import ListBox from "@/components/tabs/DropDown";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
 import { TabElement } from "@/components/tabs/types";
 import { getSeasonCached } from "@/lib/common/cache";
-import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants";
+import { TIER_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { listAllSeasons } from "@/lib/common/season";
 import { getUserTier } from "@/lib/queries/user/user";
 import { ControlPanel } from "@/prisma";
@@ -49,7 +49,10 @@ export default async function Page({ searchParams }: Props) {
 
   if (!seasonOk || !typeOk || !tierOk) {
     const next = new URLSearchParams();
-    next.set("season", seasonOk ? (sp.season as string) : currentSeason.toString());
+    next.set(
+      "season",
+      seasonOk ? (sp.season as string) : currentSeason.toString(),
+    );
     next.set("type", typeOk ? (sp.type as string) : defaultType);
     next.set("tier", tierOk ? (sp.tier as string) : defaultTier);
     redirect(`/stats?${next.toString()}`);

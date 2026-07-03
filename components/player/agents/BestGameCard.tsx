@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MAPS, MAP_LIST_URL, TEAM_LOGOS_URL } from "@/lib/common/constants";
+import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { MAPS, MAP_LIST_URL } from "@/lib/common/constants/maps";
 import type { BestGameRef } from "@/lib/queries/stats/getPlayerAgentBreakdown";
 import type { TeamLogoInfo, TeamLogoMap } from "@/lib/queries/teams/teams";
 

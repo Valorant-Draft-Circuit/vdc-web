@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants";
+import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
 import {
   RecapPerformer,
   RecapPerformerGame,
