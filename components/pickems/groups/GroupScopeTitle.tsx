@@ -11,6 +11,7 @@ type Props = {
   name: string;
   image: string;
   isOwner: boolean;
+  ownerName: string;
 };
 
 export default function GroupScopeTitle({
@@ -18,6 +19,7 @@ export default function GroupScopeTitle({
   name,
   image,
   isOwner,
+  ownerName,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -32,17 +34,24 @@ export default function GroupScopeTitle({
           className="object-cover"
         />
       </div>
-      <h2 className="text-lg font-extrabold">{name}</h2>
-      {isOwner && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Edit group"
-          className="text-vdcGrey transition-colors hover:cursor-pointer hover:text-vdcRed dark:text-gray-400"
-        >
-          <PencilIcon className="size-4" />
-        </button>
-      )}
+      <div>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-extrabold">{name}</h2>
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Edit group"
+              className="text-vdcGrey transition-colors hover:cursor-pointer hover:text-vdcRed dark:text-gray-400"
+            >
+              <PencilIcon className="size-4" />
+            </button>
+          )}
+        </div>
+        <h2 className="text-xs text-vdcGrey dark:text-gray-400">
+          Owned by {ownerName}
+        </h2>
+      </div>
       <GroupEditorModal
         open={open}
         onClose={() => setOpen(false)}

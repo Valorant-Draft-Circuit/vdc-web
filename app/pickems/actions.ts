@@ -5,12 +5,14 @@ import { revalidatePath } from "next/cache";
 import { Tier } from "@prisma/client";
 
 import { auth } from "@/lib/auth/auth";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { prisma } from "@/lib/prisma";
 import { getSeasonCached } from "@/lib/common/cache";
 import { correctMatchDate } from "@/lib/common/format";
 import { isLegalScore } from "@/lib/pickems/picks";
 import { slateLockTime } from "@/lib/pickems/format";
 import { AGENT_UUIDS } from "@/lib/common/constants/agents";
+import { GROUP_MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
   getAdvanceBoard,
   getAdvanceLock,
@@ -248,5 +250,22 @@ export async function leaveGroup(input: { groupId: number }): Promise<Result> {
   }
 
   revalidatePath("/pickems/groups");
+  return { ok: true };
+}
+
+export async function deleteGroup(input: { groupId: number }): Promise<Result> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthenticated" };
+  }
+
+  const roles = await getUserRoles(session.user.id);
+  if (!hasAccess(roles, GROUP_MODERATION_ROLES)) {
+    return { ok: false, error: "Not authorized" };
+  }
+
+  await prisma.pickemGroup.deleteMany({ where: { id: input.groupId } });
+  revalidatePath("/pickems/groups");
+  revalidatePath("/pickems/leaderboard");
   return { ok: true };
 }

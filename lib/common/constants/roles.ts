@@ -3,6 +3,13 @@ import { VDC_BLUE, VDC_GREEN, VDC_ORANGE, VDC_RED } from "./colors";
 
 export const SUPERUSER_ROLES = [Roles.OWNER, Roles.LEAD_TECH];
 
+export const GROUP_MODERATION_ROLES = [
+  Roles.ADMIN,
+  Roles.LEAD_TECH,
+  Roles.MODERATOR,
+  Roles.LEAD_MODERATOR,
+];
+
 export const ROLES = Object.entries(Roles)
   .filter(([key]) => isNaN(Number(key)))
   .map(([label, value]) => ({

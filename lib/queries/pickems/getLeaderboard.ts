@@ -25,8 +25,7 @@ export type LeaderRow = {
 };
 
 export type LeaderboardScope =
-  | { kind: "global" }
-  | { kind: "group"; groupId: number };
+  { kind: "global" } | { kind: "group"; groupId: number };
 
 const ALL_TIERS: Tier[] = [
   Tier.RECRUIT,
@@ -200,14 +199,14 @@ async function scoreTier(
     }
   }
 
-  const advanceActual = await getAdvanceResult(tier, season);
-  if (advanceActual.length === 0) {
-    return;
-  }
-
   const advancePicks = await prisma.pickemAdvancePick.findMany({
     where: { season, tier },
-    select: { userID: true, predictedTeam: true, predictedSeed: true },
+    select: {
+      userID: true,
+      predictedTeam: true,
+      predictedSeed: true,
+      Player: { select: { name: true, image: true } },
+    },
   });
   const advanceByUser = new Map<string, SeededTeam[]>();
   for (const pick of advancePicks) {
@@ -220,12 +219,33 @@ async function scoreTier(
     advanceByUser
       .get(pick.userID)!
       .push({ teamId: pick.predictedTeam, seed: pick.predictedSeed });
+    nameByUser.set(pick.userID, pick.Player.name);
+    imageByUser.set(pick.userID, pick.Player.image);
+  }
+
+  // Anyone who submitted an advancement pick shows on the board too, even before
+  // it resolves at playoffs (0 points until then).
+  for (const userId of advanceByUser.keys()) {
+    ensureRow(
+      userId,
+      nameByUser.get(userId) ?? null,
+      imageByUser.get(userId) ?? null,
+    );
+  }
+
+  const advanceActual = await getAdvanceResult(tier, season);
+  if (advanceActual.length === 0) {
+    return;
   }
 
   const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(
     (team) => team.id,
   );
-  for (const userId of slatesPlayedByUser.keys()) {
+  const advanceScoredUsers = new Set<string>([
+    ...slatesPlayedByUser.keys(),
+    ...advanceByUser.keys(),
+  ]);
+  for (const userId of advanceScoredUsers) {
     const row = ensureRow(
       userId,
       nameByUser.get(userId) ?? null,

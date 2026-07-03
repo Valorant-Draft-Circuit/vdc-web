@@ -2,8 +2,10 @@ import { Metadata } from "next";
 import { Tier } from "@prisma/client";
 
 import { auth } from "@/lib/auth/auth";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { GROUP_MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
   getLeaderboard,
   type LeaderboardScope,
@@ -76,6 +78,11 @@ export default async function LeaderboardPage({ searchParams }: Props) {
     viewerId ? getMyGroups(viewerId, season) : Promise.resolve([]),
   ]);
 
+  const canModerateGroups =
+    isGroupRanking && viewerId
+      ? hasAccess(await getUserRoles(viewerId), GROUP_MODERATION_ROLES)
+      : false;
+
   const linkTier = view === "overall" ? "mythic" : view;
   const activeScopeKey = isGroupRanking ? "groups" : scopeKey;
   const activeGroup =
@@ -105,11 +112,17 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           name={activeGroup.name}
           image={activeGroup.image}
           isOwner={activeGroup.isOwner}
+          ownerName={activeGroup.ownerName}
         />
       )}
 
       {isGroupRanking ? (
-        <GroupLeaderboardTable rows={groupRows} season={season} view={view} />
+        <GroupLeaderboardTable
+          rows={groupRows}
+          season={season}
+          view={view}
+          canModerate={canModerateGroups}
+        />
       ) : (
         <LeaderboardTable
           rows={rows}
