@@ -92,7 +92,12 @@ export default async function ReadonlyPicksPage({
         </Link>
       </div>
 
-      <PickemTierTabs activeTier={tier} season={season} basePath={basePath} />
+      <PickemTierTabs
+        activeTier={tier}
+        season={season}
+        basePath={basePath}
+        section={section}
+      />
 
       <div
         className="flex gap-1.5"

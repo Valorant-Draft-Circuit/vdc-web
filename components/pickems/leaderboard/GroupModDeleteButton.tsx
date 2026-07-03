@@ -9,9 +9,14 @@ import { deleteGroup } from "@/app/pickems/actions";
 type Props = {
   groupId: number;
   name: string;
+  redirectTo?: string;
 };
 
-export default function GroupModDeleteButton({ groupId, name }: Props) {
+export default function GroupModDeleteButton({
+  groupId,
+  name,
+  redirectTo,
+}: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -26,7 +31,11 @@ export default function GroupModDeleteButton({ groupId, name }: Props) {
     const result = await deleteGroup({ groupId });
     setBusy(false);
     if (result.ok) {
-      router.refresh();
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else {
+        router.refresh();
+      }
     } else {
       alert(result.error ?? "Failed to delete group.");
     }

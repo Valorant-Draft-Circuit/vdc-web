@@ -8,6 +8,7 @@ type Props = {
   activeTier: Tier;
   season: number;
   basePath: string;
+  section?: string;
 };
 
 const TAB_BASE =
@@ -25,7 +26,9 @@ export default function PickemTierTabs({
   activeTier,
   season,
   basePath,
+  section,
 }: Props) {
+  const sectionQuery = section ? `&section=${section}` : "";
   return (
     <>
       <div className="sm:hidden">
@@ -45,7 +48,7 @@ export default function PickemTierTabs({
           return (
             <Link
               key={tier}
-              href={`${basePath}?tier=${tier.toLowerCase()}&season=${season}`}
+              href={`${basePath}?tier=${tier.toLowerCase()}&season=${season}${sectionQuery}`}
               className={`${TAB_BASE} ${isActive ? TAB_ACTIVE : TAB_INACTIVE}`}
               style={accentVar}
             >

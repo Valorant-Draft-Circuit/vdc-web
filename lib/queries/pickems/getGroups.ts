@@ -48,6 +48,13 @@ export const getMyGroups = cache(
 export const getGroup = cache(async (groupId: number) => {
   return prisma.pickemGroup.findUnique({
     where: { id: groupId },
-    select: { id: true, name: true, image: true, season: true, ownerID: true },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      season: true,
+      ownerID: true,
+      Owner: { select: { name: true } },
+    },
   });
 });
