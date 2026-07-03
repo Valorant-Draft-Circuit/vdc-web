@@ -15,6 +15,7 @@ import {
   RULEBOOK_URL,
 } from "@/lib/common/constants/urls";
 import { Roles } from "@/prisma";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import { FM_ACCESS_LIST } from "@/app/staff/franchise-management/layout";
 
 export const navLinks = [
@@ -72,6 +73,11 @@ export const staffLinks = {
       name: "Franchise Management",
       href: "/staff/franchise-management",
       roles: FM_ACCESS_LIST,
+    },
+    {
+      name: "Moderation",
+      href: "/staff/moderation",
+      roles: MODERATION_ROLES,
     },
     { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
   ],

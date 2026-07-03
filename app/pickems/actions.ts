@@ -2,7 +2,7 @@
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
-import { Tier } from "@prisma/client";
+import { ModLogType, Tier } from "@prisma/client";
 
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
@@ -12,7 +12,7 @@ import { correctMatchDate } from "@/lib/common/format";
 import { isLegalScore } from "@/lib/pickems/picks";
 import { slateLockTime } from "@/lib/pickems/format";
 import { AGENT_UUIDS } from "@/lib/common/constants/agents";
-import { GROUP_MODERATION_ROLES } from "@/lib/common/constants/roles";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
   getAdvanceBoard,
   getAdvanceLock,
@@ -260,11 +260,42 @@ export async function deleteGroup(input: { groupId: number }): Promise<Result> {
   }
 
   const roles = await getUserRoles(session.user.id);
-  if (!hasAccess(roles, GROUP_MODERATION_ROLES)) {
+  if (!hasAccess(roles, MODERATION_ROLES)) {
     return { ok: false, error: "Not authorized" };
   }
 
+  const group = await prisma.pickemGroup.findUnique({
+    where: { id: input.groupId },
+    include: {
+      Owner: {
+        select: {
+          Accounts: {
+            where: { provider: "discord" },
+            select: { providerAccountId: true },
+          },
+        },
+      },
+    },
+  });
+  if (!group) {
+    return { ok: false, error: "Group not found" };
+  }
+
   await prisma.pickemGroup.deleteMany({ where: { id: input.groupId } });
+
+  const ownerDiscordId = group.Owner.Accounts[0]?.providerAccountId;
+  if (ownerDiscordId) {
+    await prisma.modLogs.create({
+      data: {
+        discordID: ownerDiscordId,
+        modID: session.user.id,
+        season: group.season,
+        type: ModLogType.NOTE,
+        message: `Deleted Pick'ems group "${group.name}" (group ${group.id}, season ${group.season}).`,
+      },
+    });
+  }
+
   revalidatePath("/pickems/groups");
   revalidatePath("/pickems/leaderboard");
   return { ok: true };
