@@ -4,7 +4,9 @@ import { format, formatDistanceToNow } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
 import {
+  ModLogDisplayType,
   PICKEM_DELETION_PREFIX,
+  classifyModLog,
   isExpiringSoon,
   parseActionedMarker,
   parsePickemDeletionDetails,
@@ -133,6 +135,19 @@ export type EscalationEntry = PlayerIdentity & {
 
 export const ESCALATION_WARNING_THRESHOLD = 5;
 
+const PICKEM_DELETION_WHERE = {
+  type: ModLogType.NOTE,
+  message: { startsWith: PICKEM_DELETION_PREFIX },
+} satisfies Prisma.ModLogsWhereInput;
+
+const EXCLUDING_PICKEM_DELETIONS = {
+  NOT: PICKEM_DELETION_WHERE,
+} satisfies Prisma.ModLogsWhereInput;
+
+const ESCALATION_WHERE = {
+  type: { not: ModLogType.NOTE },
+} satisfies Prisma.ModLogsWhereInput;
+
 export const getEscalationWatch = cache(
   async (): Promise<EscalationEntry[]> => {
     const escalationHaving = {
@@ -141,12 +156,14 @@ export const getEscalationWatch = cache(
     const [groupedByType, groupedTotals] = await Promise.all([
       prisma.modLogs.groupBy({
         by: ["discordID", "type"],
+        where: ESCALATION_WHERE,
         _count: { discordID: true },
         having: escalationHaving,
         orderBy: { _count: { discordID: "desc" } },
       }),
       prisma.modLogs.groupBy({
         by: ["discordID"],
+        where: ESCALATION_WHERE,
         _count: { discordID: true },
         having: escalationHaving,
         orderBy: { _count: { discordID: "desc" } },
@@ -206,6 +223,7 @@ export const getModeratorActivity = cache(
   async (): Promise<ModeratorActivityEntry[]> => {
     const grouped = await prisma.modLogs.groupBy({
       by: ["modID", "type"],
+      where: EXCLUDING_PICKEM_DELETIONS,
       _count: { _all: true },
     });
     if (grouped.length === 0) return [];
@@ -241,7 +259,7 @@ export const getModeratorActivity = cache(
 
 export type PlayerHistoryEntry = {
   logId: number;
-  type: ModLogType;
+  type: ModLogDisplayType;
   message: string;
   dateLabel: string;
   moderatorName: string;
@@ -277,7 +295,7 @@ export const getPlayerModHistory = cache(
       playerIgn: ign,
       entries: logs.map((log) => ({
         logId: log.id,
-        type: log.type,
+        type: classifyModLog(log.type, log.message),
         message: stripActionedMarker(log.message),
         dateLabel: format(log.date, "MMM d, yyyy"),
         moderatorName: log.Moderator.name ?? "unknown",

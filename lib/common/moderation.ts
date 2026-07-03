@@ -1,4 +1,7 @@
+import { ModLogType } from "@prisma/client";
 import { addHours, format } from "date-fns";
+
+export type ModLogDisplayType = ModLogType | "PICKEM_GROUP_DELETE";
 
 export type PickemDeletionDetails = {
   groupName: string;
@@ -16,6 +19,15 @@ export const PICKEM_DELETION_PREFIX = "Deleted Pick'ems group";
 const DELETION_DETAILS_PATTERN =
   /^Deleted Pick'ems group "(.+)" \(group (\d+), season (\d+)\)\./;
 const ACTIONED_MARKER_PATTERN = / \[actioned by (.+) on (\d{4}-\d{2}-\d{2})\]$/;
+
+export function classifyModLog(
+  type: ModLogType,
+  message: string,
+): ModLogDisplayType {
+  const isPickemDeletion =
+    type === ModLogType.NOTE && message.startsWith(PICKEM_DELETION_PREFIX);
+  return isPickemDeletion ? "PICKEM_GROUP_DELETE" : type;
+}
 
 export function parsePickemDeletionDetails(
   message: string,

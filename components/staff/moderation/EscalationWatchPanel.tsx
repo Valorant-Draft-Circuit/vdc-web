@@ -21,7 +21,9 @@ const PILL_ACTIVE = "bg-[var(--type-accent)] text-white";
 const PILL_INACTIVE =
   "text-[var(--type-accent)] hover:bg-[var(--type-accent)] hover:text-white";
 
-const FILTER_ORDER: EscalationFilter[] = ["TOTAL", ...MOD_LOG_TYPE_ORDER];
+const ESCALATION_TYPES = MOD_LOG_TYPE_ORDER.filter((type) => type !== "NOTE");
+
+const FILTER_ORDER: EscalationFilter[] = ["TOTAL", ...ESCALATION_TYPES];
 
 const PAGE_SIZE = 5;
 
