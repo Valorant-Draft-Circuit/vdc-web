@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { PencilIcon } from "@heroicons/react/16/solid";
 import { AGENTURL } from "@/lib/common/constants/agents";
+import GroupModDeleteButton from "@/components/pickems/leaderboard/GroupModDeleteButton";
 import GroupEditorModal from "./GroupEditorModal";
 
 type Props = {
@@ -12,6 +13,8 @@ type Props = {
   image: string;
   isOwner: boolean;
   ownerName: string;
+  canModerate: boolean;
+  season: number;
 };
 
 export default function GroupScopeTitle({
@@ -20,6 +23,8 @@ export default function GroupScopeTitle({
   image,
   isOwner,
   ownerName,
+  canModerate,
+  season,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -46,6 +51,13 @@ export default function GroupScopeTitle({
             >
               <PencilIcon className="size-4" />
             </button>
+          )}
+          {canModerate && (
+            <GroupModDeleteButton
+              groupId={groupId}
+              name={name}
+              redirectTo={`/pickems/leaderboard?scope=groups&season=${season}`}
+            />
           )}
         </div>
         <h2 className="text-xs text-vdcGrey dark:text-gray-400">

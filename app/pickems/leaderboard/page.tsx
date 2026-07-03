@@ -10,7 +10,7 @@ import {
   getLeaderboard,
   type LeaderboardScope,
 } from "@/lib/queries/pickems/getLeaderboard";
-import { getMyGroups } from "@/lib/queries/pickems/getGroups";
+import { getMyGroups, getGroup } from "@/lib/queries/pickems/getGroups";
 import { getGroupLeaderboard } from "@/lib/queries/pickems/getGroupLeaderboard";
 import LeaderboardScopes from "@/components/pickems/leaderboard/LeaderboardScopes";
 import LeaderboardTable from "@/components/pickems/leaderboard/LeaderboardTable";
@@ -72,23 +72,25 @@ export default async function LeaderboardPage({ searchParams }: Props) {
   const { tier, view } = parseView(viewParam);
   const viewerId = session?.user?.id ?? null;
 
-  const [rows, groupRows, groups] = await Promise.all([
+  const isGroupScope = !isGroupRanking && scope.kind === "group";
+  const scopedGroupId = scope.kind === "group" ? scope.groupId : null;
+
+  const [rows, groupRows, groups, activeGroup] = await Promise.all([
     isGroupRanking ? Promise.resolve([]) : getLeaderboard(season, tier, scope),
     isGroupRanking ? getGroupLeaderboard(season, tier) : Promise.resolve([]),
     viewerId ? getMyGroups(viewerId, season) : Promise.resolve([]),
+    isGroupScope && scopedGroupId !== null
+      ? getGroup(scopedGroupId)
+      : Promise.resolve(null),
   ]);
 
-  const canModerateGroups =
-    isGroupRanking && viewerId
+  const canModerate =
+    viewerId && (isGroupRanking || isGroupScope)
       ? hasAccess(await getUserRoles(viewerId), GROUP_MODERATION_ROLES)
       : false;
 
   const linkTier = view === "overall" ? "mythic" : view;
   const activeScopeKey = isGroupRanking ? "groups" : scopeKey;
-  const activeGroup =
-    !isGroupRanking && scope.kind === "group"
-      ? (groups.find((group) => group.id === scope.groupId) ?? null)
-      : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -111,8 +113,10 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           groupId={activeGroup.id}
           name={activeGroup.name}
           image={activeGroup.image}
-          isOwner={activeGroup.isOwner}
-          ownerName={activeGroup.ownerName}
+          isOwner={activeGroup.ownerID === viewerId}
+          ownerName={activeGroup.Owner?.name ?? "Unknown"}
+          canModerate={canModerate}
+          season={season}
         />
       )}
 
@@ -121,7 +125,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           rows={groupRows}
           season={season}
           view={view}
-          canModerate={canModerateGroups}
+          canModerate={canModerate}
         />
       ) : (
         <LeaderboardTable
