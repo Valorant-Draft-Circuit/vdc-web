@@ -9,6 +9,7 @@ export type GroupSummary = {
   season: number;
   joinCode: string;
   isOwner: boolean;
+  ownerName: string;
   memberCount: number;
 };
 
@@ -25,6 +26,7 @@ export const getMyGroups = cache(
             season: true,
             joinCode: true,
             ownerID: true,
+            Owner: { select: { name: true } },
             _count: { select: { Members: true } },
           },
         },
@@ -37,6 +39,7 @@ export const getMyGroups = cache(
       season: m.Group.season,
       joinCode: m.Group.joinCode,
       isOwner: m.Group.ownerID === userId,
+      ownerName: m.Group.Owner?.name ?? "Unknown",
       memberCount: m.Group._count.Members,
     }));
   },

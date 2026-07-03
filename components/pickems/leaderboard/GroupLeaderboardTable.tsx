@@ -3,11 +3,13 @@ import Image from "next/image";
 
 import { AGENTURL } from "@/lib/common/constants/agents";
 import type { GroupLeaderRow } from "@/lib/queries/pickems/getGroupLeaderboard";
+import GroupModDeleteButton from "./GroupModDeleteButton";
 
 type Props = {
   rows: GroupLeaderRow[];
   season: number;
   view: string;
+  canModerate?: boolean;
 };
 
 const RANK_COLOR: Record<number, string> = {
@@ -20,7 +22,12 @@ const HEADER_BASE =
   "sticky top-0 z-10 border-b border-gray-300 bg-gray-100 px-2.5 py-3 text-[10px] uppercase tracking-wide text-vdcGrey backdrop-blur-sm dark:border-gray-600 dark:bg-vdcBlack dark:text-gray-400";
 const CELL_BASE = "border-b border-gray-200 px-2.5 py-2.5 dark:border-gray-600";
 
-export default function GroupLeaderboardTable({ rows, season, view }: Props) {
+export default function GroupLeaderboardTable({
+  rows,
+  season,
+  view,
+  canModerate = false,
+}: Props) {
   if (rows.length === 0) {
     return (
       <h2 className="py-10 text-center text-sm text-vdcGrey dark:text-gray-400">
@@ -38,6 +45,7 @@ export default function GroupLeaderboardTable({ rows, season, view }: Props) {
             <th className={`${HEADER_BASE} text-left`}>Group</th>
             <th className={`${HEADER_BASE} text-right`}>Avg pts</th>
             <th className={`${HEADER_BASE} text-right`}>Members</th>
+            {canModerate && <th className={`${HEADER_BASE} text-right`} />}
           </tr>
         </thead>
         <tbody>
@@ -83,6 +91,14 @@ export default function GroupLeaderboardTable({ rows, season, view }: Props) {
                     {row.participantCount}/{row.memberCount}
                   </h2>
                 </td>
+                {canModerate && (
+                  <td className={`${CELL_BASE} text-right`}>
+                    <GroupModDeleteButton
+                      groupId={row.groupId}
+                      name={row.name}
+                    />
+                  </td>
+                )}
               </tr>
             );
           })}
