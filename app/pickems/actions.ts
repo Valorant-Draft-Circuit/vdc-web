@@ -290,6 +290,7 @@ export async function deleteGroup(input: { groupId: number }): Promise<Result> {
         discordID: ownerDiscordId,
         modID: session.user.id,
         season: group.season,
+        // TODO: change to ModLogType.PICKEM_GROUP_DELETE once added to the prisma enum
         type: ModLogType.NOTE,
         message: `Deleted Pick'ems group "${group.name}" (group ${group.id}, season ${group.season}).`,
       },

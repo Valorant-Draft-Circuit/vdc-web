@@ -56,6 +56,16 @@ export default function ActiveSanctionsPanel({
                 <h2 className="hidden truncate text-xs text-gray-400 sm:block">
                   by {sanction.moderatorName}
                 </h2>
+                {sanction.postMortemUrl && (
+                  <a
+                    href={sanction.postMortemUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 text-xs text-vdcBlue hover:opacity-80"
+                  >
+                    <h2>post mortem</h2>
+                  </a>
+                )}
               </div>
               <h2
                 className={`shrink-0 text-xs ${

@@ -20,6 +20,9 @@ const DELETION_DETAILS_PATTERN =
   /^Deleted Pick'ems group "(.+)" \(group (\d+), season (\d+)\)\./;
 const ACTIONED_MARKER_PATTERN = / \[actioned by (.+) on (\d{4}-\d{2}-\d{2})\]$/;
 
+// TODO: once PICKEM_GROUP_DELETE is added to the prisma ModLogType enum
+// (write it in deleteGroup + backfill old NOTE rows), drop this
+// message-prefix classification and read log.type directly.
 export function classifyModLog(
   type: ModLogType,
   message: string,
@@ -63,4 +66,12 @@ export function stripActionedMarker(message: string): string {
 
 export function isExpiringSoon(expires: Date, now: Date): boolean {
   return expires <= addHours(now, 48);
+}
+
+const POST_MORTEM_URL_PATTERN = /https?:\/\/\S*post[-_]?mortems?\S*/i;
+
+export function extractPostMortemUrl(message: string): string | null {
+  const match = message.match(POST_MORTEM_URL_PATTERN);
+  if (!match) return null;
+  return match[0].replace(/[).,>\]]+$/, "");
 }

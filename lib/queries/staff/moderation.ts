@@ -7,6 +7,7 @@ import {
   ModLogDisplayType,
   PICKEM_DELETION_PREFIX,
   classifyModLog,
+  extractPostMortemUrl,
   isExpiringSoon,
   parseActionedMarker,
   parsePickemDeletionDetails,
@@ -46,6 +47,7 @@ export type SanctionEntry = PlayerIdentity & {
   dateLabel: string;
   expiresLabel: string | null;
   expiringSoon: boolean;
+  postMortemUrl: string | null;
 };
 
 function toSanctionEntry(log: ModLogWithNames, now: Date): SanctionEntry {
@@ -56,6 +58,7 @@ function toSanctionEntry(log: ModLogWithNames, now: Date): SanctionEntry {
     type: log.type,
     moderatorName: log.Moderator.name ?? "unknown",
     message: log.message,
+    postMortemUrl: extractPostMortemUrl(log.message),
     dateLabel: format(log.date, "MMM d, yyyy"),
     expiresLabel: hasFutureExpiry
       ? `expires ${formatDistanceToNow(log.expires!, { addSuffix: true })}`
