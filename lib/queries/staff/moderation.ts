@@ -3,6 +3,7 @@ import { ModLogType, Prisma } from "@prisma/client";
 import { format, formatDistanceToNow } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
+import { MOD_TOOLS_EPOCH } from "@/prisma";
 import {
   ModLogDisplayType,
   PICKEM_DELETION_PREFIX,
@@ -11,6 +12,7 @@ import {
   isExpiringSoon,
   parseActionedMarker,
   parsePickemDeletionDetails,
+  parseSeasonBanMarker,
   stripActionedMarker,
 } from "@/lib/common/moderation";
 
@@ -75,6 +77,17 @@ export type SanctionEntry = PlayerIdentity & {
   postMortemUrl: string | null;
 };
 
+function sanctionExpiryLabel(log: ModLogWithNames, now: Date): string | null {
+  if (log.expires !== null && log.expires > now) {
+    return `expires ${formatDistanceToNow(log.expires, { addSuffix: true })}`;
+  }
+  const bannedThroughSeason = parseSeasonBanMarker(log.message);
+  if (bannedThroughSeason !== null) {
+    return `banned through season ${bannedThroughSeason}`;
+  }
+  return null;
+}
+
 function toSanctionEntry(
   log: ModLogWithNames,
   now: Date,
@@ -89,9 +102,7 @@ function toSanctionEntry(
     message: log.message,
     postMortemUrl: extractPostMortemUrl(log.message),
     dateLabel: format(log.date, "MMM d, yyyy"),
-    expiresLabel: hasFutureExpiry
-      ? `expires ${formatDistanceToNow(log.expires!, { addSuffix: true })}`
-      : null,
+    expiresLabel: sanctionExpiryLabel(log, now),
     expiringSoon: hasFutureExpiry && isExpiringSoon(log.expires!, now),
   };
 }
@@ -102,6 +113,7 @@ export const getActiveSanctions = cache(async (): Promise<SanctionEntry[]> => {
     where: {
       type: { in: [ModLogType.MUTE, ModLogType.BAN] },
       expires: { gt: now },
+      date: { gte: MOD_TOOLS_EPOCH },
     },
     include: MOD_LOG_NAMES_INCLUDE,
     orderBy: { expires: "asc" },
@@ -311,11 +323,12 @@ export const getPlayerModHistory = cache(
         },
       },
     });
-    const discordId = user?.Accounts[0]?.providerAccountId;
-    if (!discordId) return null;
+    const discordIds =
+      user?.Accounts.map((account) => account.providerAccountId) ?? [];
+    if (discordIds.length === 0) return null;
 
     const logs = await prisma.modLogs.findMany({
-      where: { discordID: discordId },
+      where: { discordID: { in: discordIds } },
       include: { Moderator: { select: { name: true } } },
       orderBy: { date: "desc" },
     });

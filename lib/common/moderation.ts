@@ -68,6 +68,14 @@ export function isExpiringSoon(expires: Date, now: Date): boolean {
   return expires <= addHours(now, 48);
 }
 
+// Format owned by the bot: ModLogs.seasonBanMarker in prisma/_ModLogs.ts
+const SEASON_BAN_MARKER_PATTERN = /\[Banned through Season (\d+)\]/;
+
+export function parseSeasonBanMarker(message: string): number | null {
+  const match = message.match(SEASON_BAN_MARKER_PATTERN);
+  return match ? Number(match[1]) : null;
+}
+
 const POST_MORTEM_URL_PATTERN = /https?:\/\/\S*post[-_]?mortems?\S*/i;
 
 export function extractPostMortemUrl(message: string): string | null {
