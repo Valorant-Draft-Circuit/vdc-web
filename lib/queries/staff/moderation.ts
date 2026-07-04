@@ -20,7 +20,6 @@ const PLAYER_IDENTITY_SELECT = {
 } satisfies Prisma.UserSelect;
 
 const MOD_LOG_NAMES_INCLUDE = {
-  Player: { select: { User: { select: PLAYER_IDENTITY_SELECT } } },
   Moderator: { select: { name: true } },
 } satisfies Prisma.ModLogsInclude;
 
@@ -33,10 +32,36 @@ type PlayerIdentity = {
   playerIgn: string | null;
 };
 
-function resolvePlayerIdentity(log: ModLogWithNames): PlayerIdentity {
-  const user = log.Player.User;
-  const ign = user.PrimaryRiotAccount?.riotIGN ?? null;
-  return { playerName: ign ?? user.name ?? log.discordID, playerIgn: ign };
+async function getIdentitiesByDiscordId(
+  discordIds: string[],
+): Promise<Map<string, PlayerIdentity>> {
+  const identityByDiscordId = new Map<string, PlayerIdentity>();
+  if (discordIds.length === 0) return identityByDiscordId;
+
+  const accounts = await prisma.account.findMany({
+    where: { providerAccountId: { in: discordIds } },
+    select: {
+      providerAccountId: true,
+      User: { select: PLAYER_IDENTITY_SELECT },
+    },
+  });
+  for (const account of accounts) {
+    const ign = account.User.PrimaryRiotAccount?.riotIGN ?? null;
+    identityByDiscordId.set(account.providerAccountId, {
+      playerName: ign ?? account.User.name ?? account.providerAccountId,
+      playerIgn: ign,
+    });
+  }
+  return identityByDiscordId;
+}
+
+function identityFor(
+  identities: Map<string, PlayerIdentity>,
+  discordID: string,
+): PlayerIdentity {
+  return (
+    identities.get(discordID) ?? { playerName: discordID, playerIgn: null }
+  );
 }
 
 export type SanctionEntry = PlayerIdentity & {
@@ -50,10 +75,14 @@ export type SanctionEntry = PlayerIdentity & {
   postMortemUrl: string | null;
 };
 
-function toSanctionEntry(log: ModLogWithNames, now: Date): SanctionEntry {
+function toSanctionEntry(
+  log: ModLogWithNames,
+  now: Date,
+  identity: PlayerIdentity,
+): SanctionEntry {
   const hasFutureExpiry = log.expires !== null && log.expires > now;
   return {
-    ...resolvePlayerIdentity(log),
+    ...identity,
     logId: log.id,
     type: log.type,
     moderatorName: log.Moderator.name ?? "unknown",
@@ -78,7 +107,12 @@ export const getActiveSanctions = cache(async (): Promise<SanctionEntry[]> => {
     orderBy: { expires: "asc" },
   });
 
-  return logs.map((log) => toSanctionEntry(log, now));
+  const identities = await getIdentitiesByDiscordId([
+    ...new Set(logs.map((log) => log.discordID)),
+  ]);
+  return logs.map((log) =>
+    toSanctionEntry(log, now, identityFor(identities, log.discordID)),
+  );
 });
 
 export const getBans = cache(async (): Promise<SanctionEntry[]> => {
@@ -89,7 +123,12 @@ export const getBans = cache(async (): Promise<SanctionEntry[]> => {
     orderBy: { date: "desc" },
   });
 
-  return logs.map((log) => toSanctionEntry(log, now));
+  const identities = await getIdentitiesByDiscordId([
+    ...new Set(logs.map((log) => log.discordID)),
+  ]);
+  return logs.map((log) =>
+    toSanctionEntry(log, now, identityFor(identities, log.discordID)),
+  );
 });
 
 export type PickemDeletionEntry = PlayerIdentity & {
@@ -112,11 +151,14 @@ export const getPickemDeletionQueue = cache(
       orderBy: { date: "desc" },
     });
 
+    const identities = await getIdentitiesByDiscordId([
+      ...new Set(logs.map((log) => log.discordID)),
+    ]);
     return logs.map((log) => {
       const details = parsePickemDeletionDetails(log.message);
       const marker = parseActionedMarker(log.message);
       return {
-        ...resolvePlayerIdentity(log),
+        ...identityFor(identities, log.discordID),
         logId: log.id,
         groupName: details?.groupName ?? null,
         rawMessage: log.message,
@@ -187,28 +229,12 @@ export const getEscalationWatch = cache(
     ];
     if (grouped.length === 0) return [];
 
-    const discordIds = [...new Set(grouped.map((row) => row.discordID))];
-    const accounts = await prisma.account.findMany({
-      where: { providerAccountId: { in: discordIds } },
-      select: {
-        providerAccountId: true,
-        User: { select: PLAYER_IDENTITY_SELECT },
-      },
-    });
-    const identityByDiscordId = new Map<string, PlayerIdentity>();
-    for (const account of accounts) {
-      const ign = account.User.PrimaryRiotAccount?.riotIGN ?? null;
-      identityByDiscordId.set(account.providerAccountId, {
-        playerName: ign ?? account.User.name ?? account.providerAccountId,
-        playerIgn: ign,
-      });
-    }
+    const identities = await getIdentitiesByDiscordId([
+      ...new Set(grouped.map((row) => row.discordID)),
+    ]);
 
     return grouped.map((row) => ({
-      ...(identityByDiscordId.get(row.discordID) ?? {
-        playerName: row.discordID,
-        playerIgn: null,
-      }),
+      ...identityFor(identities, row.discordID),
       discordID: row.discordID,
       type: row.type,
       logCount: row._count.discordID,
