@@ -22,6 +22,14 @@ export async function getSignupState() {
   return response.value;
 }
 
+export async function getLeagueState(): Promise<string | null> {
+  const row = await prisma.controlPanel.findFirst({
+    where: { id: ControlPanelID.LEAGUE_STATE },
+    select: { value: true },
+  });
+  return row?.value ?? null;
+}
+
 export async function getAllControlPanel(): Promise<ControlPanelItem[]> {
   const rows = await prisma.controlPanel.findMany({ orderBy: { id: "asc" } });
   return rows.map((row) => ({

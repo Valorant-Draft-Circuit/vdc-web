@@ -1,12 +1,7 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Tier } from "@prisma/client";
-import {
-  QuestionMarkCircleIcon,
-  UserGroupIcon,
-} from "@heroicons/react/16/solid";
 
 import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
@@ -17,12 +12,13 @@ import {
   requirePickemsEnabled,
 } from "@/lib/pickems/guard";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
-import HubOverviewPanel from "@/components/pickems/hub/HubOverviewPanel";
-import HubOverviewSkeleton from "@/components/pickems/hub/HubOverviewSkeleton";
+import PickemHubBoard from "@/components/pickems/matches/PickemHubBoard";
+import PickemHubBoardSkeleton from "@/components/pickems/matches/PickemHubBoardSkeleton";
+import HubButton from "@/components/pickems/common/HubButton";
 
 export const metadata: Metadata = {
-  title: "VDC | Pick'ems",
-  description: "Predict match scores, playoff advancement, and the bracket.",
+  title: "VDC | Pick'ems Matches",
+  description: "Predict match scores per match day.",
 };
 
 type Props = {
@@ -31,15 +27,7 @@ type Props = {
 
 const VALID_TIERS = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
 
-const GHOST_PILL =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-300 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-vdcGrey transition-colors hover:cursor-pointer hover:border-vdcGrey hover:text-vdcBlack dark:border-gray-600 dark:text-gray-400 dark:hover:text-vdcWhite";
-
-const VALID_BOARDS = new Set([
-  "overall",
-  ...TIERS_LIST.map((t) => t.toLowerCase()),
-]);
-
-export default async function PickemsHub({ searchParams }: Props) {
+export default async function MatchPicksPage({ searchParams }: Props) {
   await requirePickemsEnabled();
 
   const [sp, currentSeason, userTier, session] = await Promise.all([
@@ -62,7 +50,7 @@ export default async function PickemsHub({ searchParams }: Props) {
       userTierSlug && VALID_TIERS.has(userTierSlug)
         ? userTierSlug
         : Tier.MYTHIC.toLowerCase();
-    redirect(`/pickems?tier=${defaultTier}&season=${currentSeason}`);
+    redirect(`/pickems/matches?tier=${defaultTier}&season=${currentSeason}`);
   }
 
   const tier = tierParam.toUpperCase() as Tier;
@@ -70,20 +58,14 @@ export default async function PickemsHub({ searchParams }: Props) {
   const userId = session?.user?.id ?? null;
   const accent = TIER_HEX_COLOR_MAP[tier];
 
-  const boardParam =
-    typeof sp.board === "string" && VALID_BOARDS.has(sp.board.toLowerCase())
-      ? sp.board.toLowerCase()
-      : "overall";
-  const boardTier =
-    boardParam === "overall" ? null : (boardParam.toUpperCase() as Tier);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-wide">
-            PICK<b className="text-vdcRed">&apos;</b>EMS
-          </h1>
+          <HubButton
+            href={`/pickems?tier=${tier.toLowerCase()}&season=${season}`}
+          />
+          <h1 className="text-xl font-bold">Match Picks</h1>
           <h2
             className="rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
             style={{ backgroundColor: accent }}
@@ -91,30 +73,20 @@ export default async function PickemsHub({ searchParams }: Props) {
             {tier}
           </h2>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href="/pickems/groups" className={GHOST_PILL}>
-            <UserGroupIcon className="size-4" />
-            <h1>Groups</h1>
-          </Link>
-          <Link href="/pickems/about" className={GHOST_PILL}>
-            <QuestionMarkCircleIcon className="size-4" />
-            <h1>How to play</h1>
-          </Link>
-        </div>
       </div>
 
-      <PickemTierTabs activeTier={tier} season={season} basePath="/pickems" />
+      <PickemTierTabs
+        activeTier={tier}
+        season={season}
+        basePath="/pickems/matches"
+      />
 
-      <Suspense
-        key={`${tier}-${season}-${boardParam}`}
-        fallback={<HubOverviewSkeleton />}
-      >
-        <HubOverviewPanel
+      <Suspense key={`${tier}-${season}`} fallback={<PickemHubBoardSkeleton />}>
+        <PickemHubBoard
           tier={tier}
           season={season}
           userId={userId}
           accent={accent}
-          boardTier={boardTier}
         />
       </Suspense>
     </div>

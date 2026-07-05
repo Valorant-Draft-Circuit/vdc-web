@@ -71,7 +71,11 @@ function EmptyRow({ team }: { team?: SeriesSide["team"] }) {
       <h2 className="w-4 text-xs text-center flex-none text-gray-400">
         {team?.seed ?? "-"}
       </h2>
-      <div className="w-5 h-5 rounded bg-gray-200 dark:bg-gray-800 flex-none" />
+      {team ? (
+        <TeamLogo logo={team.logo} alt={team.franchiseSlug} />
+      ) : (
+        <div className="w-5 h-5 rounded bg-gray-200 dark:bg-gray-800 flex-none" />
+      )}
       <h2 className="flex-1 truncate text-sm italic text-gray-400">
         {team?.name ?? "TBD"}
       </h2>
@@ -90,9 +94,9 @@ export default function MatchupCard({
   if (slot.kind === "tbd") {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
-        <EmptyRow />
+        <EmptyRow team={slot.home} />
         <div className="border-t border-gray-200 dark:border-gray-700" />
-        <EmptyRow />
+        <EmptyRow team={slot.away} />
       </div>
     );
   }
@@ -102,17 +106,28 @@ export default function MatchupCard({
       <div className="rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 px-3 py-2">
           <p className="w-4 text-xs text-center flex-none text-gray-500">
-            {slot.team.seed}
+            {slot.team?.seed ?? "-"}
           </p>
-          <TeamLogo logo={slot.team.logo} alt={slot.team.franchiseSlug} />
-          <Link
-            href={`/franchises/${slot.team.franchiseSlug}?team=${tier}`}
-            className="flex-1 truncate"
-          >
-            <h2 className="truncate text-sm hover:underline">
-              {slot.team.name}
-            </h2>
-          </Link>
+          {slot.team ? (
+            <>
+              <TeamLogo logo={slot.team.logo} alt={slot.team.franchiseSlug} />
+              <Link
+                href={`/franchises/${slot.team.franchiseSlug}?team=${tier}`}
+                className="flex-1 truncate"
+              >
+                <h2 className="truncate text-sm hover:underline">
+                  {slot.team.name}
+                </h2>
+              </Link>
+            </>
+          ) : (
+            <>
+              <div className="w-5 h-5 rounded bg-gray-200 dark:bg-gray-800 flex-none" />
+              <h2 className="flex-1 truncate text-sm italic text-gray-400">
+                TBD
+              </h2>
+            </>
+          )}
           <h1 className="text-[10px] uppercase tracking-wide text-gray-400 flex-none">
             Bye
           </h1>

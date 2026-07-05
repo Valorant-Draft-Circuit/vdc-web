@@ -14,6 +14,12 @@ import {
 } from "@/lib/pickems/picks";
 import { getAdvanceResult } from "./getAdvanceResult";
 import { getTeamsInSeason } from "@/lib/queries/teams/teams";
+import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
+import {
+  realBracketResults,
+  scoreBracketPicks,
+  type BracketPick,
+} from "@/lib/pickems/bracket";
 
 export type LeaderRow = {
   userId: string;
@@ -234,32 +240,77 @@ async function scoreTier(
   }
 
   const advanceActual = await getAdvanceResult(tier, season);
-  if (advanceActual.length === 0) {
+  if (advanceActual.length > 0) {
+    const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(
+      (team) => team.id,
+    );
+    const advanceScoredUsers = new Set<string>([
+      ...slatesPlayedByUser.keys(),
+      ...advanceByUser.keys(),
+    ]);
+    for (const userId of advanceScoredUsers) {
+      const row = ensureRow(
+        userId,
+        nameByUser.get(userId) ?? null,
+        imageByUser.get(userId) ?? null,
+      );
+      const predicted =
+        advanceByUser.get(userId) ??
+        randomAdvanceSet(
+          userId,
+          season,
+          tier,
+          teamIdsInSeason,
+          advanceActual.length,
+        );
+      row.points += scoreAdvancePick(predicted, advanceActual);
+    }
+  }
+
+  const bracketPicks = await prisma.pickemBracketPick.findMany({
+    where: { season, tier },
+    select: {
+      userID: true,
+      round: true,
+      slot: true,
+      predictedTeam: true,
+      predictedLoserGames: true,
+      Player: { select: { name: true, image: true } },
+    },
+  });
+  if (bracketPicks.length === 0) {
     return;
   }
 
-  const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(
-    (team) => team.id,
-  );
-  const advanceScoredUsers = new Set<string>([
-    ...slatesPlayedByUser.keys(),
-    ...advanceByUser.keys(),
-  ]);
-  for (const userId of advanceScoredUsers) {
+  const bracketPicksByUser = new Map<string, BracketPick[]>();
+  for (const pick of bracketPicks) {
+    if (isExcluded(pick.userID)) {
+      continue;
+    }
+    if (!bracketPicksByUser.has(pick.userID)) {
+      bracketPicksByUser.set(pick.userID, []);
+    }
+    bracketPicksByUser.get(pick.userID)!.push({
+      round: pick.round,
+      slot: pick.slot,
+      teamId: pick.predictedTeam,
+      loserGames: pick.predictedLoserGames,
+    });
+    nameByUser.set(pick.userID, pick.Player.name);
+    imageByUser.set(pick.userID, pick.Player.image);
+  }
+
+  const bracket = await getPlayoffBracket(tier, season);
+  const bracketResults = realBracketResults(bracket);
+  for (const [userId, userPicks] of bracketPicksByUser) {
     const row = ensureRow(
       userId,
       nameByUser.get(userId) ?? null,
       imageByUser.get(userId) ?? null,
     );
-    const predicted =
-      advanceByUser.get(userId) ??
-      randomAdvanceSet(
-        userId,
-        season,
-        tier,
-        teamIdsInSeason,
-        advanceActual.length,
-      );
-    row.points += scoreAdvancePick(predicted, advanceActual);
+    const score = scoreBracketPicks(userPicks, bracketResults);
+    row.points += score.points;
+    row.correct += score.correct;
+    row.resolved += score.resolved;
   }
 }

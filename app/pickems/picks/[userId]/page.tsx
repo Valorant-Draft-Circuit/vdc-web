@@ -6,8 +6,16 @@ import { ArrowLeftIcon } from "@heroicons/react/16/solid";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getReadonlyPicks } from "@/lib/queries/pickems/getReadonlyPicks";
-import { requirePickemsEnabled } from "@/lib/pickems/guard";
+import {
+  getBracketBoard,
+  getUserBracketPicks,
+} from "@/lib/queries/pickems/getBracketBoard";
+import {
+  PICKEM_FIRST_SEASON,
+  requirePickemsEnabled,
+} from "@/lib/pickems/guard";
 import ReadonlyPicks from "@/components/pickems/matches/ReadonlyPicks";
+import BracketPicker from "@/components/pickems/bracket/BracketPicker";
 import HubButton from "@/components/pickems/common/HubButton";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
@@ -47,19 +55,31 @@ export default async function ReadonlyPicksPage({
       ? sp.tier.toLowerCase()
       : "mythic";
   const season =
-    typeof sp.season === "string" && !Number.isNaN(Number(sp.season))
+    typeof sp.season === "string" &&
+    !Number.isNaN(Number(sp.season)) &&
+    Number(sp.season) >= PICKEM_FIRST_SEASON
       ? Number(sp.season)
       : currentSeason;
-  const section = sp.section === "advancement" ? "advancement" : "matches";
+  const section =
+    sp.section === "advancement"
+      ? "advancement"
+      : sp.section === "bracket"
+        ? "bracket"
+        : "matches";
   const tier = tierParam.toUpperCase() as Tier;
   const accent = TIER_HEX_COLOR_MAP[tier];
   const basePath = `/pickems/picks/${userId}`;
 
-  const { playerName, playerImage, slates, advance } = await getReadonlyPicks(
-    userId,
-    tier,
-    season,
-  );
+  const [{ playerName, playerImage, slates, advance }, bracketData] =
+    await Promise.all([
+      getReadonlyPicks(userId, tier, season),
+      section === "bracket"
+        ? Promise.all([
+            getBracketBoard(tier, season),
+            getUserBracketPicks(userId, season, tier),
+          ])
+        : Promise.resolve(null),
+    ]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -115,15 +135,40 @@ export default async function ReadonlyPicksPage({
         >
           <h1>Advancement Picks</h1>
         </Link>
+        <Link
+          href={`${basePath}?tier=${tierParam}&season=${season}&section=bracket`}
+          className={`${SECTION_PILL_BASE} ${section === "bracket" ? SECTION_PILL_ACTIVE : SECTION_PILL_INACTIVE}`}
+        >
+          <h1>Bracket Picks</h1>
+        </Link>
       </div>
 
-      <ReadonlyPicks
-        slates={slates}
-        advance={advance}
-        accent={accent}
-        tier={tierParam}
-        section={section}
-      />
+      {section === "bracket" ? (
+        bracketData &&
+        bracketData[0].lock !== null &&
+        bracketData[0].lock <= new Date() ? (
+          <BracketPicker
+            bracket={bracketData[0].bracket}
+            initial={bracketData[1]}
+            tier={tier}
+            locked
+            accent={accent}
+            canSave={false}
+          />
+        ) : (
+          <p className="py-10 text-center text-sm text-vdcGrey dark:text-gray-400">
+            Bracket picks are hidden until the bracket locks.
+          </p>
+        )
+      ) : (
+        <ReadonlyPicks
+          slates={slates}
+          advance={advance}
+          accent={accent}
+          tier={tierParam}
+          section={section}
+        />
+      )}
     </div>
   );
 }

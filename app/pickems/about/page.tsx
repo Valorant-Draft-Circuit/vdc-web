@@ -46,6 +46,11 @@ export default async function PickemsAboutPage() {
             <b>Seeded advancement</b>: predict which teams make the playoff
             cutoff, in seed order (1 = top seed).
           </li>
+          <li>
+            <b>Playoff bracket</b>: once playoffs are seeded, fill out the
+            whole bracket by typing each series score. The winner advances
+            automatically.
+          </li>
         </ul>
       </section>
 
@@ -64,6 +69,18 @@ export default async function PickemsAboutPage() {
           <li>+2 for each team you place in the playoff cutoff</li>
           <li>+1 more for each team whose exact seed you call</li>
         </ul>
+        <h1 className="mt-1 text-sm font-bold text-vdcRed">Playoff bracket</h1>
+        <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
+          <li>
+            Points per correct round winner scale by round: Round 1 (10-team
+            brackets) 3, Quarterfinals 5, Semifinals 10, Final 20
+          </li>
+          <li>Calling the exact series score doubles that pick&apos;s points</li>
+          <li>
+            Your pick counts whenever your predicted team wins its real match
+            in that round, even if their opponent differs from your bracket
+          </li>
+        </ul>
       </section>
 
       <section className="flex flex-col gap-2">
@@ -80,6 +97,11 @@ export default async function PickemsAboutPage() {
           <li>
             If you skip a pick on a slate you played, a random legal pick is
             filled in for you at lock, so you are never blank.
+          </li>
+          <li>
+            The bracket locks 12 hours before the first playoff match. It must
+            be submitted complete, and skipping it scores zero bracket points.
+            There is no random fill.
           </li>
         </ul>
       </section>

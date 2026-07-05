@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import MatchupCard from "./MatchupCard";
+import BracketConnectors from "./BracketConnectors";
 
 export default async function PlayoffBracket({
   tier,
@@ -38,6 +39,12 @@ export default async function PlayoffBracket({
           shown as played.
         </h2>
       )}
+      {bracket.isInferable && !bracket.seeded && (
+        <h2 className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          The bracket is set once the regular season ends; matchups appear here
+          when playoffs begin.
+        </h2>
+      )}
       <div className="flex w-full items-stretch">
         {bracket.rounds.map((round, i) => (
           <Fragment key={i}>
@@ -63,17 +70,10 @@ export default async function PlayoffBracket({
             </div>
 
             {showConnectors && i < bracket.rounds.length - 1 && (
-              <div className="flex-1 min-w-[2.5rem] flex flex-col">
-                <div className="h-8" />
-                <div className="flex-1 flex flex-col">
-                  {bracket.rounds[i + 1].slots.map((_, k) => (
-                    <div key={k} className="bk-elbow relative flex-1">
-                      <div className="bk-elbow-v" />
-                      <div className="bk-elbow-o" />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <BracketConnectors
+                prevRound={round}
+                nextRound={bracket.rounds[i + 1]}
+              />
             )}
           </Fragment>
         ))}

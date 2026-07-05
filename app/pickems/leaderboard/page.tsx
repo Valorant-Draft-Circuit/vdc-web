@@ -17,7 +17,10 @@ import LeaderboardTable from "@/components/pickems/leaderboard/LeaderboardTable"
 import GroupLeaderboardTable from "@/components/pickems/leaderboard/GroupLeaderboardTable";
 import GroupScopeTitle from "@/components/pickems/groups/GroupScopeTitle";
 import HubButton from "@/components/pickems/common/HubButton";
-import { requirePickemsEnabled } from "@/lib/pickems/guard";
+import {
+  PICKEM_FIRST_SEASON,
+  requirePickemsEnabled,
+} from "@/lib/pickems/guard";
 
 export const metadata: Metadata = {
   title: "VDC | Pick'ems Leaderboard",
@@ -63,7 +66,9 @@ export default async function LeaderboardPage({ searchParams }: Props) {
   const scopeParam = typeof sp.scope === "string" ? sp.scope : undefined;
   const viewParam = typeof sp.view === "string" ? sp.view : undefined;
   const season =
-    typeof sp.season === "string" && !Number.isNaN(Number(sp.season))
+    typeof sp.season === "string" &&
+    !Number.isNaN(Number(sp.season)) &&
+    Number(sp.season) >= PICKEM_FIRST_SEASON
       ? Number(sp.season)
       : currentSeason;
 
