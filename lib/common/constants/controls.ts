@@ -39,6 +39,7 @@ export const BAN_CONTROL = [
 
 export const PICKEM_CONTROL = [
   ControlPanelID.PICKEM_ADVANCE_LOCK,
+  ControlPanelID.PICKEM_BRACKET_LOCK,
   ControlPanelID.PICKEM_PREVIEW,
   ControlPanelID.PICKEM_ENABLED,
 ];

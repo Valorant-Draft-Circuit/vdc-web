@@ -1,28 +1,27 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Tier } from "@prisma/client";
-import {
-  QuestionMarkCircleIcon,
-  UserGroupIcon,
-} from "@heroicons/react/16/solid";
+import { LockClosedIcon } from "@heroicons/react/16/solid";
 
 import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getUserTier } from "@/lib/queries/user/user";
+import { getBracketLock } from "@/lib/queries/pickems/getBracketBoard";
+import { lockCountdown, SLATE_LOCK_LEAD_HOURS } from "@/lib/pickems/format";
+import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
+import BracketBoardPanel from "@/components/pickems/bracket/BracketBoardPanel";
+import PlayoffBracketSkeleton from "@/components/playoffs/PlayoffBracketSkeleton";
+import HubButton from "@/components/pickems/common/HubButton";
 import {
   PICKEM_FIRST_SEASON,
   requirePickemsEnabled,
 } from "@/lib/pickems/guard";
-import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
-import HubOverviewPanel from "@/components/pickems/hub/HubOverviewPanel";
-import HubOverviewSkeleton from "@/components/pickems/hub/HubOverviewSkeleton";
 
 export const metadata: Metadata = {
-  title: "VDC | Pick'ems",
-  description: "Predict match scores, playoff advancement, and the bracket.",
+  title: "VDC | Pick'ems Bracket",
+  description: "Fill out the playoff bracket.",
 };
 
 type Props = {
@@ -31,15 +30,7 @@ type Props = {
 
 const VALID_TIERS = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
 
-const GHOST_PILL =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-300 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-vdcGrey transition-colors hover:cursor-pointer hover:border-vdcGrey hover:text-vdcBlack dark:border-gray-600 dark:text-gray-400 dark:hover:text-vdcWhite";
-
-const VALID_BOARDS = new Set([
-  "overall",
-  ...TIERS_LIST.map((t) => t.toLowerCase()),
-]);
-
-export default async function PickemsHub({ searchParams }: Props) {
+export default async function BracketPage({ searchParams }: Props) {
   await requirePickemsEnabled();
 
   const [sp, currentSeason, userTier, session] = await Promise.all([
@@ -62,28 +53,40 @@ export default async function PickemsHub({ searchParams }: Props) {
       userTierSlug && VALID_TIERS.has(userTierSlug)
         ? userTierSlug
         : Tier.MYTHIC.toLowerCase();
-    redirect(`/pickems?tier=${defaultTier}&season=${currentSeason}`);
+    redirect(`/pickems/bracket?tier=${defaultTier}&season=${currentSeason}`);
   }
 
   const tier = tierParam.toUpperCase() as Tier;
   const season = seasonParam;
   const userId = session?.user?.id ?? null;
+
+  const bracketLock = await getBracketLock(tier, season);
+
+  const now = new Date();
+  const locked = bracketLock !== null && bracketLock <= now;
   const accent = TIER_HEX_COLOR_MAP[tier];
 
-  const boardParam =
-    typeof sp.board === "string" && VALID_BOARDS.has(sp.board.toLowerCase())
-      ? sp.board.toLowerCase()
-      : "overall";
-  const boardTier =
-    boardParam === "overall" ? null : (boardParam.toUpperCase() as Tier);
+  let lockLabel: string;
+  if (bracketLock === null) {
+    lockLabel = `Locks ${SLATE_LOCK_LEAD_HOURS}h before the first playoff match`;
+  } else if (locked) {
+    const lockedOn = bracketLock.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+    lockLabel = `Locked ${lockedOn}`;
+  } else {
+    lockLabel = lockCountdown(bracketLock, now);
+  }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-extrabold tracking-wide">
-            PICK<b className="text-vdcRed">&apos;</b>EMS
-          </h1>
+          <HubButton
+            href={`/pickems?tier=${tier.toLowerCase()}&season=${season}`}
+          />
+          <h1 className="text-xl font-bold">Playoff Bracket</h1>
           <h2
             className="rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
             style={{ backgroundColor: accent }}
@@ -91,30 +94,25 @@ export default async function PickemsHub({ searchParams }: Props) {
             {tier}
           </h2>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href="/pickems/groups" className={GHOST_PILL}>
-            <UserGroupIcon className="size-4" />
-            <h1>Groups</h1>
-          </Link>
-          <Link href="/pickems/about" className={GHOST_PILL}>
-            <QuestionMarkCircleIcon className="size-4" />
-            <h1>How to play</h1>
-          </Link>
-        </div>
+        <h1 className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400">
+          <LockClosedIcon className="size-3" />
+          {lockLabel}
+        </h1>
       </div>
 
-      <PickemTierTabs activeTier={tier} season={season} basePath="/pickems" />
+      <PickemTierTabs
+        activeTier={tier}
+        season={season}
+        basePath="/pickems/bracket"
+      />
 
-      <Suspense
-        key={`${tier}-${season}-${boardParam}`}
-        fallback={<HubOverviewSkeleton />}
-      >
-        <HubOverviewPanel
+      <Suspense key={`${tier}-${season}`} fallback={<PlayoffBracketSkeleton />}>
+        <BracketBoardPanel
           tier={tier}
           season={season}
           userId={userId}
+          locked={locked}
           accent={accent}
-          boardTier={boardTier}
         />
       </Suspense>
     </div>

@@ -1,6 +1,6 @@
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getAllActiveTeamsIn } from "@/lib/queries/teams/teams";
+import { getTeamsInSeason } from "@/lib/queries/teams/teams";
 import { getAllGamesBy } from "@/lib/queries/games/games";
 import {
   getPlayoffTeamCount,
@@ -11,7 +11,10 @@ import {
   BracketTeam,
   PlayoffMatchInput,
   buildBracket,
+  buildEmptyBracket,
 } from "@/lib/common/bracket";
+import { getSeasonCached } from "@/lib/common/cache";
+import { getLeagueState } from "@/lib/queries/control/control";
 
 async function getPlayoffMatches(tier: Tier, season: number) {
   return prisma.matches.findMany({
@@ -19,8 +22,6 @@ async function getPlayoffMatches(tier: Tier, season: number) {
       tier,
       season,
       matchType: { in: [MatchType.BO3, MatchType.BO5] },
-      Home: { active: true },
-      Away: { active: true },
     },
     select: {
       matchID: true,
@@ -54,17 +55,35 @@ function toPlayoffMatchInput(match: RawPlayoffMatch): PlayoffMatchInput {
   };
 }
 
+function seedsAreRevealed(
+  season: number,
+  currentSeason: number,
+  leagueState: string | null,
+): boolean {
+  return (
+    season < currentSeason ||
+    leagueState === "PLAYOFFS" ||
+    leagueState === "OFFSEASON"
+  );
+}
+
 export async function getPlayoffBracket(
   tier: Tier,
   season: number,
 ): Promise<Bracket> {
-  const [teams, games] = await Promise.all([
-    getAllActiveTeamsIn(tier),
+  const [teams, games, currentSeason, leagueState] = await Promise.all([
+    getTeamsInSeason(tier, season),
     getAllGamesBy(tier, season),
+    getSeasonCached(),
+    getLeagueState(),
   ]);
 
   if (games.length === 0) {
-    return { rounds: [], isInferable: false };
+    return { rounds: [], isInferable: false, seeded: false };
+  }
+
+  if (!seedsAreRevealed(season, currentSeason, leagueState)) {
+    return buildEmptyBracket(getPlayoffTeamCount(teams.length));
   }
 
   const ranked = rankTeams(teams, games);

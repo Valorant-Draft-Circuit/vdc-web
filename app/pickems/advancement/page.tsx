@@ -14,7 +14,10 @@ import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import AdvanceBoardPanel from "@/components/pickems/advancement/AdvanceBoardPanel";
 import AdvancePickerSkeleton from "@/components/pickems/advancement/AdvancePickerSkeleton";
 import HubButton from "@/components/pickems/common/HubButton";
-import { requirePickemsEnabled } from "@/lib/pickems/guard";
+import {
+  PICKEM_FIRST_SEASON,
+  requirePickemsEnabled,
+} from "@/lib/pickems/guard";
 
 export const metadata: Metadata = {
   title: "VDC | Pick'ems Advancement",
@@ -39,7 +42,12 @@ export default async function AdvancementPage({ searchParams }: Props) {
 
   const tierParam = typeof sp.tier === "string" ? sp.tier.toLowerCase() : null;
   const seasonParam = typeof sp.season === "string" ? Number(sp.season) : NaN;
-  if (!tierParam || !VALID_TIERS.has(tierParam) || Number.isNaN(seasonParam)) {
+  if (
+    !tierParam ||
+    !VALID_TIERS.has(tierParam) ||
+    Number.isNaN(seasonParam) ||
+    seasonParam < PICKEM_FIRST_SEASON
+  ) {
     const userTierSlug = userTier?.toLowerCase();
     const defaultTier =
       userTierSlug && VALID_TIERS.has(userTierSlug)

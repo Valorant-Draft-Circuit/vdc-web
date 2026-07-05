@@ -1,9 +1,19 @@
+import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
 import { ROLE_ORDER, type RoleName } from "@/lib/common/constants/roles";
 import type { PlayerMapBreakdown } from "@/lib/queries/stats/getPlayerMapBreakdown";
 
 export type MapRow = PlayerMapBreakdown & { splashUrl: string | null };
 
 export type RoleCounts = Record<RoleName, number>;
+
+export function pickRandomMapSplashes(count: number): string[] {
+  const uuids = [...Object.values(MAPS)] as string[];
+  for (let current = uuids.length - 1; current > 0; current--) {
+    const swapWith = Math.floor(Math.random() * (current + 1));
+    [uuids[current], uuids[swapWith]] = [uuids[swapWith], uuids[current]];
+  }
+  return uuids.slice(0, count).map((uuid) => MAP_LIST_URL(uuid));
+}
 
 export function emptyRoleCounts(): RoleCounts {
   return { DUELIST: 0, CONTROLLER: 0, SENTINEL: 0, INITIATOR: 0 };

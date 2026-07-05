@@ -17,6 +17,9 @@ import {
   getAdvanceBoard,
   getAdvanceLock,
 } from "@/lib/queries/pickems/getAdvanceBoard";
+import { getBracketLock } from "@/lib/queries/pickems/getBracketBoard";
+import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
+import { validateBracketPicks } from "@/lib/pickems/bracket";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -77,6 +80,7 @@ export async function submitMatchPicks(input: {
     });
   }
   revalidatePath("/pickems");
+  revalidatePath("/pickems/matches");
   return { ok: true };
 }
 
@@ -129,6 +133,50 @@ export async function submitAdvancePick(input: {
     }),
   ]);
   revalidatePath("/pickems");
+  revalidatePath("/pickems/advancement");
+  return { ok: true };
+}
+
+export async function submitBracketPicks(input: {
+  tier: Tier;
+  picks: { round: number; slot: number; teamId: number; loserGames: number }[];
+}): Promise<Result> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthenticated" };
+  }
+  const userId = session.user.id;
+  const season = await getSeasonCached();
+
+  const lock = await getBracketLock(input.tier, season);
+  if (lock && lock <= new Date()) {
+    return { ok: false, error: "The bracket is locked" };
+  }
+
+  const bracket = await getPlayoffBracket(input.tier, season);
+  const validation = validateBracketPicks(bracket, input.picks);
+  if (!validation.ok) {
+    return { ok: false, error: validation.error };
+  }
+
+  await prisma.$transaction([
+    prisma.pickemBracketPick.deleteMany({
+      where: { userID: userId, season, tier: input.tier },
+    }),
+    prisma.pickemBracketPick.createMany({
+      data: input.picks.map((pick) => ({
+        userID: userId,
+        season,
+        tier: input.tier,
+        round: pick.round,
+        slot: pick.slot,
+        predictedTeam: pick.teamId,
+        predictedLoserGames: pick.loserGames,
+      })),
+    }),
+  ]);
+  revalidatePath("/pickems");
+  revalidatePath("/pickems/bracket");
   return { ok: true };
 }
 

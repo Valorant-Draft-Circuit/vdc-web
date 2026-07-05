@@ -195,7 +195,8 @@ function PickemControls({
       controls={pickemControls}
       control={control}
       renderField={(field, label) =>
-        label.toUpperCase() === "PICKEM_ADVANCE_LOCK" ? (
+        label.toUpperCase() === "PICKEM_ADVANCE_LOCK" ||
+        label.toUpperCase() === "PICKEM_BRACKET_LOCK" ? (
           <DateField field={field} label={label} />
         ) : (
           <SwitchField field={field} label={label} />

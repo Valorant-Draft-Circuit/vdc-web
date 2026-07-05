@@ -23,12 +23,22 @@ export type SeriesSlot = {
   status: "complete" | "live" | "scheduled";
 };
 
-export type ByeSlot = { kind: "bye"; team: BracketTeam };
-export type TbdSlot = { kind: "tbd" };
+export type ByeSlot = { kind: "bye"; team: BracketTeam | null };
+export type TbdSlot = { kind: "tbd"; home?: BracketTeam; away?: BracketTeam };
 export type Slot = SeriesSlot | ByeSlot | TbdSlot;
 
-export type Round = { label: string; matchType: MatchType; slots: Slot[] };
-export type Bracket = { rounds: Round[]; isInferable: boolean };
+export type Round = {
+  label: string;
+  matchType: MatchType;
+  slots: Slot[];
+  feeders: Array<[number, number] | null>;
+};
+
+export type Bracket = {
+  rounds: Round[];
+  isInferable: boolean;
+  seeded: boolean;
+};
 
 export type PlayoffMatchInput = {
   matchId: number;
@@ -40,27 +50,63 @@ export type PlayoffMatchInput = {
   awayScore: number;
 };
 
-type FirstRoundItem =
+type StructureSlot =
   | { type: "bye"; seed: number }
-  | { type: "match"; seeds: [number, number] };
+  | { type: "seeds"; seeds: [number, number] }
+  | { type: "feeders"; feeders: [number, number] };
 
-// Ordered for adjacency: each next-round slot is fed by two consecutive items.
-const FIRST_ROUND_LAYOUT: Record<number, FirstRoundItem[]> = {
+const BRACKET_STRUCTURES: Record<number, StructureSlot[][]> = {
   4: [
-    { type: "match", seeds: [1, 4] },
-    { type: "match", seeds: [2, 3] },
+    [
+      { type: "seeds", seeds: [1, 4] },
+      { type: "seeds", seeds: [2, 3] },
+    ],
+    [{ type: "feeders", feeders: [0, 1] }],
   ],
   6: [
-    { type: "bye", seed: 1 },
-    { type: "match", seeds: [4, 5] },
-    { type: "bye", seed: 2 },
-    { type: "match", seeds: [3, 6] },
+    [
+      { type: "bye", seed: 1 },
+      { type: "seeds", seeds: [4, 5] },
+      { type: "bye", seed: 2 },
+      { type: "seeds", seeds: [3, 6] },
+    ],
+    [
+      { type: "feeders", feeders: [0, 1] },
+      { type: "feeders", feeders: [2, 3] },
+    ],
+    [{ type: "feeders", feeders: [0, 1] }],
   ],
   8: [
-    { type: "match", seeds: [1, 8] },
-    { type: "match", seeds: [4, 5] },
-    { type: "match", seeds: [3, 6] },
-    { type: "match", seeds: [2, 7] },
+    [
+      { type: "seeds", seeds: [1, 8] },
+      { type: "seeds", seeds: [4, 5] },
+      { type: "seeds", seeds: [3, 6] },
+      { type: "seeds", seeds: [2, 7] },
+    ],
+    [
+      { type: "feeders", feeders: [0, 1] },
+      { type: "feeders", feeders: [2, 3] },
+    ],
+    [{ type: "feeders", feeders: [0, 1] }],
+  ],
+  10: [
+    [
+      { type: "seeds", seeds: [4, 9] },
+      { type: "seeds", seeds: [5, 8] },
+      { type: "seeds", seeds: [3, 10] },
+      { type: "seeds", seeds: [6, 7] },
+    ],
+    [
+      { type: "bye", seed: 1 },
+      { type: "feeders", feeders: [0, 1] },
+      { type: "bye", seed: 2 },
+      { type: "feeders", feeders: [2, 3] },
+    ],
+    [
+      { type: "feeders", feeders: [0, 1] },
+      { type: "feeders", feeders: [2, 3] },
+    ],
+    [{ type: "feeders", feeders: [0, 1] }],
   ],
 };
 
@@ -129,13 +175,23 @@ function hasBothTeams(
   );
 }
 
-function buildInferableRounds(
+function participantOf(slot: Slot): BracketTeam | undefined {
+  if (slot.kind === "bye") {
+    return slot.team ?? undefined;
+  }
+  if (slot.kind === "series") {
+    if (slot.home.isWinner) return slot.home.team;
+    if (slot.away.isWinner) return slot.away.team;
+  }
+  return undefined;
+}
+
+function buildStructuredRounds(
   participants: BracketTeam[],
   matches: PlayoffMatchInput[],
-  playoffTeamCount: number,
+  structure: StructureSlot[][],
   teamById: Map<number, BracketTeam>,
 ): Round[] {
-  const layout = FIRST_ROUND_LAYOUT[playoffTeamCount];
   const teamBySeed = (seed: number) => participants[seed - 1];
 
   const matchByPair = new Map<string, PlayoffMatchInput>();
@@ -146,9 +202,12 @@ function buildInferableRounds(
   }
 
   const usedMatchIds = new Set<number>();
-  const round1Slots: Slot[] = layout.map((item) => {
+  const firstRoundSlots: Slot[] = structure[0].map((item) => {
     if (item.type === "bye") {
       return { kind: "bye", team: teamBySeed(item.seed) };
+    }
+    if (item.type !== "seeds") {
+      return { kind: "tbd" };
     }
     const seedHome = teamBySeed(item.seeds[0]);
     const seedAway = teamBySeed(item.seeds[1]);
@@ -160,40 +219,52 @@ function buildInferableRounds(
     return buildSeriesSlot(seedHome, seedAway, null);
   });
 
-  const roundSizes: number[] = [];
-  let size = layout.length / 2;
-  while (size >= 1) {
-    roundSizes.push(size);
-    size = size / 2;
-  }
-  const totalRounds = 1 + roundSizes.length;
-
   const remaining = matches
     .filter((m) => !usedMatchIds.has(m.matchId) && hasBothTeams(m, teamById))
     .sort((a, b) => (a.matchDay ?? Infinity) - (b.matchDay ?? Infinity));
-
-  let idx = 0;
-  const laterRounds: Round[] = roundSizes.map((count) => {
-    const slots: Slot[] = [];
-    for (let s = 0; s < count; s++) {
-      const m = remaining[idx];
-      if (m) {
-        slots.push(seriesFromMatch(m, teamById));
-        idx++;
-      } else {
-        slots.push({ kind: "tbd" });
-      }
-    }
-    return { label: "", matchType: MatchType.BO3, slots };
-  });
+  let remainingIndex = 0;
 
   const rounds: Round[] = [
-    { label: "", matchType: MatchType.BO3, slots: round1Slots },
-    ...laterRounds,
+    {
+      label: "",
+      matchType: MatchType.BO3,
+      slots: firstRoundSlots,
+      feeders: structure[0].map(() => null),
+    },
   ];
+
+  for (let r = 1; r < structure.length; r++) {
+    const slots: Slot[] = [];
+    const feeders: Array<[number, number] | null> = [];
+    for (const item of structure[r]) {
+      if (item.type === "bye") {
+        slots.push({ kind: "bye", team: teamBySeed(item.seed) });
+        feeders.push(null);
+        continue;
+      }
+      if (item.type !== "feeders") {
+        continue;
+      }
+      feeders.push(item.feeders);
+      const m = remaining[remainingIndex];
+      if (m) {
+        slots.push(seriesFromMatch(m, teamById));
+        remainingIndex++;
+      } else {
+        const prev = rounds[r - 1];
+        slots.push({
+          kind: "tbd",
+          home: participantOf(prev.slots[item.feeders[0]]),
+          away: participantOf(prev.slots[item.feeders[1]]),
+        });
+      }
+    }
+    rounds.push({ label: "", matchType: MatchType.BO3, slots, feeders });
+  }
+
   rounds.forEach((round, i) => {
-    round.label = roundLabel(i, totalRounds);
-    round.matchType = i === totalRounds - 1 ? MatchType.BO5 : MatchType.BO3;
+    round.label = roundLabel(i, structure.length);
+    round.matchType = i === structure.length - 1 ? MatchType.BO5 : MatchType.BO3;
   });
   return rounds;
 }
@@ -213,6 +284,7 @@ function buildFallbackRounds(
       label: roundLabel(i, days.length),
       matchType: dayMatches[0]?.matchType ?? MatchType.BO3,
       slots: dayMatches.map((m) => seriesFromMatch(m, teamById)),
+      feeders: dayMatches.map(() => null),
     };
   });
 }
@@ -223,29 +295,47 @@ export function buildBracket(
   playoffTeamCount: number,
 ): Bracket {
   if (seededTeams.length === 0) {
-    return { rounds: [], isInferable: false };
+    return { rounds: [], isInferable: false, seeded: false };
   }
 
   const teamById = new Map(seededTeams.map((t) => [t.id, t]));
+  const structure = BRACKET_STRUCTURES[playoffTeamCount];
   const isInferable =
-    [4, 6, 8].includes(playoffTeamCount) &&
-    seededTeams.length >= playoffTeamCount;
+    structure !== undefined && seededTeams.length >= playoffTeamCount;
 
   if (isInferable) {
     const participants = seededTeams.slice(0, playoffTeamCount);
     return {
-      rounds: buildInferableRounds(
-        participants,
-        matches,
-        playoffTeamCount,
-        teamById,
-      ),
+      rounds: buildStructuredRounds(participants, matches, structure, teamById),
       isInferable: true,
+      seeded: true,
     };
   }
 
   return {
     rounds: buildFallbackRounds(matches, teamById),
     isInferable: false,
+    seeded: true,
   };
+}
+
+export function buildEmptyBracket(playoffTeamCount: number): Bracket {
+  const structure = BRACKET_STRUCTURES[playoffTeamCount];
+  if (!structure) {
+    return { rounds: [], isInferable: false, seeded: false };
+  }
+  const rounds: Round[] = structure.map((roundDef, r) => ({
+    label: roundLabel(r, structure.length),
+    matchType: r === structure.length - 1 ? MatchType.BO5 : MatchType.BO3,
+    slots: roundDef.map((item): Slot => {
+      if (item.type === "bye") {
+        return { kind: "bye", team: null };
+      }
+      return { kind: "tbd" };
+    }),
+    feeders: roundDef.map((item) =>
+      item.type === "feeders" ? item.feeders : null,
+    ),
+  }));
+  return { rounds, isInferable: true, seeded: false };
 }
