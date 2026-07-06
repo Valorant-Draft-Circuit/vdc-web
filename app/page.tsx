@@ -11,6 +11,8 @@ import UpcomingMatch, {
 import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
 import MatchNightRecapLoader from "@/components/home/recap/MatchNightRecapLoader";
 import MatchNightRecapSkeleton from "@/components/home/recap/MatchNightRecapSkeleton";
+import RecentTransactionsLoader from "@/components/home/transactions/RecentTransactionsLoader";
+import RecentTransactionsSkeleton from "@/components/home/transactions/RecentTransactionsSkeleton";
 
 export default async function Home() {
   const session = await auth();
@@ -49,6 +51,9 @@ export default async function Home() {
       ) : null}
       <Suspense fallback={<MatchNightRecapSkeleton />}>
         <MatchNightRecapLoader />
+      </Suspense>
+      <Suspense fallback={<RecentTransactionsSkeleton />}>
+        <RecentTransactionsLoader />
       </Suspense>
       <div className="flex flex-col xl:flex-row 4xl:flex-col">
         <div className="overflow-hidden xl:w-3/4 4xl:w-full">
