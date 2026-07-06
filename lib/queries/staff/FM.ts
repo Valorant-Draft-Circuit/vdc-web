@@ -117,6 +117,7 @@ export type ActiveSub = {
   tier: Tier;
   teamName: string;
   teamLogo: string | null;
+  franchiseSlug: string | null;
   sinceLabel: string | null;
 };
 
@@ -131,7 +132,9 @@ export const getActiveSubs = cache(async (): Promise<ActiveSub[]> => {
         select: {
           name: true,
           tier: true,
-          Franchise: { select: { Brand: { select: { logo: true } } } },
+          Franchise: {
+            select: { slug: true, Brand: { select: { logo: true } } },
+          },
         },
       },
     },
@@ -170,6 +173,7 @@ export const getActiveSubs = cache(async (): Promise<ActiveSub[]> => {
       tier: user.Team.tier,
       teamName: user.Team.name,
       teamLogo: user.Team.Franchise.Brand?.logo ?? null,
+      franchiseSlug: user.Team.Franchise.slug,
       sinceLabel: sinceDate ? formatPlainDate(sinceDate) : null,
     });
   }

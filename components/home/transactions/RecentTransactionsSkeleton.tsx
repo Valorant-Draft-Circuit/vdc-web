@@ -10,13 +10,13 @@ export default function RecentTransactionsSkeleton() {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="h-44 rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 animate-pulse"
+                className="h-56 rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 animate-pulse"
               />
             ))}
           </div>
           <div className="md:hidden flex flex-col gap-3">
             <div className="h-10 rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 animate-pulse" />
-            <div className="h-44 rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 animate-pulse" />
+            <div className="h-56 rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 animate-pulse" />
           </div>
         </div>
       </div>

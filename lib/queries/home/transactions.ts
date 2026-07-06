@@ -17,6 +17,7 @@ export type RecentTransactionRow = {
   playerIgn: string | null;
   teamName: string | null;
   teamLogo: string | null;
+  franchiseSlug: string | null;
   dateLabel: string;
 };
 
@@ -37,7 +38,9 @@ const transactionInclude = {
   Team: {
     select: {
       name: true,
-      Franchise: { select: { Brand: { select: { logo: true } } } },
+      Franchise: {
+        select: { slug: true, Brand: { select: { logo: true } } },
+      },
     },
   },
 } as const;
@@ -89,6 +92,7 @@ function toRow(transaction: TransactionWithRelations): RecentTransactionRow {
     playerIgn: transaction.Player?.PrimaryRiotAccount?.riotIGN ?? null,
     teamName: transaction.Team?.name ?? null,
     teamLogo: transaction.Team?.Franchise.Brand?.logo ?? null,
+    franchiseSlug: transaction.Team?.Franchise.slug ?? null,
     dateLabel: formatRelativeAge(transaction.date),
   };
 }
