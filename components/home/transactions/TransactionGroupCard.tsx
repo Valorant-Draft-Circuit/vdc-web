@@ -13,6 +13,7 @@ import {
 import {
   RecentTransactionRow,
   TransactionGroup,
+  TransactionGroupKey,
 } from "@/lib/queries/home/transactions";
 import TeamLogo from "../recap/TeamLogo";
 
@@ -51,16 +52,16 @@ export default function TransactionGroupCard({
         {transactionGroupLabel(group.key)}
       </h1>
       {group.rows.length === 0 ? (
-        <h3 className="text-xs text-gray-500 dark:text-gray-400 py-1">
+        <h3 className="text-sm text-gray-500 dark:text-gray-400 py-1">
           No recent transactions
         </h3>
       ) : (
         <ul
           onScroll={revealMoreRowsAtListBottom}
-          className="flex flex-col max-h-32 overflow-y-auto"
+          className="flex flex-col max-h-44 overflow-y-auto"
         >
           {visibleRows.map((row) => (
-            <TransactionRowItem key={row.id} row={row} />
+            <TransactionRowItem key={row.id} row={row} groupKey={group.key} />
           ))}
         </ul>
       )}
@@ -68,9 +69,15 @@ export default function TransactionGroupCard({
   );
 }
 
-function TransactionRowItem({ row }: { row: RecentTransactionRow }) {
+function TransactionRowItem({
+  row,
+  groupKey,
+}: {
+  row: RecentTransactionRow;
+  groupKey: TransactionGroupKey;
+}) {
   return (
-    <li className="flex items-center gap-2 py-1 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0">
+    <li className="flex items-center gap-2 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0">
       <h2
         className={`rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider flex-none ${TRANSACTION_TYPE_COLOR_MAP[row.type]}`}
       >
@@ -88,15 +95,27 @@ function TransactionRowItem({ row }: { row: RecentTransactionRow }) {
           row.label
         )}
       </h2>
-      <div className="ml-auto flex items-center gap-1 flex-none">
-        <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
-        {row.teamName && (
-          <h3 className="text-[10px] text-gray-600 dark:text-gray-400">
-            {row.teamName}
-          </h3>
+      <div className="ml-auto flex-none">
+        {row.franchiseSlug && row.teamName ? (
+          <Link
+            href={`/franchises/${row.franchiseSlug}?team=${groupKey.toLowerCase()}`}
+            className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-vdcRed"
+          >
+            <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
+            <h2 className="text-xs">{row.teamName}</h2>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-1">
+            <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
+            {row.teamName && (
+              <h2 className="text-xs text-gray-600 dark:text-gray-400">
+                {row.teamName}
+              </h2>
+            )}
+          </div>
         )}
       </div>
-      <h3 className="text-[9px] text-gray-500 flex-none w-7 text-right">
+      <h3 className="text-sm text-gray-500 flex-none w-7 text-right">
         {row.dateLabel}
       </h3>
     </li>

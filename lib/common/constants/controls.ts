@@ -44,10 +44,31 @@ export const PICKEM_CONTROL = [
   ControlPanelID.PICKEM_ENABLED,
 ];
 
-export const CONTROL_GROUPS: Record<string, Set<number>> = {
-  general: new Set(GENERAL_CONTROL),
-  mmr: new Set(MMR_CONTROL),
-  draft: new Set(DRAFT_CONTROL),
-  ban: new Set(BAN_CONTROL),
-  pickems: new Set(PICKEM_CONTROL),
+export const QueuebotControlID = {
+  QUEUE_ENABLED: 36,
+  QUEUE_HEALTH_CHECK_INTERVAL_MS: 37,
+  QUEUE_HEALTH_DB_TIMEOUT_MS: 38,
+  QUEUE_MAX_SCAN_PER_BUCKET: 39,
+  QUEUE_NEW_PLAYER_GAME_REQ: 40,
+  QUEUE_RETURNING_GAME_REQ: 41,
+  QUEUE_CHANNEL_STOP_THRESHOLD: 42,
+} as const;
+
+export const QUEUEBOT_CONTROL = [
+  QueuebotControlID.QUEUE_ENABLED,
+  QueuebotControlID.QUEUE_HEALTH_CHECK_INTERVAL_MS,
+  QueuebotControlID.QUEUE_HEALTH_DB_TIMEOUT_MS,
+  QueuebotControlID.QUEUE_MAX_SCAN_PER_BUCKET,
+  QueuebotControlID.QUEUE_NEW_PLAYER_GAME_REQ,
+  QueuebotControlID.QUEUE_RETURNING_GAME_REQ,
+  QueuebotControlID.QUEUE_CHANNEL_STOP_THRESHOLD,
+];
+
+export const CONTROL_GROUPS: Record<string, readonly number[]> = {
+  general: GENERAL_CONTROL,
+  mmr: MMR_CONTROL,
+  draft: DRAFT_CONTROL,
+  ban: BAN_CONTROL,
+  pickems: PICKEM_CONTROL,
+  queuebot: QUEUEBOT_CONTROL,
 };
