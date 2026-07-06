@@ -49,15 +49,22 @@ export default function ControlPanelForm({
       draft: [],
       ban: [],
       pickems: [],
+      queuebot: [],
     };
     items.forEach((item) => {
-      for (const [groupName, controlSet] of Object.entries(CONTROL_GROUPS)) {
-        if (controlSet.has(item.id)) {
+      for (const [groupName, controlIds] of Object.entries(CONTROL_GROUPS)) {
+        if (controlIds.includes(item.id)) {
           groupMap[groupName].push(item);
           break;
         }
       }
     });
+    for (const [groupName, controlIds] of Object.entries(CONTROL_GROUPS)) {
+      groupMap[groupName].sort(
+        (first, second) =>
+          controlIds.indexOf(first.id) - controlIds.indexOf(second.id),
+      );
+    }
     return groupMap;
   }, [items]);
 
@@ -97,6 +104,12 @@ export default function ControlPanelForm({
       {groupedControls.pickems.length > 0 && (
         <PickemControls
           pickemControls={groupedControls.pickems}
+          control={control}
+        />
+      )}
+      {groupedControls.queuebot.length > 0 && (
+        <QueuebotControls
+          queuebotControls={groupedControls.queuebot}
           control={control}
         />
       )}
@@ -181,6 +194,24 @@ function BanControls({
       title="Ban Order Controls"
       controls={banControls}
       control={control}
+    />
+  );
+}
+
+function QueuebotControls({
+  queuebotControls,
+  control,
+}: ControlsSectionProps & { queuebotControls: ConfigItem[] }) {
+  return (
+    <ConfigSection
+      title="Queuebot Controls"
+      controls={queuebotControls}
+      control={control}
+      renderField={(field, label) =>
+        label.toLowerCase() === "queue_enabled" ? (
+          <SwitchField field={field} label={label} />
+        ) : null
+      }
     />
   );
 }
