@@ -15,6 +15,10 @@ import {
   getMatchNightRecap,
   MatchNightRecap,
 } from "../queries/home/matchNight";
+import {
+  getRecentTransactions,
+  TransactionGroup,
+} from "../queries/home/transactions";
 
 let cache: NodeCache;
 initCache();
@@ -186,4 +190,16 @@ export async function getMatchNightRecapCached(
   const recap = await getMatchNightRecap(season);
   cache.set(key, recap, minutes(30));
   return recap;
+}
+
+export async function getRecentTransactionsCached(
+  season: number,
+): Promise<TransactionGroup[] | null> {
+  const key = `s${season}-recentTransactions`;
+  const hit = cache.get<TransactionGroup[] | null>(key);
+  if (hit !== undefined) return hit;
+
+  const recentTransactions = await getRecentTransactions(season);
+  cache.set(key, recentTransactions, minutes(30));
+  return recentTransactions;
 }

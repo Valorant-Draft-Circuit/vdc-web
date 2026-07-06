@@ -17,3 +17,18 @@ export function formatDate(date: Date) {
     day: "numeric",
   });
 }
+
+export function formatRelativeAge(date: Date) {
+  const elapsedMs = Date.now() - new Date(date).getTime();
+  const hours = Math.floor(elapsedMs / (60 * 60 * 1000));
+  if (hours < 1) return "now";
+  if (hours < 24) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
+}
+
+export function formatPlainDate(date: Date) {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
