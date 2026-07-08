@@ -1,7 +1,11 @@
 import Link from "next/link";
 import TeamLogo from "@/components/home/recap/TeamLogo";
 import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
-import { getSeasonSubUsage, SubUsageRow, TierSubUsage } from "@/lib/queries/staff/FM";
+import {
+  getSeasonSubUsage,
+  SubUsageRow,
+  TierSubUsage,
+} from "@/lib/queries/staff/FM";
 import { Tier } from "@prisma/client";
 
 export default async function SubUsagePanel() {
@@ -52,27 +56,26 @@ function SubUsageRowItem({ sub, tier }: { sub: SubUsageRow; tier: Tier }) {
   return (
     <li className="flex flex-col gap-1 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0">
       <div className="flex items-center gap-2">
-        <h3 className="truncate">
-          {sub.playerIgn ? (
-            <Link
-              href={`/player/${encodeURIComponent(sub.playerIgn)}`}
-              className="hover:text-vdcRed"
-            >
-              {sub.name}
-            </Link>
-          ) : (
-            sub.name
-          )}
-        </h3>
-        {sub.isCurrentlySubbed && (
-          <h3 className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider bg-vdcBlue/20 text-vdcBlue flex-none">
-            SUBBED IN
-          </h3>
+        {sub.playerIgn ? (
+          <Link
+            href={`/player/${encodeURIComponent(sub.playerIgn)}`}
+            className="hover:text-vdcRed"
+          >
+            <h2 className="truncate"></h2>
+            {sub.name}
+          </Link>
+        ) : (
+          <h2 className="truncate">sub.name</h2>
         )}
-        <h3 className="ml-auto flex-none text-[10px] text-gray-600 dark:text-gray-400">
+        {sub.isCurrentlySubbed && (
+          <h2 className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider bg-vdcBlue/20 text-vdcBlue flex-none">
+            SUBBED IN
+          </h2>
+        )}
+        <h2 className="ml-auto flex-none text-[10px] text-gray-600 dark:text-gray-400">
           {sub.matchDayLabels.length}{" "}
           {sub.matchDayLabels.length === 1 ? "MD" : "MDs"}
-        </h3>
+        </h2>
       </div>
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1 flex-none">
@@ -86,9 +89,9 @@ function SubUsageRowItem({ sub, tier }: { sub: SubUsageRow; tier: Tier }) {
             </Link>
           ))}
         </div>
-        <h3 className="ml-auto text-[10px] text-gray-500 truncate">
+        <h2 className="ml-auto text-[10px] text-gray-500 truncate">
           {sub.matchDayLabels.join(" · ")}
-        </h3>
+        </h2>
       </div>
     </li>
   );
