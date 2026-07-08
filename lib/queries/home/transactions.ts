@@ -13,6 +13,7 @@ export type TransactionGroupKey = Tier | "LEAGUE";
 export type RecentTransactionRow = {
   id: number;
   type: TransactionType;
+  stintEnded: boolean;
   label: string;
   playerIgn: string | null;
   teamName: string | null;
@@ -27,6 +28,7 @@ export type TransactionGroup = {
 };
 
 const MAX_ROWS_PER_GROUP = 30;
+const RAW_ROWS_FETCH_LIMIT = 60;
 
 const transactionInclude = {
   Player: {
@@ -79,15 +81,95 @@ async function fetchGroupRows(
     },
     include: transactionInclude,
     orderBy: { date: "desc" },
-    take: MAX_ROWS_PER_GROUP,
+    take: RAW_ROWS_FETCH_LIMIT,
   });
-  return transactions.map(toRow);
+  return mergeStints(transactions).slice(0, MAX_ROWS_PER_GROUP);
 }
 
-function toRow(transaction: TransactionWithRelations): RecentTransactionRow {
+function mergeStints(
+  transactions: TransactionWithRelations[],
+): RecentTransactionRow[] {
+  const pendingCloserCounts = new Map<string, number>();
+  const rows: RecentTransactionRow[] = [];
+
+  for (const transaction of transactions) {
+    const closedType = stintTypeClosedBy(transaction);
+    if (closedType) {
+      rows.push(toRow(transaction, closedType, true));
+      const key = stintKey(transaction, closedType);
+      pendingCloserCounts.set(key, (pendingCloserCounts.get(key) ?? 0) + 1);
+      continue;
+    }
+
+    const openedType = stintTypeOpenedBy(transaction);
+    if (openedType) {
+      const key = stintKey(transaction, openedType);
+      const pendingClosers = pendingCloserCounts.get(key) ?? 0;
+      if (pendingClosers > 0) {
+        pendingCloserCounts.set(key, pendingClosers - 1);
+        continue;
+      }
+      rows.push(toRow(transaction, openedType, false));
+      continue;
+    }
+
+    rows.push(toRow(transaction, transaction.type, false));
+  }
+
+  return rows;
+}
+
+function stintTypeClosedBy(
+  transaction: TransactionWithRelations,
+): TransactionType | null {
+  if (transaction.type === TransactionType.UNSUB) return TransactionType.SUB;
+  if (transaction.type === TransactionType.ACTIVATE) return TransactionType.IR;
+  if (
+    transaction.type === TransactionType.CAPTAIN &&
+    captainMode(transaction.details) === "REMOVE"
+  ) {
+    return TransactionType.CAPTAIN;
+  }
+  return null;
+}
+
+function stintTypeOpenedBy(
+  transaction: TransactionWithRelations,
+): TransactionType | null {
+  if (transaction.type === TransactionType.SUB) return TransactionType.SUB;
+  if (transaction.type === TransactionType.IR) return TransactionType.IR;
+  if (transaction.type === TransactionType.CAPTAIN) {
+    return TransactionType.CAPTAIN;
+  }
+  return null;
+}
+
+function captainMode(details: string | null): string | null {
+  if (!details) return null;
+  try {
+    const parsed = JSON.parse(details);
+    return typeof parsed?.mode === "string" ? parsed.mode : null;
+  } catch {
+    return null;
+  }
+}
+
+function stintKey(
+  transaction: TransactionWithRelations,
+  stintType: TransactionType,
+): string {
+  return `${stintType}|${transaction.userID}|${transaction.team}`;
+}
+
+function toRow(
+  transaction: TransactionWithRelations,
+  displayType: TransactionType,
+  stintEnded: boolean,
+): RecentTransactionRow {
   return {
     id: transaction.id,
-    type: transaction.type,
+    type: displayType,
+    stintEnded: stintEnded,
     label: rowLabel(transaction),
     playerIgn: transaction.Player?.PrimaryRiotAccount?.riotIGN ?? null,
     teamName: transaction.Team?.name ?? null,
