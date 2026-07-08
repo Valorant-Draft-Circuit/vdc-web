@@ -2,13 +2,13 @@ import { getMmmrTierLinesCached, getSeasonCached } from "@/lib/common/cache";
 import { ControlPanel } from "@/prisma";
 import {
   ContractStatus,
+  GameType,
   LeagueStatus,
   Tier,
-  TransactionType,
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
-import { formatPlainDate } from "@/lib/common/format";
+import { TIERS_LIST } from "@/lib/common/constants/tiers";
 
 export type FormattedContract = {
   discord: string | null;
@@ -110,72 +110,128 @@ function derivedTier(
   return "N/A";
 }
 
-export type ActiveSub = {
+export type SubbedTeam = {
+  name: string;
+  logo: string | null;
+  franchiseSlug: string;
+};
+
+export type SubUsageRow = {
   userID: string;
   name: string;
   playerIgn: string | null;
-  tier: Tier;
-  teamName: string;
-  teamLogo: string | null;
-  franchiseSlug: string | null;
-  sinceLabel: string | null;
+  isCurrentlySubbed: boolean;
+  matchDayLabels: string[];
+  teams: SubbedTeam[];
 };
 
-export const getActiveSubs = cache(async (): Promise<ActiveSub[]> => {
-  const subbedUsers = await prisma.user.findMany({
-    where: { Status: { contractStatus: ContractStatus.ACTIVE_SUB } },
+export type TierSubUsage = {
+  tier: Tier;
+  subs: SubUsageRow[];
+};
+
+type SubUsageAccumulator = {
+  userID: string;
+  name: string;
+  playerIgn: string | null;
+  isCurrentlySubbed: boolean;
+  matchDays: Set<number>;
+  teamsById: Map<number, SubbedTeam>;
+};
+
+export const getSeasonSubUsage = cache(async (): Promise<TierSubUsage[]> => {
+  const season = await getSeasonCached();
+  const seasonStats = await prisma.playerStats.findMany({
+    where: { Game: { season: season, gameType: GameType.SEASON } },
     select: {
-      id: true,
-      name: true,
-      PrimaryRiotAccount: { select: { riotIGN: true } },
+      userID: true,
+      team: true,
+      Player: {
+        select: {
+          team: true,
+          name: true,
+          PrimaryRiotAccount: { select: { riotIGN: true } },
+          Status: { select: { contractStatus: true } },
+        },
+      },
       Team: {
         select: {
           name: true,
-          tier: true,
           Franchise: {
             select: { slug: true, Brand: { select: { logo: true } } },
           },
         },
       },
+      Game: {
+        select: { tier: true, Match: { select: { matchDay: true } } },
+      },
     },
   });
-  if (subbedUsers.length === 0) return [];
 
-  const season = await getSeasonCached();
-  const subTransactions = await prisma.transaction.findMany({
-    where: {
-      type: TransactionType.SUB,
-      season: season,
-      userID: { in: subbedUsers.map((user) => user.id) },
-    },
-    orderBy: { date: "desc" },
-    select: { userID: true, date: true },
-  });
+  const usageByTier = new Map<Tier, Map<string, SubUsageAccumulator>>();
 
-  const latestSubDateByUser = new Map<string, Date>();
-  for (const subTransaction of subTransactions) {
-    if (
-      subTransaction.userID &&
-      !latestSubDateByUser.has(subTransaction.userID)
-    ) {
-      latestSubDateByUser.set(subTransaction.userID, subTransaction.date);
-    }
-  }
+  for (const stat of seasonStats) {
+    const statTeamId = stat.team;
+    const matchDay = stat.Game.Match?.matchDay;
+    if (statTeamId === null || statTeamId === stat.Player.team) continue;
+    if (!stat.Team || matchDay == null) continue;
 
-  const activeSubs: ActiveSub[] = [];
-  for (const user of subbedUsers) {
-    if (!user.Team) continue;
-    const sinceDate = latestSubDateByUser.get(user.id);
-    activeSubs.push({
-      userID: user.id,
-      name: user.PrimaryRiotAccount?.riotIGN ?? user.name ?? "Unknown",
-      playerIgn: user.PrimaryRiotAccount?.riotIGN ?? null,
-      tier: user.Team.tier,
-      teamName: user.Team.name,
-      teamLogo: user.Team.Franchise.Brand?.logo ?? null,
-      franchiseSlug: user.Team.Franchise.slug,
-      sinceLabel: sinceDate ? formatPlainDate(sinceDate) : null,
+    const tierUsage =
+      usageByTier.get(stat.Game.tier) ??
+      new Map<string, SubUsageAccumulator>();
+    usageByTier.set(stat.Game.tier, tierUsage);
+
+    const accumulator = tierUsage.get(stat.userID) ?? {
+      userID: stat.userID,
+      name:
+        stat.Player.PrimaryRiotAccount?.riotIGN ??
+        stat.Player.name ??
+        "Unknown",
+      playerIgn: stat.Player.PrimaryRiotAccount?.riotIGN ?? null,
+      isCurrentlySubbed:
+        stat.Player.Status?.contractStatus === ContractStatus.ACTIVE_SUB,
+      matchDays: new Set<number>(),
+      teamsById: new Map<number, SubbedTeam>(),
+    };
+    tierUsage.set(stat.userID, accumulator);
+
+    accumulator.matchDays.add(matchDay);
+    accumulator.teamsById.set(statTeamId, {
+      name: stat.Team.name,
+      logo: stat.Team.Franchise.Brand?.logo ?? null,
+      franchiseSlug: stat.Team.Franchise.slug,
     });
   }
-  return activeSubs.sort((a, b) => a.name.localeCompare(b.name));
+
+  const tierSubUsage: TierSubUsage[] = [];
+  for (const tier of TIERS_LIST) {
+    const tierUsage = usageByTier.get(tier);
+    if (!tierUsage) continue;
+    const subs = [...tierUsage.values()]
+      .map(toSubUsageRow)
+      .sort(byMatchDayCountThenName);
+    tierSubUsage.push({ tier, subs });
+  }
+  return tierSubUsage;
 });
+
+function toSubUsageRow(accumulator: SubUsageAccumulator): SubUsageRow {
+  const matchDayLabels = [...accumulator.matchDays]
+    .sort((first, second) => first - second)
+    .map((matchDay) => `MD ${matchDay}`);
+  return {
+    userID: accumulator.userID,
+    name: accumulator.name,
+    playerIgn: accumulator.playerIgn,
+    isCurrentlySubbed: accumulator.isCurrentlySubbed,
+    matchDayLabels: matchDayLabels,
+    teams: [...accumulator.teamsById.values()],
+  };
+}
+
+function byMatchDayCountThenName(first: SubUsageRow, second: SubUsageRow) {
+  const countDifference =
+    second.matchDayLabels.length - first.matchDayLabels.length;
+  if (countDifference !== 0) return countDifference;
+  return first.name.localeCompare(second.name);
+}

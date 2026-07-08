@@ -1,5 +1,5 @@
 import Contracts from "@/components/staff/FM/Contracts";
-import ActiveSubsPanel from "@/components/staff/FM/ActiveSubsPanel";
+import SubUsagePanel from "@/components/staff/FM/SubUsagePanel";
 
 export default async function Page() {
   return (
@@ -8,7 +8,7 @@ export default async function Page() {
         <h1 className="text-lg lg:text-xl py-2">Contracts</h1>
         <Contracts />
       </section>
-      <ActiveSubsPanel />
+      <SubUsagePanel />
     </div>
   );
 }
