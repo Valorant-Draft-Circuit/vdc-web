@@ -36,6 +36,18 @@ export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
   UPDATE_TIER: "TIER",
 };
 
+export const STINT_ENDED_LABELS: Partial<Record<TransactionType, string>> = {
+  SUB: "SUB → UNSUB",
+  CAPTAIN: "- CAPTAIN",
+  IR: "- IR",
+};
+
+export const STINT_ENDED_COLOR_MAP: Partial<Record<TransactionType, string>> = {
+  SUB: "border border-vdcBlue/50 text-vdcBlue",
+  CAPTAIN: "border border-vdcRed/50 text-vdcRed",
+  IR: "border border-vdcYellow/50 text-vdcYellow",
+};
+
 export const TRANSACTION_TYPE_COLOR_MAP: Record<TransactionType, string> = {
   SIGN: "bg-vdcGreen/20 text-vdcGreen",
   RENEW: "bg-vdcGreen/20 text-vdcGreen",
