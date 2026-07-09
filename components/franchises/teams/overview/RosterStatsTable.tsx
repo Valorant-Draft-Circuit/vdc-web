@@ -73,8 +73,8 @@ export default function RosterStatsTable({
       </h2>
       {sortedRows.some((row) => row.replaces) && (
         <h3 className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-          Subbed-out players share a row with their replacement (pairing
-          inferred) and the sub&apos;s stats are shown. Use the swap button to
+          Subbed out players share a row with their replacement 
+          and the sub&apos;s stats are shown. Use the swap button to
           see the original player.
         </h3>
       )}
