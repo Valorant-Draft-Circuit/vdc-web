@@ -79,9 +79,9 @@ export default function RosterStatsTable({
         </h3>
       )}
       {sortedRows.length === 0 ? (
-        <h3 className="text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="text-sm text-gray-500 dark:text-gray-400">
           No players rostered
-        </h3>
+        </h2>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
