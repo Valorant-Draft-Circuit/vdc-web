@@ -8,6 +8,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { isUserPlaying } from "@/lib/common/player";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
+import { avatarColor } from "@/lib/common/avatar";
 
 export default function PlayerCard({
   player,
@@ -43,13 +45,13 @@ export default function PlayerCard({
         />
       )}
 
-      <ImageWithFallback
-        src={player.image}
-        fallbackSrc={"/vdc-flame.svg"}
-        className="mx-auto size-18 rounded-full"
-        alt={`${player.discordName} avatar`}
-        width={500}
-        height={500}
+      <PlayerAvatar
+        name={player.discordName ?? player.riotIGN ?? "??"}
+        image={player.image ?? null}
+        fallbackColor={avatarColor(String(player.discordId ?? player.id))}
+        sizeClass="size-18"
+        pixels={72}
+        textClass="text-lg"
       />
 
       <div className="flex-1">

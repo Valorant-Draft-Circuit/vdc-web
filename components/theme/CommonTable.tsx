@@ -5,7 +5,11 @@ import {
   FormattedGameStat,
   FormattedStat,
 } from "@/lib/queries/stats/stats";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/16/solid";
+import {
+  ArrowDownTrayIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@heroicons/react/16/solid";
 import {
   Column,
   ColumnDef,
@@ -24,7 +28,13 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useMemo, useEffect, InputHTMLAttributes } from "react";
-import { Switch } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Switch,
+} from "@headlessui/react";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,16 +57,20 @@ const TEXT_KEYS = [
   "contractStatus",
 ];
 
-export default function StatsTable({
+export default function CommonTable({
   data,
   gameType,
   tier,
+  season,
   hiddenFields,
+  exportName = "vdc-stats",
 }: {
   data;
   gameType?;
   tier?;
+  season?: number;
   hiddenFields?: string[];
+  exportName?: string;
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [combineFilter, setCombineFilter] = useState<CombineFilter>("all");
@@ -218,6 +232,68 @@ export default function StatsTable({
     debugColumns: false,
   });
 
+  const exportColumns = () =>
+    table.getVisibleFlatColumns().filter((column) => column.id !== "roles");
+
+  const exportFileName = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    return [
+      exportName,
+      season ? `s${season}` : null,
+      tier ? String(tier).toLowerCase() : null,
+      today,
+    ]
+      .filter(Boolean)
+      .join("-");
+  };
+
+  const downloadFile = (content: string, mimeType: string, extension: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${exportFileName()}.${extension}`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportCsv = () => {
+    const csvColumns = exportColumns();
+    const headerLine = csvColumns
+      .map((column) => {
+        const field = FIELDS.find(({ key }) => key === column.id);
+        return csvCell(field?.label ?? column.id);
+      })
+      .join(",");
+    const rowLines = table.getRowModel().rows.map((row) =>
+      csvColumns
+        .map((column) => {
+          const value = row.getValue(column.id);
+          if (Array.isArray(value)) return csvCell(value.join(" | "));
+          return csvCell(value);
+        })
+        .join(","),
+    );
+    const csv = [headerLine, ...rowLines].join("\n");
+    downloadFile(csv, "text/csv;charset=utf-8", "csv");
+  };
+
+  const exportJson = () => {
+    const jsonColumns = exportColumns();
+    const exportRows = table.getRowModel().rows.map((row) => {
+      const exportRow: Record<string, unknown> = {};
+      for (const column of jsonColumns) {
+        exportRow[column.id] = row.getValue(column.id) ?? null;
+      }
+      return exportRow;
+    });
+    downloadFile(
+      JSON.stringify(exportRows, null, 2),
+      "application/json;charset=utf-8",
+      "json",
+    );
+  };
+
   if (!data) {
     return <h1 className=" p-4 text-center text-vdcRed">Loading...</h1>;
   }
@@ -237,6 +313,41 @@ export default function StatsTable({
           setCurrentTierOnlyFilter={setCurrentTierOnlyFilter}
         />
       )}
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xs uppercase tracking-wider text-gray-500">
+          {table.getRowModel().rows.length} players
+        </h2>
+        <Menu>
+          <MenuButton className="flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-semibold uppercase tracking-wider bg-vdcWhite/40 dark:bg-vdcBlack/40 text-gray-600 dark:text-gray-400 data-hover:cursor-pointer data-hover:text-vdcRed">
+            <ArrowDownTrayIcon className="size-4" />
+            <h2>Export</h2>
+            <ChevronDownIcon className="size-3.5" />
+          </MenuButton>
+          <MenuItems
+            anchor="bottom end"
+            className="z-50 mt-1 min-w-28 overflow-hidden rounded-md bg-vdcWhite dark:bg-vdcGrey shadow-lg ring-1 ring-black/5 focus:outline-none"
+          >
+            <MenuItem>
+              <button
+                type="button"
+                onClick={exportCsv}
+                className="w-full px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider data-focus:bg-slate-200 dark:data-focus:bg-vdcBlack/40 hover:cursor-pointer"
+              >
+                <h2>CSV</h2>
+              </button>
+            </MenuItem>
+            <MenuItem>
+              <button
+                type="button"
+                onClick={exportJson}
+                className="w-full px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider data-focus:bg-slate-200 dark:data-focus:bg-vdcBlack/40 hover:cursor-pointer"
+              >
+                <h2>JSON</h2>
+              </button>
+            </MenuItem>
+          </MenuItems>
+        </Menu>
+      </div>
       <div className="max-h-[70vh] overflow-auto">
         <table className="w-full text-sm">
           <thead>
@@ -388,7 +499,7 @@ function TableRow({ row }: { row: Row<TableRowData>; idx: number }) {
   return (
     <tr
       key={row.id}
-      className="group border-t border-vdcBlack/5 dark:border-vdcWhite/5 hover:bg-slate-200 dark:hover:bg-vdcBlack/20"
+      className="group border-t border-vdcBlack/5 dark:border-vdcWhite/5 even:bg-slate-200/60 dark:even:bg-vdcBlack/15 hover:bg-slate-200 dark:hover:bg-vdcBlack/25"
     >
       {row.getVisibleCells().map((cell) => {
         if (cell.column.id === "name") {
@@ -396,7 +507,7 @@ function TableRow({ row }: { row: Row<TableRowData>; idx: number }) {
           return (
             <td
               key={cell.id}
-              className="whitespace-nowrap px-2 py-2 sticky left-0 z-10 bg-slate-100 dark:bg-vdcGrey group-hover:bg-slate-200 dark:group-hover:bg-[#292c30] border-r border-vdcBlack/5 dark:border-vdcWhite/5"
+              className="whitespace-nowrap px-2 py-2 sticky left-0 z-10 bg-slate-100 dark:bg-vdcGrey group-even:bg-slate-200 dark:group-even:bg-[#2c2f33] group-hover:bg-slate-200 dark:group-hover:bg-[#292c30] border-r border-vdcBlack/5 dark:border-vdcWhite/5"
             >
               <Link
                 href={`/player/${encodedPlayer}`}
@@ -472,4 +583,11 @@ function DebouncedInput({
       onChange={(e) => setValue(e.target.value)}
     />
   );
+}
+
+function csvCell(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const text = String(value);
+  if (/[",\n]/.test(text)) return `"${text.replaceAll('"', '""')}"`;
+  return text;
 }

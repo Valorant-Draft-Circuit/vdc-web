@@ -46,7 +46,7 @@ export default async function TeamPanel({
               <div className="h-64 rounded-md bg-slate-100 dark:bg-vdcGrey animate-pulse" />
             }
           >
-            <TeamStatsPanel teamId={team.id} season={season} />
+            <TeamStatsPanel teamId={team.id} season={season} tier={team.tier} />
           </Suspense>
         ) : null,
     },
@@ -75,15 +75,13 @@ export default async function TeamPanel({
   ];
 
   return (
-    <div className="p-5 xl:py-3 xl:px-0">
-      <HorizontalTab tabElements={viewTabs} params="view" />
-    </div>
+    <HorizontalTab tabElements={viewTabs} params="view" />
   );
 }
 
 export function TeamPanelSkeleton() {
   return (
-    <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-4 animate-pulse">
+    <div className="flex flex-col gap-3 animate-pulse">
       <div className="h-10 rounded-md bg-slate-100 dark:bg-vdcGrey" />
       <div className="h-14 rounded-md bg-slate-100 dark:bg-vdcGrey" />
       <div className="h-64 rounded-md bg-slate-100 dark:bg-vdcGrey" />

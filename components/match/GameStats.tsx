@@ -1,10 +1,10 @@
-import StatsTable from "../stats/StatsTable";
+import CommonTable from "../theme/CommonTable";
 import { getStatsBy } from "@/lib/queries/stats/stats";
 
 export default async function GameStats({ gameId }: { gameId: string }) {
   const data = await getStatsBy({ gameId });
   if (data.length === 0) return <NoStatsFound />;
-  return <StatsTable data={data} />;
+  return <CommonTable data={data} />;
 }
 
 function NoStatsFound() {

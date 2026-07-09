@@ -90,7 +90,7 @@ export default async function Page({ searchParams }: Props) {
   }));
 
   return (
-    <div className="mx-auto py-10 xl:py-12 flex flex-col gap-1 xl:gap-2">
+    <div className="mx-auto py-10 xl:py-12 flex flex-col gap-3">
       <Suspense>
         <StatsTitle defaultQueries={defaultQueries} />
       </Suspense>
