@@ -44,9 +44,6 @@ export default function RosterStatsTable({
 
   const sortedRows = useMemo(() => {
     const compare = (first: RosterStatRow, second: RosterStatRow) => {
-      if (first.isRosterMember !== second.isRosterMember) {
-        return first.isRosterMember ? -1 : 1;
-      }
       const a = first[sortCol];
       const b = second[sortCol];
       if (a === null && b === null) return 0;
@@ -175,11 +172,6 @@ function RosterStatRowItem({
               className={`rounded px-1.5 py-0.5 font-bold tracking-wider flex-none ${BADGE_COLOR_MAP[displayed.badge]}`}
             >
               {displayed.badge}
-            </h2>
-          )}
-          {!displayed.isRosterMember && (
-            <h2 className="rounded px-1.5 py-0.5 font-bold tracking-wider flex-none bg-vdcBlue/20 text-vdcBlue">
-              SUB
             </h2>
           )}
           {row.replaces && (
