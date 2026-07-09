@@ -142,7 +142,7 @@ export default function CommonTable({
         if (Array.isArray(val)) {
           if (key === "roles") {
             return (
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-nowrap gap-1">
                 {val.map((iconUrl: string) => (
                   <Image
                     key={iconUrl}
@@ -543,7 +543,7 @@ function Filter({ column }: { column: Column<TableRowData> }) {
   const columnFilterValue = column.getFilterValue();
   return (
     <DebouncedInput
-      className="w-full px-1 border border-vdcGrey rounded text-xsxl:text-sm  focus:outline-vdcRed dark:text-vdcWhite"
+      className="w-full px-1.5 py-0.5 rounded border border-vdcRed/60 text-xs focus:border-vdcRed focus:outline-none dark:text-vdcWhite placeholder:text-gray-500"
       onChange={(value) => column.setFilterValue(value)}
       placeholder={`Search...`}
       type="text"

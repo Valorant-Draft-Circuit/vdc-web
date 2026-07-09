@@ -57,11 +57,11 @@ export default function TransactionRowItem({
             )}
           </div>
         )}
-        <h3
+        <h2
           className={`text-sm text-gray-500 flex-none w-7 text-right ${teamLinkTier ? "" : "ml-auto"}`}
         >
           {row.dateLabel}
-        </h3>
+        </h2>
       </div>
     </li>
   );
