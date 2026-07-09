@@ -51,6 +51,17 @@ type TransactionWithRelations = Prisma.TransactionGetPayload<{
   include: typeof transactionInclude;
 }>;
 
+export const getTeamTransactions = cache(
+  async (teamId: number, season: number): Promise<RecentTransactionRow[]> => {
+    const transactions = await prisma.transaction.findMany({
+      where: { season: season, team: teamId },
+      include: transactionInclude,
+      orderBy: { date: "desc" },
+    });
+    return mergeStints(transactions);
+  },
+);
+
 export const getRecentTransactions = cache(
   async (season: number): Promise<TransactionGroup[] | null> => {
     const tierGroupPromises = TIERS_LIST.map(async (tier) => ({

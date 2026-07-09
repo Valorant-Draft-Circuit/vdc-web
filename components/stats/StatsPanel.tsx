@@ -1,6 +1,6 @@
 import { GameType, Tier } from "@prisma/client";
 import { getStatsBy } from "@/lib/queries/stats/stats";
-import StatsTable from "./StatsTable";
+import CommonTable from "../theme/CommonTable";
 
 export default async function StatsPanel({
   tier,
@@ -13,10 +13,11 @@ export default async function StatsPanel({
 }) {
   const data = await getStatsBy({ tier, season, gameType });
   return (
-    <StatsTable
+    <CommonTable
       data={data}
       gameType={gameType.toLowerCase()}
       tier={tier.toLowerCase()}
+      season={season}
     />
   );
 }

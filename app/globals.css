@@ -52,6 +52,7 @@
 @source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 @source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 @source inline('{data-selected:,}border-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('data-selected:bg-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 @source inline('from-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 
 body {

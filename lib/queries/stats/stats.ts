@@ -1,7 +1,7 @@
-import { avg } from "@/lib/common/math";
 import { determineTierWithTierLines, getMMRTierLines } from "@/lib/common/tier";
 import { hasFlags } from "@/lib/common/flags";
 import { normalizeAgentName } from "@/lib/common/agents";
+import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel, Flags } from "@/prisma";
 import { Tier, GameType } from "@prisma/client";
@@ -47,40 +47,41 @@ export const HEADERS = [
 export const FIELDS = [
   { key: "discord", label: "DISCORD" },
   { key: "name", label: "NAME" },
+  { key: "roles", label: "ROLES" },
   { key: "agents", label: "AGENT" },
   { key: "franchise", label: "FRANCHISE" },
   { key: "team", label: "TEAM" },
   { key: "mmr", label: "MMR" },
   { key: "tier", label: "TIER" },
-  { key: "leagueStatus", label: "LEAGUE_STATUS" },
-  { key: "contractStatus", label: "CONTRACT_STATUS" },
-  { key: "contractRemaining", label: "CONTRACT_REMAINING" },
-  { key: "matchesPlayed", label: "MP" },
-  { key: "attackRating", label: "ATK_RATING" },
-  { key: "defenseRating", label: "DEF_RATING" },
-  { key: "rating", label: "RATING" },
-  { key: "acs", label: "ACS" },
-  { key: "totalKills", label: "K" },
-  { key: "totalDeaths", label: "D" },
-  { key: "totalAssists", label: "A" },
-  { key: "kdr", label: "KD" },
-  { key: "kpr", label: "KPR" },
-  { key: "apr", label: "APR" },
-  { key: "adr", label: "ADR" },
-  { key: "totalPlants", label: "PLANTS" },
-  { key: "totalDefuses", label: "DEFUSES" },
+  { key: "leagueStatus", label: "STATUS", title: "League Status" },
+  { key: "contractStatus", label: "CONTRACT", title: "Contract Status" },
+  { key: "contractRemaining", label: "SZNs", title: "Contract Remaining" },
+  { key: "matchesPlayed", label: "MP", title: "Matches Played" },
+  { key: "attackRating", label: "ATK", title: "Attack Rating" },
+  { key: "defenseRating", label: "DEF", title: "Defense Rating" },
+  { key: "rating", label: "RATING", title: "Overall Rating" },
+  { key: "acs", label: "ACS", title: "Average Combat Score" },
+  { key: "totalKills", label: "K", title: "Kills" },
+  { key: "totalDeaths", label: "D", title: "Deaths" },
+  { key: "totalAssists", label: "A", title: "Assists" },
+  { key: "kdr", label: "KD", title: "Kill/Death Ratio" },
+  { key: "kpr", label: "KPR", title: "Kills Per Round" },
+  { key: "apr", label: "APR", title: "Assists Per Round" },
+  { key: "adr", label: "ADR", title: "Average Damage Per Round" },
+  { key: "totalPlants", label: "PLA", title: "Plants" },
+  { key: "totalDefuses", label: "DEF", title: "Defuses" },
   //{ key: 'totalExitKills', label: 'EXIT_KILLS' },
-  { key: "totalEcoKills", label: "ECO_KILLS" },
-  { key: "totalAntiecoKills", label: "ANTIECO_KILLS" },
-  { key: "totalTradeKills", label: "TRADE_KILLS" },
-  { key: "totalTradeDeaths", label: "TRADE_DEATHS" },
-  { key: "totalClutches", label: "CLUTCHES" },
-  { key: "firstKills", label: "FK" },
-  { key: "fkpr", label: "FKPR" },
-  { key: "firstDeaths", label: "FD" },
-  { key: "fdpr", label: "FDPR" },
-  { key: "hs", label: "HS" },
-  { key: "kast", label: "KAST" },
+  { key: "totalEcoKills", label: "EK", title: "Eco Kills" },
+  { key: "totalAntiecoKills", label: "AEK", title: "Anti-Eco Kills" },
+  { key: "totalTradeKills", label: "TK", title: "Trade Kills" },
+  { key: "totalTradeDeaths", label: "TD", title: "Trade Deaths" },
+  { key: "totalClutches", label: "CL", title: "Clutches" },
+  { key: "firstKills", label: "FK", title: "First Kills" },
+  { key: "fkpr", label: "FKPR", title: "First Kills Per Round" },
+  { key: "firstDeaths", label: "FD", title: "First Deaths" },
+  { key: "fdpr", label: "FDPR", title: "First Deaths Per Round" },
+  { key: "hs", label: "HS", title: "Headshot Percentage" },
+  { key: "kast", label: "KAST", title: "Kill/Assist/Survive/Trade Percentage" },
 ];
 
 export type GroupedPlayerStats = {
@@ -162,6 +163,8 @@ export type PlayerNameTeam = {
   } | null;
   Team: {
     name: string;
+    tier: Tier;
+    Franchise: { slug: string };
   } | null;
   flags: string;
   tier: Tier;
@@ -190,6 +193,9 @@ export type FormattedStat = {
   firstKills: number | null;
   firstDeaths: number | null;
   hs: number | null;
+  roles?: string[];
+  teamSlug?: string | null;
+  teamTier?: Tier | null;
 };
 
 export type FormattedGameStat = {
@@ -208,16 +214,6 @@ export type FormattedGameStat = {
   firstKills: number | null;
   firstDeaths: number | null;
   hs: number | null;
-};
-
-export type FormattedTeamStat = {
-  name: string | null;
-  rating: number | null;
-  acs: number | null;
-  totalKills: number | null;
-  totalDeaths: number | null;
-  totalAssists: number | null;
-  kdr: number | null;
 };
 
 type StatsQuery = {
@@ -250,7 +246,14 @@ export async function getStatsBy(statsQuery: StatsQuery) {
     return await formatStats({ playerStats, statType: "gameStats" });
   } else if (statsQuery.teamId && statsQuery.season) {
     playerStats = await getStatsByTeam(statsQuery.teamId, statsQuery.season);
-    return await formatStats({ playerStats, statType: "teamStats" });
+    const [formatted, roleIconsByIgn] = await Promise.all([
+      formatStats({ playerStats }),
+      getTeamRoleIcons(statsQuery.teamId, statsQuery.season),
+    ]);
+    return (formatted as FormattedStat[]).map((row) => ({
+      ...row,
+      roles: row.name ? (roleIconsByIgn.get(row.name) ?? []) : [],
+    }));
   } else {
     playerStats = await getOverallPlayerStats(statsQuery);
     return await formatStats({ playerStats, gameType: statsQuery.gameType });
@@ -286,26 +289,85 @@ async function getStatsByTeam(teamId: number, season: number) {
   return prisma.playerStats.groupBy({
     where: {
       Game: { season: season, gameType: gameType },
-      Player: {
-        team: teamId,
-      },
+      team: teamId,
     },
     by: ["userID"],
     _sum: {
       kills: true,
       deaths: true,
       assists: true,
+      plants: true,
+      defuses: true,
+      firstKills: true,
+      firstDeaths: true,
+      tradeKills: true,
+      tradeDeaths: true,
+      ecoKills: true,
+      antiEcoKills: true,
+      ecoDeaths: true,
+      exitKills: true,
+      clutches: true,
     },
     _avg: {
       acs: true,
       ratingAttack: true,
       ratingDefense: true,
       kast: true,
+      kills: true,
+      assists: true,
+      firstKills: true,
+      firstDeaths: true,
+      hsPercent: true,
     },
     _count: {
       userID: true,
     },
   });
+}
+
+async function getTeamRoleIcons(
+  teamId: number,
+  season: number,
+): Promise<Map<string, string[]>> {
+  const leagueState = await ControlPanel.getLeagueState();
+  const gameType =
+    leagueState === "COMBINES" ? GameType.COMBINE : GameType.SEASON;
+
+  const [agentRows, catalog] = await Promise.all([
+    prisma.playerStats.findMany({
+      where: {
+        Game: { season: season, gameType: gameType },
+        team: teamId,
+      },
+      select: {
+        agent: true,
+        Player: {
+          select: { PrimaryRiotAccount: { select: { riotIGN: true } } },
+        },
+      },
+    }),
+    getAgentCatalog(),
+  ]);
+
+  const roleGameCountsByIgn = new Map<string, Map<string, number>>();
+  for (const row of agentRows) {
+    const riotIgn = row.Player.PrimaryRiotAccount?.riotIGN;
+    const role = catalog[normalizeAgentName(row.agent)]?.role;
+    if (!riotIgn || !role?.iconUrl) continue;
+    const roleCounts =
+      roleGameCountsByIgn.get(riotIgn) ?? new Map<string, number>();
+    roleGameCountsByIgn.set(riotIgn, roleCounts);
+    roleCounts.set(role.iconUrl, (roleCounts.get(role.iconUrl) ?? 0) + 1);
+  }
+
+  const roleIconsByIgn = new Map<string, string[]>();
+  for (const [riotIgn, roleCounts] of roleGameCountsByIgn) {
+    const iconsByUsage = [...roleCounts.entries()]
+      .sort((first, second) => second[1] - first[1])
+      .map(([iconUrl]) => iconUrl);
+    roleIconsByIgn.set(riotIgn, iconsByUsage);
+  }
+  return roleIconsByIgn;
 }
 
 async function getAggregatedPlayerStatsByMatch(
@@ -534,7 +596,7 @@ async function formatStats(opts: {
   playerStats: GroupedPlayerStats[] | GroupedGamePlayerStats[];
   statType?: string;
   gameType?: GameType;
-}): Promise<FormattedStat[] | FormattedGameStat[] | FormattedTeamStat[]> {
+}): Promise<FormattedStat[] | FormattedGameStat[]> {
   const userIds = opts.playerStats.map((ps) => ps.userID);
   const mmrTierLines = await getMMRTierLines();
   const usersData = await prisma.user.findMany({
@@ -550,7 +612,11 @@ async function formatStats(opts: {
         },
       },
       Team: {
-        select: { name: true },
+        select: {
+          name: true,
+          tier: true,
+          Franchise: { select: { slug: true } },
+        },
       },
       flags: true,
     },
@@ -589,22 +655,6 @@ async function formatStats(opts: {
         hs: stats._avg.hsPercent,
       };
     });
-  } else if (opts.statType === "teamStats") {
-    return opts.playerStats.map((stats): FormattedTeamStat => {
-      const user = userMap[stats.userID];
-      const kills = stats._sum.kills ?? 0;
-      const deaths = stats._sum.deaths ?? 0;
-      const rating = avg([stats._avg.ratingAttack, stats._avg.ratingDefense]);
-      return {
-        name: user?.PrimaryRiotAccount?.riotIGN ?? null,
-        rating: rating,
-        acs: stats._avg.acs,
-        totalKills: kills,
-        totalDeaths: deaths,
-        totalAssists: stats._sum.assists,
-        kdr: deaths === 0 ? null : kills / deaths,
-      };
-    });
   } else {
     return opts.playerStats.map((stats): FormattedStat => {
       const user = userMap[stats.userID];
@@ -640,6 +690,8 @@ async function formatStats(opts: {
       return {
         name: user?.PrimaryRiotAccount?.riotIGN ?? null,
         team: teamName,
+        teamSlug: user?.Team?.Franchise.slug ?? null,
+        teamTier: user?.Team?.tier ?? null,
         currentTier: user.tier,
         matchesPlayed: stats._count.userID,
         acs: stats._avg.acs,

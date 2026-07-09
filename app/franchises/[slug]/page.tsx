@@ -1,5 +1,7 @@
 import TeamPanel, {
   TeamPanelSkeleton,
+  TEAM_VIEWS,
+  TeamView,
 } from "@/components/franchises/teams/TeamPanel";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
 import { TabElement } from "@/components/tabs/types";
@@ -78,6 +80,12 @@ export default async function Page({ params, searchParams }: Props) {
   }
 
   const activeTeam = sp.team as string;
+  const viewParam = typeof sp.view === "string" ? sp.view.toLowerCase() : "";
+  const activeView: TeamView = (TEAM_VIEWS as readonly string[]).includes(
+    viewParam,
+  )
+    ? (viewParam as TeamView)
+    : "overview";
   const activeTeams: TabElement[] = tabMeta.map((meta) => ({
     id: meta.id,
     query: meta.query,
@@ -86,14 +94,14 @@ export default async function Page({ params, searchParams }: Props) {
     content:
       meta.query.toLowerCase() === activeTeam ? (
         <Suspense fallback={<TeamPanelSkeleton />}>
-          <TeamPanel team={meta.team} />
+          <TeamPanel team={meta.team} view={activeView} />
         </Suspense>
       ) : null,
   }));
 
   return (
     <div className="mx-auto max-w-400 pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
+      <div className="mx-auto xl:max-w-5xl flex flex-col gap-3">
         <div
           style={{ "--p": primary, "--s": secondary } as React.CSSProperties}
           className="relative xl:col-span-5 xl:rounded-3xl px-10 py-32 overflow-hidden xl:shadow-2xl bg-gradient-to-tl from-[var(--p)] to-[var(--s)]"
@@ -137,7 +145,7 @@ export default async function Page({ params, searchParams }: Props) {
             </div>
           </div>
         </div>
-        <div className="xl:max-w-5xl flex flex-col gap-5">
+        <div className="xl:max-w-5xl flex flex-col gap-3">
           {activeTeams.length === 0 ? (
             <div className="text-center text-vdcGrey dark:text-vdcWhite py-10">
               No active teams for this franchise.
