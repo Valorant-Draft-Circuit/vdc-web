@@ -12,7 +12,6 @@ export type RosterStatRow = {
   avatarUrl: string | null;
   mmr: number | null;
   badge: RosterBadge | null;
-  isRosterMember: boolean;
   rating: number | null;
   acs: number | null;
   kills: number | null;
@@ -32,11 +31,9 @@ export function buildRosterStatRows(
   }
 
   const rows: RosterStatRow[] = [];
-  const claimedIgns = new Set<string>();
 
   for (const player of roster) {
     const stat = player.riotName ? statsByIgn.get(player.riotName) : undefined;
-    if (player.riotName) claimedIgns.add(player.riotName);
     rows.push({
       key: player.id,
       displayName: player.riotName ?? player.name ?? "Unknown",
@@ -45,33 +42,12 @@ export function buildRosterStatRows(
       avatarUrl: player.image ?? null,
       mmr: player.PrimaryRiotAccount?.MMR?.mmrEffective ?? null,
       badge: deriveBadge(player),
-      isRosterMember: true,
       rating: stat ? combinedRating(stat) : null,
       acs: stat?.acs ?? null,
       kills: stat?.totalKills ?? null,
       deaths: stat?.totalDeaths ?? null,
       assists: stat?.totalAssists ?? null,
       kdr: stat?.kdr ?? null,
-    });
-  }
-
-  for (const stat of teamStats) {
-    if (!stat.name || claimedIgns.has(stat.name)) continue;
-    rows.push({
-      key: stat.name,
-      displayName: stat.name,
-      playerIgn: stat.name,
-      discordId: null,
-      avatarUrl: null,
-      mmr: null,
-      badge: null,
-      isRosterMember: false,
-      rating: combinedRating(stat),
-      acs: stat.acs,
-      kills: stat.totalKills,
-      deaths: stat.totalDeaths,
-      assists: stat.totalAssists,
-      kdr: stat.kdr,
     });
   }
   return mergeSubbedOutPlayers(rows);
