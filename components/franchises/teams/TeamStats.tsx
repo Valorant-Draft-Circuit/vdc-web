@@ -8,5 +8,5 @@ type Props = {
 
 export default async function TeamStatsPanel({ teamId, season }: Props) {
   const data = await getStatsBy({ teamId, season });
-  return <StatsTable data={data} />;
+  return <StatsTable data={data} hiddenFields={["team"]} />;
 }

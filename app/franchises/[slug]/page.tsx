@@ -1,5 +1,7 @@
 import TeamPanel, {
   TeamPanelSkeleton,
+  TEAM_VIEWS,
+  TeamView,
 } from "@/components/franchises/teams/TeamPanel";
 import HorizontalTab from "@/components/tabs/HorizontalTab";
 import { TabElement } from "@/components/tabs/types";
@@ -78,6 +80,12 @@ export default async function Page({ params, searchParams }: Props) {
   }
 
   const activeTeam = sp.team as string;
+  const viewParam = typeof sp.view === "string" ? sp.view.toLowerCase() : "";
+  const activeView: TeamView = (TEAM_VIEWS as readonly string[]).includes(
+    viewParam,
+  )
+    ? (viewParam as TeamView)
+    : "overview";
   const activeTeams: TabElement[] = tabMeta.map((meta) => ({
     id: meta.id,
     query: meta.query,
@@ -86,7 +94,7 @@ export default async function Page({ params, searchParams }: Props) {
     content:
       meta.query.toLowerCase() === activeTeam ? (
         <Suspense fallback={<TeamPanelSkeleton />}>
-          <TeamPanel team={meta.team} />
+          <TeamPanel team={meta.team} view={activeView} />
         </Suspense>
       ) : null,
   }));

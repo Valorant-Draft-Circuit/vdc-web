@@ -17,6 +17,7 @@ import {
 } from "@tanstack/react-table";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
 import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
+import { avatarColor } from "@/lib/common/avatar";
 
 type Props = {
   rows: LeaderRow[];
@@ -31,26 +32,9 @@ const RANK_COLOR: Record<number, string> = {
   3: "#cd853f",
 };
 
-const AVATAR_PALETTE = [
-  "#9b59b6",
-  "#3498db",
-  "#2ecc71",
-  "#f1c40f",
-  "#FF9266",
-  "#de3845",
-];
-
 const HEADER_BASE =
   "sticky top-0 z-10 border-b border-gray-300 bg-gray-100 px-2.5 py-3 text-[10px] uppercase tracking-wide text-vdcGrey backdrop-blur-sm dark:border-gray-600 dark:bg-vdcBlack dark:text-gray-400";
 const CELL_BASE = "border-b border-gray-200 px-2.5 py-2.5 dark:border-gray-600";
-
-function avatarColor(seed: string): string {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-  }
-  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
-}
 
 function accuracyValue(row: LeaderRow): number {
   if (row.resolved === 0) {

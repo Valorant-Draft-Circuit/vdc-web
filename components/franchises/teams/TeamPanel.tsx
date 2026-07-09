@@ -1,213 +1,93 @@
-import { getSeasonCached, getStandingsByCached } from "@/lib/common/cache";
-import { getApexRankings } from "@/lib/queries/standings/standings";
-import PlayerCard from "./PlayerCard";
-import MatchCard from "@/components/schedule/MatchCard";
-import Divider from "@/components/theme/Divider";
-import { ControlPanel } from "@/prisma";
-import {
-  calculateTeamTotalMmr,
-  FranchiseTeam,
-} from "@/lib/queries/franchises/franchises";
-import { Standing } from "@/lib/queries/standings/standings";
+import { Suspense } from "react";
+import HorizontalTab from "@/components/tabs/HorizontalTab";
+import { TabElement } from "@/components/tabs/types";
+import { getSeasonCached } from "@/lib/common/cache";
+import { FranchiseTeam } from "@/lib/queries/franchises/franchises";
+import TeamMapsLoader from "./maps/TeamMapsLoader";
+import TeamMapsSkeleton from "./maps/TeamMapsSkeleton";
+import TeamOverview from "./overview/TeamOverview";
+import TeamOverviewSkeleton from "./overview/TeamOverviewSkeleton";
 import TeamStatsPanel from "./TeamStats";
+import TeamTransactionsLoader from "./transactions/TeamTransactionsLoader";
+import TeamTransactionsSkeleton from "./transactions/TeamTransactionsSkeleton";
 
-export default async function TeamPanel({ team }: { team: FranchiseTeam }) {
+export const TEAM_VIEWS = ["overview", "stats", "maps", "transactions"] as const;
+export type TeamView = (typeof TEAM_VIEWS)[number];
+
+export default async function TeamPanel({
+  team,
+  view,
+}: {
+  team: FranchiseTeam;
+  view: TeamView;
+}) {
   const season = await getSeasonCached();
 
-  const standings = await getStandingsByCached(season, team.tier);
-  const idx = standings.findIndex((s) => s.teamName === team.name);
-  const [teamStats, rank] = [standings[idx], idx];
-  const mmrShow = await ControlPanel.getMMRDisplayState();
-  const isApexRank =
-    typeof rank === "number" && rank < getApexRankings(standings);
-  const { futureGames, pastGames, Roster } = team;
-
-  const teamTotalMmr = calculateTeamTotalMmr(Roster);
-  let rosterPanelTitle = "Roster";
-  if (mmrShow) {
-    rosterPanelTitle = `Roster (MMR Σ: ${teamTotalMmr})`;
-  }
-
-  return (
-    <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-5">
-      <div className="rounded-md drop-shadow-lg">
-        <TeamStats stats={teamStats} rank={rank} isApexRank={isApexRank} />
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-2 text-md">
-        <PanelSection title={rosterPanelTitle}>
-          <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
-            {Roster.length > 0 ? (
-              <>
-                {Roster.map((player, i: number) => (
-                  <PlayerCard
-                    key={player.id ?? i}
-                    player={player}
-                    mmrShow={mmrShow}
-                  />
-                ))}
-              </>
-            ) : (
-              <EmptyMessage text={"There's no one here :("} />
-            )}
-          </div>
-        </PanelSection>
-        <div className="flex-1 flex-col">
-          <PanelSection title="Team Stats">
+  const viewTabs: TabElement[] = [
+    {
+      query: "overview",
+      name: "Overview",
+      color: "vdcRed",
+      content:
+        view === "overview" ? (
+          <Suspense fallback={<TeamOverviewSkeleton />}>
+            <TeamOverview team={team} />
+          </Suspense>
+        ) : null,
+    },
+    {
+      query: "stats",
+      name: "Stats",
+      color: "vdcRed",
+      content:
+        view === "stats" ? (
+          <Suspense
+            fallback={
+              <div className="h-64 rounded-md bg-slate-100 dark:bg-vdcGrey animate-pulse" />
+            }
+          >
             <TeamStatsPanel teamId={team.id} season={season} />
-          </PanelSection>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <MatchSection
-          title="Match History"
-          matches={pastGames}
-          emptyText="No matches played yet"
-        />
-        <MatchSection
-          title="Upcoming Matches"
-          matches={futureGames}
-          emptyText="No matches scheduled"
-        />
-      </div>
-    </div>
-  );
-}
-
-function PanelSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col">
-      <Divider title={title} />
-      {children}
-    </div>
-  );
-}
-
-function MatchSection({
-  title,
-  matches,
-  emptyText,
-}: {
-  title: string;
-  matches: FranchiseTeam["futureGames"] | FranchiseTeam["pastGames"];
-  emptyText: string;
-}) {
-  return (
-    <PanelSection title={title}>
-      {matches.length > 0 ? (
-        <div className="grid grid-cols-1 gap-2 p-2">
-          {matches.map((match, index) => (
-            <div key={index}>
-              <div className="pb-2 text-vdcGrey dark:text-gray-300 text-sm xl:text-md">
-                <h1>{match.date}</h1>
-              </div>
-              <MatchCard match={match} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <EmptyMessage text={emptyText} />
-      )}
-    </PanelSection>
-  );
-}
-
-function EmptyMessage({ text }: { text: string }) {
-  return (
-    <div className="text-center my-auto text-sm text-vdcRed">
-      <div className="px-4 py-5 sm:p-6">
-        <h1>{text}</h1>
-      </div>
-    </div>
-  );
-}
-
-function TeamStats({
-  stats,
-  rank,
-  isApexRank,
-}: {
-  stats: Standing | undefined;
-  rank: number;
-  isApexRank: boolean;
-}) {
-  const entries = [
-    { label: "RANK: ", value: rank >= 0 ? rank + 1 : "N/A" },
-    { label: "W: ", value: stats?.wins || 0 },
-    { label: "L: ", value: stats?.losses || 0 },
-    { label: "RWP: ", value: `${((stats?.rwp ?? 0) * 100).toFixed(0) || 0}%` },
+          </Suspense>
+        ) : null,
+    },
+    {
+      query: "maps",
+      name: "Maps",
+      color: "vdcRed",
+      content:
+        view === "maps" ? (
+          <Suspense fallback={<TeamMapsSkeleton />}>
+            <TeamMapsLoader teamId={team.id} season={season} />
+          </Suspense>
+        ) : null,
+    },
+    {
+      query: "transactions",
+      name: "Transactions",
+      color: "vdcRed",
+      content:
+        view === "transactions" ? (
+          <Suspense fallback={<TeamTransactionsSkeleton />}>
+            <TeamTransactionsLoader teamId={team.id} season={season} />
+          </Suspense>
+        ) : null,
+    },
   ];
 
   return (
-    <div className="flex bg-gray-100 dark:bg-[#353543] text-xs text-vdcGrey dark:text-gray-300 rounded-md overflow-hidden">
-      {entries.map((e) => {
-        const isRank = e.label === "RANK: ";
-        return (
-          <div
-            key={e.label}
-            className="flex flex-1 items-center justify-between px-2 py-4 xl:py-5 border-x border-vdcBlack first:border-l-0 last:border-r-0 gap-2 text-xs xl:text-md"
-          >
-            <h1>{e.label}</h1>
-            <h1 className={isRank && isApexRank ? "text-vdcRed font-bold" : ""}>
-              {e.value}
-            </h1>
-          </div>
-        );
-      })}
+    <div className="p-5 xl:py-3 xl:px-0">
+      <HorizontalTab tabElements={viewTabs} params="view" />
     </div>
   );
 }
 
 export function TeamPanelSkeleton() {
   return (
-    <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-5 animate-pulse">
-      <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-md drop-shadow-lg" />
-      <div className="flex flex-col sm:flex-row gap-2 text-md">
-        <div className="flex-1 flex flex-col">
-          <Divider title="Roster" />
-          <div className="grid grid-cols-1 gap-2 xl:p-2 mx-auto">
-            {Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="h-16 bg-gray-200 dark:bg-gray-700 rounded-md w-full"
-                />
-              ))}
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col">
-          <Divider title="Team Stats" />
-          <div className="px-4 py-5 sm:p-6 w-full space-y-2">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        {["Match History", "Upcoming Matches"].map((section) => (
-          <div key={section} className="flex flex-col">
-            <Divider title={section} />
-            <div className="grid grid-cols-1 gap-2 p-2">
-              {Array(3)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 w-full">
-                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
-                    <div className="flex-1 h-16 bg-gray-200 dark:bg-gray-700 rounded-md" />
-                  </div>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="p-5 xl:py-3 xl:px-0 flex flex-col gap-4 animate-pulse">
+      <div className="h-10 rounded-md bg-slate-100 dark:bg-vdcGrey" />
+      <div className="h-14 rounded-md bg-slate-100 dark:bg-vdcGrey" />
+      <div className="h-64 rounded-md bg-slate-100 dark:bg-vdcGrey" />
+      <div className="h-40 rounded-md bg-slate-100 dark:bg-vdcGrey" />
     </div>
   );
 }
