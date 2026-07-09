@@ -200,6 +200,6 @@ export async function getRecentTransactionsCached(
   if (hit !== undefined) return hit;
 
   const recentTransactions = await getRecentTransactions(season);
-  cache.set(key, recentTransactions, minutes(30));
+  cache.set(key, recentTransactions, minutes(1));
   return recentTransactions;
 }
