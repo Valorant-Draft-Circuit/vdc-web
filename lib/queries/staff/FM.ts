@@ -9,6 +9,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { deriveTeamIdFromStats } from "@/lib/common/player";
 
 export type FormattedContract = {
   discord: string | null;
@@ -168,39 +169,54 @@ export const getSeasonSubUsage = cache(async (): Promise<TierSubUsage[]> => {
     },
   });
 
+  const statsByUser = new Map<string, typeof seasonStats>();
+  for (const stat of seasonStats) {
+    const userStats = statsByUser.get(stat.userID) ?? [];
+    userStats.push(stat);
+    statsByUser.set(stat.userID, userStats);
+  }
+
   const usageByTier = new Map<Tier, Map<string, SubUsageAccumulator>>();
 
-  for (const stat of seasonStats) {
-    const statTeamId = stat.team;
-    const matchDay = stat.Game.Match?.matchDay;
-    if (statTeamId === null || statTeamId === stat.Player.team) continue;
-    if (!stat.Team || matchDay == null) continue;
+  for (const userStats of statsByUser.values()) {
+    const rosterTeamIds = new Set<number>();
+    const currentTeamId = userStats[0].Player.team;
+    if (currentTeamId !== null) rosterTeamIds.add(currentTeamId);
+    const pluralityTeamId = deriveTeamIdFromStats(userStats);
+    if (pluralityTeamId !== null) rosterTeamIds.add(pluralityTeamId);
 
-    const tierUsage =
-      usageByTier.get(stat.Game.tier) ??
-      new Map<string, SubUsageAccumulator>();
-    usageByTier.set(stat.Game.tier, tierUsage);
+    for (const stat of userStats) {
+      const statTeamId = stat.team;
+      const matchDay = stat.Game.Match?.matchDay;
+      if (statTeamId === null || rosterTeamIds.has(statTeamId)) continue;
+      if (!stat.Team || matchDay == null) continue;
 
-    const accumulator = tierUsage.get(stat.userID) ?? {
-      userID: stat.userID,
-      name:
-        stat.Player.PrimaryRiotAccount?.riotIGN ??
-        stat.Player.name ??
-        "Unknown",
-      playerIgn: stat.Player.PrimaryRiotAccount?.riotIGN ?? null,
-      isCurrentlySubbed:
-        stat.Player.Status?.contractStatus === ContractStatus.ACTIVE_SUB,
-      matchDays: new Set<number>(),
-      teamsById: new Map<number, SubbedTeam>(),
-    };
-    tierUsage.set(stat.userID, accumulator);
+      const tierUsage =
+        usageByTier.get(stat.Game.tier) ??
+        new Map<string, SubUsageAccumulator>();
+      usageByTier.set(stat.Game.tier, tierUsage);
 
-    accumulator.matchDays.add(matchDay);
-    accumulator.teamsById.set(statTeamId, {
-      name: stat.Team.name,
-      logo: stat.Team.Franchise.Brand?.logo ?? null,
-      franchiseSlug: stat.Team.Franchise.slug,
-    });
+      const accumulator = tierUsage.get(stat.userID) ?? {
+        userID: stat.userID,
+        name:
+          stat.Player.PrimaryRiotAccount?.riotIGN ??
+          stat.Player.name ??
+          "Unknown",
+        playerIgn: stat.Player.PrimaryRiotAccount?.riotIGN ?? null,
+        isCurrentlySubbed:
+          stat.Player.Status?.contractStatus === ContractStatus.ACTIVE_SUB,
+        matchDays: new Set<number>(),
+        teamsById: new Map<number, SubbedTeam>(),
+      };
+      tierUsage.set(stat.userID, accumulator);
+
+      accumulator.matchDays.add(matchDay);
+      accumulator.teamsById.set(statTeamId, {
+        name: stat.Team.name,
+        logo: stat.Team.Franchise.Brand?.logo ?? null,
+        franchiseSlug: stat.Team.Franchise.slug,
+      });
+    }
   }
 
   const tierSubUsage: TierSubUsage[] = [];
@@ -209,7 +225,7 @@ export const getSeasonSubUsage = cache(async (): Promise<TierSubUsage[]> => {
     if (!tierUsage) continue;
     const subs = [...tierUsage.values()]
       .map(toSubUsageRow)
-      .sort(byMatchDayCountThenName);
+      .sort(bySubbedInThenUsage);
     tierSubUsage.push({ tier, subs });
   }
   return tierSubUsage;
@@ -229,7 +245,10 @@ function toSubUsageRow(accumulator: SubUsageAccumulator): SubUsageRow {
   };
 }
 
-function byMatchDayCountThenName(first: SubUsageRow, second: SubUsageRow) {
+function bySubbedInThenUsage(first: SubUsageRow, second: SubUsageRow) {
+  if (first.isCurrentlySubbed !== second.isCurrentlySubbed) {
+    return first.isCurrentlySubbed ? -1 : 1;
+  }
   const countDifference =
     second.matchDayLabels.length - first.matchDayLabels.length;
   if (countDifference !== 0) return countDifference;

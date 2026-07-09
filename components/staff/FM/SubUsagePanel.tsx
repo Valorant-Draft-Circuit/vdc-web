@@ -61,11 +61,10 @@ function SubUsageRowItem({ sub, tier }: { sub: SubUsageRow; tier: Tier }) {
             href={`/player/${encodeURIComponent(sub.playerIgn)}`}
             className="hover:text-vdcRed"
           >
-            <h2 className="truncate"></h2>
-            {sub.name}
+            <h2 className="truncate">{sub.name}</h2>
           </Link>
         ) : (
-          <h2 className="truncate">sub.name</h2>
+          <h2 className="truncate">{sub.name}</h2>
         )}
         {sub.isCurrentlySubbed && (
           <h2 className="rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider bg-vdcBlue/20 text-vdcBlue flex-none">
