@@ -58,7 +58,7 @@ export default function TeamMatchList({
       ) : (
         <ul
           onScroll={revealMoreMatchesAtListBottom}
-          className="flex flex-col max-h-52 overflow-y-auto"
+          className="flex flex-col max-h-52 overflow-y-auto pr-3"
         >
           {visibleMatches.map((match) => (
             <TeamMatchRow
