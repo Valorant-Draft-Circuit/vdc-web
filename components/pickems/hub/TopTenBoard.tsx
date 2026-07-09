@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Tier } from "@prisma/client";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
-import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
 
 type Props = {
   rows: LeaderRow[];

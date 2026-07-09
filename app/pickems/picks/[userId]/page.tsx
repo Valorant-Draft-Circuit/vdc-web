@@ -18,7 +18,7 @@ import ReadonlyPicks from "@/components/pickems/matches/ReadonlyPicks";
 import BracketPicker from "@/components/pickems/bracket/BracketPicker";
 import HubButton from "@/components/pickems/common/HubButton";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
-import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
 
 export const metadata: Metadata = {
   title: "VDC | Pick'ems",

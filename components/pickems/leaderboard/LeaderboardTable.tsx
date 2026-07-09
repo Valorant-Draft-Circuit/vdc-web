@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
-import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
 import { avatarColor } from "@/lib/common/avatar";
 
 type Props = {

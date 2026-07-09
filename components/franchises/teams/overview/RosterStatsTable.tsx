@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowsRightLeftIcon } from "@heroicons/react/16/solid";
 import DiscordBadge from "@/components/buttons/DiscordBadge";
-import PlayerAvatar from "@/components/pickems/common/PlayerAvatar";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
 import { avatarColor } from "@/lib/common/avatar";
 import { RosterBadge, RosterStatRow } from "@/lib/common/team";
 

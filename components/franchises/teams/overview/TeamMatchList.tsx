@@ -10,7 +10,7 @@ import { Tier } from "@prisma/client";
 
 type TeamMatch = FranchiseTeam["pastGames"][number];
 
-const INITIAL_VISIBLE_MATCHES = 5;
+const INITIAL_VISIBLE_MATCHES = 10;
 const SHOW_MORE_STEP = 5;
 
 export default function TeamMatchList({
