@@ -49,7 +49,7 @@ export default function HorizontalTab({
       onChange={handleChange}
       className="flex flex-col gap-3"
     >
-      <div className="xl:hidden sticky top-0 z-40 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
+      <div className="xl:hidden sticky top-0 z-40 has-data-open:z-50 bg-vdcWhite dark:bg-vdcBlack mx-auto w-full pt-5 px-10 sm:px-12 ">
         <MobileTabs
           tabElements={tabElements}
           selected={selectedIndex}
