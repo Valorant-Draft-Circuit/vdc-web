@@ -25,6 +25,7 @@ type Props = {
   viewerId: string | null;
   season: number;
   linkTier: string;
+  showTotals: boolean;
 };
 
 const RANK_COLOR: Record<number, string> = {
@@ -60,7 +61,10 @@ function cellClasses(columnId: string): string {
   if (columnId === "points") {
     return `${CELL_BASE} text-[15px] font-extrabold ${alignment}`;
   }
-  if (columnId === "accuracy") {
+  if (columnId === "total") {
+    return `${CELL_BASE} text-sm font-semibold ${alignment}`;
+  }
+  if (columnId === "accuracy" || columnId === "tiers") {
     return `${CELL_BASE} text-sm text-vdcGrey dark:text-gray-400 ${alignment}`;
   }
   return `${CELL_BASE} text-sm ${alignment}`;
@@ -71,60 +75,72 @@ export default function LeaderboardTable({
   viewerId,
   season,
   linkTier,
+  showTotals,
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "points", desc: true },
   ]);
   const [search, setSearch] = useState("");
 
-  const columns = useMemo<ColumnDef<LeaderRow>[]>(
-    () => [
-      {
-        id: "player",
-        header: "Player",
-        accessorFn: (row) => row.name,
-        enableSorting: false,
-        cell: ({ row }) => {
-          const player = row.original;
-          const isViewer = viewerId !== null && player.userId === viewerId;
-          return (
-            <Link
-              href={`/pickems/picks/${player.userId}?tier=${linkTier}&season=${season}`}
-              className="flex items-center gap-2.5 transition-colors hover:cursor-pointer hover:text-vdcRed"
-            >
-              <PlayerAvatar
-                name={player.name}
-                image={player.image}
-                fallbackColor={avatarColor(player.userId)}
-                sizeClass="size-7"
-                pixels={28}
-                textClass="text-[11px]"
-              />
-              {player.name}
-              {isViewer && (
-                <h1 className="ml-1.5 text-[9px] font-extrabold text-vdcRed">
-                  YOU
-                </h1>
-              )}
-            </Link>
-          );
-        },
+  const columns = useMemo<ColumnDef<LeaderRow>[]>(() => {
+    const playerColumn: ColumnDef<LeaderRow> = {
+      id: "player",
+      header: "Player",
+      accessorFn: (row) => row.name,
+      enableSorting: false,
+      cell: ({ row }) => {
+        const player = row.original;
+        const isViewer = viewerId !== null && player.userId === viewerId;
+        return (
+          <Link
+            href={`/pickems/picks/${player.userId}?tier=${linkTier}&season=${season}`}
+            className="flex items-center gap-2.5 transition-colors hover:cursor-pointer hover:text-vdcRed"
+          >
+            <PlayerAvatar
+              name={player.name}
+              image={player.image}
+              fallbackColor={avatarColor(player.userId)}
+              sizeClass="size-7"
+              pixels={28}
+              textClass="text-[11px]"
+            />
+            {player.name}
+            {isViewer && (
+              <h1 className="ml-1.5 text-[9px] font-extrabold text-vdcRed">
+                YOU
+              </h1>
+            )}
+          </Link>
+        );
       },
-      {
-        id: "points",
-        header: "Points",
-        accessorKey: "points",
-        cell: ({ getValue }) => formatPoints(getValue<number>()),
-      },
-      {
-        id: "accuracy",
-        header: "Accuracy",
-        accessorFn: (row) => accuracyValue(row),
-        cell: ({ row }) => accuracyText(row.original),
-      },
-    ],
-    [viewerId, season, linkTier],
-  );
+    };
+    const pointsColumn: ColumnDef<LeaderRow> = {
+      id: "points",
+      header: showTotals ? "Avg" : "Points",
+      accessorKey: "points",
+      cell: ({ getValue }) => formatPoints(getValue<number>()),
+    };
+    const totalColumn: ColumnDef<LeaderRow> = {
+      id: "total",
+      header: "Total",
+      accessorKey: "totalPoints",
+      cell: ({ getValue }) => formatPoints(getValue<number>()),
+    };
+    const tiersColumn: ColumnDef<LeaderRow> = {
+      id: "tiers",
+      header: "Tiers",
+      accessorKey: "resolvedTiers",
+    };
+    const accuracyColumn: ColumnDef<LeaderRow> = {
+      id: "accuracy",
+      header: "Accuracy",
+      accessorFn: (row) => accuracyValue(row),
+      cell: ({ row }) => accuracyText(row.original),
+    };
+    return showTotals
+      ? [playerColumn, pointsColumn, totalColumn, tiersColumn, accuracyColumn]
+      : [playerColumn, pointsColumn, accuracyColumn];
+  }, [viewerId, season, linkTier, showTotals]);
 
   const table = useReactTable({
     data: rows,

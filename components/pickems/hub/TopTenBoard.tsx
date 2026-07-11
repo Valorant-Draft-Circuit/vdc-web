@@ -60,6 +60,11 @@ export default function TopTenBoard({
                   textClass="text-[10px]"
                 />
                 <h2 className="flex-1 truncate text-sm">{row.name}</h2>
+                {boardTier === null && (
+                  <h2 className="text-[10px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
+                    {row.resolvedTiers} {row.resolvedTiers === 1 ? "tier" : "tiers"}
+                  </h2>
+                )}
                 <h2 className="text-sm font-bold tabular-nums">
                   {formatPoints(row.points)}
                 </h2>

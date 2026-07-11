@@ -36,6 +36,7 @@ export type BestTier = { tier: Tier; points: number };
 export type LeaderRow = TierScoreRow & {
   totalPoints: number;
   bestTier: BestTier;
+  resolvedTiers: number;
 };
 
 export type LeaderboardScope =
@@ -82,7 +83,6 @@ export const getLeaderboard = cache(
     }
 
     const rows = new Map<string, LeaderRow>();
-    const resolvedTiersByUser = new Map<string, number>();
     tierBoards.forEach((board, boardIndex) => {
       const boardTier = tiersToScore[boardIndex];
       for (const tierRow of board.values()) {
@@ -93,10 +93,11 @@ export const getLeaderboard = cache(
             ...tierRow,
             totalPoints: tierRow.points,
             bestTier: { tier: boardTier, points: tierRow.points },
+            resolvedTiers: resolvedIncrement,
           });
-          resolvedTiersByUser.set(tierRow.userId, resolvedIncrement);
           continue;
         }
+        existing.resolvedTiers += resolvedIncrement;
         existing.totalPoints += tierRow.points;
         existing.correct += tierRow.correct;
         existing.resolved += tierRow.resolved;
@@ -105,21 +106,17 @@ export const getLeaderboard = cache(
         if (tierRow.points > existing.bestTier.points) {
           existing.bestTier = { tier: boardTier, points: tierRow.points };
         }
-        resolvedTiersByUser.set(
-          tierRow.userId,
-          resolvedTiersByUser.get(tierRow.userId)! + resolvedIncrement,
-        );
       }
     });
 
     const isOverall = tier === null;
     for (const row of rows.values()) {
-      const resolvedTiers = resolvedTiersByUser.get(row.userId)!;
       if (!isOverall) {
         row.points = row.totalPoints;
         continue;
       }
-      row.points = resolvedTiers > 0 ? row.totalPoints / resolvedTiers : 0;
+      row.points =
+        row.resolvedTiers > 0 ? row.totalPoints / row.resolvedTiers : 0;
     }
 
     return [...rows.values()].sort((a, b) => {
