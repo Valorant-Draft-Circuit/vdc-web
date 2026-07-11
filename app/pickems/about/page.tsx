@@ -119,7 +119,8 @@ export default async function PickemsAboutPage() {
           so playing one tier or five is equally fair. A tier only counts
           toward your average once results have resolved in it, so joining a
           new tier mid-season never drops your standing before its matches are
-          played. Ties are broken by match-winner accuracy.
+          played. Prefer raw totals? The Overall board also shows a sortable
+          Total column. Ties are broken by match-winner accuracy.
         </p>
       </section>
     </div>

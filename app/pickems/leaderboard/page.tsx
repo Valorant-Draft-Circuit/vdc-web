@@ -138,13 +138,14 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           viewerId={viewerId}
           season={season}
           linkTier={linkTier}
+          showTotals={view === "overall"}
         />
       )}
 
       <p className="text-[11px] text-vdcGrey dark:text-gray-400">
         {isGroupRanking
           ? "Group score = average points of members who made picks. The Members column shows participants out of total. Ties broken by total points."
-          : "Ties broken by accuracy. Overall = sum of points across every tier you played."}
+          : "Ties broken by accuracy. Overall ranks by average points across your tiers with resolved results; sort the Total column to rank by combined points instead."}
       </p>
     </div>
   );
