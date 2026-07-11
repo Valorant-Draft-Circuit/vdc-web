@@ -66,6 +66,10 @@ export default function StandingHero({
       <HeroCell value={formatPoints(row.points)} label="Avg pts" />
       <HeroCell value={formatPoints(row.totalPoints)} label="Total pts" />
       <HeroCell
+        value={String(row.resolvedTiers)}
+        label={row.resolvedTiers === 1 ? "Tier" : "Tiers"}
+      />
+      <HeroCell
         value={row.bestTier.tier}
         label={`Best tier · ${formatPoints(row.bestTier.points)} pts`}
         accent={TIER_HEX_COLOR_MAP[row.bestTier.tier]}
