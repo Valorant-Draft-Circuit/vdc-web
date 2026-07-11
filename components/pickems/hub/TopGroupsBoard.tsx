@@ -11,9 +11,10 @@ type Props = {
 };
 
 export default function TopGroupsBoard({ rows, season, boardTier }: Props) {
-  const showAllHref = boardTier
-    ? `/pickems/leaderboard?season=${season}&scope=groups&view=${boardTier.toLowerCase()}`
-    : `/pickems/leaderboard?season=${season}&scope=groups`;
+  const viewParam = boardTier ? `&view=${boardTier.toLowerCase()}` : "";
+  const showAllHref = `/pickems/leaderboard?season=${season}&scope=groups${viewParam}`;
+  const groupHref = (groupId: number) =>
+    `/pickems/leaderboard?season=${season}&scope=group:${groupId}${viewParam}`;
 
   return (
     <div className="rounded-md border border-black/5 bg-vdcWhite/40 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-vdcBlack/40">
@@ -36,28 +37,30 @@ export default function TopGroupsBoard({ rows, season, boardTier }: Props) {
       ) : (
         <ol className="flex flex-col gap-1">
           {rows.map((row, index) => (
-            <li
-              key={row.groupId}
-              className="flex items-center gap-3 rounded px-2 py-1.5"
-            >
-              <h2 className="w-5 flex-none text-center text-xs font-bold tabular-nums text-vdcGrey dark:text-gray-400">
-                {index + 1}
-              </h2>
-              <span className="relative size-6 flex-none overflow-hidden rounded-full">
-                <Image
-                  src={AGENTURL(row.image)}
-                  alt={row.name}
-                  fill
-                  className="object-cover"
-                />
-              </span>
-              <h2 className="flex-1 truncate text-sm">{row.name}</h2>
-              <h2 className="text-[10px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
-                {row.participantCount}/{row.memberCount} playing
-              </h2>
-              <h2 className="w-12 text-right text-sm font-bold tabular-nums">
-                {row.averagePoints.toFixed(1)}
-              </h2>
+            <li key={row.groupId}>
+              <Link
+                href={groupHref(row.groupId)}
+                className="flex items-center gap-3 rounded px-2 py-1.5 hover:bg-black/5 dark:hover:bg-white/5"
+              >
+                <h2 className="w-5 flex-none text-center text-xs font-bold tabular-nums text-vdcGrey dark:text-gray-400">
+                  {index + 1}
+                </h2>
+                <span className="relative size-6 flex-none overflow-hidden rounded-full">
+                  <Image
+                    src={AGENTURL(row.image)}
+                    alt={row.name}
+                    fill
+                    className="object-cover"
+                  />
+                </span>
+                <h2 className="flex-1 truncate text-sm">{row.name}</h2>
+                <h2 className="text-[10px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
+                  {row.participantCount}/{row.memberCount} playing
+                </h2>
+                <h2 className="w-12 text-right text-sm font-bold tabular-nums">
+                  {row.averagePoints.toFixed(1)}
+                </h2>
+              </Link>
             </li>
           ))}
         </ol>

@@ -1,29 +1,12 @@
 import { outcomeOf, type ResolvedMatch } from "./resolve";
 import type { Score, SeededTeam } from "./picks";
 
-const CORRECT_WINNER_POINTS = 1;
-const EXACT_SCORE_BONUS = 2;
+export const CORRECT_WINNER_POINTS = 0.2;
 const MADE_CUTOFF_POINTS = 2;
 const EXACT_SEED_BONUS = 1;
 
 export function scoreMatchPick(pick: Score, result: ResolvedMatch): number {
-  if (!result.resolved) {
-    return 0;
-  }
-
-  let points = 0;
-  const predictedOutcome = outcomeOf(pick.home, pick.away);
-  const actualOutcome = outcomeOf(result.homeScore, result.awayScore);
-  if (predictedOutcome === actualOutcome) {
-    points += CORRECT_WINNER_POINTS;
-  }
-
-  const exactScore =
-    pick.home === result.homeScore && pick.away === result.awayScore;
-  if (exactScore) {
-    points += EXACT_SCORE_BONUS;
-  }
-  return points;
+  return isWinnerCorrect(pick, result) ? CORRECT_WINNER_POINTS : 0;
 }
 
 export function scoreAdvancePick(

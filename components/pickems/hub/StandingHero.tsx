@@ -1,4 +1,6 @@
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
+import { formatPoints } from "@/lib/pickems/format";
+import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
 
 type Props = {
   row: LeaderRow | null;
@@ -7,10 +9,23 @@ type Props = {
   loggedIn: boolean;
 };
 
-function HeroCell({ value, label }: { value: string; label: string }) {
+function HeroCell({
+  value,
+  label,
+  accent,
+}: {
+  value: string;
+  label: string;
+  accent?: string;
+}) {
   return (
     <div className="flex flex-col items-center gap-0.5">
-      <h1 className="text-2xl font-extrabold tabular-nums">{value}</h1>
+      <h1
+        className="text-2xl font-extrabold tabular-nums"
+        style={accent ? { color: accent } : undefined}
+      >
+        {value}
+      </h1>
       <h2 className="text-[10px] uppercase tracking-wider text-vdcRed">
         {label}
       </h2>
@@ -45,8 +60,16 @@ export default function StandingHero({
   const percentile = Math.max(1, Math.round((rank / totalPlayers) * 100));
 
   return (
-    <div className={`${surface} flex items-center justify-around px-6 py-6`}>
-      <HeroCell value={String(row.points)} label="Total pts" />
+    <div
+      className={`${surface} flex flex-wrap items-center justify-around gap-x-4 gap-y-4 px-6 py-6`}
+    >
+      <HeroCell value={formatPoints(row.points)} label="Avg pts" />
+      <HeroCell value={formatPoints(row.totalPoints)} label="Total pts" />
+      <HeroCell
+        value={row.bestTier.tier}
+        label={`Best tier · ${formatPoints(row.bestTier.points)} pts`}
+        accent={TIER_HEX_COLOR_MAP[row.bestTier.tier]}
+      />
       <HeroCell value={`#${rank}`} label={`of ${totalPlayers} players`} />
       <HeroCell value={`Top ${percentile}%`} label="Overall" />
     </div>

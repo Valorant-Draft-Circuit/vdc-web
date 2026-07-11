@@ -8,6 +8,7 @@ import {
   TrophyIcon,
 } from "@heroicons/react/16/solid";
 import { pickRandomMapSplashes } from "@/lib/common/maps";
+import { formatPoints } from "@/lib/pickems/format";
 import type {
   HubOverview,
   StageSummary,
@@ -34,10 +35,10 @@ function pointsLine(summary: StageSummary): string | null {
     return null;
   }
   if (summary.state === "dead") {
-    return `up to ${summary.maxPoints} pts`;
+    return `up to ${formatPoints(summary.maxPoints)} pts`;
   }
-  const scored = summary.points !== null ? String(summary.points) : "-";
-  return `${scored} / ${summary.maxPoints} pts`;
+  const scored = summary.points !== null ? formatPoints(summary.points) : "-";
+  return `${scored} / ${formatPoints(summary.maxPoints)} pts`;
 }
 
 function StageCard({
@@ -96,8 +97,8 @@ function StageCard({
               points
             ) : (
               <>
-                <b style={{ color: accent }}>{summary.points}</b>
-                {` / ${summary.maxPoints} pts`}
+                <b style={{ color: accent }}>{formatPoints(summary.points)}</b>
+                {` / ${formatPoints(summary.maxPoints)} pts`}
               </>
             )}
           </h2>

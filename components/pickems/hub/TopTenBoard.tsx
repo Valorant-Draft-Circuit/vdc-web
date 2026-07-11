@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Tier } from "@prisma/client";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
+import { formatPoints } from "@/lib/pickems/format";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
 
 type Props = {
@@ -59,7 +60,9 @@ export default function TopTenBoard({
                   textClass="text-[10px]"
                 />
                 <h2 className="flex-1 truncate text-sm">{row.name}</h2>
-                <h2 className="text-sm font-bold tabular-nums">{row.points}</h2>
+                <h2 className="text-sm font-bold tabular-nums">
+                  {formatPoints(row.points)}
+                </h2>
               </Link>
             </li>
           ))}

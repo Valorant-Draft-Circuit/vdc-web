@@ -1,4 +1,5 @@
 import TeamMark from "@/components/pickems/common/TeamMark";
+import { formatPoints } from "@/lib/pickems/format";
 import { legalScores } from "@/lib/pickems/picks";
 import type {
   ReadonlyMatch,
@@ -13,11 +14,8 @@ function resultText(match: ReadonlyMatch): string {
   if (match.pick === null) {
     return `${actual} · No pick`;
   }
-  if (match.points === 3) {
-    return `${actual} · Exact +3`;
-  }
-  if (match.points === 1) {
-    return `${actual} · Winner +1`;
+  if (match.points > 0) {
+    return `${actual} · Correct +${formatPoints(match.points)}`;
   }
   return `${actual} · Missed +0`;
 }
@@ -121,7 +119,8 @@ export default function ResultSlateGrid({
               </p>
             </div>
             <h2 className="text-right text-[10px] font-normal text-vdcGrey dark:text-gray-400">
-              {slate.slatePoints} pts &middot; {slate.correct}/{slate.total}
+              {formatPoints(slate.slatePoints)} pts &middot; {slate.correct}/
+              {slate.total}
             </h2>
           </div>
           <div className="flex flex-col gap-2.5">
