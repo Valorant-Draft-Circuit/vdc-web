@@ -2,7 +2,11 @@ import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveMatch, type GameResult } from "@/lib/pickems/resolve";
-import { scoreAdvancePick, scoreMatchPick } from "@/lib/pickems/scoring";
+import {
+  CORRECT_WINNER_POINTS,
+  scoreAdvancePick,
+  scoreMatchPick,
+} from "@/lib/pickems/scoring";
 import { randomAdvanceSet, randomScore } from "@/lib/pickems/picks";
 import { lockCountdown } from "@/lib/pickems/format";
 import {
@@ -118,7 +122,12 @@ async function summarizeMatchesStage(
     }
   }
 
-  return { state, statusLabel, points, maxPoints: resolvedCount * 3 };
+  return {
+    state,
+    statusLabel,
+    points,
+    maxPoints: resolvedCount * CORRECT_WINNER_POINTS,
+  };
 }
 
 async function summarizeAdvancementStage(

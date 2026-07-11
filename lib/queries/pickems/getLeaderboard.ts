@@ -21,13 +21,21 @@ import {
   type BracketPick,
 } from "@/lib/pickems/bracket";
 
-export type LeaderRow = {
+type TierScoreRow = {
   userId: string;
   name: string;
   image: string | null;
   points: number;
   correct: number;
   resolved: number;
+  hasResolvedPicks: boolean;
+};
+
+export type BestTier = { tier: Tier; points: number };
+
+export type LeaderRow = TierScoreRow & {
+  totalPoints: number;
+  bestTier: BestTier;
 };
 
 export type LeaderboardScope =
@@ -68,30 +76,50 @@ export const getLeaderboard = cache(
       }
     }
 
-    const rows = new Map<string, LeaderRow>();
-    const ensureRow = (
-      userId: string,
-      name: string | null,
-      image: string | null,
-    ) => {
-      const existing = rows.get(userId);
-      if (existing) {
-        return existing;
-      }
-      const created: LeaderRow = {
-        userId,
-        name: name ?? "Player",
-        image: image ?? null,
-        points: 0,
-        correct: 0,
-        resolved: 0,
-      };
-      rows.set(userId, created);
-      return created;
-    };
-
+    const tierBoards: Map<string, TierScoreRow>[] = [];
     for (const tierToScore of tiersToScore) {
-      await scoreTier(season, tierToScore, memberIds, ensureRow);
+      tierBoards.push(await scoreTier(season, tierToScore, memberIds));
+    }
+
+    const rows = new Map<string, LeaderRow>();
+    const resolvedTiersByUser = new Map<string, number>();
+    tierBoards.forEach((board, boardIndex) => {
+      const boardTier = tiersToScore[boardIndex];
+      for (const tierRow of board.values()) {
+        const resolvedIncrement = tierRow.hasResolvedPicks ? 1 : 0;
+        const existing = rows.get(tierRow.userId);
+        if (existing === undefined) {
+          rows.set(tierRow.userId, {
+            ...tierRow,
+            totalPoints: tierRow.points,
+            bestTier: { tier: boardTier, points: tierRow.points },
+          });
+          resolvedTiersByUser.set(tierRow.userId, resolvedIncrement);
+          continue;
+        }
+        existing.totalPoints += tierRow.points;
+        existing.correct += tierRow.correct;
+        existing.resolved += tierRow.resolved;
+        existing.hasResolvedPicks =
+          existing.hasResolvedPicks || tierRow.hasResolvedPicks;
+        if (tierRow.points > existing.bestTier.points) {
+          existing.bestTier = { tier: boardTier, points: tierRow.points };
+        }
+        resolvedTiersByUser.set(
+          tierRow.userId,
+          resolvedTiersByUser.get(tierRow.userId)! + resolvedIncrement,
+        );
+      }
+    });
+
+    const isOverall = tier === null;
+    for (const row of rows.values()) {
+      const resolvedTiers = resolvedTiersByUser.get(row.userId)!;
+      if (!isOverall) {
+        row.points = row.totalPoints;
+        continue;
+      }
+      row.points = resolvedTiers > 0 ? row.totalPoints / resolvedTiers : 0;
     }
 
     return [...rows.values()].sort((a, b) => {
@@ -107,14 +135,32 @@ async function scoreTier(
   season: number,
   tier: Tier,
   memberIds: Set<string> | null,
-  ensureRow: (
+): Promise<Map<string, TierScoreRow>> {
+  const isExcluded = (userId: string) =>
+    memberIds !== null && !memberIds.has(userId);
+
+  const rows = new Map<string, TierScoreRow>();
+  const ensureRow = (
     userId: string,
     name: string | null,
     image: string | null,
-  ) => LeaderRow,
-) {
-  const isExcluded = (userId: string) =>
-    memberIds !== null && !memberIds.has(userId);
+  ) => {
+    const existing = rows.get(userId);
+    if (existing) {
+      return existing;
+    }
+    const created: TierScoreRow = {
+      userId,
+      name: name ?? "Player",
+      image: image ?? null,
+      points: 0,
+      correct: 0,
+      resolved: 0,
+      hasResolvedPicks: false,
+    };
+    rows.set(userId, created);
+    return created;
+  };
 
   const matches = await prisma.matches.findMany({
     where: {
@@ -198,6 +244,7 @@ async function scoreTier(
           randomScore(userId, matchId, match.matchType);
         row.points += scoreMatchPick(pick, result);
         row.resolved += 1;
+        row.hasResolvedPicks = true;
         if (isWinnerCorrect(pick, result)) {
           row.correct += 1;
         }
@@ -264,6 +311,7 @@ async function scoreTier(
           advanceActual.length,
         );
       row.points += scoreAdvancePick(predicted, advanceActual);
+      row.hasResolvedPicks = true;
     }
   }
 
@@ -279,7 +327,7 @@ async function scoreTier(
     },
   });
   if (bracketPicks.length === 0) {
-    return;
+    return rows;
   }
 
   const bracketPicksByUser = new Map<string, BracketPick[]>();
@@ -312,5 +360,10 @@ async function scoreTier(
     row.points += score.points;
     row.correct += score.correct;
     row.resolved += score.resolved;
+    if (score.resolved > 0) {
+      row.hasResolvedPicks = true;
+    }
   }
+
+  return rows;
 }

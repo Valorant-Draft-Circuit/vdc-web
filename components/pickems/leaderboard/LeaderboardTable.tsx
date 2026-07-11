@@ -16,6 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
+import { formatPoints } from "@/lib/pickems/format";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
 import { avatarColor } from "@/lib/common/avatar";
 
@@ -113,7 +114,7 @@ export default function LeaderboardTable({
         id: "points",
         header: "Points",
         accessorKey: "points",
-        cell: ({ getValue }) => getValue<number>(),
+        cell: ({ getValue }) => formatPoints(getValue<number>()),
       },
       {
         id: "accuracy",

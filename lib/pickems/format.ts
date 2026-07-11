@@ -45,6 +45,10 @@ export function lockCountdown(lockTime: Date, now: Date): string {
   return `Locks in ${minutes}m`;
 }
 
+export function formatPoints(points: number): string {
+  return String(Math.round(points * 100) / 100);
+}
+
 export function lockBadgeShort(lockTime: Date, now: Date): string {
   const { remainingMs, days, hours } = timeUntilLock(lockTime, now);
   if (remainingMs <= 0) {

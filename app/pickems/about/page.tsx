@@ -58,11 +58,7 @@ export default async function PickemsAboutPage() {
         <h2 className="text-lg font-bold">Scoring</h2>
         <h1 className="text-sm font-bold text-vdcRed">Match picks</h1>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
-          <li>+1 for the correct winner (or correctly calling a draw)</li>
-          <li>+2 for the exact series score</li>
-          <li>
-            A perfect pick (correct winner and exact score) is worth 3 points
-          </li>
+          <li>+0.2 for the correct winner (or correctly calling a draw)</li>
         </ul>
         <h1 className="mt-1 text-sm font-bold text-vdcRed">Advancement</h1>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
@@ -119,8 +115,11 @@ export default async function PickemsAboutPage() {
         <h2 className="text-lg font-bold">Leaderboards</h2>
         <p className="text-sm text-vdcBlack dark:text-vdcWhite">
           View the Global board, a per-tier board, or any of your group boards.
-          The Overall view sums your points across every tier you played. Ties
-          are broken by match-winner accuracy.
+          The Overall view averages your points across the tiers you played,
+          so playing one tier or five is equally fair. A tier only counts
+          toward your average once results have resolved in it, so joining a
+          new tier mid-season never drops your standing before its matches are
+          played. Ties are broken by match-winner accuracy.
         </p>
       </section>
     </div>
