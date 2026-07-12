@@ -49,7 +49,7 @@ export default function TransactionGroupCard({
       ) : (
         <ul
           onScroll={revealMoreRowsAtListBottom}
-          className="flex flex-col max-h-72 overflow-y-auto"
+          className="flex flex-col max-h-72 overflow-y-auto overflow-x-hidden"
         >
           {visibleRows.map((row) => (
             <TransactionRowItem
