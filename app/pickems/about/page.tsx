@@ -47,8 +47,8 @@ export default async function PickemsAboutPage() {
             cutoff, in seed order (1 = top seed).
           </li>
           <li>
-            <b>Playoff bracket</b>: once playoffs are seeded, fill out the
-            whole bracket by typing each series score. The winner advances
+            <b>Playoff bracket</b>: once playoffs are seeded, fill out the whole
+            bracket by typing each series score. The winner advances
             automatically.
           </li>
         </ul>
@@ -68,13 +68,15 @@ export default async function PickemsAboutPage() {
         <h1 className="mt-1 text-sm font-bold text-vdcRed">Playoff bracket</h1>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
           <li>
-            Points per correct round winner scale by round: Round 1 (10-team
-            brackets) 3, Quarterfinals 5, Semifinals 10, Final 20
+            Points per correct round winner scale by round: Play In&apos;s
+            (10-team brackets) 3, Quarterfinals 5, Semifinals 10, Final 20
           </li>
-          <li>Calling the exact series score doubles that pick&apos;s points</li>
           <li>
-            Your pick counts whenever your predicted team wins its real match
-            in that round, even if their opponent differs from your bracket
+            Calling the exact series score doubles that pick&apos;s points
+          </li>
+          <li>
+            Your pick counts whenever your predicted team wins its real match in
+            that round, even if their opponent differs from your bracket
           </li>
         </ul>
       </section>
@@ -115,12 +117,12 @@ export default async function PickemsAboutPage() {
         <h2 className="text-lg font-bold">Leaderboards</h2>
         <p className="text-sm text-vdcBlack dark:text-vdcWhite">
           View the Global board, a per-tier board, or any of your group boards.
-          The Overall view averages your points across the tiers you played,
-          so playing one tier or five is equally fair. A tier only counts
-          toward your average once results have resolved in it, so joining a
-          new tier mid-season never drops your standing before its matches are
-          played. Prefer raw totals? The Overall board also shows a sortable
-          Total column. Ties are broken by match-winner accuracy.
+          The Overall view averages your points across the tiers you played, so
+          playing one tier or five is equally fair. A tier only counts toward
+          your average once results have resolved in it, so joining a new tier
+          mid-season never drops your standing before its matches are played.
+          Prefer raw totals? The Overall board also shows a sortable Total
+          column. Ties are broken by match-winner accuracy.
         </p>
       </section>
     </div>

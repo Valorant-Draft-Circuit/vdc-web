@@ -57,9 +57,9 @@ export const FIELDS = [
   { key: "contractStatus", label: "CONTRACT", title: "Contract Status" },
   { key: "contractRemaining", label: "SZNs", title: "Contract Remaining" },
   { key: "matchesPlayed", label: "MP", title: "Matches Played" },
+  { key: "rating", label: "RTG", title: "Overall Rating" },
   { key: "attackRating", label: "ATK", title: "Attack Rating" },
   { key: "defenseRating", label: "DEF", title: "Defense Rating" },
-  { key: "rating", label: "RATING", title: "Overall Rating" },
   { key: "acs", label: "ACS", title: "Average Combat Score" },
   { key: "totalKills", label: "K", title: "Kills" },
   { key: "totalDeaths", label: "D", title: "Deaths" },
@@ -176,6 +176,7 @@ export type FormattedStat = {
   currentTier: Tier;
   matchesPlayed: number;
   acs: number | null;
+  rating: number | null;
   attackRating: number | null;
   defenseRating: number | null;
   totalKills: number | null;
@@ -695,6 +696,10 @@ async function formatStats(opts: {
         currentTier: user.tier,
         matchesPlayed: stats._count.userID,
         acs: stats._avg.acs,
+        rating:
+          stats._avg.ratingAttack !== null && stats._avg.ratingDefense !== null
+            ? (stats._avg.ratingAttack + stats._avg.ratingDefense) / 2
+            : null,
         attackRating: stats._avg.ratingAttack,
         defenseRating: stats._avg.ratingDefense,
         totalKills: kills,
