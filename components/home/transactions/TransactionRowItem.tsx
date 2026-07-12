@@ -17,18 +17,20 @@ export default function TransactionRowItem({
   teamLinkTier: string | null;
 }) {
   return (
-    <li
-      className={`flex flex-col gap-1 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0${row.tradeDetails ? " relative" : ""}`}
-    >
+    <li className="flex flex-col gap-1 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0">
       <h2
         className={`self-start rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${pillColorClass(row)}`}
       >
         {pillLabel(row)}
       </h2>
-      <div className="flex items-center gap-2">
-        {row.tradeDetails ? (
-          <TradeDetailsPopover label={row.label} details={row.tradeDetails} />
-        ) : (
+      {row.tradeDetails ? (
+        <TradeDetailsPopover
+          label={row.label}
+          details={row.tradeDetails}
+          dateLabel={row.dateLabel}
+        />
+      ) : (
+        <div className="flex items-center gap-2">
           <h2 className="truncate">
             {row.playerIgn ? (
               <Link
@@ -41,35 +43,35 @@ export default function TransactionRowItem({
               row.label
             )}
           </h2>
-        )}
-        {teamLinkTier && (
-          <div className="ml-auto flex-none">
-            {row.franchiseSlug && row.teamName ? (
-              <Link
-                href={`/franchises/${row.franchiseSlug}?team=${teamLinkTier}`}
-                className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-vdcRed"
-              >
-                <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
-                <h2 className="text-xs">{row.teamName}</h2>
-              </Link>
-            ) : (
-              <div className="flex items-center gap-1">
-                <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
-                {row.teamName && (
-                  <h2 className="text-xs text-gray-600 dark:text-gray-400">
-                    {row.teamName}
-                  </h2>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-        <h2
-          className={`text-sm text-gray-500 flex-none w-10 text-right ${teamLinkTier ? "" : "ml-auto"}`}
-        >
-          {row.dateLabel}
-        </h2>
-      </div>
+          {teamLinkTier && (
+            <div className="ml-auto flex-none">
+              {row.franchiseSlug && row.teamName ? (
+                <Link
+                  href={`/franchises/${row.franchiseSlug}?team=${teamLinkTier}`}
+                  className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-vdcRed"
+                >
+                  <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
+                  <h2 className="text-xs">{row.teamName}</h2>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <TeamLogo logo={row.teamLogo} teamName={row.teamName} />
+                  {row.teamName && (
+                    <h2 className="text-xs text-gray-600 dark:text-gray-400">
+                      {row.teamName}
+                    </h2>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          <h2
+            className={`text-sm text-gray-500 flex-none w-10 text-right ${teamLinkTier ? "" : "ml-auto"}`}
+          >
+            {row.dateLabel}
+          </h2>
+        </div>
+      )}
     </li>
   );
 }

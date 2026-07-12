@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import type { TradeAsset, TradeDetails } from "@/lib/common/transactions";
@@ -8,70 +8,54 @@ import type { TradeAsset, TradeDetails } from "@/lib/common/transactions";
 export default function TradeDetailsPopover({
   label,
   details,
+  dateLabel,
 }: {
   label: string;
   details: TradeDetails;
+  dateLabel: string;
 }) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const closeOnOutsidePress = (event: PointerEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePress);
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [open]);
 
   return (
-    <div ref={containerRef} className="min-w-0">
+    <div className="flex flex-col">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="flex min-w-0 items-center gap-1 hover:cursor-pointer hover:text-vdcRed"
+        className="flex items-center gap-2 hover:cursor-pointer"
       >
-        <h2 className="truncate">{label}</h2>
-        <ChevronDownIcon className="size-3 flex-none text-vdcRed" />
-      </button>
-      <div
-        className={`absolute inset-x-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-md border border-black/10 bg-vdcWhite/95 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-vdcBlack/95 ${
-          open ? "block" : "hidden"
-        }`}
-      >
-        <div className="grid grid-cols-2 gap-3">
-          {details.sides.map((side, sideIndex) => (
-            <div key={`${side.franchiseName}-${sideIndex}`}>
-              <h2 className="mb-1 truncate text-[10px] uppercase tracking-wider text-vdcRed">
-                {side.franchiseName} send
-              </h2>
-              {side.assets.length === 0 ? (
-                <h2 className="text-[11px] text-gray-500 dark:text-gray-400">
-                  Nothing
-                </h2>
-              ) : (
-                side.assets.map((asset, assetIndex) => (
-                  <AssetLine key={assetIndex} asset={asset} />
-                ))
-              )}
-            </div>
-          ))}
+        <div className="flex min-w-0 items-center gap-1 hover:text-vdcRed">
+          <h2 className="truncate">{label}</h2>
+          <ChevronDownIcon
+            className={`size-3 flex-none text-vdcRed transition-transform ${open ? "rotate-180" : ""}`}
+          />
         </div>
-      </div>
+        <h2 className="ml-auto w-10 flex-none text-right text-sm text-gray-500">
+          {dateLabel}
+        </h2>
+      </button>
+      {open && (
+        <div className="mt-1.5 rounded-md border border-black/10 bg-vdcWhite/60 p-3 dark:border-white/10 dark:bg-vdcBlack/60">
+          <div className="grid grid-cols-2 gap-3">
+            {details.sides.map((side, sideIndex) => (
+              <div key={`${side.franchiseName}-${sideIndex}`}>
+                <h2 className="mb-1 truncate text-[10px] uppercase tracking-wider text-vdcRed">
+                  {side.franchiseName} send
+                </h2>
+                {side.assets.length === 0 ? (
+                  <h2 className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Nothing
+                  </h2>
+                ) : (
+                  side.assets.map((asset, assetIndex) => (
+                    <AssetLine key={assetIndex} asset={asset} />
+                  ))
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
