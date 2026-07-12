@@ -91,16 +91,16 @@ const BRACKET_STRUCTURES: Record<number, StructureSlot[][]> = {
   ],
   10: [
     [
-      { type: "seeds", seeds: [4, 9] },
-      { type: "seeds", seeds: [5, 8] },
-      { type: "seeds", seeds: [3, 10] },
-      { type: "seeds", seeds: [6, 7] },
+      { type: "bye", seed: 1 },
+      { type: "seeds", seeds: [7, 10] },
+      { type: "bye", seed: 2 },
+      { type: "seeds", seeds: [8, 9] },
     ],
     [
-      { type: "bye", seed: 1 },
       { type: "feeders", feeders: [0, 1] },
-      { type: "bye", seed: 2 },
+      { type: "seeds", seeds: [4, 5] },
       { type: "feeders", feeders: [2, 3] },
+      { type: "seeds", seeds: [3, 6] },
     ],
     [
       { type: "feeders", feeders: [0, 1] },
@@ -194,77 +194,94 @@ function buildStructuredRounds(
 ): Round[] {
   const teamBySeed = (seed: number) => participants[seed - 1];
 
+  const matchesByDay = [...matches].sort(
+    (a, b) => (a.matchDay ?? Infinity) - (b.matchDay ?? Infinity),
+  );
+
   const matchByPair = new Map<string, PlayoffMatchInput>();
-  for (const m of matches) {
-    if (hasBothTeams(m, teamById)) {
-      matchByPair.set(pairKey(m.homeTeamId as number, m.awayTeamId as number), m);
+  for (const m of matchesByDay) {
+    if (!hasBothTeams(m, teamById)) {
+      continue;
+    }
+    const key = pairKey(m.homeTeamId as number, m.awayTeamId as number);
+    if (!matchByPair.has(key)) {
+      matchByPair.set(key, m);
     }
   }
 
   const usedMatchIds = new Set<number>();
-  const firstRoundSlots: Slot[] = structure[0].map((item) => {
-    if (item.type === "bye") {
-      return { kind: "bye", team: teamBySeed(item.seed) };
+  const takePairMatch = (home: BracketTeam, away: BracketTeam) => {
+    const m = matchByPair.get(pairKey(home.id, away.id));
+    if (!m || usedMatchIds.has(m.matchId)) {
+      return null;
     }
-    if (item.type !== "seeds") {
-      return { kind: "tbd" };
-    }
-    const seedHome = teamBySeed(item.seeds[0]);
-    const seedAway = teamBySeed(item.seeds[1]);
-    const m = matchByPair.get(pairKey(seedHome.id, seedAway.id)) ?? null;
-    if (m) {
-      usedMatchIds.add(m.matchId);
-      return seriesFromMatch(m, teamById);
-    }
-    return buildSeriesSlot(seedHome, seedAway, null);
+    usedMatchIds.add(m.matchId);
+    return m;
+  };
+  const buildSeededSeries = (seeds: [number, number]): SeriesSlot => {
+    const home = teamBySeed(seeds[0]);
+    const away = teamBySeed(seeds[1]);
+    return buildSeriesSlot(home, away, takePairMatch(home, away));
+  };
+
+  const seededSeriesBySlot = new Map<string, SeriesSlot>();
+  structure.forEach((roundDef, r) => {
+    roundDef.forEach((item, i) => {
+      if (item.type === "seeds") {
+        seededSeriesBySlot.set(`${r}:${i}`, buildSeededSeries(item.seeds));
+      }
+    });
   });
 
-  const remaining = matches
-    .filter((m) => !usedMatchIds.has(m.matchId) && hasBothTeams(m, teamById))
-    .sort((a, b) => (a.matchDay ?? Infinity) - (b.matchDay ?? Infinity));
-  let remainingIndex = 0;
+  const sequentialMatches = matchesByDay.filter((m) =>
+    hasBothTeams(m, teamById),
+  );
+  let sequentialIndex = 0;
+  const takeNextSequential = () => {
+    while (sequentialIndex < sequentialMatches.length) {
+      const m = sequentialMatches[sequentialIndex];
+      sequentialIndex++;
+      if (!usedMatchIds.has(m.matchId)) {
+        usedMatchIds.add(m.matchId);
+        return m;
+      }
+    }
+    return null;
+  };
 
-  const rounds: Round[] = [
-    {
-      label: "",
-      matchType: MatchType.BO3,
-      slots: firstRoundSlots,
-      feeders: structure[0].map(() => null),
-    },
-  ];
-
-  for (let r = 1; r < structure.length; r++) {
+  const rounds: Round[] = [];
+  structure.forEach((roundDef, r) => {
     const slots: Slot[] = [];
     const feeders: Array<[number, number] | null> = [];
-    for (const item of structure[r]) {
+    roundDef.forEach((item, i) => {
       if (item.type === "bye") {
         slots.push({ kind: "bye", team: teamBySeed(item.seed) });
         feeders.push(null);
-        continue;
+        return;
       }
-      if (item.type !== "feeders") {
-        continue;
+      if (item.type === "seeds") {
+        slots.push(seededSeriesBySlot.get(`${r}:${i}`)!);
+        feeders.push(null);
+        return;
       }
       feeders.push(item.feeders);
-      const m = remaining[remainingIndex];
-      if (m) {
-        slots.push(seriesFromMatch(m, teamById));
-        remainingIndex++;
+      const prev = rounds[r - 1];
+      const home = participantOf(prev.slots[item.feeders[0]]);
+      const away = participantOf(prev.slots[item.feeders[1]]);
+      const pairMatch = home && away ? takePairMatch(home, away) : null;
+      const match = pairMatch ?? takeNextSequential();
+      if (match) {
+        slots.push(seriesFromMatch(match, teamById));
       } else {
-        const prev = rounds[r - 1];
-        slots.push({
-          kind: "tbd",
-          home: participantOf(prev.slots[item.feeders[0]]),
-          away: participantOf(prev.slots[item.feeders[1]]),
-        });
+        slots.push({ kind: "tbd", home, away });
       }
-    }
-    rounds.push({ label: "", matchType: MatchType.BO3, slots, feeders });
-  }
-
-  rounds.forEach((round, i) => {
-    round.label = roundLabel(i, structure.length);
-    round.matchType = i === structure.length - 1 ? MatchType.BO5 : MatchType.BO3;
+    });
+    rounds.push({
+      label: roundLabel(r, structure.length),
+      matchType: r === structure.length - 1 ? MatchType.BO5 : MatchType.BO3,
+      slots,
+      feeders,
+    });
   });
   return rounds;
 }

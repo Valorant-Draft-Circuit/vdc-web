@@ -61,6 +61,11 @@ export const navLinks = [
         href: "https://go.vdc.gg/fahub",
         ext: true,
       },
+      {
+        name: "Blog",
+        href: "https://blog.vdc.gg",
+        ext: true,
+      },
     ],
   },
 ];

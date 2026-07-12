@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { MatchType, Tier } from "@prisma/client";
+import { LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveMatch, type GameResult } from "@/lib/pickems/resolve";
 import {
@@ -108,6 +108,19 @@ export const getLeaderboard = cache(
         }
       }
     });
+
+    if (rows.size > 0) {
+      const suspendedStatuses = await prisma.status.findMany({
+        where: {
+          userID: { in: [...rows.keys()] },
+          leagueStatus: LeagueStatus.SUSPENDED,
+        },
+        select: { userID: true },
+      });
+      for (const { userID } of suspendedStatuses) {
+        rows.delete(userID);
+      }
+    }
 
     const isOverall = tier === null;
     for (const row of rows.values()) {
