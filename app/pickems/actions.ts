@@ -2,10 +2,11 @@
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
-import { ModLogType, Tier } from "@prisma/client";
+import { LeagueStatus, ModLogType, Tier } from "@prisma/client";
 
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
+import { getLeagueStatus } from "@/lib/queries/user/user";
 import { prisma } from "@/lib/prisma";
 import { getSeasonCached } from "@/lib/common/cache";
 import { correctMatchDate } from "@/lib/common/format";
@@ -24,6 +25,12 @@ import { validateBracketPicks } from "@/lib/pickems/bracket";
 type Result = { ok: true } | { ok: false; error: string };
 
 const MAX_GROUP_NAME_LENGTH = 60;
+const SUSPENDED_ERROR = "Suspended players cannot participate in Pick'ems";
+
+async function isSuspended(userId: string): Promise<boolean> {
+  const leagueStatus = await getLeagueStatus(userId);
+  return leagueStatus === LeagueStatus.SUSPENDED;
+}
 
 export async function submitMatchPicks(input: {
   picks: { matchId: number; homeScore: number; awayScore: number }[];
@@ -33,6 +40,9 @@ export async function submitMatchPicks(input: {
     return { ok: false, error: "Unauthenticated" };
   }
   const userId = session.user.id;
+  if (await isSuspended(userId)) {
+    return { ok: false, error: SUSPENDED_ERROR };
+  }
 
   for (const pick of input.picks) {
     const match = await prisma.matches.findUnique({
@@ -93,6 +103,9 @@ export async function submitAdvancePick(input: {
     return { ok: false, error: "Unauthenticated" };
   }
   const userId = session.user.id;
+  if (await isSuspended(userId)) {
+    return { ok: false, error: SUSPENDED_ERROR };
+  }
   const season = await getSeasonCached();
 
   const lock = await getAdvanceLock(input.tier, season);
@@ -146,6 +159,9 @@ export async function submitBracketPicks(input: {
     return { ok: false, error: "Unauthenticated" };
   }
   const userId = session.user.id;
+  if (await isSuspended(userId)) {
+    return { ok: false, error: SUSPENDED_ERROR };
+  }
   const season = await getSeasonCached();
 
   const lock = await getBracketLock(input.tier, season);
@@ -188,6 +204,9 @@ export async function createGroup(input: {
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthenticated" };
   }
+  if (await isSuspended(session.user.id)) {
+    return { ok: false, error: SUSPENDED_ERROR };
+  }
 
   const name = input.name.trim();
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
@@ -224,6 +243,9 @@ export async function updateGroup(input: {
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthenticated" };
   }
+  if (await isSuspended(session.user.id)) {
+    return { ok: false, error: SUSPENDED_ERROR };
+  }
 
   const name = input.name.trim();
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
@@ -255,6 +277,9 @@ export async function joinGroupByCode(input: {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthenticated" };
+  }
+  if (await isSuspended(session.user.id)) {
+    return { ok: false, error: SUSPENDED_ERROR };
   }
 
   const group = await prisma.pickemGroup.findUnique({

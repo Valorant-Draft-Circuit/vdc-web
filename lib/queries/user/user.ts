@@ -35,6 +35,14 @@ export type PlayerRiotAccounts = {
   Accounts: RiotAccountRow[];
 };
 
+export const getLeagueStatus = cache(async (userId: string) => {
+  const status = await prisma.status.findUnique({
+    where: { userID: userId },
+    select: { leagueStatus: true },
+  });
+  return status?.leagueStatus ?? null;
+});
+
 export async function getUserTier(props?: { isStats: boolean }) {
   const session = await auth();
   const isMmrVisible = await ControlPanel.getMMRDisplayState();

@@ -12,7 +12,7 @@ export default function PreviewBanner() {
         </div>
         <div className="ml-3 flex-1">
           <p className="text-sm text-vdcBlack dark:text-vdcWhite font-roboto">
-            Pick&apos;ems is in beta. Scoring and features may change.
+            Pick&apos;ems are in beta. Scoring and features may change.
           </p>
         </div>
       </div>

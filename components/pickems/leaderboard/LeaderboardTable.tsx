@@ -34,6 +34,8 @@ const RANK_COLOR: Record<number, string> = {
   3: "#cd853f",
 };
 
+const DEFAULT_SORTING: SortingState = [{ id: "points", desc: true }];
+
 const HEADER_BASE =
   "sticky top-0 z-10 border-b border-gray-300 bg-gray-100 px-2.5 py-3 text-[10px] uppercase tracking-wide text-vdcGrey backdrop-blur-sm dark:border-gray-600 dark:bg-vdcBlack dark:text-gray-400";
 const CELL_BASE = "border-b border-gray-200 px-2.5 py-2.5 dark:border-gray-600";
@@ -77,9 +79,7 @@ export default function LeaderboardTable({
   linkTier,
   showTotals,
 }: Props) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "points", desc: true },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>(DEFAULT_SORTING);
   const [search, setSearch] = useState("");
 
   const columns = useMemo<ColumnDef<LeaderRow>[]>(() => {
@@ -146,7 +146,12 @@ export default function LeaderboardTable({
     data: rows,
     columns,
     state: { sorting },
-    onSortingChange: setSorting,
+    onSortingChange: (updater) => {
+      setSorting((current) => {
+        const next = typeof updater === "function" ? updater(current) : updater;
+        return next.length === 0 ? DEFAULT_SORTING : next;
+      });
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
@@ -216,11 +221,15 @@ export default function LeaderboardTable({
                             header.getContext(),
                           )}
                         </h1>
-                        {sorted === "asc" && (
-                          <ChevronUpIcon className="size-4" />
-                        )}
-                        {sorted === "desc" && (
-                          <ChevronDownIcon className="size-4" />
+                        {canSort && (
+                          <span className="size-4 flex-none">
+                            {sorted === "asc" && (
+                              <ChevronUpIcon className="size-4" />
+                            )}
+                            {sorted === "desc" && (
+                              <ChevronDownIcon className="size-4" />
+                            )}
+                          </span>
                         )}
                       </button>
                     </th>
