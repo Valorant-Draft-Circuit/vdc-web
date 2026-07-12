@@ -1,3 +1,4 @@
+import { Tier } from "@prisma/client";
 import type { LeaderRow } from "@/lib/queries/pickems/getLeaderboard";
 import { formatPoints } from "@/lib/pickems/format";
 import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
@@ -7,6 +8,7 @@ type Props = {
   rank: number | null;
   totalPlayers: number;
   loggedIn: boolean;
+  boardTier: Tier | null;
 };
 
 function HeroCell({
@@ -38,6 +40,7 @@ export default function StandingHero({
   rank,
   totalPlayers,
   loggedIn,
+  boardTier,
 }: Props) {
   const surface =
     "rounded-md border border-black/5 bg-vdcWhite/40 backdrop-blur-sm dark:border-white/10 dark:bg-vdcBlack/40";
@@ -58,11 +61,24 @@ export default function StandingHero({
   }
 
   const percentile = Math.max(1, Math.round((rank / totalPlayers) * 100));
+  const heroLayout = `${surface} flex flex-wrap items-center justify-around gap-x-4 gap-y-4 px-6 py-6`;
+
+  if (boardTier) {
+    return (
+      <div className={heroLayout}>
+        <HeroCell value={formatPoints(row.totalPoints)} label="Total pts" />
+        <HeroCell value={`#${rank}`} label={`of ${totalPlayers} players`} />
+        <HeroCell
+          value={`Top ${percentile}%`}
+          label={boardTier}
+          accent={TIER_HEX_COLOR_MAP[boardTier]}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`${surface} flex flex-wrap items-center justify-around gap-x-4 gap-y-4 px-6 py-6`}
-    >
+    <div className={heroLayout}>
       <HeroCell value={formatPoints(row.points)} label="Avg pts" />
       <HeroCell value={formatPoints(row.totalPoints)} label="Total pts" />
       <HeroCell

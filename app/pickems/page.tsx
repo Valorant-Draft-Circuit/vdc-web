@@ -11,6 +11,7 @@ import {
 import { auth } from "@/lib/auth/auth";
 import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
+import { VDC_RED } from "@/lib/common/constants/colors";
 import { getUserTier } from "@/lib/queries/user/user";
 import {
   PICKEM_FIRST_SEASON,
@@ -30,14 +31,10 @@ type Props = {
 };
 
 const VALID_TIERS = new Set(TIERS_LIST.map((t) => t.toLowerCase()));
+const VALID_TABS = new Set(["overview", ...VALID_TIERS]);
 
 const GHOST_PILL =
   "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gray-300 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-vdcGrey transition-colors hover:cursor-pointer hover:border-vdcGrey hover:text-vdcBlack dark:border-gray-600 dark:text-gray-400 dark:hover:text-vdcWhite";
-
-const VALID_BOARDS = new Set([
-  "overall",
-  ...TIERS_LIST.map((t) => t.toLowerCase()),
-]);
 
 export default async function PickemsHub({ searchParams }: Props) {
   await requirePickemsEnabled();
@@ -49,33 +46,34 @@ export default async function PickemsHub({ searchParams }: Props) {
     auth(),
   ]);
 
-  const tierParam = typeof sp.tier === "string" ? sp.tier.toLowerCase() : null;
+  const tabParam = typeof sp.tier === "string" ? sp.tier.toLowerCase() : null;
   const seasonParam = typeof sp.season === "string" ? Number(sp.season) : NaN;
   if (
-    !tierParam ||
-    !VALID_TIERS.has(tierParam) ||
+    !tabParam ||
+    !VALID_TABS.has(tabParam) ||
     Number.isNaN(seasonParam) ||
     seasonParam < PICKEM_FIRST_SEASON
   ) {
     const userTierSlug = userTier?.toLowerCase();
-    const defaultTier =
-      userTierSlug && VALID_TIERS.has(userTierSlug)
-        ? userTierSlug
-        : Tier.MYTHIC.toLowerCase();
-    redirect(`/pickems?tier=${defaultTier}&season=${currentSeason}`);
+    const defaultTab =
+      userTierSlug && VALID_TIERS.has(userTierSlug) ? userTierSlug : "overview";
+    redirect(`/pickems?tier=${defaultTab}&season=${currentSeason}`);
   }
 
-  const tier = tierParam.toUpperCase() as Tier;
+  const boardTier =
+    tabParam === "overview" ? null : (tabParam.toUpperCase() as Tier);
   const season = seasonParam;
   const userId = session?.user?.id ?? null;
-  const accent = TIER_HEX_COLOR_MAP[tier];
 
-  const boardParam =
-    typeof sp.board === "string" && VALID_BOARDS.has(sp.board.toLowerCase())
-      ? sp.board.toLowerCase()
-      : "overall";
-  const boardTier =
-    boardParam === "overall" ? null : (boardParam.toUpperCase() as Tier);
+  const userTierSlug = userTier?.toLowerCase();
+  const fallbackStageTier =
+    userTierSlug && VALID_TIERS.has(userTierSlug)
+      ? (userTierSlug.toUpperCase() as Tier)
+      : Tier.MYTHIC;
+  const stageTier = boardTier ?? fallbackStageTier;
+
+  const tabLabel = boardTier ?? "OVERVIEW";
+  const accent = boardTier ? TIER_HEX_COLOR_MAP[boardTier] : VDC_RED;
 
   return (
     <div className="flex flex-col gap-4">
@@ -88,7 +86,7 @@ export default async function PickemsHub({ searchParams }: Props) {
             className="rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
             style={{ backgroundColor: accent }}
           >
-            {tier}
+            {tabLabel}
           </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -103,14 +101,19 @@ export default async function PickemsHub({ searchParams }: Props) {
         </div>
       </div>
 
-      <PickemTierTabs activeTier={tier} season={season} basePath="/pickems" />
+      <PickemTierTabs
+        activeTier={boardTier}
+        season={season}
+        basePath="/pickems"
+        includeOverview
+      />
 
       <Suspense
-        key={`${tier}-${season}-${boardParam}`}
+        key={`${tabParam}-${season}`}
         fallback={<HubOverviewSkeleton />}
       >
         <HubOverviewPanel
-          tier={tier}
+          stageTier={stageTier}
           season={season}
           userId={userId}
           accent={accent}
