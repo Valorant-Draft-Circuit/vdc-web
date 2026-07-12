@@ -214,19 +214,7 @@ export default function CommonTable({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: (updaterOrValue) => {
-      const newSorting =
-        typeof updaterOrValue === "function"
-          ? updaterOrValue(sorting)
-          : updaterOrValue;
-
-      const hasACS = newSorting.some((s) => s.id === "acs");
-      if (!hasACS) {
-        newSorting.push({ id: "acs", desc: true });
-      }
-
-      setSorting(newSorting);
-    },
+    onSortingChange: setSorting,
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
@@ -432,6 +420,19 @@ function TableCol({
   const sortingState = table.getState().sorting;
   const primarySortId = sortingState[0]?.id;
 
+  const sortByColumn = (columnId: string) => {
+    table.setSorting((previous) => {
+      const primary = previous[0];
+      const descFirst = !TEXT_KEYS.includes(columnId);
+      const desc = primary?.id === columnId ? !primary.desc : descFirst;
+      const nextSorting: SortingState = [{ id: columnId, desc }];
+      if (columnId !== "acs") {
+        nextSorting.push({ id: "acs", desc: true });
+      }
+      return nextSorting;
+    });
+  };
+
   return (
     <tr key={headerGroup.id}>
       {headerGroup.headers.map((header) => {
@@ -457,7 +458,7 @@ function TableCol({
                 <div
                   onClick={
                     isSortable
-                      ? header.column.getToggleSortingHandler()
+                      ? () => sortByColumn(header.column.id)
                       : undefined
                   }
                   className={`flex flex-row items-center font-semibold ${
@@ -476,10 +477,14 @@ function TableCol({
                       ?.toString()
                       .replace("_", " ")}
                   </h2>
-                  {{
-                    asc: <ChevronUpIcon className="size-4" />,
-                    desc: <ChevronDownIcon className="size-4" />,
-                  }[header.column.getIsSorted() as string] ?? null}
+                  {isSortable && (
+                    <span className="size-4 flex-none">
+                      {{
+                        asc: <ChevronUpIcon className="size-4" />,
+                        desc: <ChevronDownIcon className="size-4" />,
+                      }[header.column.getIsSorted() as string] ?? null}
+                    </span>
+                  )}
                 </div>
                 {header.column.getCanFilter() ? (
                   <div>

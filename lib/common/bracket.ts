@@ -119,7 +119,7 @@ function roundLabel(roundIndex: number, totalRounds: number): string {
   if (fromEnd === 0) return "Final";
   if (fromEnd === 1) return "Semifinals";
   if (fromEnd === 2) return "Quarterfinals";
-  return `Round ${roundIndex + 1}`;
+  return "Play In's";
 }
 
 function pairKey(a: number, b: number): string {
@@ -296,7 +296,9 @@ function buildFallbackRounds(
   ).sort((a, b) => a - b);
 
   return days.map((day, i) => {
-    const dayMatches = withTeams.filter((m) => (m.matchDay ?? Infinity) === day);
+    const dayMatches = withTeams.filter(
+      (m) => (m.matchDay ?? Infinity) === day,
+    );
     return {
       label: roundLabel(i, days.length),
       matchType: dayMatches[0]?.matchType ?? MatchType.BO3,
