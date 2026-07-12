@@ -7,6 +7,7 @@ import {
 } from "@/lib/common/constants/transactions";
 import { RecentTransactionRow } from "@/lib/queries/home/transactions";
 import TeamLogo from "../recap/TeamLogo";
+import TradeDetailsPopover from "./TradeDetailsPopover";
 
 export default function TransactionRowItem({
   row,
@@ -16,25 +17,31 @@ export default function TransactionRowItem({
   teamLinkTier: string | null;
 }) {
   return (
-    <li className="flex flex-col gap-1 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0">
+    <li
+      className={`flex flex-col gap-1 py-2 text-xs border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0${row.tradeDetails ? " relative" : ""}`}
+    >
       <h2
         className={`self-start rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${pillColorClass(row)}`}
       >
         {pillLabel(row)}
       </h2>
       <div className="flex items-center gap-2">
-        <h2 className="truncate">
-          {row.playerIgn ? (
-            <Link
-              href={`/player/${encodeURIComponent(row.playerIgn)}`}
-              className="hover:text-vdcRed"
-            >
-              {row.label}
-            </Link>
-          ) : (
-            row.label
-          )}
-        </h2>
+        {row.tradeDetails ? (
+          <TradeDetailsPopover label={row.label} details={row.tradeDetails} />
+        ) : (
+          <h2 className="truncate">
+            {row.playerIgn ? (
+              <Link
+                href={`/player/${encodeURIComponent(row.playerIgn)}`}
+                className="hover:text-vdcRed"
+              >
+                {row.label}
+              </Link>
+            ) : (
+              row.label
+            )}
+          </h2>
+        )}
         {teamLinkTier && (
           <div className="ml-auto flex-none">
             {row.franchiseSlug && row.teamName ? (
@@ -58,7 +65,7 @@ export default function TransactionRowItem({
           </div>
         )}
         <h2
-          className={`text-sm text-gray-500 flex-none w-7 text-right ${teamLinkTier ? "" : "ml-auto"}`}
+          className={`text-sm text-gray-500 flex-none w-10 text-right ${teamLinkTier ? "" : "ml-auto"}`}
         >
           {row.dateLabel}
         </h2>

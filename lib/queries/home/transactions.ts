@@ -7,6 +7,10 @@ import {
   ROSTER_TRANSACTION_TYPES,
 } from "@/lib/common/constants/transactions";
 import { formatRelativeAge } from "@/lib/common/format";
+import {
+  parseTradeDetails,
+  type TradeDetails,
+} from "@/lib/common/transactions";
 
 export type TransactionGroupKey = Tier | "LEAGUE";
 
@@ -20,6 +24,7 @@ export type RecentTransactionRow = {
   teamLogo: string | null;
   franchiseSlug: string | null;
   dateLabel: string;
+  tradeDetails: TradeDetails | null;
 };
 
 export type TransactionGroup = {
@@ -177,41 +182,34 @@ function toRow(
   displayType: TransactionType,
   stintEnded: boolean,
 ): RecentTransactionRow {
+  const tradeDetails =
+    displayType === TransactionType.TRADE
+      ? parseTradeDetails(transaction.details)
+      : null;
+  const label = tradeDetails
+    ? `${tradeDetails.sides[0].franchiseName} ⇄ ${tradeDetails.sides[1].franchiseName}`
+    : rowLabel(transaction);
   return {
     id: transaction.id,
     type: displayType,
     stintEnded: stintEnded,
-    label: rowLabel(transaction),
+    label: label,
     playerIgn: transaction.Player?.PrimaryRiotAccount?.riotIGN ?? null,
     teamName: transaction.Team?.name ?? null,
     teamLogo: transaction.Team?.Franchise.Brand?.logo ?? null,
     franchiseSlug: transaction.Team?.Franchise.slug ?? null,
     dateLabel: formatRelativeAge(transaction.date),
+    tradeDetails: tradeDetails,
   };
 }
 
 function rowLabel(transaction: TransactionWithRelations): string {
   if (transaction.type === TransactionType.TRADE) {
-    return tradeLabel(transaction.details);
+    return "Trade";
   }
   return (
     transaction.Player?.PrimaryRiotAccount?.riotIGN ??
     transaction.Player?.name ??
     "Unknown"
   );
-}
-
-function tradeLabel(details: string | null): string {
-  if (!details) return "Trade";
-  try {
-    const parsed = JSON.parse(details);
-    const firstName = parsed?.franchise1?.name;
-    const secondName = parsed?.franchise2?.name;
-    if (typeof firstName === "string" && typeof secondName === "string") {
-      return `${firstName} ⇄ ${secondName}`;
-    }
-    return "Trade";
-  } catch {
-    return "Trade";
-  }
 }
