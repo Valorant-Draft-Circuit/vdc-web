@@ -44,6 +44,7 @@ export default function PlayerHistoryLookup({
                     <h2 className="truncate text-xs text-gray-400">
                       {entry.dateLabel} · by {entry.moderatorName}
                       {entry.expiresLabel ? ` · ${entry.expiresLabel}` : ""}
+                      {entry.mapBanLabel ? ` · ${entry.mapBanLabel}` : ""}
                     </h2>
                   </div>
                   <h3 className="mt-1 text-sm font-normal text-gray-600 dark:text-gray-300">

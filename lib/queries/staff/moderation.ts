@@ -16,10 +16,12 @@ import {
   stripActionedMarker,
 } from "@/lib/common/moderation";
 
-const PLAYER_IDENTITY_SELECT = {
-  name: true,
-  PrimaryRiotAccount: { select: { riotIGN: true } },
-} satisfies Prisma.UserSelect;
+import {
+  getIdentitiesByDiscordId,
+  identityFor,
+  type PlayerIdentity,
+} from "./identity";
+import { getMapBanStatusByLogId, type MapBanLogStatus } from "./mapBans";
 
 const MOD_LOG_NAMES_INCLUDE = {
   Moderator: { select: { name: true } },
@@ -28,43 +30,6 @@ const MOD_LOG_NAMES_INCLUDE = {
 type ModLogWithNames = Prisma.ModLogsGetPayload<{
   include: typeof MOD_LOG_NAMES_INCLUDE;
 }>;
-
-type PlayerIdentity = {
-  playerName: string;
-  playerIgn: string | null;
-};
-
-async function getIdentitiesByDiscordId(
-  discordIds: string[],
-): Promise<Map<string, PlayerIdentity>> {
-  const identityByDiscordId = new Map<string, PlayerIdentity>();
-  if (discordIds.length === 0) return identityByDiscordId;
-
-  const accounts = await prisma.account.findMany({
-    where: { providerAccountId: { in: discordIds } },
-    select: {
-      providerAccountId: true,
-      User: { select: PLAYER_IDENTITY_SELECT },
-    },
-  });
-  for (const account of accounts) {
-    const ign = account.User.PrimaryRiotAccount?.riotIGN ?? null;
-    identityByDiscordId.set(account.providerAccountId, {
-      playerName: ign ?? account.User.name ?? account.providerAccountId,
-      playerIgn: ign,
-    });
-  }
-  return identityByDiscordId;
-}
-
-function identityFor(
-  identities: Map<string, PlayerIdentity>,
-  discordID: string,
-): PlayerIdentity {
-  return (
-    identities.get(discordID) ?? { playerName: discordID, playerIgn: null }
-  );
-}
 
 export type SanctionEntry = PlayerIdentity & {
   logId: number;
@@ -305,7 +270,15 @@ export type PlayerHistoryEntry = {
   dateLabel: string;
   moderatorName: string;
   expiresLabel: string | null;
+  mapBanLabel: string | null;
 };
+
+function mapBanLabelFor(status: MapBanLogStatus | undefined): string | null {
+  if (!status) return null;
+  if (status.remaining <= 0) return "served";
+  const paused = status.frozen ? " (paused)" : "";
+  return `${status.remaining} of ${status.mapCount} maps remaining${paused}`;
+}
 
 export type PlayerModHistory = {
   playerIgn: string;
@@ -327,11 +300,14 @@ export const getPlayerModHistory = cache(
       user?.Accounts.map((account) => account.providerAccountId) ?? [];
     if (discordIds.length === 0) return null;
 
-    const logs = await prisma.modLogs.findMany({
-      where: { discordID: { in: discordIds } },
-      include: { Moderator: { select: { name: true } } },
-      orderBy: { date: "desc" },
-    });
+    const [logs, mapBanStatuses] = await Promise.all([
+      prisma.modLogs.findMany({
+        where: { discordID: { in: discordIds } },
+        include: { Moderator: { select: { name: true } } },
+        orderBy: { date: "desc" },
+      }),
+      getMapBanStatusByLogId(discordIds),
+    ]);
 
     return {
       playerIgn: ign,
@@ -344,6 +320,10 @@ export const getPlayerModHistory = cache(
         expiresLabel: log.expires
           ? `expires ${format(log.expires, "MMM d, yyyy")}`
           : null,
+        mapBanLabel:
+          log.type === ModLogType.MAP_BAN
+            ? mapBanLabelFor(mapBanStatuses.get(log.id))
+            : null,
       })),
     };
   },

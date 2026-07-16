@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { GameType } from "@prisma/client";
+import MapBanBanner from "@/components/player/MapBanBanner";
 import PlayerAgents from "@/components/player/PlayerAgents";
 import PlayerInfo from "@/components/player/PlayerInfo";
 import PlayerMaps from "@/components/player/PlayerMaps";
@@ -226,6 +227,9 @@ export default async function Page({ params, searchParams }: Props) {
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
       <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
+        <Suspense fallback={null}>
+          <MapBanBanner ign={playerIGN.decoded} />
+        </Suspense>
         <div className="p-2 flex flex-col xl:gap-5">
           <div className="px-10 xl:px-0 m-auto flex flex-row gap-1 xl:gap-5 w-full">
             <div className="w-full">

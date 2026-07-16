@@ -1,4 +1,5 @@
 import LeagueStateBadge from "@/components/staff/LeagueStateBadge";
+import ActiveMapBansPanel from "@/components/staff/moderation/ActiveMapBansPanel";
 import EscalationWatchPanel from "@/components/staff/moderation/EscalationWatchPanel";
 import ModeratorActivityPanel from "@/components/staff/moderation/ModeratorActivityPanel";
 import PickemDeletionQueue from "@/components/staff/moderation/PickemDeletionQueue";
@@ -12,6 +13,7 @@ import {
   getPickemDeletionQueue,
   getPlayerModHistory,
 } from "@/lib/queries/staff/moderation";
+import { getActiveMapBans } from "@/lib/queries/staff/mapBans";
 import { ControlPanel } from "@/prisma";
 import { ModLogType } from "@prisma/client";
 
@@ -28,6 +30,7 @@ export default async function Page({
     leagueState,
     sanctions,
     bans,
+    mapBans,
     deletionQueue,
     escalations,
     activity,
@@ -36,6 +39,7 @@ export default async function Page({
     ControlPanel.getLeagueState(),
     getActiveSanctions(),
     getBans(),
+    getActiveMapBans(),
     getPickemDeletionQueue(),
     getEscalationWatch(),
     getModeratorActivity(),
@@ -72,6 +76,8 @@ export default async function Page({
           <SanctionsSection summary={summary} sanctions={sanctions} bans={bans}>
             <PickemDeletionQueue entries={deletionQueue} />
           </SanctionsSection>
+
+          <ActiveMapBansPanel entries={mapBans} />
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <EscalationWatchPanel escalations={escalations} />
