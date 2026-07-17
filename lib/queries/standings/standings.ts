@@ -9,7 +9,6 @@ import {
   PLAYOFF_ODDS_SIMULATIONS,
   shrunkMapWinRate,
 } from "@/lib/common/playoffOdds";
-import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { pseudoRandomUnitInterval } from "@/lib/common/random";
 import { ControlPanel } from "@/prisma";
 import { getLeagueState } from "../control/control";
@@ -153,6 +152,12 @@ async function getRemainingMatchMaps(
 const SIMULATED_WINNER_ROUNDS = 13;
 const SIMULATED_LOSER_ROUNDS = 8;
 const SIMULATION_YIELD_INTERVAL = 500;
+
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
 
 async function simulatePlayoffOdds(
   seasonNumber: number,
