@@ -1,8 +1,10 @@
 import NodeCache from "node-cache";
 import { ControlPanel, Franchise, Team } from "@/prisma";
 import { minutes, Times } from "./times";
-import { Standing } from "../queries/standings/standings";
 import {
+  Standing,
+  getPlayoffOdds,
+  PlayoffOddsRow,
   getFranchiseStandings,
   getStandingsByTier,
 } from "../queries/standings/standings";
@@ -95,6 +97,34 @@ export async function getStandingsByCached(
   const standingByTier = await getStandingsByTier(season, tier);
   cache.set(key, standingByTier, minutes(1));
   return standingByTier;
+}
+
+const playoffOddsInFlight = new Map<
+  string,
+  Promise<PlayoffOddsRow[] | null>
+>();
+
+export async function getPlayoffOddsCached(
+  season: number,
+  tier: Tier,
+): Promise<PlayoffOddsRow[] | null> {
+  const key = `playoff-odds-${season}-${tier}`;
+  const hit = cache.get<PlayoffOddsRow[] | null>(key);
+  if (hit !== undefined) return hit;
+
+  const inFlight = playoffOddsInFlight.get(key);
+  if (inFlight) return inFlight;
+
+  const pending = getPlayoffOdds(season, tier)
+    .then((playoffOdds) => {
+      cache.set(key, playoffOdds, minutes(30));
+      return playoffOdds;
+    })
+    .finally(() => {
+      playoffOddsInFlight.delete(key);
+    });
+  playoffOddsInFlight.set(key, pending);
+  return pending;
 }
 
 export type TeamWithFranchise = Prisma.TeamsGetPayload<{
