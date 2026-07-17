@@ -19,10 +19,6 @@ import {
   getRecentTransactions,
   TransactionGroup,
 } from "../queries/home/transactions";
-import { getPeerStatPool } from "../queries/stats/getPeerStatPool";
-import { getAgentCatalog } from "../queries/agents/getAgentCatalog";
-import { GameType } from "@prisma/client";
-import type { PeerRow } from "./indepth";
 
 let cache: NodeCache;
 initCache();
@@ -194,26 +190,6 @@ export async function getMatchNightRecapCached(
   const recap = await getMatchNightRecap(season);
   cache.set(key, recap, minutes(30));
   return recap;
-}
-
-export async function getPeerStatPoolCached(
-  gameType: GameType,
-  season?: number,
-): Promise<PeerRow[]> {
-  const key =
-    season === undefined
-      ? `${gameType}-peerPool-career`
-      : `s${season}-${gameType}-peerPool`;
-  const hit = cache.get<PeerRow[]>(key);
-  if (hit !== undefined) return hit;
-
-  const [catalog, tierLines] = await Promise.all([
-    getAgentCatalog(),
-    getMmmrTierLinesCached(),
-  ]);
-  const pool = await getPeerStatPool({ gameType, catalog, tierLines, season });
-  cache.set(key, pool, minutes(30));
-  return pool;
 }
 
 export async function getRecentTransactionsCached(

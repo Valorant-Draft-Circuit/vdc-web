@@ -23,15 +23,6 @@ import { getPlayerStatsBy } from "@/lib/queries/stats/stats";
 import { getAgentCatalog } from "@/lib/queries/agents/getAgentCatalog";
 import { getPlayerAgentBreakdown } from "@/lib/queries/stats/getPlayerAgentBreakdown";
 import { agentToUrlSlug } from "@/lib/common/agents";
-import PlayerStatsTab from "@/components/player/stats/PlayerStatsTab";
-import { PlayerStatsSkeleton } from "@/components/player/stats/PlayerStatsSkeleton";
-import { getPlayerCareerStats } from "@/lib/queries/stats/getPlayerCareerStats";
-import {
-  getPeerStatPoolCached,
-  getMmmrTierLinesCached,
-} from "@/lib/common/cache";
-import { toStatRows } from "@/lib/common/indepth";
-import { determineTierWithTierLines } from "@/lib/common/tier";
 
 type PlayerIGN = {
   encoded: string;
@@ -161,7 +152,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   const defaultType = leagueState === "COMBINES" ? "combine" : "season";
   const validTypes = new Set(["season", "combine"]);
-  const validBy = new Set(["summary", "agents", "maps", "stats"]);
+  const validBy = new Set(["summary", "agents", "maps"]);
   const validSeasons = new Set(listOfAllSeasons);
 
   const seasonOk = typeof sp.season === "string" && validSeasons.has(sp.season);
@@ -170,10 +161,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   if (!seasonOk || !typeOk || !byOk) {
     const next = new URLSearchParams();
-    next.set(
-      "season",
-      seasonOk ? (sp.season as string) : currentSeason.toString(),
-    );
+    next.set("season", seasonOk ? (sp.season as string) : currentSeason.toString());
     next.set("type", typeOk ? (sp.type as string) : defaultType);
     next.set("by", byOk ? (sp.by as string) : "summary");
     redirect(`/player/${player}?${next.toString()}`);
@@ -206,22 +194,6 @@ export default async function Page({ params, searchParams }: Props) {
           />
         </Suspense>
       ),
-    },
-    {
-      query: "Stats",
-      color: "vdcRed",
-      name: "Stats",
-      content:
-        sp.by === "stats" ? (
-          <Suspense fallback={<PlayerStatsSkeleton />}>
-            <PlayerStatsWithData
-              riotIGN={playerIGN.decoded}
-              season={season}
-              gameType={gameTypeParam}
-              mmr={mmr}
-            />
-          </Suspense>
-        ) : null,
     },
     {
       query: "Agents",
@@ -289,40 +261,6 @@ async function handleDiscordIDSearch(discordID: string) {
     redirect(`/player/${encodedIGN}`);
   }
   return <PlayerNotFound player={discordID} />;
-}
-
-async function PlayerStatsWithData({
-  riotIGN,
-  season,
-  gameType,
-  mmr,
-}: {
-  riotIGN: string;
-  season: number;
-  gameType: GameType;
-  mmr: number | null;
-}) {
-  const [catalog, careerRaw, seasonPool, careerPool, tierLines] =
-    await Promise.all([
-      getAgentCatalog(),
-      getPlayerCareerStats({ riotIgn: riotIGN, gameType }),
-      getPeerStatPoolCached(gameType, season),
-      getPeerStatPoolCached(gameType),
-      getMmmrTierLinesCached(),
-    ]);
-
-  const careerRows = toStatRows(careerRaw, catalog);
-  const selfTier = determineTierWithTierLines(mmr, tierLines);
-
-  return (
-    <PlayerStatsTab
-      careerRows={careerRows}
-      selectedSeason={season}
-      seasonPool={seasonPool}
-      careerPool={careerPool}
-      selfTier={selfTier}
-    />
-  );
 }
 
 async function PlayerSummaryWithStats({
