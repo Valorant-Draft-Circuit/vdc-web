@@ -1,8 +1,17 @@
-import { MatchType } from "@prisma/client";
+import { GameType, MatchType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Tier } from "@prisma/client";
 import { getAllActiveTeamsIn, ActiveTeam } from "../teams/teams";
 import { getAllGamesBy, Game } from "../games/games";
+import { MIN_GAMES_BY_MATCH_TYPE } from "@/lib/common/constants/matchFormat";
+import {
+  mapWinProbability,
+  PLAYOFF_ODDS_SIMULATIONS,
+  shrunkMapWinRate,
+} from "@/lib/common/playoffOdds";
+import { pseudoRandomUnitInterval } from "@/lib/common/random";
+import { ControlPanel } from "@/prisma";
+import { getLeagueState } from "../control/control";
 
 export type Standing = {
   franchiseSlug: string;
@@ -78,6 +87,138 @@ export async function getStandingsByTier(
 export function rankTeams(teams: ActiveTeam[], games: Game[]): TeamStats[] {
   const teamStats = teams.map((team) => calculateTeamStats(team, games));
   return applyTiebreakers(teamStats, games);
+}
+
+export type PlayoffOddsRow = {
+  teamId: number;
+  franchiseSlug: string;
+  odds: number;
+};
+
+type RemainingMap = { home: number; away: number };
+
+export async function getPlayoffOdds(
+  seasonNumber: number,
+  tier: Tier
+): Promise<PlayoffOddsRow[] | null> {
+  const [leagueState, currentSeason] = await Promise.all([
+    getLeagueState(),
+    ControlPanel.getSeason(),
+  ]);
+  if (leagueState !== "REGULAR_SEASON") return null;
+  if (seasonNumber !== currentSeason) return null;
+
+  const [games, teams, remainingMaps] = await Promise.all([
+    getAllGamesBy(tier, seasonNumber),
+    getAllActiveTeamsIn(tier),
+    getRemainingMatchMaps(seasonNumber, tier),
+  ]);
+  if (games.length === 0 || teams.length === 0) return null;
+
+  return simulatePlayoffOdds(seasonNumber, tier, teams, games, remainingMaps);
+}
+
+async function getRemainingMatchMaps(
+  seasonNumber: number,
+  tier: Tier
+): Promise<RemainingMap[]> {
+  const matches = await prisma.matches.findMany({
+    where: { season: seasonNumber, tier, matchType: MatchType.BO2 },
+    select: {
+      home: true,
+      away: true,
+      Games: {
+        where: {
+          OR: [{ gameType: GameType.SEASON }, { gameType: GameType.FORFEIT }],
+          winner: { not: null },
+        },
+        select: { gameID: true },
+      },
+    },
+  });
+
+  const mapsPerMatch = MIN_GAMES_BY_MATCH_TYPE[MatchType.BO2] ?? 2;
+  const remainingMaps: RemainingMap[] = [];
+  for (const match of matches) {
+    if (match.home === null || match.away === null) continue;
+    const mapsLeft = mapsPerMatch - match.Games.length;
+    for (let mapIndex = 0; mapIndex < mapsLeft; mapIndex++) {
+      remainingMaps.push({ home: match.home, away: match.away });
+    }
+  }
+  return remainingMaps;
+}
+
+const SIMULATED_WINNER_ROUNDS = 13;
+const SIMULATED_LOSER_ROUNDS = 8;
+
+function simulatePlayoffOdds(
+  seasonNumber: number,
+  tier: Tier,
+  teams: ActiveTeam[],
+  playedGames: Game[],
+  remainingMaps: RemainingMap[]
+): PlayoffOddsRow[] {
+  const strengthByTeam = buildStrengthByTeam(teams, playedGames);
+  const playoffCount = getPlayoffTeamCount(teams.length);
+  const seedBase = `playoff-odds:${seasonNumber}:${tier}:${playedGames.length}`;
+  const qualifiedCounts = new Map<number, number>(
+    teams.map((team) => [team.id, 0])
+  );
+
+  for (let sim = 0; sim < PLAYOFF_ODDS_SIMULATIONS; sim++) {
+    const syntheticGames = remainingMaps.map((map, mapIndex) =>
+      simulateMap(map, strengthByTeam, `${seedBase}:${sim}:${mapIndex}`)
+    );
+    const ranked = rankTeams(teams, [...playedGames, ...syntheticGames]);
+    for (const team of ranked.slice(0, playoffCount)) {
+      qualifiedCounts.set(team.id, (qualifiedCounts.get(team.id) ?? 0) + 1);
+    }
+  }
+
+  return teams.map((team) => ({
+    teamId: team.id,
+    franchiseSlug: team.Franchise.slug,
+    odds: (qualifiedCounts.get(team.id) ?? 0) / PLAYOFF_ODDS_SIMULATIONS,
+  }));
+}
+
+function buildStrengthByTeam(
+  teams: ActiveTeam[],
+  games: Game[]
+): Map<number, number> {
+  const strengthByTeam = new Map<number, number>();
+  for (const team of teams) {
+    const teamGames = games.filter(
+      (game) => game.Match?.home === team.id || game.Match?.away === team.id
+    );
+    const mapWins = teamGames.filter((game) => game.winner === team.id).length;
+    strengthByTeam.set(team.id, shrunkMapWinRate(mapWins, teamGames.length));
+  }
+  return strengthByTeam;
+}
+
+function simulateMap(
+  map: RemainingMap,
+  strengthByTeam: Map<number, number>,
+  seed: string
+): Game {
+  const homeStrength = strengthByTeam.get(map.home) ?? 0.5;
+  const awayStrength = strengthByTeam.get(map.away) ?? 0.5;
+  const homeWinProbability = mapWinProbability(homeStrength, awayStrength);
+  const homeWins = pseudoRandomUnitInterval(seed) < homeWinProbability;
+
+  return {
+    winner: homeWins ? map.home : map.away,
+    rounds: SIMULATED_WINNER_ROUNDS + SIMULATED_LOSER_ROUNDS,
+    roundsWonHome: homeWins
+      ? SIMULATED_WINNER_ROUNDS
+      : SIMULATED_LOSER_ROUNDS,
+    roundsWonAway: homeWins
+      ? SIMULATED_LOSER_ROUNDS
+      : SIMULATED_WINNER_ROUNDS,
+    Match: { home: map.home, away: map.away, matchDay: null },
+  };
 }
 
 export async function getFranchiseStandings(
