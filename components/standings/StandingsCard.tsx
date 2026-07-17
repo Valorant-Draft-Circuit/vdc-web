@@ -2,23 +2,17 @@ import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { Standing } from "@/lib/queries/standings/standings";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  formatPlayoffOdds,
-  playoffOddsColorClass,
-} from "@/lib/common/playoffOdds";
 
 export default function StandingsCard({
   standing,
   ranking,
   apexRanks,
   query,
-  playoffOdds,
 }: {
   standing: Standing;
   ranking: number;
   apexRanks: number;
   query: string;
-  playoffOdds: number | null;
 }) {
   const tier = query.toLocaleLowerCase();
   const link =
@@ -59,15 +53,6 @@ export default function StandingsCard({
               {standing.wins}W {standing.losses}L
             </h1>
             <h1 className="text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
-            {playoffOdds != null && (
-              <h1
-                className={`text-sm xl:text-sm ${playoffOddsColorClass(
-                  playoffOdds
-                )}`}
-              >
-                Playoff Odds: {formatPlayoffOdds(playoffOdds)}
-              </h1>
-            )}
           </div>
         </div>
       </Link>
