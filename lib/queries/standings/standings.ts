@@ -9,6 +9,7 @@ import {
   PLAYOFF_ODDS_SIMULATIONS,
   shrunkMapWinRate,
 } from "@/lib/common/playoffOdds";
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { pseudoRandomUnitInterval } from "@/lib/common/random";
 import { ControlPanel } from "@/prisma";
 import { getLeagueState } from "../control/control";
@@ -151,14 +152,15 @@ async function getRemainingMatchMaps(
 
 const SIMULATED_WINNER_ROUNDS = 13;
 const SIMULATED_LOSER_ROUNDS = 8;
+const SIMULATION_YIELD_INTERVAL = 500;
 
-function simulatePlayoffOdds(
+async function simulatePlayoffOdds(
   seasonNumber: number,
   tier: Tier,
   teams: ActiveTeam[],
   playedGames: Game[],
   remainingMaps: RemainingMap[]
-): PlayoffOddsRow[] {
+): Promise<PlayoffOddsRow[]> {
   const strengthByTeam = buildStrengthByTeam(teams, playedGames);
   const playoffCount = getPlayoffTeamCount(teams.length);
   const seedBase = `playoff-odds:${seasonNumber}:${tier}:${playedGames.length}`;
@@ -167,6 +169,9 @@ function simulatePlayoffOdds(
   );
 
   for (let sim = 0; sim < PLAYOFF_ODDS_SIMULATIONS; sim++) {
+    if (sim > 0 && sim % SIMULATION_YIELD_INTERVAL === 0) {
+      await yieldToEventLoop();
+    }
     const syntheticGames = remainingMaps.map((map, mapIndex) =>
       simulateMap(map, strengthByTeam, `${seedBase}:${sim}:${mapIndex}`)
     );
