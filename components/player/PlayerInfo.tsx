@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
+import { avatarColor } from "@/lib/common/avatar";
 import {
   TEAM_LOGOS_URL,
   TRACKER_PROFILE_URL,
@@ -72,14 +74,19 @@ export default async function PlayerInfo({
               target="_blank"
               href={`https://discord.com/users/${discordAccountId}`}
             >
-              <ImageWithFallback
-                alt={playerInfo.name ?? ""}
-                src={playerInfo.image ?? "/vdc-flame.svg"}
-                fallbackSrc="/vdc-flame.svg"
-                className={`size-20 rounded-md border-5 border-${tierColor} overflow-hidden text-sm`}
-                width={250}
-                height={250}
-              />
+              <span
+                className={`inline-block rounded-md border-5 border-${tierColor} overflow-hidden`}
+              >
+                <PlayerAvatar
+                  name={playerInfo.name ?? "??"}
+                  image={playerInfo.image ?? null}
+                  fallbackColor={avatarColor(discordAccountId ?? playerInfo.name ?? "?")}
+                  sizeClass="size-20"
+                  pixels={160}
+                  textClass="text-2xl"
+                  shapeClass="rounded-none"
+                />
+              </span>
             </a>
           </span>
           <div className="flex flex-col my-auto gap-1">

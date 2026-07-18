@@ -22,6 +22,7 @@ type Props = {
   sizeClass: string;
   pixels: number;
   textClass: string;
+  shapeClass?: string;
 };
 
 export default function PlayerAvatar({
@@ -31,6 +32,7 @@ export default function PlayerAvatar({
   sizeClass,
   pixels,
   textClass,
+  shapeClass = "rounded-full",
 }: Props) {
   const [failed, setFailed] = useState(false);
 
@@ -42,14 +44,14 @@ export default function PlayerAvatar({
         width={pixels}
         height={pixels}
         onError={() => setFailed(true)}
-        className={`${sizeClass} flex-none rounded-full object-cover`}
+        className={`${sizeClass} flex-none ${shapeClass} object-cover`}
       />
     );
   }
 
   return (
     <h2
-      className={`flex ${sizeClass} flex-none items-center justify-center rounded-full font-extrabold text-white ${textClass}`}
+      className={`flex ${sizeClass} flex-none items-center justify-center ${shapeClass} font-extrabold text-white ${textClass}`}
       style={{ backgroundColor: fallbackColor }}
     >
       {initials(name)}

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth/auth";
 import SignIn from "./SignIn";
-import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
+import { avatarColor } from "@/lib/common/avatar";
 import SignOut from "./SignOut";
 import Link from "next/link";
 import { getUser } from "@/lib/queries/user/user";
@@ -41,13 +42,13 @@ export default async function AuthSection() {
       </div>
       <div className="flex m-auto">
         <Link href="/me">
-          <ImageWithFallback
-            alt="user avatar"
-            src={userAvatar ?? "/vdc-flame.svg"}
-            fallbackSrc="/vdc-flame.svg"
-            width={25}
-            height={25}
-            className="inline-block size-12 rounded-full"
+          <PlayerAvatar
+            name={user?.name ?? "??"}
+            image={userAvatar ?? null}
+            fallbackColor={avatarColor(session.user.id)}
+            sizeClass="size-12"
+            pixels={48}
+            textClass="text-sm"
           />
         </Link>
       </div>

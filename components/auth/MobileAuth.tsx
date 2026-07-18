@@ -1,4 +1,5 @@
-import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
+import PlayerAvatar from "@/components/theme/PlayerAvatar";
+import { avatarColor } from "@/lib/common/avatar";
 import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { getUserStatus } from "@/lib/common/auth/auth-utils";
@@ -33,13 +34,13 @@ export default async function MobileAuth() {
       <div className="flex flex-row gap-2 ml-10">
         <div className="flex m-auto">
           <Link href="/me">
-            <ImageWithFallback
-              alt="user avatar"
-              src={userImage ?? "/vdc-flame.svg"}
-              fallbackSrc="/vdc-flame.svg"
-              width={25}
-              height={25}
-              className="inline-block size-12 rounded-full"
+            <PlayerAvatar
+              name={userName ?? "??"}
+              image={userImage ?? null}
+              fallbackColor={avatarColor(session.user.id)}
+              sizeClass="size-12"
+              pixels={48}
+              textClass="text-sm"
             />
           </Link>
         </div>
