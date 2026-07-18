@@ -3,7 +3,8 @@ import { Tier } from "@prisma/client";
 
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
-import { getSeasonCached } from "@/lib/common/cache";
+import { getAgentsCached, getSeasonCached } from "@/lib/common/cache";
+import { buildAgentOptions } from "@/lib/common/constants/agents";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
 import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
@@ -122,6 +123,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           ownerName={activeGroup.Owner?.name ?? "Unknown"}
           canModerate={canModerate}
           season={season}
+          agentOptions={buildAgentOptions(await getAgentsCached())}
         />
       )}
 

@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 
 import { auth } from "@/lib/auth/auth";
-import { getSeasonCached } from "@/lib/common/cache";
+import { getAgentsCached, getSeasonCached } from "@/lib/common/cache";
+import { buildAgentOptions } from "@/lib/common/constants/agents";
 import { getMyGroups } from "@/lib/queries/pickems/getGroups";
 import { requirePickemsEnabled } from "@/lib/pickems/guard";
 import GroupsPanel from "@/components/pickems/groups/GroupsPanel";
@@ -15,8 +16,13 @@ export const metadata: Metadata = {
 export default async function GroupsPage() {
   await requirePickemsEnabled();
 
-  const [season, session] = await Promise.all([getSeasonCached(), auth()]);
+  const [season, session, agents] = await Promise.all([
+    getSeasonCached(),
+    auth(),
+    getAgentsCached(),
+  ]);
   const userId = session?.user?.id ?? null;
+  const agentOptions = buildAgentOptions(agents);
 
   return (
     <div className="flex flex-col gap-4">
@@ -33,6 +39,7 @@ export default async function GroupsPage() {
         <GroupsPanel
           groups={await getMyGroups(userId, season)}
           season={season}
+          agentOptions={agentOptions}
         />
       )}
     </div>

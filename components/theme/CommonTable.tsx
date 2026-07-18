@@ -1,5 +1,5 @@
 "use client";
-import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
+import { AGENTURL } from "@/lib/common/constants/agents";
 import {
   FIELDS,
   FormattedGameStat,
@@ -59,6 +59,7 @@ const TEXT_KEYS = [
 
 export default function CommonTable({
   data,
+  agents,
   gameType,
   tier,
   season,
@@ -66,6 +67,7 @@ export default function CommonTable({
   exportName = "vdc-stats",
 }: {
   data;
+  agents: Record<string, string>;
   gameType?;
   tier?;
   season?: number;
@@ -158,16 +160,20 @@ export default function CommonTable({
           }
           return (
             <div className="flex flex-wrap gap-1">
-              {val.map((agent: string) => (
-                <Image
-                  key={agent}
-                  src={AGENTURL(AGENTS[agent.toUpperCase()])}
-                  alt={agent}
-                  width={500}
-                  height={500}
-                  className="size-6 xl:size-7"
-                />
-              ))}
+              {val.map((agent: string) => {
+                const agentUuid = agents[agent.toUpperCase()];
+                if (!agentUuid) return null;
+                return (
+                  <Image
+                    key={agent}
+                    src={AGENTURL(agentUuid)}
+                    alt={agent}
+                    width={500}
+                    height={500}
+                    className="size-6 xl:size-7"
+                  />
+                );
+              })}
             </div>
           );
         }

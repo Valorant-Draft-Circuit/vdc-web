@@ -1,7 +1,7 @@
 "use client";
 
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
+import { MAP_LIST_URL } from "@/lib/common/constants/maps";
 import { XMarkIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { MatchTeam } from "@/lib/queries/match/match";
@@ -23,6 +23,7 @@ type MapBanInput = {
 export default function MapBan({
   mapBan,
   teams,
+  maps,
   delay = 0,
 }: {
   mapBan: MapBanInput;
@@ -30,6 +31,7 @@ export default function MapBan({
     home: MatchTeam | null | undefined;
     away: MatchTeam | null | undefined;
   };
+  maps: Record<string, string>;
   delay?: number;
 }) {
   const router = useRouter();
@@ -50,7 +52,7 @@ export default function MapBan({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const mapUrl = MAP_LIST_URL(MAPS[mapBan.map?.toUpperCase() ?? ""]);
+  const mapUuid = maps[mapBan.map?.toUpperCase() ?? ""];
   const { home, away } = teams;
   const decidingTeam = mapBan.team === home?.id ? home : away;
   const isBan = mapBan.type === MapBanType.BAN;
@@ -68,17 +70,19 @@ export default function MapBan({
       style={{ transitionDelay: `${delay}ms` }}
       onClick={() => updateParam("game", mapBan.gameId ?? "")}
     >
-      <Image
-        alt={mapBan.map ?? ""}
-        src={mapUrl}
-        width={5000}
-        height={5000}
-        className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
-          isBan || isDiscard
-            ? "grayscale brightness-35 dark:brightness-30"
-            : "brightness-55 dark:brightness-50"
-        }`}
-      />
+      {mapUuid && (
+        <Image
+          alt={mapBan.map ?? ""}
+          src={MAP_LIST_URL(mapUuid)}
+          width={5000}
+          height={5000}
+          className={`absolute inset-0 -z-10 size-full object-cover rounded-lg ${
+            isBan || isDiscard
+              ? "grayscale brightness-35 dark:brightness-30"
+              : "brightness-55 dark:brightness-50"
+          }`}
+        />
+      )}
       <div className="flex flex-row xl:flex-col gap-5 p-5 justify-between">
         <div className="flex flex-row xl:flex-col gap-5 drop-shadow-lg text-vdcWhite my-auto xl:m-auto xl:text-center">
           <h1>{mapBan.map}</h1>

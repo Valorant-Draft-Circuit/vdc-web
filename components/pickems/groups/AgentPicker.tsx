@@ -1,20 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import {
-  AGENT_PICKER_OPTIONS,
-  AGENTURL,
-} from "@/lib/common/constants/agents";
+import { AGENTURL, AgentOption } from "@/lib/common/constants/agents";
 
 type Props = {
   value: string;
+  options: AgentOption[];
   onChange: (uuid: string) => void;
 };
 
-export default function AgentPicker({ value, onChange }: Props) {
+export default function AgentPicker({ value, options, onChange }: Props) {
   return (
     <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
-      {AGENT_PICKER_OPTIONS.map((agent) => {
+      {options.map((agent) => {
         const isSelected = agent.uuid === value;
         const borderClass = isSelected
           ? "border-vdcRed"

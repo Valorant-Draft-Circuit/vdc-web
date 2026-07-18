@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AGENT_PICKER_OPTIONS } from "@/lib/common/constants/agents";
+import { AgentOption } from "@/lib/common/constants/agents";
 import { createGroup, updateGroup } from "@/app/pickems/actions";
 import AgentPicker from "./AgentPicker";
 
@@ -11,20 +11,22 @@ type Props = {
   open: boolean;
   onClose: () => void;
   mode: "create" | "edit";
+  agentOptions: AgentOption[];
   groupId?: number;
   initialName?: string;
   initialImage?: string;
 };
 
-function randomAgentUuid(): string {
-  const index = Math.floor(Math.random() * AGENT_PICKER_OPTIONS.length);
-  return AGENT_PICKER_OPTIONS[index].uuid;
+function randomAgentUuid(options: AgentOption[]): string {
+  const index = Math.floor(Math.random() * options.length);
+  return options[index].uuid;
 }
 
 export default function GroupEditorModal({
   open,
   onClose,
   mode,
+  agentOptions,
   groupId,
   initialName,
   initialImage,
@@ -40,7 +42,7 @@ export default function GroupEditorModal({
       return;
     }
     setName(initialName ?? "");
-    setImage(initialImage ?? randomAgentUuid());
+    setImage(initialImage ?? randomAgentUuid(agentOptions));
     setError(null);
   }, [open, initialName, initialImage]);
 
@@ -89,7 +91,7 @@ export default function GroupEditorModal({
             Pick an agent
           </h2>
           <div className="overflow-auto">
-            <AgentPicker value={image} onChange={setImage} />
+            <AgentPicker value={image} options={agentOptions} onChange={setImage} />
           </div>
           {error && (
             <h2 className="text-xs font-semibold text-vdcRed">{error}</h2>

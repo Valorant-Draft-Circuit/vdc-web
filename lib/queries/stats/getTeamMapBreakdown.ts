@@ -3,7 +3,9 @@ import { GameType, MapBansSide, MapBanType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { avg } from "@/lib/common/math";
 import { normalizeAgentName } from "@/lib/common/agents";
-import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
+import { AGENTURL } from "@/lib/common/constants/agents";
+import { getAgentsCached } from "@/lib/common/cache";
+import { Agents } from "@/lib/common/valorant-api";
 
 export type TeamMapAgent = {
   name: string;
@@ -46,6 +48,7 @@ const TOP_AGENTS_SHOWN = 5;
 
 export const getTeamMapBreakdown = cache(
   async (teamId: number, season: number): Promise<TeamMapBreakdown[]> => {
+    const agents = await getAgentsCached();
     const [games, vetoRows] = await Promise.all([
       prisma.games.findMany({
         where: {
@@ -180,18 +183,21 @@ export const getTeamMapBreakdown = cache(
         banCount: accumulator.banCount,
         attackSideChoices: accumulator.attackSideChoices,
         defenseSideChoices: accumulator.defenseSideChoices,
-        agents: topAgents(accumulator.agentGameCounts),
+        agents: topAgents(accumulator.agentGameCounts, agents),
       }))
       .sort((first, second) => second.played - first.played);
   },
 );
 
-function topAgents(agentGameCounts: Map<string, number>): TeamMapAgent[] {
+function topAgents(
+  agentGameCounts: Map<string, number>,
+  agents: Agents,
+): TeamMapAgent[] {
   return [...agentGameCounts.entries()]
     .sort((first, second) => second[1] - first[1])
     .slice(0, TOP_AGENTS_SHOWN)
     .map(([name]) => {
-      const agentUuid = AGENTS[name.toUpperCase() as keyof typeof AGENTS];
+      const agentUuid = agents[name.toUpperCase()];
       return { name, iconUrl: agentUuid ? AGENTURL(agentUuid) : null };
     });
 }

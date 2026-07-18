@@ -1,7 +1,7 @@
 "use client";
 
 import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
-import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
+import { MAP_LIST_URL } from "@/lib/common/constants/maps";
 import { MatchDetail } from "@/lib/queries/match/match";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -12,10 +12,12 @@ type GameRow = MatchDetail["Games"][number];
 export default function Game({
   game,
   gameNumber,
+  maps,
   delay = 0,
 }: {
   game: GameRow;
   gameNumber: number;
+  maps: Record<string, string>;
   delay?: number;
 }) {
   const router = useRouter();
@@ -37,6 +39,7 @@ export default function Game({
   };
   const tierColor = TIER_COLOR_MAP[game.tier];
   const map = game.map;
+  const mapUuid = map ? maps[map.toUpperCase()] : undefined;
   return (
     <div
       className={`relative xl:w-full transform transition-all duration-300 ease-out
@@ -48,10 +51,10 @@ export default function Game({
       style={{ transitionDelay: `${delay}ms` }}
       onClick={() => updateParam("game", game.gameID)}
     >
-      {map && (
+      {mapUuid && (
         <Image
           alt={game.map ?? ""}
-          src={MAP_LIST_URL(MAPS[map!.toUpperCase()])}
+          src={MAP_LIST_URL(mapUuid)}
           width={5000}
           height={5000}
           className="absolute inset-0 -z-10 size-full object-cover rounded-lg brightness-55 dark:brightness-50"

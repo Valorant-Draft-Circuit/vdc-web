@@ -8,14 +8,16 @@ import { PencilIcon } from "@heroicons/react/16/solid";
 import type { GroupSummary } from "@/lib/queries/pickems/getGroups";
 import { AGENTURL } from "@/lib/common/constants/agents";
 import { joinGroupByCode, leaveGroup } from "@/app/pickems/actions";
+import { AgentOption } from "@/lib/common/constants/agents";
 import GroupEditorModal from "./GroupEditorModal";
 
 type Props = {
   groups: GroupSummary[];
   season: number;
+  agentOptions: AgentOption[];
 };
 
-export default function GroupsPanel({ groups, season }: Props) {
+export default function GroupsPanel({ groups, season, agentOptions }: Props) {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -213,6 +215,7 @@ export default function GroupsPanel({ groups, season }: Props) {
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
         mode={editorMode}
+        agentOptions={agentOptions}
         groupId={editorGroup?.id}
         initialName={editorGroup?.name}
         initialImage={editorGroup?.image}

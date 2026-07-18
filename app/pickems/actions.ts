@@ -8,11 +8,10 @@ import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { getLeagueStatus } from "@/lib/queries/user/user";
 import { prisma } from "@/lib/prisma";
-import { getSeasonCached } from "@/lib/common/cache";
+import { getAgentsCached, getSeasonCached } from "@/lib/common/cache";
 import { correctMatchDate } from "@/lib/common/format";
 import { isLegalScore } from "@/lib/pickems/picks";
 import { slateLockTime } from "@/lib/pickems/format";
-import { AGENT_UUIDS } from "@/lib/common/constants/agents";
 import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import {
   getAdvanceBoard,
@@ -30,6 +29,11 @@ const SUSPENDED_ERROR = "Suspended players cannot participate in Pick'ems";
 async function isSuspended(userId: string): Promise<boolean> {
   const leagueStatus = await getLeagueStatus(userId);
   return leagueStatus === LeagueStatus.SUSPENDED;
+}
+
+async function isKnownAgentUuid(uuid: string): Promise<boolean> {
+  const agents = await getAgentsCached();
+  return Object.values(agents).includes(uuid);
 }
 
 export async function submitMatchPicks(input: {
@@ -212,7 +216,7 @@ export async function createGroup(input: {
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
     return { ok: false, error: "Name must be 1-60 chars" };
   }
-  if (!AGENT_UUIDS.has(input.image)) {
+  if (!(await isKnownAgentUuid(input.image))) {
     return { ok: false, error: "Invalid image" };
   }
 
@@ -251,7 +255,7 @@ export async function updateGroup(input: {
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
     return { ok: false, error: "Name must be 1-60 chars" };
   }
-  if (!AGENT_UUIDS.has(input.image)) {
+  if (!(await isKnownAgentUuid(input.image))) {
     return { ok: false, error: "Invalid image" };
   }
 

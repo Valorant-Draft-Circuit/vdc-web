@@ -56,7 +56,10 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { matchId } = await params;
-  const matchInfo = await getMatch(matchId);
+  const [matchInfo, maps] = await Promise.all([
+    getMatch(matchId),
+    getMapsCached(),
+  ]);
   if (!matchInfo) notFound();
 
   const gameParam = (await searchParams).game;
@@ -190,6 +193,7 @@ export default async function Page({
                       key={mapBan.id}
                       mapBan={mapBan}
                       teams={teams}
+                      maps={maps}
                       delay={i * 75}
                     />
                   ))}
@@ -204,6 +208,7 @@ export default async function Page({
                       key={game.gameID}
                       game={game}
                       gameNumber={i}
+                      maps={maps}
                       delay={i * 75}
                     />
                   ))}

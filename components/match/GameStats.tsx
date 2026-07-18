@@ -1,10 +1,14 @@
 import CommonTable from "../theme/CommonTable";
 import { getStatsBy } from "@/lib/queries/stats/stats";
+import { getAgentsCached } from "@/lib/common/cache";
 
 export default async function GameStats({ gameId }: { gameId: string }) {
-  const data = await getStatsBy({ gameId });
+  const [data, agents] = await Promise.all([
+    getStatsBy({ gameId }),
+    getAgentsCached(),
+  ]);
   if (data.length === 0) return <NoStatsFound />;
-  return <CommonTable data={data} />;
+  return <CommonTable data={data} agents={agents} />;
 }
 
 function NoStatsFound() {

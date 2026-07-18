@@ -11,6 +11,7 @@ export const MAPS = {
   ICEBOX: "e2ad5c54-4114-a870-9641-8ea21279579a",
   CORRODE: "1c18ab1f-420d-0d8b-71d0-77ad3c439115",
   HAVEN: "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+  SUMMIT: "756da597-416b-c0f2-f47b-afbdf28670bc",
 };
 
 export const MAP_LIST_URL = (UUID) => {

@@ -27,6 +27,7 @@ export const AGENTS = {
   TEJO: "b444168c-4e35-8076-db47-ef9bf368f384",
   WAYLAY: "df1cb487-4902-002e-5c17-d28e83e78588",
   VETO: "92eeef5d-43b5-1d4a-8d03-b3927a09034b",
+  MIKS: "7c8a4701-4de6-9355-b254-e09bc2a34b72",
 };
 
 export const AGENTURL = (UUID) => {
@@ -35,8 +36,10 @@ export const AGENTURL = (UUID) => {
 
 export type AgentOption = { name: string; uuid: string };
 
-export const AGENT_PICKER_OPTIONS: AgentOption[] = Object.entries(AGENTS)
-  .map(([name, uuid]) => ({ name, uuid }))
-  .sort((a, b) => a.name.localeCompare(b.name));
-
-export const AGENT_UUIDS = new Set<string>(Object.values(AGENTS));
+export function buildAgentOptions(
+  agents: Record<string, string>,
+): AgentOption[] {
+  return Object.entries(agents)
+    .map(([name, uuid]) => ({ name, uuid }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}

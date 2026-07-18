@@ -5,6 +5,7 @@ import Image from "next/image";
 import { PencilIcon } from "@heroicons/react/16/solid";
 import { AGENTURL } from "@/lib/common/constants/agents";
 import GroupModDeleteButton from "@/components/pickems/leaderboard/GroupModDeleteButton";
+import { AgentOption } from "@/lib/common/constants/agents";
 import GroupEditorModal from "./GroupEditorModal";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
   ownerName: string;
   canModerate: boolean;
   season: number;
+  agentOptions: AgentOption[];
 };
 
 export default function GroupScopeTitle({
@@ -25,6 +27,7 @@ export default function GroupScopeTitle({
   ownerName,
   canModerate,
   season,
+  agentOptions,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -68,6 +71,7 @@ export default function GroupScopeTitle({
         open={open}
         onClose={() => setOpen(false)}
         mode="edit"
+        agentOptions={agentOptions}
         groupId={groupId}
         initialName={name}
         initialImage={image}
