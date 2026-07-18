@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
 import Link from "next/link";
 import { auth } from "@/lib/auth/auth";
 import { getUserStatus } from "@/lib/common/auth/auth-utils";
@@ -33,9 +33,10 @@ export default async function MobileAuth() {
       <div className="flex flex-row gap-2 ml-10">
         <div className="flex m-auto">
           <Link href="/me">
-            <Image
+            <ImageWithFallback
               alt="user avatar"
-              src={userImage ?? ""}
+              src={userImage ?? "/vdc-flame.svg"}
+              fallbackSrc="/vdc-flame.svg"
               width={25}
               height={25}
               className="inline-block size-12 rounded-full"

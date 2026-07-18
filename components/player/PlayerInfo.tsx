@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
 import {
   TEAM_LOGOS_URL,
   TRACKER_PROFILE_URL,
@@ -71,9 +72,10 @@ export default async function PlayerInfo({
               target="_blank"
               href={`https://discord.com/users/${discordAccountId}`}
             >
-              <Image
+              <ImageWithFallback
                 alt={playerInfo.name ?? ""}
-                src={playerInfo.image ?? ""}
+                src={playerInfo.image ?? "/vdc-flame.svg"}
+                fallbackSrc="/vdc-flame.svg"
                 className={`size-20 rounded-md border-5 border-${tierColor} overflow-hidden text-sm`}
                 width={250}
                 height={250}
@@ -170,9 +172,10 @@ function ProfileBanner({ playerInfo }: { playerInfo: PlayerProfile }) {
   const hasBanner = playerInfo.banner;
   if (hasBanner) {
     return (
-      <Image
+      <ImageWithFallback
         alt={playerInfo.name ?? ""}
         src={playerInfo.banner ?? ""}
+        fallbackSrc={playerInfo.image ?? "/vdc-flame.svg"}
         fill
         sizes="100vw"
         className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-35 dark:brightness-20"
@@ -180,9 +183,10 @@ function ProfileBanner({ playerInfo }: { playerInfo: PlayerProfile }) {
     );
   }
   return (
-    <Image
+    <ImageWithFallback
       alt={playerInfo.name ?? ""}
-      src={playerInfo.image ?? ""}
+      src={playerInfo.image ?? "/vdc-flame.svg"}
+      fallbackSrc="/vdc-flame.svg"
       width={5000}
       height={5000}
       className="absolute pointer-events-none inset-0 size-full object-contain z-0 sm:object-right xl:z-10 justify-self-end brightness-50 opacity-80 drop-shadow-lg"

@@ -1,4 +1,4 @@
-import { ImageWithFallback } from "@/components/player/search/PlayerCard";
+import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
 import Link from "next/link";
 
 type PlayerCardUser = {

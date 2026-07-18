@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ImageWithFallback } from "@/components/player/search/PlayerCard";
+import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
 import { SignupQueue } from "@/lib/queries/staff/admin";
 
 const STATUS_LABEL: Record<string, string> = {

@@ -112,19 +112,3 @@ export default function PlayerCard({
   );
 }
 
-export const ImageWithFallback = (
-  props: React.ComponentProps<typeof Image> & { fallbackSrc: string },
-) => {
-  const { src, fallbackSrc, ...rest } = props;
-  const [imgSrc, setImgSrc] = useState(src);
-  return (
-    <Image
-      {...rest}
-      alt=""
-      src={imgSrc}
-      onError={() => {
-        setImgSrc(fallbackSrc);
-      }}
-    />
-  );
-};
