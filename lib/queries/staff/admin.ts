@@ -4,13 +4,13 @@ import { MIN_GAMES_BY_MATCH_TYPE } from "@/lib/common/constants/matchFormat";
 import {
   SeasonBoundary,
   SignupTrend,
-  bucketByMonth,
-  bucketBySeason,
-  bucketByWeek,
+  monthlySignupSeries,
+  seasonSignupSeries,
+  weeklySignupSeries,
 } from "@/lib/common/signups";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus, MatchType, Tier } from "@prisma/client";
-import { addDays, format, subDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 
 export type SignedTierCount = {
   tier: Tier;
@@ -177,32 +177,6 @@ export async function getTotalFreeAgentCount() {
   });
 }
 
-export async function getTotalPlayerCountOver(days) {
-  const today = new Date();
-  const startDate = subDays(today, days);
-
-  const users = await prisma.user.findMany({
-    where: {
-      createdAt: {
-        lte: today,
-      },
-    },
-    select: { createdAt: true },
-  });
-
-  const dateList: string[] = [];
-  for (let i = 0; i <= days; i++) {
-    dateList.push(format(addDays(startDate, i), "yyyy-MM-dd"));
-  }
-
-  const counts: { date: string; total: number }[] = [];
-
-  for (const date of dateList) {
-    const count = users.filter((u) => u.createdAt <= new Date(date)).length;
-    counts.push({ date, total: count });
-  }
-}
-
 export type TierComposition = {
   tier: Tier;
   signed: number;
@@ -238,8 +212,6 @@ const SIGNUP_FUNNEL_STATUSES: LeagueStatus[] = [
   LeagueStatus.APPROVED,
   LeagueStatus.DRAFT_ELIGIBLE,
 ];
-
-const MANUAL_REVIEW_LIST_CAP = 8;
 
 export type SignupFunnelEntry = { status: LeagueStatus; count: number };
 
@@ -280,7 +252,6 @@ export async function getSignupQueue(): Promise<SignupQueue> {
       },
     },
     orderBy: { createdAt: "asc" },
-    take: MANUAL_REVIEW_LIST_CAP,
   });
 
   const manualReviewPlayers: SignupQueuePlayer[] = reviewUsers.map((user) => ({
@@ -292,8 +263,6 @@ export async function getSignupQueue(): Promise<SignupQueue> {
 
   return { funnel, manualReviewCount, manualReviewPlayers };
 }
-
-const UNREPORTED_LIST_CAP = 8;
 
 export type UnreportedMatch = {
   matchID: number;
@@ -347,11 +316,10 @@ export async function getUnreportedMatches(season: number): Promise<UnreportedMa
     }))
     .filter((match) => match.reported < match.expected);
 
-  return { count: unreported.length, matches: unreported.slice(0, UNREPORTED_LIST_CAP) };
+  return { count: unreported.length, matches: unreported };
 }
 
 const UPCOMING_VETO_WINDOW_DAYS = 7;
-const UPCOMING_MISSING_VETO_LIST_CAP = 8;
 
 export type UpcomingMatchMissingVeto = {
   matchID: number;
@@ -404,7 +372,7 @@ export async function getUpcomingMissingVetos(season: number): Promise<UpcomingM
     dateScheduled: row.dateScheduled,
   }));
 
-  return { count: matches.length, matches: matches.slice(0, UPCOMING_MISSING_VETO_LIST_CAP) };
+  return { count: matches.length, matches };
 }
 
 const SIGNUP_TREND_WEEKS = 12;
@@ -431,9 +399,9 @@ export async function getSignupTrend(): Promise<SignupTrend> {
   const now = new Date();
 
   return {
-    weekly: bucketByWeek(dates, now, SIGNUP_TREND_WEEKS),
-    monthly: bucketByMonth(dates, now, SIGNUP_TREND_MONTHS),
-    bySeason: bucketBySeason(dates, boundaries),
+    weekly: weeklySignupSeries(dates, now, SIGNUP_TREND_WEEKS),
+    monthly: monthlySignupSeries(dates, now, SIGNUP_TREND_MONTHS),
+    bySeason: seasonSignupSeries(dates, boundaries),
   };
 }
 
