@@ -226,6 +226,8 @@ export async function getMatchNightRecapCached(
   return recap;
 }
 
+const peerPoolInFlight = new Map<string, Promise<PeerRow[]>>();
+
 export async function getPeerStatPoolCached(
   gameType: GameType,
   season?: number,
@@ -237,13 +239,30 @@ export async function getPeerStatPoolCached(
   const hit = cache.get<PeerRow[]>(key);
   if (hit !== undefined) return hit;
 
+  const inFlight = peerPoolInFlight.get(key);
+  if (inFlight) return inFlight;
+
+  const pending = computePeerStatPool(gameType, season)
+    .then((pool) => {
+      cache.set(key, pool, minutes(30));
+      return pool;
+    })
+    .finally(() => {
+      peerPoolInFlight.delete(key);
+    });
+  peerPoolInFlight.set(key, pending);
+  return pending;
+}
+
+async function computePeerStatPool(
+  gameType: GameType,
+  season?: number,
+): Promise<PeerRow[]> {
   const [catalog, tierLines] = await Promise.all([
     getAgentCatalog(),
     getMmmrTierLinesCached(),
   ]);
-  const pool = await getPeerStatPool({ gameType, catalog, tierLines, season });
-  cache.set(key, pool, minutes(30));
-  return pool;
+  return getPeerStatPool({ gameType, catalog, tierLines, season });
 }
 
 export async function getRecentTransactionsCached(

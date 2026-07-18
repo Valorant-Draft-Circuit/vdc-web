@@ -143,96 +143,173 @@ const presentOrZero = (value: number | null) => value ?? 0;
 const ratio = (numerator: number, denominator: number) =>
   denominator === 0 ? 0 : numerator / denominator;
 
-const meanOfPresent = (values: Array<number | null>) => {
-  const present = values.filter((value): value is number => value !== null);
-  if (present.length === 0) return 0;
-  const sum = present.reduce((total, value) => total + value, 0);
-  return sum / present.length;
+type MeanAccumulator = { sum: number; count: number };
+
+export type StatAccumulator = {
+  games: number;
+  rounds: number;
+  wins: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  damage: number;
+  firstKills: number;
+  firstDeaths: number;
+  clutches: number;
+  ecoKills: number;
+  antiEcoKills: number;
+  tradeKills: number;
+  tradeDeaths: number;
+  plants: number;
+  defuses: number;
+  acs: MeanAccumulator;
+  kast: MeanAccumulator;
+  hsPercent: MeanAccumulator;
+  ratingAttack: MeanAccumulator;
+  ratingDefense: MeanAccumulator;
 };
 
-const sumOf = (rows: StatRow[], pick: (row: StatRow) => number | null) =>
-  rows.reduce((total, row) => total + presentOrZero(pick(row)), 0);
+const createMeanAccumulator = (): MeanAccumulator => ({ sum: 0, count: 0 });
 
-export function aggregateStats(rows: StatRow[]): AggregatedStats {
-  const games = rows.length;
-  const rounds = rows.reduce((total, row) => total + row.rounds, 0);
-  const wins = rows.filter(
-    (row) => row.team !== null && row.team === row.winner,
-  ).length;
-  const losses = games - wins;
+const foldMean = (mean: MeanAccumulator, value: number | null) => {
+  if (value === null) return;
+  mean.sum += value;
+  mean.count += 1;
+};
 
-  const totalKills = sumOf(rows, (row) => row.kills);
-  const totalDeaths = sumOf(rows, (row) => row.deaths);
-  const totalAssists = sumOf(rows, (row) => row.assists);
-  const totalDamage = sumOf(rows, (row) => row.damage);
-  const firstKills = sumOf(rows, (row) => row.firstKills);
-  const firstDeaths = sumOf(rows, (row) => row.firstDeaths);
-  const clutches = sumOf(rows, (row) => row.clutches);
+const meanValue = (mean: MeanAccumulator) =>
+  mean.count === 0 ? 0 : mean.sum / mean.count;
 
-  const ratingAttack = meanOfPresent(rows.map((row) => row.ratingAttack));
-  const ratingDefense = meanOfPresent(rows.map((row) => row.ratingDefense));
-
+export function createStatAccumulator(): StatAccumulator {
   return {
-    games,
-    rounds,
-    wins,
-    losses,
-    winPct: games === 0 ? 0 : (wins / games) * 100,
-    acs: meanOfPresent(rows.map((row) => row.acs)),
-    adr: ratio(totalDamage, rounds),
-    totalKills,
-    totalDeaths,
-    totalAssists,
-    kd: ratio(totalKills, totalDeaths),
-    kda: ratio(totalKills + totalAssists, totalDeaths),
-    kpr: ratio(totalKills, rounds),
-    apr: ratio(totalAssists, rounds),
-    dpr: ratio(totalDeaths, rounds),
-    ratingOverall: (ratingAttack + ratingDefense) / 2,
-    ratingAttack,
-    ratingDefense,
-    kast: meanOfPresent(rows.map((row) => row.kast)),
-    hsPercent: meanOfPresent(rows.map((row) => row.hsPercent)),
-    clutches,
-    clutchesPerGame: ratio(clutches, games),
-    firstKills,
-    firstDeaths,
-    fkPct: ratio(firstKills, rounds) * 100,
-    fdPct: ratio(firstDeaths, rounds) * 100,
-    fkMinusFd: firstKills - firstDeaths,
-    fkpr: ratio(firstKills, rounds),
-    fdpr: ratio(firstDeaths, rounds),
-    ecoKills: sumOf(rows, (row) => row.ecoKills),
-    antiEcoKills: sumOf(rows, (row) => row.antiEcoKills),
-    tradeKills: sumOf(rows, (row) => row.tradeKills),
-    tradeDeaths: sumOf(rows, (row) => row.tradeDeaths),
-    plants: sumOf(rows, (row) => row.plants),
-    defuses: sumOf(rows, (row) => row.defuses),
+    games: 0,
+    rounds: 0,
+    wins: 0,
+    kills: 0,
+    deaths: 0,
+    assists: 0,
+    damage: 0,
+    firstKills: 0,
+    firstDeaths: 0,
+    clutches: 0,
+    ecoKills: 0,
+    antiEcoKills: 0,
+    tradeKills: 0,
+    tradeDeaths: 0,
+    plants: 0,
+    defuses: 0,
+    acs: createMeanAccumulator(),
+    kast: createMeanAccumulator(),
+    hsPercent: createMeanAccumulator(),
+    ratingAttack: createMeanAccumulator(),
+    ratingDefense: createMeanAccumulator(),
   };
 }
 
-export function derivePrimaryRole(
-  rows: ReadonlyArray<{ role: RoleName | null }>,
-): RoleName | null {
-  const counts: Record<RoleName, number> = {
+export function foldStatRow(acc: StatAccumulator, row: StatRow): void {
+  acc.games += 1;
+  acc.rounds += row.rounds;
+  if (row.team !== null && row.team === row.winner) acc.wins += 1;
+  acc.kills += presentOrZero(row.kills);
+  acc.deaths += presentOrZero(row.deaths);
+  acc.assists += presentOrZero(row.assists);
+  acc.damage += presentOrZero(row.damage);
+  acc.firstKills += presentOrZero(row.firstKills);
+  acc.firstDeaths += presentOrZero(row.firstDeaths);
+  acc.clutches += presentOrZero(row.clutches);
+  acc.ecoKills += presentOrZero(row.ecoKills);
+  acc.antiEcoKills += presentOrZero(row.antiEcoKills);
+  acc.tradeKills += presentOrZero(row.tradeKills);
+  acc.tradeDeaths += presentOrZero(row.tradeDeaths);
+  acc.plants += presentOrZero(row.plants);
+  acc.defuses += presentOrZero(row.defuses);
+  foldMean(acc.acs, row.acs);
+  foldMean(acc.kast, row.kast);
+  foldMean(acc.hsPercent, row.hsPercent);
+  foldMean(acc.ratingAttack, row.ratingAttack);
+  foldMean(acc.ratingDefense, row.ratingDefense);
+}
+
+export function finalizeAggregatedStats(acc: StatAccumulator): AggregatedStats {
+  const ratingAttack = meanValue(acc.ratingAttack);
+  const ratingDefense = meanValue(acc.ratingDefense);
+
+  return {
+    games: acc.games,
+    rounds: acc.rounds,
+    wins: acc.wins,
+    losses: acc.games - acc.wins,
+    winPct: acc.games === 0 ? 0 : (acc.wins / acc.games) * 100,
+    acs: meanValue(acc.acs),
+    adr: ratio(acc.damage, acc.rounds),
+    totalKills: acc.kills,
+    totalDeaths: acc.deaths,
+    totalAssists: acc.assists,
+    kd: ratio(acc.kills, acc.deaths),
+    kda: ratio(acc.kills + acc.assists, acc.deaths),
+    kpr: ratio(acc.kills, acc.rounds),
+    apr: ratio(acc.assists, acc.rounds),
+    dpr: ratio(acc.deaths, acc.rounds),
+    ratingOverall: (ratingAttack + ratingDefense) / 2,
+    ratingAttack,
+    ratingDefense,
+    kast: meanValue(acc.kast),
+    hsPercent: meanValue(acc.hsPercent),
+    clutches: acc.clutches,
+    clutchesPerGame: ratio(acc.clutches, acc.games),
+    firstKills: acc.firstKills,
+    firstDeaths: acc.firstDeaths,
+    fkPct: ratio(acc.firstKills, acc.rounds) * 100,
+    fdPct: ratio(acc.firstDeaths, acc.rounds) * 100,
+    fkMinusFd: acc.firstKills - acc.firstDeaths,
+    fkpr: ratio(acc.firstKills, acc.rounds),
+    fdpr: ratio(acc.firstDeaths, acc.rounds),
+    ecoKills: acc.ecoKills,
+    antiEcoKills: acc.antiEcoKills,
+    tradeKills: acc.tradeKills,
+    tradeDeaths: acc.tradeDeaths,
+    plants: acc.plants,
+    defuses: acc.defuses,
+  };
+}
+
+export function aggregateStats(rows: StatRow[]): AggregatedStats {
+  const acc = createStatAccumulator();
+  for (const row of rows) {
+    foldStatRow(acc, row);
+  }
+  return finalizeAggregatedStats(acc);
+}
+
+export type RoleCounts = Record<RoleName, number>;
+
+export function createRoleCounts(): RoleCounts {
+  return {
     DUELIST: 0,
     CONTROLLER: 0,
     SENTINEL: 0,
     INITIATOR: 0,
   };
-  let hasAnyRole = false;
-  for (const row of rows) {
-    if (row.role) {
-      counts[row.role] += 1;
-      hasAnyRole = true;
-    }
-  }
+}
+
+export function pickPrimaryRole(counts: RoleCounts): RoleName | null {
+  const hasAnyRole = ROLE_ORDER.some((role) => counts[role] > 0);
   if (!hasAnyRole) return null;
   let best: RoleName = ROLE_ORDER[0];
   for (const role of ROLE_ORDER) {
     if (counts[role] > counts[best]) best = role;
   }
   return best;
+}
+
+export function derivePrimaryRole(
+  rows: ReadonlyArray<{ role: RoleName | null }>,
+): RoleName | null {
+  const counts = createRoleCounts();
+  for (const row of rows) {
+    if (row.role) counts[row.role] += 1;
+  }
+  return pickPrimaryRole(counts);
 }
 
 export type ComparableStat =
