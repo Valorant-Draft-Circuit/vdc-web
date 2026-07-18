@@ -16,6 +16,10 @@ const AVATAR_PALETTE = [
   VDC_RED,
 ];
 
+export function isAnimatedImage(src: string): boolean {
+  return src.includes(".gif");
+}
+
 export function avatarColor(seed: string): string {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {

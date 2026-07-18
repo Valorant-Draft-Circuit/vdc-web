@@ -9,7 +9,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { isUserPlaying } from "@/lib/common/player";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
-import { avatarColor } from "@/lib/common/avatar";
+import { avatarColor, isAnimatedImage } from "@/lib/common/avatar";
 
 export default function PlayerCard({
   player,
@@ -41,6 +41,7 @@ export default function PlayerCard({
           src={player.banner ?? ""}
           fill
           sizes="100vw"
+          unoptimized={isAnimatedImage(player.banner ?? "")}
           className="absolute pointer-events-none inset-0 object-cover -z-10 brightness-40 dark:brightness-20 rounded-xl"
         />
       )}

@@ -374,8 +374,10 @@ async function getTeamRoleIcons(
 async function getAggregatedPlayerStatsByMatch(
   matchId: string,
 ): Promise<(GroupedPlayerStats & { agents: string[] })[]> {
+  const numericMatchId = Number(matchId);
+  if (!Number.isInteger(numericMatchId)) return [];
   const match = await prisma.matches.findFirst({
-    where: { matchID: Number(matchId) },
+    where: { matchID: numericMatchId },
     select: {
       Games: {
         select: {

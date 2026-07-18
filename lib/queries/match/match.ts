@@ -4,9 +4,11 @@ export type MatchDetail = NonNullable<Awaited<ReturnType<typeof getMatch>>>;
 export type MatchTeam = NonNullable<MatchDetail["Home"]>;
 
 export async function getMatch(id: string) {
+  const matchId = Number(id);
+  if (!Number.isInteger(matchId)) return null;
   const match = await prisma.matches.findUnique({
     where: {
-      matchID: Number(id),
+      matchID: matchId,
     },
     include: {
       Home: {

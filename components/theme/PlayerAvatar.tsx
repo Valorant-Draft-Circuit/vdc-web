@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { isAnimatedImage } from "@/lib/common/avatar";
 
 function initials(name: string): string {
   const trimmed = name.trim();
@@ -43,6 +44,7 @@ export default function PlayerAvatar({
         alt={name}
         width={pixels}
         height={pixels}
+        unoptimized={isAnimatedImage(image)}
         onError={() => setFailed(true)}
         className={`${sizeClass} flex-none ${shapeClass} object-cover`}
       />
