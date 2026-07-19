@@ -49,6 +49,7 @@ export default function ControlPanelForm({
       draft: [],
       ban: [],
       pickems: [],
+      webMapbans: [],
       queuebot: [],
     };
     items.forEach((item) => {
@@ -104,6 +105,12 @@ export default function ControlPanelForm({
       {groupedControls.pickems.length > 0 && (
         <PickemControls
           pickemControls={groupedControls.pickems}
+          control={control}
+        />
+      )}
+      {groupedControls.webMapbans.length > 0 && (
+        <WebMapbansControls
+          webMapbansControls={groupedControls.webMapbans}
           control={control}
         />
       )}
@@ -229,6 +236,27 @@ function PickemControls({
         label.toUpperCase() === "PICKEM_ADVANCE_LOCK" ||
         label.toUpperCase() === "PICKEM_BRACKET_LOCK" ? (
           <DateField field={field} label={label} />
+        ) : (
+          <SwitchField field={field} label={label} />
+        )
+      }
+    />
+  );
+}
+
+function WebMapbansControls({
+  webMapbansControls,
+  control,
+}: ControlsSectionProps & { webMapbansControls: ConfigItem[] }) {
+  return (
+    <ConfigSection
+      title="Web Map Bans Controls"
+      controls={webMapbansControls}
+      control={control}
+      renderField={(field, label) =>
+        label.toUpperCase() === "WEB_MAPBANS_ALLOWLIST" ||
+        label.toUpperCase() === "WEB_MAPBANS_PAGER_MINUTES" ? (
+          <InputField field={field} label={label} />
         ) : (
           <SwitchField field={field} label={label} />
         )

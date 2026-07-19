@@ -56,14 +56,14 @@ export default function ActiveMapBansPanel({
               </div>
               <div className="mt-1 flex flex-col gap-0.5">
                 {entry.bans.map((ban) => (
-                  <h3
+                  <h2
                     key={ban.logId}
                     className="truncate text-xs font-normal text-gray-400"
                   >
                     {ban.mapCount}-map ban · {ban.dateLabel} · by{" "}
                     {ban.moderatorName} · {ban.rulesLine}
                     {ban.reason ? ` - ${ban.reason}` : ""}
-                  </h3>
+                  </h2>
                 ))}
               </div>
             </li>

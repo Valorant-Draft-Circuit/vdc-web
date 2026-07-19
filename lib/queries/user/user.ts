@@ -111,6 +111,16 @@ export const getRiotIGNByDiscordId = cache(async (discordId: string) => {
   return riotIGN ?? null;
 });
 
+export const getDiscordIdByUserId = cache(
+  async (userId: string): Promise<string | null> => {
+    const discordAccount = await prisma.account.findFirst({
+      where: { userId, provider: "discord" },
+      select: { providerAccountId: true },
+    });
+    return discordAccount?.providerAccountId ?? null;
+  },
+);
+
 export const getRiotAccountsByUserId = cache(
   async (userId: string): Promise<PlayerRiotAccounts | null> => {
     return prisma.user.findUnique({
