@@ -2,18 +2,32 @@ import Game from "@/components/match/Game";
 import MapBan from "@/components/match/MapBan";
 import GameStats from "@/components/match/GameStats";
 import MatchStats from "@/components/match/MatchStats";
+import VetoBoard from "@/components/match/veto/VetoBoard";
 import { getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { SECONDARY_MAP_LIST_URL } from "@/lib/common/constants/maps";
 import { toTailwindCustomHexCode } from "@/lib/common/format";
 import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
+import {
+  getVetoState,
+  getViewerVetoRole,
+  MatchVeto,
+} from "@/lib/queries/match/getVetoState";
+import { getWebMapbansFlags } from "@/lib/queries/control/control";
+import { getDiscordIdByUserId } from "@/lib/queries/user/user";
+import { auth } from "@/lib/auth/auth";
+import { getUserRoles, hasAccess } from "@/lib/auth/access";
+import { Roles } from "@/prisma";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+const VETO_START_WINDOW_MS = 12 * 60 * 60 * 1000;
+const VETO_STAFF_ROLES = [Roles.ADMIN, Roles.LEAD_TECH];
 
 type PlayedMapBans = {
   id: number;
@@ -67,7 +81,7 @@ export default async function Page({
     (game) => typeof gameParam === "string" && game.gameID === gameParam,
   );
   const mapPick = matchInfo?.MapBans.find(
-    (mapBan) => mapBan.map === gameOverview?.map
+    (mapBan) => mapBan.map === gameOverview?.map,
   )?.team;
 
   const gameOverviewWithTeam = gameOverview
@@ -76,6 +90,11 @@ export default async function Page({
 
   const homeTeam = matchInfo?.Home;
   const awayTeam = matchInfo?.Away;
+
+  const vetoView =
+    homeTeam && awayTeam
+      ? await loadVetoView(matchInfo, homeTeam.id, awayTeam.id)
+      : null;
 
   const teams = {
     home: homeTeam,
@@ -110,12 +129,12 @@ export default async function Page({
 
   const mapBans = matchInfo?.MapBans?.filter(
     (mapban) =>
-      mapban.type !== MapBanType.PICK && mapban.type !== MapBanType.DECIDER
+      mapban.type !== MapBanType.PICK && mapban.type !== MapBanType.DECIDER,
   );
 
   const mapBansWithGameId = [...(mapBans ?? []), ...(playedMapBans ?? [])];
   mapBansWithGameId.sort(
-    (firstItem, secondItem) => firstItem.order - secondItem.order
+    (firstItem, secondItem) => firstItem.order - secondItem.order,
   );
   const today = new Date();
   const matchDateObj = new Date(matchInfo!.dateScheduled);
@@ -169,12 +188,27 @@ export default async function Page({
           <h1>{matchDate}</h1>
         </div>
         {isInFuture ? (
-          <div className="mx-10">
-            <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
-              This match has not been played yet! Stats and game details will be
-              available after the match has been completed and submitted.
-            </h2>
-          </div>
+          <>
+            {vetoView && homeTeam && awayTeam && (
+              <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
+                <VetoBoard
+                  matchID={matchInfo.matchID}
+                  veto={vetoView.veto}
+                  teams={{ home: homeTeam, away: awayTeam }}
+                  maps={maps}
+                  viewerTeamId={vetoView.viewerTeamId}
+                  viewerIsStaff={vetoView.viewerIsStaff}
+                  canStart={vetoView.canStart}
+                />
+              </div>
+            )}
+            <div className="mx-10">
+              <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
+                This match has not been played yet! Stats and game details will
+                be available after the match has been completed and submitted.
+              </h2>
+            </div>
+          </>
         ) : (
           <>
             {gameOverview && (
@@ -240,6 +274,56 @@ type MatchTeams = {
   home: MatchTeam | null | undefined;
   away: MatchTeam | null | undefined;
 };
+
+type VetoView = {
+  veto: MatchVeto;
+  viewerTeamId: number | null;
+  viewerIsStaff: boolean;
+  canStart: boolean;
+};
+
+async function loadVetoView(
+  matchInfo: MatchDetail,
+  homeTeamId: number,
+  awayTeamId: number,
+): Promise<VetoView | null> {
+  const [session, veto, mapbansFlags] = await Promise.all([
+    auth(),
+    getVetoState(matchInfo.matchID, matchInfo.matchType),
+    getWebMapbansFlags(),
+  ]);
+
+  if (!mapbansFlags.enabled) return null;
+  if (!veto) return null;
+
+  const userId = session?.user?.id ?? null;
+  const [viewerRole, viewerRoles] = await Promise.all([
+    getViewerVetoRole(userId, homeTeamId, awayTeamId),
+    userId ? getUserRoles(userId) : Promise.resolve(""),
+  ]);
+  const viewerIsStaff = hasAccess(viewerRoles, VETO_STAFF_ROLES);
+  if (mapbansFlags.staffOnly && !viewerIsStaff) {
+    const viewerDiscordId = userId ? await getDiscordIdByUserId(userId) : null;
+    const viewerIsAllowlisted =
+      viewerDiscordId !== null &&
+      mapbansFlags.allowlist.includes(viewerDiscordId);
+    if (!viewerIsAllowlisted) return null;
+  }
+
+  const msUntilMatch = new Date(matchInfo.dateScheduled).getTime() - Date.now();
+  const canStart =
+    viewerRole.teamId !== null &&
+    veto.state.phase === "not-started" &&
+    msUntilMatch <= VETO_START_WINDOW_MS &&
+    msUntilMatch > 0;
+
+  return {
+    veto,
+    viewerTeamId: viewerRole.teamId,
+    viewerIsStaff,
+    canStart,
+  };
+}
 
 type GameOverviewWithPick = MatchDetail["Games"][number] & {
   mapPick: number | null | undefined;

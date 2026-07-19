@@ -44,6 +44,13 @@ export const PICKEM_CONTROL = [
   ControlPanelID.PICKEM_ENABLED,
 ];
 
+export const WEB_MAPBANS_CONTROL = [
+  ControlPanelID.WEB_MAPBANS_ENABLED,
+  ControlPanelID.WEB_MAPBANS_STAFF_ONLY,
+  ControlPanelID.WEB_MAPBANS_ALLOWLIST,
+  ControlPanelID.WEB_MAPBANS_PAGER_MINUTES,
+];
+
 export const QueuebotControlID = {
   QUEUE_ENABLED: 36,
   QUEUE_HEALTH_CHECK_INTERVAL_MS: 37,
@@ -70,5 +77,6 @@ export const CONTROL_GROUPS: Record<string, readonly number[]> = {
   draft: DRAFT_CONTROL,
   ban: BAN_CONTROL,
   pickems: PICKEM_CONTROL,
+  webMapbans: WEB_MAPBANS_CONTROL,
   queuebot: QUEUEBOT_CONTROL,
 };
