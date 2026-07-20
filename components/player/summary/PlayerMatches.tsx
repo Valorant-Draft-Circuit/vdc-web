@@ -14,19 +14,21 @@ import { useRouter } from "next/navigation";
 type Router = ReturnType<typeof useRouter>;
 import { useEffect, useState } from "react";
 import { StatsPayload } from "./PlayerSummary";
-import type {
-  TeamLogoInfo,
-  TeamLogoMap,
-} from "@/lib/queries/teams/teams";
+import type { TeamLogoInfo, TeamLogoMap } from "@/lib/queries/teams/teams";
+import type { MatchLobbyContext, MatchStatRanks } from "@/lib/common/match";
+import StatRankBadge from "./StatRankBadge";
+import RosterColumns from "./RosterColumns";
 
 export default function PlayerMatches({
   stats,
   gameType,
   teamMap,
+  lobbyContextByStatId,
 }: {
   stats: StatsPayload[];
   gameType: string | undefined;
   teamMap: TeamLogoMap;
+  lobbyContextByStatId: Record<number, MatchLobbyContext>;
 }) {
   const total = stats.length;
   return (
@@ -43,6 +45,7 @@ export default function PlayerMatches({
               key={stat.id}
               matchCount={total - i}
               teamMap={teamMap}
+              lobbyContext={lobbyContextByStatId[stat.id]}
             />
           ))}
         </ul>
@@ -56,11 +59,13 @@ function Match({
   gameType,
   matchCount,
   teamMap,
+  lobbyContext,
 }: {
   stat: StatsPayload;
   gameType: string | undefined;
   matchCount: number;
   teamMap: TeamLogoMap;
+  lobbyContext: MatchLobbyContext | undefined;
 }) {
   const [maps, setMaps] = useState<Maps>();
   const router = useRouter();
@@ -103,9 +108,9 @@ function Match({
   }
 
   if (gameType === GameType.COMBINE) {
-    return ComebineGame({ stat, date, matchCount, mapUrl });
+    return ComebineGame({ stat, date, matchCount, mapUrl, lobbyContext });
   } else {
-    return SeasonGame({ stat, maps, router, date, teamMap });
+    return SeasonGame({ stat, maps, router, date, teamMap, lobbyContext });
   }
 }
 
@@ -114,11 +119,13 @@ function ComebineGame({
   date,
   matchCount,
   mapUrl,
+  lobbyContext,
 }: {
   stat: StatsPayload;
   date: string;
   matchCount: number;
   mapUrl: string | undefined;
+  lobbyContext: MatchLobbyContext | undefined;
 }) {
   const tier = stat.Game.tier;
   const tierBgMap: Record<Tier, string> = {
@@ -217,13 +224,20 @@ function ComebineGame({
             <div className="m-auto grid grid-rows-2 grid-flow-col gap-1 xl:gap-2 text-xs ">
               {statPairs.map(([label, value], i) => (
                 <h1 key={i} className="flex flex-col xl:flex-row xl:gap-2">
-                  {label}: <span className="text-gray-400 text-center xl:text-start">{value}</span>
+                  {label}:{" "}
+                  <span className="text-gray-400 text-center xl:text-start">
+                    {value}
+                  </span>
                 </h1>
               ))}
             </div>
           </div>
           <div className="flex flex-row">
-            <IndividualStats stats={stat} mapUrl={mapUrl} />
+            <IndividualStats
+              stats={stat}
+              mapUrl={mapUrl}
+              ranks={lobbyContext?.ranks}
+            />
           </div>
         </div>
       </li>
@@ -237,12 +251,14 @@ function SeasonGame({
   router,
   date,
   teamMap,
+  lobbyContext,
 }: {
   stat: StatsPayload;
   maps: Maps;
   router: Router;
   date: string;
   teamMap: TeamLogoMap;
+  lobbyContext: MatchLobbyContext | undefined;
 }) {
   if (!stat?.Game?.Match)
     return (
@@ -286,12 +302,16 @@ function SeasonGame({
       >
         <div
           className={`${
-            mapUrl
-              ? "text-vdcWhite divide-vdcWhite"
-              : "dark:text-vdcWhite text-vdcGrey divide-vdcBlack dark:divide-vdcWhite"
-          } flex flex-col divide-y`}
+            mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
+          } flex flex-col`}
         >
-          <div className="flex flex-row gap-2">
+          <div
+            className={`${
+              mapUrl
+                ? "border-vdcWhite"
+                : "border-vdcBlack dark:border-vdcWhite"
+            } flex flex-row gap-2 border-b xl:hidden`}
+          >
             <h1
               className={`${
                 mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
@@ -300,13 +320,49 @@ function SeasonGame({
               {result} - {date} - MD{matchDay}
             </h1>
           </div>
-          <div className="flex flex-row py-2 justify-between w-full">
-            <IndividualOverview stat={stat} mapUrl={mapUrl} />
-            <GameInfo stat={stat} />
-            <Lobby teams={teams} teamMap={teamMap} />
+          <div className="flex flex-row py-2 justify-between w-full xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-x-10">
+            <div className="contents xl:flex xl:flex-row xl:justify-evenly xl:items-center">
+              <div className="m-auto flex flex-col gap-1 text-center">
+                <IndividualOverview stat={stat} mapUrl={mapUrl} />
+                <h1
+                  className={`${
+                    mapUrl ? "text-gray-400" : "text-vdcGrey dark:text-gray-400"
+                  } hidden xl:block text-xs`}
+                >
+                  {date} - MD{matchDay}
+                </h1>
+              </div>
+              <div className="contents xl:hidden">
+                <Lobby teams={teams} teamMap={teamMap} />
+              </div>
+              <div className="hidden xl:block">
+                <IndividualStats
+                  stats={stat}
+                  mapUrl={mapUrl}
+                  ranks={lobbyContext?.ranks}
+                />
+              </div>
+            </div>
+            <GameInfo stat={stat} result={result} />
+            <div className="hidden xl:flex xl:flex-row xl:justify-evenly xl:items-center">
+              {lobbyContext?.rosters && (
+                <RosterColumns rosters={lobbyContext.rosters} />
+              )}
+              <Lobby teams={teams} teamMap={teamMap} />
+            </div>
           </div>
-          <div className="flex flex-row">
-            <IndividualStats stats={stat} mapUrl={mapUrl} />
+          <div
+            className={`${
+              mapUrl
+                ? "border-vdcWhite"
+                : "border-vdcBlack dark:border-vdcWhite"
+            } flex flex-row border-t xl:hidden`}
+          >
+            <IndividualStats
+              stats={stat}
+              mapUrl={mapUrl}
+              ranks={lobbyContext?.ranks}
+            />
           </div>
         </div>
       </li>
@@ -317,9 +373,11 @@ function SeasonGame({
 function IndividualStats({
   stats,
   mapUrl,
+  ranks,
 }: {
   stats: StatsPayload;
   mapUrl: string | undefined;
+  ranks: MatchStatRanks | undefined;
 }) {
   const atk = stats.ratingAttack ?? 0;
   const def = stats.ratingDefense ?? 0;
@@ -334,22 +392,30 @@ function IndividualStats({
   }
   const hs = (stats.hsPercent ?? 0).toFixed(2);
   const statsList = [
-    { name: "Rating", value: rating },
-    { name: "ACS", value: stats.acs },
-    { name: damageStatsName, value: damageStats },
-    { name: "HS%", value: `${hs}%` },
+    { name: "Rating", value: rating, statRank: ranks?.rating ?? null },
+    { name: "ACS", value: stats.acs, statRank: ranks?.acs ?? null },
+    { name: damageStatsName, value: damageStats, statRank: ranks?.adr ?? null },
+    { name: "HS%", value: `${hs}%`, statRank: ranks?.hs ?? null },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-2 w-full px-2 pt-1 mx-auto">
+    <div className="grid grid-cols-4 xl:grid-cols-1 gap-2 xl:gap-1 w-full xl:w-auto px-2 pt-1 mx-auto">
       {statsList.map((stat, index) => (
-        <div key={index} className="flex flex-col text-xs text-center ">
+        <div
+          key={index}
+          className="flex flex-col xl:flex-row xl:items-center xl:justify-between xl:gap-3 text-xs text-center"
+        >
           <h1 className={`${mapUrl ? "text-gray-200" : "dark:text-gray-200"}`}>
             {stat.name}
           </h1>
-          <h1 className={`${mapUrl ? "text-gray-400" : "dark:text-gray-400"}`}>
-            {stat.value}
-          </h1>
+          <div className="flex flex-row gap-1 justify-center items-center">
+            <h1
+              className={`${mapUrl ? "text-gray-400" : "dark:text-gray-400"}`}
+            >
+              {stat.value}
+            </h1>
+            <StatRankBadge statRank={stat.statRank} />
+          </div>
         </div>
       ))}
     </div>
@@ -403,11 +469,11 @@ function IndividualOverview({
           alt={agent}
           width={500}
           height={500}
-          className="size-10 text-xs"
+          className="size-10 xl:size-14 text-xs rounded-full"
         />
       </div>
       <div className="flex flex-col gap-1 my-auto text-center">
-        <h1 className={`${mapUrl ? "text-vdcWhite" : ""} text-sm`}>
+        <h1 className={`${mapUrl ? "text-vdcWhite" : ""} text-md`}>
           <span className="text-vdcGreen">{k}</span> /{" "}
           <span className="text-vdcRed">{d}</span> /{" "}
           <span className="text-vdcBlue">{a}</span>
@@ -415,7 +481,7 @@ function IndividualOverview({
         <h1
           className={`${
             mapUrl ? "text-gray-400" : "text-vdcGrey dark:text-gray-400"
-          } text-xs`}
+          } text-sm`}
         >
           {kda} KDA
         </h1>
@@ -424,7 +490,7 @@ function IndividualOverview({
   );
 }
 
-function GameInfo({ stat }: { stat: StatsPayload }) {
+function GameInfo({ stat, result }: { stat: StatsPayload; result: string }) {
   const playerTeam = stat.team;
   const game = stat.Game;
   const map = game.map;
@@ -442,9 +508,12 @@ function GameInfo({ stat }: { stat: StatsPayload }) {
   }
 
   return (
-    <div className="m-auto flex flex-col text-center">
-      {map && <h1 className="text-xs text-gray-400 text-center">{map}</h1>}
-      <h1 className="text-xl text-gray-400">
+    <div className="m-auto order-2 xl:order-none flex flex-col text-center">
+      <h1 className="hidden xl:block xl:text-base">{result}</h1>
+      {map && (
+        <h1 className="text-xs xl:text-sm text-gray-400 text-center">{map}</h1>
+      )}
+      <h1 className="text-xl xl:text-2xl text-gray-400">
         <span className="text-vdcGreen">{teamScore}</span> :{" "}
         <span className="text-vdcRed">{opponentScore}</span>
       </h1>
@@ -460,7 +529,7 @@ function Lobby({
   teamMap: TeamLogoMap;
 }) {
   return (
-    <div className="m-auto flex flex-row text-center gap-1 xl:gap-2">
+    <div className="m-auto order-3 xl:order-none flex flex-row text-center gap-1 xl:gap-2">
       <TeamLogo id={teams.home.id} info={teamMap[teams.home.id]} />
       <h1 className="text-xs my-auto text-gray-400">VS</h1>
       <TeamLogo id={teams.away.id} info={teamMap[teams.away.id]} />
@@ -483,7 +552,7 @@ function TeamLogo({
           alt={String(id)}
           width={500}
           height={500}
-          className="size-10 m-auto text-center w-fit"
+          className="size-10 xl:size-12 m-auto text-center w-fit"
         />
       </div>
     );
@@ -503,7 +572,7 @@ function TeamLogo({
           alt={String(id)}
           width={500}
           height={500}
-          className="size-10 m-auto text-center w-fit"
+          className="size-10 xl:size-12 m-auto text-center w-fit"
         />
       </Link>
     </div>

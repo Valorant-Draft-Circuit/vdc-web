@@ -11,6 +11,15 @@ import PlayerUpcomingCard from "./PlayerUpcomingCard";
 import { deriveTeamIdFromStats } from "@/lib/common/player";
 import { getTeamLogoMap, type TeamLogoMap } from "@/lib/queries/teams/teams";
 import CombineDisclaimer from "@/components/player/CombineDisclaimer";
+import {
+  buildLobbyRosters,
+  computeLobbyRanks,
+  type MatchLobbyContext,
+} from "@/lib/common/match";
+import {
+  getLobbyStatsForGames,
+  type LobbyStatRow,
+} from "@/lib/queries/stats/getLobbyStatsForGames";
 
 export type StatsPayload = Prisma.PlayerStatsGetPayload<{
   include: { Game: { include: { Match: true } } };
@@ -49,7 +58,10 @@ export default async function PlayerSummary({
   }));
 
   const isCombine = gameType?.toUpperCase() === GameType.COMBINE;
-  const teamMap: TeamLogoMap = isCombine ? {} : await buildTeamMap(stats);
+  const [teamMap, lobbyContextByStatId] = await Promise.all([
+    isCombine ? Promise.resolve({} as TeamLogoMap) : buildTeamMap(stats),
+    buildLobbyContextByStatId(stats),
+  ]);
 
   const teamId = isCombine ? null : deriveTeamIdFromStats(stats);
   const isCurrentSeason = season === currentSeason;
@@ -89,6 +101,7 @@ export default async function PlayerSummary({
             stats={stats}
             gameType={gameType?.toUpperCase()}
             teamMap={teamMap}
+            lobbyContextByStatId={lobbyContextByStatId}
           />
         </div>
       </div>
@@ -105,6 +118,35 @@ async function buildTeamMap(stats: StatsPayload[]) {
     if (typeof away === "number") teamIds.push(away);
   }
   return getTeamLogoMap(teamIds);
+}
+
+async function buildLobbyContextByStatId(
+  stats: StatsPayload[],
+): Promise<Record<number, MatchLobbyContext>> {
+  const gameIds = [...new Set(stats.map((s) => s.Game.gameID))];
+  const lobbyRows = await getLobbyStatsForGames(gameIds);
+
+  const rowsByGame: Record<string, LobbyStatRow[]> = {};
+  for (const row of lobbyRows) {
+    if (!rowsByGame[row.gameID]) rowsByGame[row.gameID] = [];
+    rowsByGame[row.gameID].push(row);
+  }
+
+  const contextByStatId: Record<number, MatchLobbyContext> = {};
+  for (const stat of stats) {
+    const gameRows = rowsByGame[stat.Game.gameID] ?? [];
+    const home = stat.Game.Match?.home;
+    const away = stat.Game.Match?.away;
+    const hasTeams = typeof home === "number" && typeof away === "number";
+
+    contextByStatId[stat.id] = {
+      ranks: computeLobbyRanks(gameRows, stat.userID),
+      rosters: hasTeams
+        ? buildLobbyRosters(gameRows, home, away, stat.userID)
+        : null,
+    };
+  }
+  return contextByStatId;
 }
 
 export function NoStats() {

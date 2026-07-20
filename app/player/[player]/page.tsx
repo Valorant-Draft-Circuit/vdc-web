@@ -253,7 +253,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
-      <div className="mx-auto xl:max-w-5xl flex flex-col gap-5">
+      <div className="mx-auto xl:max-w-7xl flex flex-col gap-5">
         <PlayerInfo playerInfo={playerInfo} />
         <Suspense fallback={null}>
           <MapBanBanner ign={playerIGN.decoded} />

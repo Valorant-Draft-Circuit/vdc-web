@@ -1,4 +1,5 @@
 import { MatchType } from "@prisma/client";
+import type { LobbyStatRow } from "@/lib/queries/stats/getLobbyStatsForGames";
 
 export function packageMatch(
   match,
@@ -43,4 +44,109 @@ export function determineIfKnockout(match) {
   } else {
     return "";
   }
+}
+
+export type StatRank = { rank: number; total: number };
+
+export type MatchStatRanks = {
+  rating: StatRank | null;
+  acs: StatRank | null;
+  adr: StatRank | null;
+  hs: StatRank | null;
+};
+
+export type RosterEntry = {
+  userID: string;
+  riotIGN: string | null;
+  agent: string;
+  isViewedPlayer: boolean;
+};
+
+export type LobbyRosters = {
+  home: RosterEntry[];
+  away: RosterEntry[];
+};
+
+export type MatchLobbyContext = {
+  ranks: MatchStatRanks;
+  rosters: LobbyRosters | null;
+};
+
+type ScoredPlayer = { userID: string; value: number | null };
+
+function rankWithinLobby(
+  players: ScoredPlayer[],
+  viewedUserId: string,
+): StatRank | null {
+  const scored = players.filter((player) => player.value !== null);
+  const viewed = scored.find((player) => player.userID === viewedUserId);
+  if (!viewed) return null;
+
+  const playersAbove = scored.filter(
+    (player) => player.value! > viewed.value!,
+  ).length;
+  return { rank: playersAbove + 1, total: scored.length };
+}
+
+function combinedRating(row: LobbyStatRow): number | null {
+  if (row.ratingAttack === null && row.ratingDefense === null) return null;
+  return ((row.ratingAttack ?? 0) + (row.ratingDefense ?? 0)) / 2;
+}
+
+export function computeLobbyRanks(
+  lobbyRows: LobbyStatRow[],
+  viewedUserId: string,
+): MatchStatRanks {
+  const ratingPool = lobbyRows.map((row) => ({
+    userID: row.userID,
+    value: combinedRating(row),
+  }));
+  const acsPool = lobbyRows.map((row) => ({
+    userID: row.userID,
+    value: row.acs,
+  }));
+  const damagePool = lobbyRows.map((row) => ({
+    userID: row.userID,
+    value: row.damage,
+  }));
+  const hsPool = lobbyRows.map((row) => ({
+    userID: row.userID,
+    value: row.hsPercent,
+  }));
+
+  return {
+    rating: rankWithinLobby(ratingPool, viewedUserId),
+    acs: rankWithinLobby(acsPool, viewedUserId),
+    adr: rankWithinLobby(damagePool, viewedUserId),
+    hs: rankWithinLobby(hsPool, viewedUserId),
+  };
+}
+
+export function buildLobbyRosters(
+  lobbyRows: LobbyStatRow[],
+  homeTeamId: number,
+  awayTeamId: number,
+  viewedUserId: string,
+): LobbyRosters {
+  const toEntry = (row: LobbyStatRow): RosterEntry => ({
+    userID: row.userID,
+    riotIGN: row.Player.PrimaryRiotAccount?.riotIGN ?? null,
+    agent: row.agent,
+    isViewedPlayer: row.userID === viewedUserId,
+  });
+
+  const byAcsDescending = (a: LobbyStatRow, b: LobbyStatRow) =>
+    (b.acs ?? -1) - (a.acs ?? -1);
+
+  const homeRows = lobbyRows
+    .filter((row) => row.team === homeTeamId)
+    .sort(byAcsDescending);
+  const awayRows = lobbyRows
+    .filter((row) => row.team === awayTeamId)
+    .sort(byAcsDescending);
+
+  return {
+    home: homeRows.map(toEntry),
+    away: awayRows.map(toEntry),
+  };
 }
