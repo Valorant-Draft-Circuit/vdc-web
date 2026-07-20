@@ -64,7 +64,7 @@ export default async function PlayerInfo({
   }
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
-    <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 overflow-hidden xl:shadow-2xl">
+    <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 xl:px-14 xl:py-28 overflow-hidden xl:shadow-2xl">
       <div className="flex flex-col gap-2">
         <div className="absolute inset-0 bg-black/80 pointer-events-none" />
         <ProfileBanner playerInfo={playerInfo} />
@@ -81,8 +81,8 @@ export default async function PlayerInfo({
                   name={playerInfo.name ?? "??"}
                   image={playerInfo.image ?? null}
                   fallbackColor={avatarColor(discordAccountId ?? playerInfo.name ?? "?")}
-                  sizeClass="size-20"
-                  pixels={160}
+                  sizeClass="size-20 xl:size-28"
+                  pixels={224}
                   textClass="text-2xl"
                   shapeClass="rounded-none"
                 />
@@ -95,13 +95,15 @@ export default async function PlayerInfo({
               href={`${TRACKER_PROFILE_URL}/${encodedIGN}`}
               className="hover:opacity-80"
             >
-              <h2 className="text-vdcRed">
+              <h2 className="text-vdcRed xl:text-xl">
                 {riotIGN}
-                <span className="text-gray-300 text-sm">{riotTag}</span>
+                <span className="text-gray-300 text-sm xl:text-base">
+                  {riotTag}
+                </span>
               </h2>
             </a>
             <div className="flex flex-row gap-1">
-              <h2 className="text-vdcWhite text-sm">
+              <h2 className="text-vdcWhite text-sm xl:text-base">
                 {isPlayerSigned ? (
                   <Link
                     href={`/franchises/${playerTeam.Franchise.slug}?team=${teamTierSlug}`}
@@ -119,12 +121,12 @@ export default async function PlayerInfo({
                   src={`${TEAM_LOGOS_URL}${playerTeam.Franchise.Brand.logo}`}
                   width={250}
                   height={250}
-                  className="size-5 my-auto drop-shadow-xl"
+                  className="size-5 xl:size-7 my-auto drop-shadow-xl"
                 />
               )}
             </div>
             {showMmr && (
-              <div className="text-sm text-gray-300">
+              <div className="text-sm xl:text-base text-gray-300">
                 <h1>MMR: {playerInfo.PrimaryRiotAccount!.MMR!.mmrEffective}</h1>
               </div>
             )}
