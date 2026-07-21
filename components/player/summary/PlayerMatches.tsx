@@ -284,6 +284,7 @@ function SeasonGame({
   }
   const goToGame = () =>
     router.push(`/match/${stat.Game.Match!.matchID}?game=${stat.Game.gameID}`);
+  const isMvp = lobbyContext?.isMvp ?? false;
   return (
     <div className="relative rounded-md">
       <Image
@@ -293,11 +294,18 @@ function SeasonGame({
         height={5000}
         className="absolute inset-0 -z-10 size-full object-cover brightness-30 rounded-md"
       />
+      {isMvp && (
+        <h2 className="absolute -top- right-0 z-10 rounded-tr-md rounded-bl-md bg-linear-to-tl from-yellow-400 to-yellow-100 px-2 py-0.5 text-[10px] leading-none text-gray-900">
+          MVP
+        </h2>
+      )}
       <li
         key={stat.id}
         onClick={goToGame}
         className={`${
           result === "Victory" ? "bg-vdcBlue/30" : "bg-vdcRed/30"
+        } ${
+          isMvp ? "ring-1 ring-yellow-400" : ""
         } p-2 rounded-md hover:opacity-90 hover:cursor-pointer`}
       >
         <div
@@ -320,7 +328,7 @@ function SeasonGame({
               {result} - {date} - MD{matchDay}
             </h1>
           </div>
-          <div className="flex flex-row py-2 justify-between w-full xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-x-10">
+          <div className="flex flex-row py-2 justify-between w-full xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-x-8">
             <div className="contents xl:flex xl:flex-row xl:justify-evenly xl:items-center">
               <div className="m-auto flex flex-col gap-1 text-center">
                 <IndividualOverview stat={stat} mapUrl={mapUrl} />
@@ -469,10 +477,10 @@ function IndividualOverview({
           alt={agent}
           width={500}
           height={500}
-          className="size-10 xl:size-14 text-xs rounded-full"
+          className="size-10 xl:size-14 text-xs rounded-md"
         />
       </div>
-      <div className="flex flex-col gap-1 my-auto text-center">
+      <div className="flex w-28 flex-col gap-1 my-auto text-center tabular-nums">
         <h1 className={`${mapUrl ? "text-vdcWhite" : ""} text-md`}>
           <span className="text-vdcGreen">{k}</span> /{" "}
           <span className="text-vdcRed">{d}</span> /{" "}

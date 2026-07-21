@@ -18,7 +18,7 @@ export default function StatRankBadge({
     MEDAL_CLASS_BY_RANK[statRank.rank] ?? "text-gray-200 bg-gray-500";
   return (
     <h2
-      className={`${accentClass} leading-none rounded-2xl px-1.5 py-0.5 opacity-90`}
+      className={`${accentClass} leading-none rounded-2xl px-1.5 py-0.5 opacity-90 text-[8px]`}
     >
       {ordinal(statRank.rank)}
     </h2>

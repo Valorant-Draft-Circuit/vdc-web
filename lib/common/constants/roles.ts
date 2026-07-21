@@ -10,6 +10,13 @@ export const MODERATION_ROLES = [
   Roles.LEAD_MODERATOR,
 ];
 
+export const FM_ACCESS_LIST = [
+  Roles.LEAGUE_GM,
+  Roles.LEAGUE_AGM,
+  Roles.TECH_NUMBERS,
+  Roles.ADMIN,
+];
+
 export const ROLES = Object.entries(Roles)
   .filter(([key]) => isNaN(Number(key)))
   .map(([label, value]) => ({

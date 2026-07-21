@@ -14,6 +14,7 @@ import CombineDisclaimer from "@/components/player/CombineDisclaimer";
 import {
   buildLobbyRosters,
   computeLobbyRanks,
+  findLobbyMvp,
   type MatchLobbyContext,
 } from "@/lib/common/match";
 import {
@@ -144,6 +145,7 @@ async function buildLobbyContextByStatId(
       rosters: hasTeams
         ? buildLobbyRosters(gameRows, home, away, stat.userID)
         : null,
+      isMvp: findLobbyMvp(gameRows) === stat.userID,
     };
   }
   return contextByStatId;

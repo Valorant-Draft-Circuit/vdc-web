@@ -1,14 +1,7 @@
 import UnAuthorized from "@/components/auth/Unauthorized";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { auth } from "@/lib/auth/auth";
-import { Roles } from "@/prisma";
-
-export const FM_ACCESS_LIST = [
-  Roles.LEAGUE_GM,
-  Roles.LEAGUE_AGM,
-  Roles.TECH_NUMBERS,
-  Roles.ADMIN,
-];
+import { FM_ACCESS_LIST } from "@/lib/common/constants/roles";
 
 export default async function Layout({
   children,

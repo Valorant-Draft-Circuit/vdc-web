@@ -70,6 +70,7 @@ export type LobbyRosters = {
 export type MatchLobbyContext = {
   ranks: MatchStatRanks;
   rosters: LobbyRosters | null;
+  isMvp: boolean;
 };
 
 type ScoredPlayer = { userID: string; value: number | null };
@@ -120,6 +121,35 @@ export function computeLobbyRanks(
     adr: rankWithinLobby(damagePool, viewedUserId),
     hs: rankWithinLobby(hsPool, viewedUserId),
   };
+}
+
+export function findLobbyMvp(lobbyRows: LobbyStatRow[]): string | null {
+  const averagedPlayers = lobbyRows
+    .map((row) => {
+      const ranks = computeLobbyRanks(lobbyRows, row.userID);
+      const rankValues = [ranks.rating, ranks.acs, ranks.adr]
+        .filter((statRank): statRank is StatRank => statRank !== null)
+        .map((statRank) => statRank.rank);
+      if (rankValues.length === 0) return null;
+      const averageRank =
+        rankValues.reduce((sum, rank) => sum + rank, 0) / rankValues.length;
+      return {
+        userID: row.userID,
+        averageRank,
+        rating: combinedRating(row) ?? 0,
+      };
+    })
+    .filter((player) => player !== null);
+
+  if (averagedPlayers.length === 0) return null;
+
+  const [best] = [...averagedPlayers].sort(
+    (a, b) =>
+      a.averageRank - b.averageRank ||
+      b.rating - a.rating ||
+      a.userID.localeCompare(b.userID),
+  );
+  return best.userID;
 }
 
 export function buildLobbyRosters(

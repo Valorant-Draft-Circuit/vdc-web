@@ -15,8 +15,10 @@ import {
   RULEBOOK_URL,
 } from "@/lib/common/constants/urls";
 import { Roles } from "@/prisma";
-import { MODERATION_ROLES } from "@/lib/common/constants/roles";
-import { FM_ACCESS_LIST } from "@/app/staff/franchise-management/layout";
+import {
+  FM_ACCESS_LIST,
+  MODERATION_ROLES,
+} from "@/lib/common/constants/roles";
 
 export const navLinks = [
   {
