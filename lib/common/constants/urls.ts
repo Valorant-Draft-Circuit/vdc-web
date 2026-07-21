@@ -7,6 +7,8 @@ export const DISCORD_USER_HOWTO_URL =
   "https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5H5D7JBY2QKKPVKNA";
 
 export const TRACKER_PROFILE_URL = "https://tracker.gg/valorant/profile/riot";
+export const TRACKER_MATCH_URL = (riotMatchId: string) =>
+  `https://tracker.gg/valorant/match/${riotMatchId}`;
 export const WEB_ASSET_URL = BUCKET_URL + "web-assets/";
 export const TEAM_LOGOS_URL = BUCKET_URL + "team-logos/";
 export const VDC_ASSETS_URL =

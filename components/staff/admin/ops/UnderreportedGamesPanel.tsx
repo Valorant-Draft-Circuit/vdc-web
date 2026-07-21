@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { format } from "date-fns";
+import { CopyTextButton } from "@/components/theme/CopyTextButton";
 import { ScrollRevealList } from "@/components/theme/ScrollRevealList";
+import { TRACKER_MATCH_URL } from "@/lib/common/constants/urls";
 import {
   EXPECTED_PLAYER_STATS_PER_GAME,
   UnderreportedGame,
@@ -12,26 +14,19 @@ export default function UnderreportedGamesPanel({
 }: {
   data: UnderreportedGames;
 }) {
-  const gameRows = data.games.map((game) => {
-    const rowBody = <GameRowBody game={game} />;
-    if (game.matchID === null) {
-      return (
-        <li key={game.gameID} className="block py-1.5">
-          {rowBody}
-        </li>
-      );
-    }
-    return (
-      <li key={game.gameID}>
-        <Link
-          href={`/match/${game.matchID}?game=${game.gameID}`}
-          className="block py-1.5 hover:bg-gray-50 dark:hover:bg-vdcBlack/40"
-        >
-          {rowBody}
-        </Link>
-      </li>
-    );
-  });
+  const gameRows = data.games.map((game) => (
+    <li key={game.gameID} className="py-1.5">
+      <GameSummaryLine game={game} />
+      <div className="flex flex-wrap items-baseline gap-x-1.5">
+        <CopyTextButton
+          text={TRACKER_MATCH_URL(game.gameID)}
+          label="TRN link"
+          className="text-sm"
+        />
+        <h2 className="text-gray-400">{format(game.datePlayed, "MMM d")}</h2>
+      </div>
+    </li>
+  ));
 
   return (
     <div className="rounded-xl bg-white p-5 shadow-xs dark:bg-vdcGrey">
@@ -57,21 +52,25 @@ export default function UnderreportedGamesPanel({
   );
 }
 
-function GameRowBody({ game }: { game: UnderreportedGame }) {
+function GameSummaryLine({ game }: { game: UnderreportedGame }) {
+  const summary = (
+    <div className="flex items-baseline justify-between gap-2 text-xs text-gray-400">
+      <h2>
+        {game.tier} · {game.gameType}
+      </h2>
+      <h2>
+        {game.statCount}/{EXPECTED_PLAYER_STATS_PER_GAME}
+      </h2>
+    </div>
+  );
+
+  if (game.matchID === null) return summary;
   return (
-    <>
-      <div className="flex items-baseline justify-between gap-2 text-xs text-gray-400">
-        <h2>
-          {game.tier} · {game.gameType}
-        </h2>
-        <h2>
-          {game.statCount}/{EXPECTED_PLAYER_STATS_PER_GAME}
-        </h2>
-      </div>
-      <div className="flex flex-wrap items-baseline gap-x-1.5">
-        <h2 className="text-vdcBlue">{game.map ?? "Unknown map"}</h2>
-        <h2 className="text-gray-400">{format(game.datePlayed, "MMM d")}</h2>
-      </div>
-    </>
+    <Link
+      href={`/match/${game.matchID}?game=${game.gameID}`}
+      className="block hover:bg-gray-50 dark:hover:bg-vdcBlack/40"
+    >
+      {summary}
+    </Link>
   );
 }
