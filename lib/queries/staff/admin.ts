@@ -9,7 +9,7 @@ import {
   weeklySignupSeries,
 } from "@/lib/common/signups";
 import { prisma } from "@/lib/prisma";
-import { LeagueStatus, MatchType, Tier } from "@prisma/client";
+import { GameType, LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { addDays, subDays } from "date-fns";
 
 export type SignedTierCount = {
@@ -319,6 +319,58 @@ export async function getUnreportedMatches(season: number): Promise<UnreportedMa
   return { count: unreported.length, matches: unreported };
 }
 
+export const EXPECTED_PLAYER_STATS_PER_GAME = 10;
+
+export type UnderreportedGame = {
+  gameID: string;
+  matchID: number | null;
+  tier: Tier;
+  gameType: GameType;
+  map: string | null;
+  datePlayed: Date;
+  statCount: number;
+};
+
+export type UnderreportedGames = {
+  count: number;
+  games: UnderreportedGame[];
+};
+
+export async function getUnderreportedGames(
+  season: number,
+): Promise<UnderreportedGames> {
+  const rows = await prisma.games.findMany({
+    where: {
+      season,
+      gameType: { notIn: [GameType.FORFEIT, GameType.INVALID] },
+    },
+    select: {
+      gameID: true,
+      matchID: true,
+      tier: true,
+      gameType: true,
+      map: true,
+      datePlayed: true,
+      _count: { select: { PlayerStats: true } },
+    },
+    orderBy: { datePlayed: "desc" },
+  });
+
+  const underreported = rows
+    .filter((row) => row._count.PlayerStats < EXPECTED_PLAYER_STATS_PER_GAME)
+    .map((row) => ({
+      gameID: row.gameID,
+      matchID: row.matchID,
+      tier: row.tier,
+      gameType: row.gameType,
+      map: row.map,
+      datePlayed: row.datePlayed,
+      statCount: row._count.PlayerStats,
+    }));
+
+  return { count: underreported.length, games: underreported };
+}
+
 const UPCOMING_VETO_WINDOW_DAYS = 7;
 
 export type UpcomingMatchMissingVeto = {
@@ -409,16 +461,30 @@ export type OpsInsights = {
   signupQueue: SignupQueue;
   unreportedMatches: UnreportedMatches;
   upcomingMissingVetos: UpcomingMissingVetos;
+  underreportedGames: UnderreportedGames;
   signupTrend: SignupTrend;
 };
 
 export async function getOpsInsights(season: number): Promise<OpsInsights> {
-  const [signupQueue, unreportedMatches, upcomingMissingVetos, signupTrend] = await Promise.all([
+  const [
+    signupQueue,
+    unreportedMatches,
+    upcomingMissingVetos,
+    underreportedGames,
+    signupTrend,
+  ] = await Promise.all([
     getSignupQueue(),
     getUnreportedMatches(season),
     getUpcomingMissingVetos(season),
+    getUnderreportedGames(season),
     getSignupTrend(),
   ]);
 
-  return { signupQueue, unreportedMatches, upcomingMissingVetos, signupTrend };
+  return {
+    signupQueue,
+    unreportedMatches,
+    upcomingMissingVetos,
+    underreportedGames,
+    signupTrend,
+  };
 }

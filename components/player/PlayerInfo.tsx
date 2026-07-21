@@ -64,7 +64,7 @@ export default async function PlayerInfo({
   }
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
-    <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 py-20 xl:px-14 xl:py-28 overflow-hidden xl:shadow-2xl">
+    <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 xl:px-14 aspect-[3/2] sm:aspect-[5/2] xl:aspect-[7/2] flex flex-col justify-center overflow-hidden xl:shadow-2xl">
       <div className="flex flex-col gap-2">
         <div className="absolute inset-0 bg-black/80 pointer-events-none" />
         <ProfileBanner playerInfo={playerInfo} />
