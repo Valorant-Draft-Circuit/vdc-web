@@ -2,23 +2,33 @@
 
 import { submitMapPick, submitSidePick } from "@/app/match/[matchId]/actions";
 import { MAP_LIST_URL } from "@/lib/common/constants/maps";
-import { MapBansSide } from "@prisma/client";
+import { MapBansSide, MapBanType } from "@prisma/client";
+import {
+  BoltIcon,
+  CheckCircleIcon,
+  NoSymbolIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useState, useTransition } from "react";
+import VetoTurnHeader from "./VetoTurnHeader";
 
 type MapTurn = { kind: "map"; turnType: string; remainingMaps: string[] };
 type SideTurn = { kind: "side"; rowId: number; map: string };
 
 export default function VetoActionPanel({
   matchID,
+  headline,
   turn,
   maps,
 }: {
   matchID: number;
+  headline: string;
   turn: MapTurn | SideTurn;
   maps: Record<string, string>;
 }) {
   const [selection, setSelection] = useState<string | null>(null);
+  const [animatedMap, setAnimatedMap] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -49,67 +59,155 @@ export default function VetoActionPanel({
 
   return (
     <div className="flex flex-col gap-3">
+      <VetoTurnHeader headline={headline}>
+        {selection && (
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={confirmSelection}
+            className="rounded-md bg-vdcRed px-4 py-1 text-vdcWhite hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
+          >
+            <h1>{confirmLabel}</h1>
+          </button>
+        )}
+      </VetoTurnHeader>
       {turn.kind === "map" ? (
-        <div className="flex flex-row flex-wrap gap-3">
+        <div className="flex flex-col gap-3">
           {turn.remainingMaps.map((map) => {
             const mapUuid = maps[map.toUpperCase()];
             const isSelected = selection === map;
+            const isBanTurn = turn.turnType === MapBanType.BAN;
+            const isAnimating = animatedMap === map;
+            const showsTurnState = isAnimating || isSelected;
+            const animatingClass = isBanTurn
+              ? "veto-ban-animating"
+              : "veto-pick-animating";
+            const selectedClass = isBanTurn
+              ? "veto-ban-selected"
+              : "veto-pick-selected";
             return (
               <button
                 key={map}
                 type="button"
                 disabled={isPending}
                 onClick={() => toggleSelection(map)}
-                className={`relative flex w-32 h-16 items-center justify-center overflow-hidden rounded-md hover:brightness-90 disabled:opacity-50 hover:cursor-pointer ${
-                  isSelected ? "ring-2 ring-vdcRed" : ""
-                }`}
+                onMouseEnter={() => {
+                  if (animatedMap !== map) setAnimatedMap(map);
+                }}
+                onMouseLeave={() => {
+                  if (selection && selection !== map && animatedMap === map) {
+                    setAnimatedMap(null);
+                  }
+                }}
+                className={`group relative flex w-full h-20 items-center justify-center overflow-hidden rounded-md hover:brightness-90 disabled:opacity-50 hover:cursor-pointer ${
+                  isAnimating ? animatingClass : ""
+                } ${isSelected ? selectedClass : ""}`}
               >
                 {mapUuid && (
                   <Image
                     alt={map}
                     src={MAP_LIST_URL(mapUuid)}
                     fill
-                    sizes="140px"
+                    sizes="576px"
                     className="object-cover brightness-50"
                   />
                 )}
-                <h3 className="relative text-vdcWhite">{map}</h3>
+                {isBanTurn ? (
+                  <>
+                    <div className="pointer-events-none veto-ban-grey" />
+                    <div className="pointer-events-none veto-ban-line-up bg-vdcRed/80" />
+                    <div className="pointer-events-none veto-ban-line-down bg-vdcRed/80" />
+                    <div className="pointer-events-none veto-ban-outline" />
+                  </>
+                ) : (
+                  <>
+                    <div className="pointer-events-none veto-pick-bright" />
+                    <div className="pointer-events-none veto-ban-line-up bg-vdcGreen/80" />
+                    <div className="pointer-events-none veto-ban-line-down bg-vdcGreen/80" />
+                    <div className="pointer-events-none veto-pick-outline" />
+                  </>
+                )}
+                <div className="pointer-events-none relative flex w-full items-center">
+                  <div
+                    className={`veto-flank-left h-0.5 flex-1 ${
+                      isBanTurn ? "bg-vdcRed/80" : "bg-vdcGreen/80"
+                    }`}
+                  />
+                  <div className="flex items-center px-3">
+                    <h1 className="text-vdcWhite">{map}</h1>
+                    {isBanTurn ? (
+                      <NoSymbolIcon
+                        className={`ml-2 size-8 text-vdcRed drop-shadow-lg transition-all duration-500 ${
+                          showsTurnState
+                            ? "scale-100 rotate-180 opacity-100"
+                            : "scale-50 opacity-0"
+                        }`}
+                      />
+                    ) : (
+                      <CheckCircleIcon
+                        className={`ml-2 size-8 text-vdcGreen drop-shadow-lg transition-all duration-300 ${
+                          showsTurnState
+                            ? "scale-100 opacity-100"
+                            : "scale-50 opacity-0"
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <div
+                    className={`veto-flank-right h-0.5 flex-1 ${
+                      isBanTurn ? "bg-vdcRed/80" : "bg-vdcGreen/80"
+                    }`}
+                  />
+                </div>
               </button>
             );
           })}
         </div>
       ) : (
-        <div className="flex flex-row gap-3">
-          {sideChoices.map((side) => {
+        <div className="relative flex h-64 xl:h-100 w-full overflow-hidden rounded-md">
+          {maps[turn.map.toUpperCase()] && (
+            <Image
+              alt={turn.map}
+              src={MAP_LIST_URL(maps[turn.map.toUpperCase()])}
+              fill
+              sizes="1200px"
+              className="object-cover brightness-50"
+            />
+          )}
+          {sideChoices.map((side, index) => {
             const isSelected = selection === side;
+            const isDimmed = selection !== null && !isSelected;
+            const isAttack = side === MapBansSide.ATTACK;
             return (
               <button
                 key={side}
                 type="button"
                 disabled={isPending}
                 onClick={() => toggleSelection(side)}
-                className={`rounded-md px-4 py-2 hover:brightness-90 disabled:opacity-50 hover:cursor-pointer ${
-                  isSelected
-                    ? "bg-vdcRed text-vdcWhite ring-2 ring-vdcRed"
-                    : "border border-vdcRed/50 text-vdcRed"
+                className={`relative flex flex-1 items-center justify-center gap-3 transition-all duration-300 hover:bg-vdcWhite/10 disabled:opacity-50 hover:cursor-pointer ${
+                  index === 0 ? "border-r border-vdcWhite/30" : ""
+                } ${isSelected ? (isAttack ? "bg-vdcRed/30" : "bg-vdcBlue/30") : ""} ${
+                  isDimmed ? "opacity-40 grayscale" : ""
                 }`}
               >
-                {side}
+                {isAttack ? (
+                  <BoltIcon
+                    className={`size-8 text-vdcRed drop-shadow-lg transition-transform duration-300 ${
+                      isSelected ? "scale-125" : ""
+                    }`}
+                  />
+                ) : (
+                  <ShieldCheckIcon
+                    className={`size-8 text-vdcBlue drop-shadow-lg transition-transform duration-300 ${
+                      isSelected ? "scale-125" : ""
+                    }`}
+                  />
+                )}
+                <h1 className="text-vdcWhite drop-shadow-lg">{side}</h1>
               </button>
             );
           })}
         </div>
-      )}
-
-      {selection && (
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={confirmSelection}
-          className="self-start rounded-md bg-vdcRed px-4 py-2 text-vdcWhite hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
-        >
-          {confirmLabel}
-        </button>
       )}
 
       {error && <h2 className="text-xs text-vdcRed">{error}</h2>}

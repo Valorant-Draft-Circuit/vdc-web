@@ -23,7 +23,7 @@ type ActionResult =
   | { ok: true }
   | { ok: false; error: string; vetoUrl?: string };
 
-type RosteredViewerContext = {
+type VetoActorContext = {
   match: {
     matchID: number;
     matchType: MatchType;
@@ -31,13 +31,16 @@ type RosteredViewerContext = {
     home: number | null;
     away: number | null;
   };
-  viewerTeamId: number;
+  viewerTeamId: number | null;
+  actsForAnyTeam: boolean;
   userId: string;
 };
 
-async function requireRosteredViewer(
+async function requireVetoActor(
   matchID: number,
-): Promise<{ error: string } | RosteredViewerContext> {
+): Promise<{ error: string } | VetoActorContext> {
+  const flags = await getWebMapbansFlags();
+  if (!flags.enabled) return { error: "Web map bans are not enabled" as const };
   const session = await auth();
   if (!session?.user?.id) return { error: "Not logged in" as const };
   const match = await prisma.matches.findFirst({
@@ -58,29 +61,27 @@ async function requireRosteredViewer(
     where: { id: session.user.id, team: { in: [match.home, match.away] } },
     select: { team: true },
   });
-  if (!viewer?.team)
-    return { error: "You are not rostered on either team" as const };
-  return { match, viewerTeamId: viewer.team, userId: session.user.id };
-}
+  const viewerTeamId = viewer?.team ?? null;
 
-async function requireVetoActor(
-  matchID: number,
-): Promise<{ error: string } | RosteredViewerContext> {
-  const flags = await getWebMapbansFlags();
-  if (!flags.enabled) return { error: "Web map bans are not enabled" as const };
-  const ctx = await requireRosteredViewer(matchID);
-  if ("error" in ctx) return ctx;
+  // Staff acting as a universal substitute exists ONLY while the staff-only
+  // rollout flag is on; launch removes the bypass with the flag.
+  let actsForAnyTeam = false;
   if (flags.staffOnly) {
     const [roles, discordId] = await Promise.all([
-      getUserRoles(ctx.userId),
-      getDiscordIdByUserId(ctx.userId),
+      getUserRoles(session.user.id),
+      getDiscordIdByUserId(session.user.id),
     ]);
+    const isStaff = hasAccess(roles, VETO_STAFF_ROLES);
     const isAllowlisted =
       discordId !== null && flags.allowlist.includes(discordId);
-    if (!hasAccess(roles, VETO_STAFF_ROLES) && !isAllowlisted)
+    if (!isStaff && !isAllowlisted)
       return { error: "Web map bans are in staff testing" as const };
+    actsForAnyTeam = isStaff;
   }
-  return ctx;
+
+  if (!actsForAnyTeam && viewerTeamId === null)
+    return { error: "You are not rostered on either team" as const };
+  return { match, viewerTeamId, actsForAnyTeam, userId: session.user.id };
 }
 
 function revalidateMatch(matchID: number) {
@@ -166,7 +167,10 @@ export async function submitMapPick(
   if (state.phase !== "map-turns" || !state.currentMapTurn) {
     return { ok: false, error: "It is not a map turn" };
   }
-  if (state.currentMapTurn.actingTeamId !== ctx.viewerTeamId) {
+  if (
+    !ctx.actsForAnyTeam &&
+    state.currentMapTurn.actingTeamId !== ctx.viewerTeamId
+  ) {
     return { ok: false, error: "It is not your team's turn" };
   }
   const normalizedPick = state.remainingMaps.find(
@@ -224,7 +228,10 @@ export async function submitSidePick(
   if (state.currentSideTurn.rowId !== rowId) {
     return { ok: false, error: "That side turn is not current - refreshing" };
   }
-  if (state.currentSideTurn.actingTeamId !== ctx.viewerTeamId) {
+  if (
+    !ctx.actsForAnyTeam &&
+    state.currentSideTurn.actingTeamId !== ctx.viewerTeamId
+  ) {
     return { ok: false, error: "It is not your team's side pick" };
   }
 

@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 const RECONNECT_BASE_DELAY_MS = 1000;
 const RECONNECT_MAX_DELAY_MS = 15000;
 const FALLBACK_POLL_MS = 15000;
+const CONNECT_TIMEOUT_MS = 5000;
 
 export default function VetoLiveConnector({ matchID }: { matchID: number }) {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
   useEffect(() => {
     let socket: WebSocket | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let connectTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
     let pollTimer: ReturnType<typeof setInterval> | null = null;
     let disposed = false;
 
@@ -31,18 +33,36 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
       }
     }
 
+    function clearConnectTimeout() {
+      if (connectTimeoutTimer) {
+        clearTimeout(connectTimeoutTimer);
+        connectTimeoutTimer = null;
+      }
+    }
+
     function connect() {
       if (disposed) return;
       const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-      socket = new WebSocket(
+      const pendingSocket = new WebSocket(
         `${protocol}://${window.location.host}/ws/veto?matchID=${matchID}`,
       );
-      socket.onopen = () => {
+      socket = pendingSocket;
+      // Dev servers without the ws endpoint can hang the upgrade forever
+      // (never open, never error), so a pending handshake must be killed
+      // explicitly or neither the socket nor the polling fallback ever runs.
+      connectTimeoutTimer = setTimeout(() => {
+        if (pendingSocket.readyState === WebSocket.CONNECTING) {
+          pendingSocket.close();
+        }
+      }, CONNECT_TIMEOUT_MS);
+      pendingSocket.onopen = () => {
         attemptRef.current = 0;
+        clearConnectTimeout();
         stopPollingFallback();
       };
-      socket.onmessage = () => router.refresh();
-      socket.onclose = () => {
+      pendingSocket.onmessage = () => router.refresh();
+      pendingSocket.onclose = () => {
+        clearConnectTimeout();
         if (disposed) return;
         startPollingFallback();
         const delay = Math.min(
@@ -52,13 +72,15 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
         attemptRef.current += 1;
         reconnectTimer = setTimeout(connect, delay);
       };
-      socket.onerror = () => socket?.close();
+      pendingSocket.onerror = () => pendingSocket.close();
     }
 
+    startPollingFallback();
     connect();
     return () => {
       disposed = true;
       if (reconnectTimer) clearTimeout(reconnectTimer);
+      clearConnectTimeout();
       stopPollingFallback();
       socket?.close();
     };

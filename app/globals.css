@@ -92,3 +92,210 @@ p {
   position: absolute;
   background-color: rgb(148 163 184 / 0.55);
 }
+
+.veto-ban-line-up,
+.veto-ban-line-down {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  opacity: 0;
+}
+
+.veto-flank-left {
+  transform: scaleX(0);
+  transform-origin: right;
+}
+
+.veto-flank-right {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.veto-ban-animating .veto-flank-left,
+.veto-ban-animating .veto-flank-right,
+.veto-pick-animating .veto-flank-left,
+.veto-pick-animating .veto-flank-right {
+  animation: veto-flank-grow 0.9s ease-out forwards;
+}
+
+.veto-ban-selected .veto-flank-left,
+.veto-ban-selected .veto-flank-right,
+.veto-pick-selected .veto-flank-left,
+.veto-pick-selected .veto-flank-right {
+  transform: scaleX(1);
+}
+
+@keyframes veto-flank-grow {
+  0% {
+    transform: scaleX(0);
+  }
+  35%,
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.veto-ban-grey {
+  position: absolute;
+  inset: 0;
+  transform: scaleY(0);
+  backdrop-filter: grayscale(1) brightness(0.6);
+}
+
+@keyframes veto-tile-reveal {
+  0% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.veto-tile-reveal {
+  animation: veto-tile-reveal 0.7s ease-out;
+}
+
+.veto-ban-outline {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-left: 2px solid var(--color-vdcRed);
+  border-right: 2px solid var(--color-vdcRed);
+}
+
+.veto-ban-animating .veto-ban-outline {
+  animation: veto-ban-outline-in 1.05s ease-out forwards;
+}
+
+@keyframes veto-ban-outline-in {
+  0%,
+  85% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.veto-ban-animating .veto-ban-line-up {
+  animation: veto-ban-line-up 0.9s ease-out forwards;
+}
+
+.veto-ban-animating .veto-ban-line-down {
+  animation: veto-ban-line-down 0.9s ease-out forwards;
+}
+
+.veto-ban-animating .veto-ban-grey {
+  animation: veto-ban-grey 0.9s ease-out forwards;
+}
+
+.veto-pick-bright {
+  position: absolute;
+  inset: 0;
+  transform: scaleY(0);
+  backdrop-filter: brightness(1.6) saturate(1.4);
+}
+
+.veto-pick-outline {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-left: 2px solid var(--color-vdcGreen);
+  border-right: 2px solid var(--color-vdcGreen);
+}
+
+.veto-pick-animating .veto-ban-line-up {
+  animation: veto-ban-line-up 0.9s ease-out forwards;
+}
+
+.veto-pick-animating .veto-ban-line-down {
+  animation: veto-ban-line-down 0.9s ease-out forwards;
+}
+
+.veto-pick-animating .veto-pick-bright {
+  animation: veto-ban-grey 0.9s ease-out forwards;
+}
+
+.veto-pick-animating .veto-pick-outline {
+  animation: veto-ban-outline-in 1.05s ease-out forwards;
+}
+
+.veto-pick-selected .veto-pick-bright {
+  transform: scaleY(1);
+}
+
+.veto-pick-selected .veto-ban-line-up {
+  top: 0;
+  opacity: 1;
+}
+
+.veto-pick-selected .veto-ban-line-down {
+  top: calc(100% - 2px);
+  opacity: 1;
+}
+
+.veto-pick-selected .veto-pick-outline {
+  opacity: 1;
+}
+
+.veto-ban-selected .veto-ban-grey {
+  transform: scaleY(1);
+}
+
+.veto-ban-selected .veto-ban-line-up {
+  top: 0;
+  opacity: 1;
+}
+
+.veto-ban-selected .veto-ban-line-down {
+  top: calc(100% - 2px);
+  opacity: 1;
+}
+
+.veto-ban-selected .veto-ban-outline {
+  opacity: 1;
+}
+
+@keyframes veto-ban-line-up {
+  0%,
+  35% {
+    top: 50%;
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes veto-ban-line-down {
+  0%,
+  35% {
+    top: 50%;
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 2px);
+    opacity: 1;
+  }
+}
+
+@keyframes veto-ban-grey {
+  0%,
+  35% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}

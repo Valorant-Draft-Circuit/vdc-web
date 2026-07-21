@@ -15,11 +15,21 @@ function joinRoom(matchID: number, socket: WebSocket) {
   const room = vetoRooms.get(matchID) ?? new Set<WebSocket>();
   room.add(socket);
   vetoRooms.set(matchID, room);
+  console.log(`[ws] +match ${matchID} (room=${room.size})`);
   socket.on("close", () => {
     room.delete(socket);
     if (room.size === 0) vetoRooms.delete(matchID);
+    console.log(`[ws] -match ${matchID} (room=${room.size})`);
   });
 }
+
+process.on("unhandledRejection", (reason) => {
+  console.error("[server] unhandledRejection", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("[server] uncaughtException", error);
+});
 
 app.prepare().then(() => {
   const handleUpgrade = app.getUpgradeHandler();
@@ -28,9 +38,14 @@ app.prepare().then(() => {
   vetoEmitter().on("vetoChanged", (matchID: number) => {
     const room = vetoRooms.get(matchID);
     if (!room) return;
+    let notified = 0;
     for (const socket of room) {
-      if (socket.readyState === WebSocket.OPEN) socket.send("changed");
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send("changed");
+        notified += 1;
+      }
     }
+    console.log(`[ws] vetoChanged match ${matchID} -> ${notified} socket(s)`);
   });
 
   const server = createServer((req, res) => {
@@ -42,6 +57,7 @@ app.prepare().then(() => {
     if (pathname === "/ws/veto") {
       const matchID = Number(query.matchID);
       if (!Number.isInteger(matchID)) {
+        console.warn(`[ws] rejected upgrade with bad matchID: ${req.url}`);
         socket.destroy();
         return;
       }

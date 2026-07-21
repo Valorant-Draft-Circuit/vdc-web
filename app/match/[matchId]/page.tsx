@@ -198,11 +198,12 @@ export default async function Page({
                   maps={maps}
                   viewerTeamId={vetoView.viewerTeamId}
                   viewerIsStaff={vetoView.viewerIsStaff}
+                  viewerActsForAnyTeam={vetoView.viewerActsForAnyTeam}
                   canStart={vetoView.canStart}
                 />
               </div>
             )}
-            <div className="mx-10">
+            <div className="px-5 xl:px-0">
               <h2 className="mt-4 rounded-lg border border-vdcRed/40 bg-vdcRed/10 px-4 py-3 text-sm xl:text-lg text-center">
                 This match has not been played yet! Stats and game details will
                 be available after the match has been completed and submitted.
@@ -279,6 +280,7 @@ type VetoView = {
   veto: MatchVeto;
   viewerTeamId: number | null;
   viewerIsStaff: boolean;
+  viewerActsForAnyTeam: boolean;
   canStart: boolean;
 };
 
@@ -307,12 +309,23 @@ async function loadVetoView(
     const viewerIsAllowlisted =
       viewerDiscordId !== null &&
       mapbansFlags.allowlist.includes(viewerDiscordId);
-    if (!viewerIsAllowlisted) return null;
+    const vetoExists = veto.state.phase !== "not-started";
+    if (!viewerIsAllowlisted && !vetoExists) return null;
+    if (!viewerIsAllowlisted) {
+      return {
+        veto,
+        viewerTeamId: null,
+        viewerIsStaff: false,
+        viewerActsForAnyTeam: false,
+        canStart: false,
+      };
+    }
   }
 
+  const viewerActsForAnyTeam = mapbansFlags.staffOnly && viewerIsStaff;
   const msUntilMatch = new Date(matchInfo.dateScheduled).getTime() - Date.now();
   const canStart =
-    viewerRole.teamId !== null &&
+    (viewerRole.teamId !== null || viewerActsForAnyTeam) &&
     veto.state.phase === "not-started" &&
     msUntilMatch <= VETO_START_WINDOW_MS &&
     msUntilMatch > 0;
@@ -321,6 +334,7 @@ async function loadVetoView(
     veto,
     viewerTeamId: viewerRole.teamId,
     viewerIsStaff,
+    viewerActsForAnyTeam,
     canStart,
   };
 }
