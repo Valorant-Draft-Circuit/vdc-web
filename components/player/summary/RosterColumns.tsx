@@ -64,7 +64,7 @@ function RosterRow({ entry, agents }: { entry: RosterEntry; agents: Agents }) {
   const nameClass = entry.isViewedPlayer ? "text-vdcWhite" : "text-gray-300";
 
   const name = (
-    <p className={`${nameClass} text-sm leading-tight truncate max-w-20`}>
+    <p className={`${nameClass} text-xs leading-tight truncate max-w-20`}>
       {entry.riotIGN ?? "Unknown"}
     </p>
   );

@@ -14,12 +14,13 @@ export default function StatRankBadge({
 }) {
   if (!statRank) return null;
 
-  const accentClass = MEDAL_CLASS_BY_RANK[statRank.rank] ?? "text-gray-200 bg-gray-500";
+  const accentClass =
+    MEDAL_CLASS_BY_RANK[statRank.rank] ?? "text-gray-200 bg-gray-500";
   return (
-    <h3
+    <h2
       className={`${accentClass} leading-none rounded-2xl px-1.5 py-0.5 opacity-90`}
     >
       {ordinal(statRank.rank)}
-    </h3>
+    </h2>
   );
 }
