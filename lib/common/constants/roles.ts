@@ -17,6 +17,15 @@ export const FM_ACCESS_LIST = [
   Roles.ADMIN,
 ];
 
+export const MEDIA_BROADCAST_ROLES = [
+  Roles.TECH_BROADCAST,
+  Roles.MEDIA_CASTER,
+  Roles.MEDIA_OBSERVER,
+  Roles.MEDIA_PRODUCER,
+  Roles.LEAD_MEDIA_SSH,
+  Roles.LEAD_MEDIA_TPC,
+];
+
 export const ROLES = Object.entries(Roles)
   .filter(([key]) => isNaN(Number(key)))
   .map(([label, value]) => ({

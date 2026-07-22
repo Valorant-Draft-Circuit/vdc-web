@@ -1,7 +1,9 @@
 "use client";
 
+import { EyeIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useVetoSelection } from "./VetoSelectionContext";
 
 const RECONNECT_BASE_DELAY_MS = 1000;
 const RECONNECT_MAX_DELAY_MS = 15000;
@@ -11,6 +13,8 @@ const CONNECT_TIMEOUT_MS = 5000;
 export default function VetoLiveConnector({ matchID }: { matchID: number }) {
   const router = useRouter();
   const attemptRef = useRef(0);
+  const [viewerCount, setViewerCount] = useState<number | null>(null);
+  const { setRemoteSelectedMap } = useVetoSelection();
 
   useEffect(() => {
     let socket: WebSocket | null = null;
@@ -60,9 +64,21 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
         clearConnectTimeout();
         stopPollingFallback();
       };
-      pendingSocket.onmessage = () => router.refresh();
+      pendingSocket.onmessage = (event) => {
+        const message = String(event.data);
+        if (message.startsWith("viewers:")) {
+          setViewerCount(Number(message.slice("viewers:".length)) || null);
+          return;
+        }
+        if (message.startsWith("preview:")) {
+          setRemoteSelectedMap(message.slice("preview:".length) || null);
+          return;
+        }
+        router.refresh();
+      };
       pendingSocket.onclose = () => {
         clearConnectTimeout();
+        setViewerCount(null);
         if (disposed) return;
         startPollingFallback();
         const delay = Math.min(
@@ -84,7 +100,13 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
       stopPollingFallback();
       socket?.close();
     };
-  }, [matchID, router]);
+  }, [matchID, router, setRemoteSelectedMap]);
 
-  return null;
+  if (viewerCount === null) return null;
+  return (
+    <div className="flex flex-row items-center gap-1 text-gray-500 dark:text-gray-400">
+      <EyeIcon className="size-4" />
+      <h2 className="text-xs">{viewerCount}</h2>
+    </div>
+  );
 }

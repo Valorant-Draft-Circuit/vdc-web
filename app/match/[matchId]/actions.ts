@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { ControlPanel, Roles } from "@/prisma";
 import { MapBansSide, MatchType, VetoSource } from "@prisma/client";
 import { buildVetoSkeleton, deriveVetoState } from "@/lib/common/mapbansFlow";
-import { emitVetoChanged } from "@/lib/server/vetoEvents";
+import { emitVetoChanged, emitVetoPreview } from "@/lib/server/vetoEvents";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
 import { getDiscordIdByUserId } from "@/lib/queries/user/user";
 
@@ -134,6 +134,9 @@ export async function startVeto(matchID: number): Promise<ActionResult> {
           select: { vetoUrl: true },
         })
       )?.vetoUrl;
+      console.log(
+        `[webmapban - m${matchID}]: start rejected for user ${ctx.userId} (already in progress)`,
+      );
       return {
         ok: false,
         error: "A veto for this match is already in progress",
@@ -143,8 +146,45 @@ export async function startVeto(matchID: number): Promise<ActionResult> {
     throw error;
   }
 
+  console.log(`[webmapban - m${matchID}]: started by user ${ctx.userId}`);
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
+  return { ok: true };
+}
+
+export async function previewVetoSelection(
+  matchID: number,
+  map: string | null,
+): Promise<ActionResult> {
+  const ctx = await requireVetoActor(matchID);
+  if ("error" in ctx) return { ok: false, error: ctx.error };
+
+  let normalizedPreview: string | null = null;
+  if (map !== null) {
+    const [rows, mapPoolStr] = await Promise.all([
+      prisma.mapBans.findMany({ where: { matchID }, orderBy: { order: "asc" } }),
+      ControlPanel.getMapPool(),
+    ]);
+    const state = deriveVetoState(rows, mapPoolStr.split(","));
+    if (state.phase !== "map-turns" || !state.currentMapTurn) {
+      return { ok: false, error: "It is not a map turn" };
+    }
+    if (
+      !ctx.actsForAnyTeam &&
+      state.currentMapTurn.actingTeamId !== ctx.viewerTeamId
+    ) {
+      return { ok: false, error: "It is not your team's turn" };
+    }
+    normalizedPreview =
+      state.remainingMaps.find(
+        (candidate) => candidate.toUpperCase() === map.toUpperCase(),
+      ) ?? null;
+    if (!normalizedPreview) {
+      return { ok: false, error: "That map is not in the remaining pool" };
+    }
+  }
+
+  emitVetoPreview(matchID, normalizedPreview);
   return { ok: true };
 }
 
@@ -185,8 +225,16 @@ export async function submitMapPick(
     data: { map: normalizedPick },
   });
   if (updated.count === 0) {
+    console.log(
+      `[webmapban - m${matchID}]: ${state.currentMapTurn.type} ${normalizedPick} by user ${ctx.userId} lost the turn race`,
+    );
     return { ok: false, error: "That turn was already taken - refreshing" };
   }
+
+  console.log(
+    `[webmapban - m${matchID}]: user ${ctx.userId} ${state.currentMapTurn.type} ${normalizedPick} (order ${state.currentMapTurn.order})`,
+  );
+  emitVetoPreview(matchID, null);
 
   const refreshedRows = await prisma.mapBans.findMany({
     where: { matchID },
@@ -198,6 +246,9 @@ export async function submitMapPick(
       where: { id: autoFill.rowId, map: null },
       data: { map: autoFill.map },
     });
+    console.log(
+      `[webmapban - m${matchID}]: auto-filled ${autoFill.map} (row ${autoFill.rowId})`,
+    );
   }
 
   emitVetoChanged(matchID);
@@ -240,8 +291,15 @@ export async function submitSidePick(
     data: { side },
   });
   if (updated.count === 0) {
+    console.log(
+      `[webmapban - m${matchID}]: side ${side} on ${state.currentSideTurn.map} by user ${ctx.userId} lost the turn race`,
+    );
     return { ok: false, error: "That side was already picked - refreshing" };
   }
+
+  console.log(
+    `[webmapban - m${matchID}]: user ${ctx.userId} picked ${side} on ${state.currentSideTurn.map} (row ${rowId})`,
+  );
 
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
@@ -259,6 +317,9 @@ export async function resetVeto(matchID: number): Promise<ActionResult> {
 
   await prisma.mapBans.deleteMany({ where: { matchID } });
 
+  console.log(
+    `[webmapban - m${matchID}]: reset by staff user ${session.user.id}`,
+  );
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
   return { ok: true };

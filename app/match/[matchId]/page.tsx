@@ -19,6 +19,7 @@ import { getDiscordIdByUserId } from "@/lib/queries/user/user";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { Roles } from "@/prisma";
+import { MEDIA_BROADCAST_ROLES } from "@/lib/common/constants/roles";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
@@ -199,6 +200,7 @@ export default async function Page({
                   viewerTeamId={vetoView.viewerTeamId}
                   viewerIsStaff={vetoView.viewerIsStaff}
                   viewerActsForAnyTeam={vetoView.viewerActsForAnyTeam}
+                  viewerIsMedia={vetoView.viewerIsMedia}
                   canStart={vetoView.canStart}
                 />
               </div>
@@ -281,6 +283,7 @@ type VetoView = {
   viewerTeamId: number | null;
   viewerIsStaff: boolean;
   viewerActsForAnyTeam: boolean;
+  viewerIsMedia: boolean;
   canStart: boolean;
 };
 
@@ -304,6 +307,7 @@ async function loadVetoView(
     userId ? getUserRoles(userId) : Promise.resolve(""),
   ]);
   const viewerIsStaff = hasAccess(viewerRoles, VETO_STAFF_ROLES);
+  const viewerIsMedia = hasAccess(viewerRoles, MEDIA_BROADCAST_ROLES);
   if (mapbansFlags.staffOnly && !viewerIsStaff) {
     const viewerDiscordId = userId ? await getDiscordIdByUserId(userId) : null;
     const viewerIsAllowlisted =
@@ -317,6 +321,7 @@ async function loadVetoView(
         viewerTeamId: null,
         viewerIsStaff: false,
         viewerActsForAnyTeam: false,
+        viewerIsMedia,
         canStart: false,
       };
     }
@@ -335,6 +340,7 @@ async function loadVetoView(
     viewerTeamId: viewerRole.teamId,
     viewerIsStaff,
     viewerActsForAnyTeam,
+    viewerIsMedia,
     canStart,
   };
 }

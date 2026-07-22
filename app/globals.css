@@ -93,6 +93,15 @@ p {
   background-color: rgb(148 163 184 / 0.55);
 }
 
+.broadcast-mode {
+  overflow: hidden;
+}
+
+.broadcast-mode nav,
+.broadcast-mode footer {
+  display: none;
+}
+
 .veto-ban-line-up,
 .veto-ban-line-down {
   position: absolute;
@@ -146,17 +155,31 @@ p {
 
 @keyframes veto-tile-reveal {
   0% {
-    opacity: 0;
-    transform: scale(1.08);
+    transform: scale(1.05);
   }
   100% {
-    opacity: 1;
     transform: scale(1);
   }
 }
 
 .veto-tile-reveal {
   animation: veto-tile-reveal 0.7s ease-out;
+}
+
+@keyframes veto-tile-reveal-dead {
+  0%,
+  55% {
+    transform: scale(1);
+    filter: grayscale(0) brightness(0.55);
+  }
+  100% {
+    transform: scale(1);
+    filter: grayscale(1) brightness(0.35);
+  }
+}
+
+.veto-tile-reveal-dead {
+  animation: veto-tile-reveal-dead 1.1s ease-out;
 }
 
 .veto-ban-outline {

@@ -18,3 +18,7 @@ export function vetoEmitter(): EventEmitter {
 export function emitVetoChanged(matchID: number) {
   vetoEmitter().emit("vetoChanged", matchID);
 }
+
+export function emitVetoPreview(matchID: number, map: string | null) {
+  vetoEmitter().emit("vetoPreview", matchID, map);
+}

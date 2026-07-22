@@ -11,15 +11,27 @@ const handle = app.getRequestHandler();
 
 const vetoRooms = new Map<number, Set<WebSocket>>();
 
+function broadcastRoomSize(matchID: number) {
+  const room = vetoRooms.get(matchID);
+  if (!room) return;
+  for (const socket of room) {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(`viewers:${room.size}`);
+    }
+  }
+}
+
 function joinRoom(matchID: number, socket: WebSocket) {
   const room = vetoRooms.get(matchID) ?? new Set<WebSocket>();
   room.add(socket);
   vetoRooms.set(matchID, room);
-  console.log(`[ws] +match ${matchID} (room=${room.size})`);
+  console.log(`[ws - m${matchID}] joined. (room=${room.size})`);
+  broadcastRoomSize(matchID);
   socket.on("close", () => {
     room.delete(socket);
     if (room.size === 0) vetoRooms.delete(matchID);
-    console.log(`[ws] -match ${matchID} (room=${room.size})`);
+    console.log(`[ws - m${matchID}] left (room=${room.size})`);
+    broadcastRoomSize(matchID);
   });
 }
 
@@ -45,7 +57,17 @@ app.prepare().then(() => {
         notified += 1;
       }
     }
-    console.log(`[ws] vetoChanged match ${matchID} -> ${notified} socket(s)`);
+    console.log(`[ws - m${matchID}] vetoChanged -> ${notified} socket(s)`);
+  });
+
+  vetoEmitter().on("vetoPreview", (matchID: number, map: string | null) => {
+    const room = vetoRooms.get(matchID);
+    if (!room) return;
+    for (const socket of room) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(`preview:${map ?? ""}`);
+      }
+    }
   });
 
   const server = createServer((req, res) => {
@@ -57,7 +79,9 @@ app.prepare().then(() => {
     if (pathname === "/ws/veto") {
       const matchID = Number(query.matchID);
       if (!Number.isInteger(matchID)) {
-        console.warn(`[ws] rejected upgrade with bad matchID: ${req.url}`);
+        console.warn(
+          `[ws - m${matchID}] rejected upgrade with bad matchID: ${req.url}`,
+        );
         socket.destroy();
         return;
       }

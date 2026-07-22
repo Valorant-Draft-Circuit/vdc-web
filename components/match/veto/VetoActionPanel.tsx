@@ -1,6 +1,10 @@
 "use client";
 
-import { submitMapPick, submitSidePick } from "@/app/match/[matchId]/actions";
+import {
+  previewVetoSelection,
+  submitMapPick,
+  submitSidePick,
+} from "@/app/match/[matchId]/actions";
 import { MAP_LIST_URL } from "@/lib/common/constants/maps";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import {
@@ -11,6 +15,7 @@ import {
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useState, useTransition } from "react";
+import { useVetoSelection } from "./VetoSelectionContext";
 import VetoTurnHeader from "./VetoTurnHeader";
 
 type MapTurn = { kind: "map"; turnType: string; remainingMaps: string[] };
@@ -27,14 +32,19 @@ export default function VetoActionPanel({
   turn: MapTurn | SideTurn;
   maps: Record<string, string>;
 }) {
-  const [selection, setSelection] = useState<string | null>(null);
+  const { selectedMap: selection, setSelectedMap: setSelection } =
+    useVetoSelection();
   const [animatedMap, setAnimatedMap] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const toggleSelection = (value: string) => {
     setError(null);
-    setSelection((current) => (current === value ? null : value));
+    const nextSelection = selection === value ? null : value;
+    setSelection(nextSelection);
+    if (turn.kind === "map") {
+      void previewVetoSelection(matchID, nextSelection);
+    }
   };
 
   const confirmSelection = () => {
@@ -46,8 +56,9 @@ export default function VetoActionPanel({
           : await submitSidePick(matchID, turn.rowId, selection as MapBansSide);
       if (!result.ok) {
         setError(result.error);
-        setSelection(null);
       }
+      setSelection(null);
+      setAnimatedMap(null);
     });
   };
 
