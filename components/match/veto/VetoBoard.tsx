@@ -48,7 +48,6 @@ export default function VetoBoard({
   viewerTeamId,
   viewerIsStaff,
   viewerActsForAnyTeam,
-  viewerIsMedia = false,
   canStart,
   variant = "page",
 }: {
@@ -59,7 +58,6 @@ export default function VetoBoard({
   viewerTeamId: number | null;
   viewerIsStaff: boolean;
   viewerActsForAnyTeam: boolean;
-  viewerIsMedia?: boolean;
   canStart: boolean;
   variant?: "page" | "broadcast";
 }) {
