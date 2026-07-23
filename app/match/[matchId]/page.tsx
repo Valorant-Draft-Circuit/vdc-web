@@ -158,7 +158,11 @@ export default async function Page({
 
           <div className="relative flex flex-col w-full">
             <div className="flex flex-row justify-between">
-              <TeamIdentity team={homeTeam} teamBrand={homeTeamBrand} />
+              <TeamIdentity
+                team={homeTeam}
+                teamBrand={homeTeamBrand}
+                side="HOME"
+              />
               <div className="flex flex-col text-2xl text-center">
                 <h1 className={`text-${tierColor} text-lg`}>
                   {matchInfo?.tier}
@@ -172,7 +176,11 @@ export default async function Page({
                   {matchInfo?.matchType.replaceAll("_", " ")}
                 </h1>
               </div>
-              <TeamIdentity team={awayTeam} teamBrand={awayTeamBrand} />
+              <TeamIdentity
+                team={awayTeam}
+                teamBrand={awayTeamBrand}
+                side="AWAY"
+              />
             </div>
           </div>
         </div>
@@ -446,9 +454,11 @@ function OverviewScore({
 function TeamIdentity({
   team,
   teamBrand,
+  side,
 }: {
   team: MatchTeam | null | undefined;
   teamBrand: MatchTeam["Franchise"]["Brand"] | undefined;
+  side: "HOME" | "AWAY";
 }) {
   const franchiseSlug = team?.Franchise.slug;
   const teamTierSlug = team?.tier.toLowerCase();
@@ -466,6 +476,9 @@ function TeamIdentity({
         />
       </Link>
       <h1 className="text-vdcWhite truncate">{team?.name}</h1>
+      <h2 className="text-[10px] tracking-wider uppercase text-vdcRed">
+        {side}
+      </h2>
     </div>
   );
 }

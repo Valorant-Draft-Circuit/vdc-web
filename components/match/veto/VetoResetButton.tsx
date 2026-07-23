@@ -26,7 +26,7 @@ export default function VetoResetButton({ matchID }: { matchID: number }) {
         type="button"
         disabled={isPending}
         onClick={handleClick}
-        className="rounded-md border border-vdcRed/50 px-3 py-1 text-xs text-vdcRed hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
+        className="rounded-md border border-vdcRed/50 px-2 py-1 text-xs text-vdcRed hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
       >
         <h1>{isArmed ? "Confirm reset" : "Reset veto"}</h1>
       </button>

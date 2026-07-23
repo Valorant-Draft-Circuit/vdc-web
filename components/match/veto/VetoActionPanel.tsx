@@ -125,7 +125,6 @@ export default function VetoActionPanel({
                 )}
                 {isBanTurn ? (
                   <>
-                    <div className="pointer-events-none veto-ban-grey" />
                     <div className="pointer-events-none veto-ban-line-up bg-vdcRed/80" />
                     <div className="pointer-events-none veto-ban-line-down bg-vdcRed/80" />
                     <div className="pointer-events-none veto-ban-outline" />

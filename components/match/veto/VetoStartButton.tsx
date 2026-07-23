@@ -24,7 +24,7 @@ export default function VetoStartButton({ matchID }: { matchID: number }) {
         type="button"
         disabled={isPending}
         onClick={handleStart}
-        className="self-start rounded-md bg-vdcRed px-4 py-2 text-vdcWhite hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
+        className="self-start rounded-md bg-vdcRed px-2 py-1 text-xs text-vdcWhite hover:brightness-90 disabled:opacity-50 hover:cursor-pointer"
       >
         <h1>Start map bans</h1>
       </button>

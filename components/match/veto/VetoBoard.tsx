@@ -17,6 +17,8 @@ import VetoStartButton from "./VetoStartButton";
 const GLASSY_PANEL_CLASSES =
   "rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 backdrop-blur-sm p-5";
 
+const BROADCAST_REVEAL_CLASS = "veto-reveal-in";
+
 function resolveTeam(
   teamId: number | null,
   teams: { home: MatchTeam; away: MatchTeam },
@@ -94,7 +96,7 @@ export default function VetoBoard({
                 href={`/match/${matchID}/broadcast`}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-md border border-vdcBlue px-2 py-1 text-[10px] uppercase tracking-wider text-vdcBlue hover:bg-vdcBlue hover:text-vdcWhite"
+                className="rounded-md border border-vdcBlue px-2 py-1 text-xs uppercase tracking-wider text-vdcBlue hover:bg-vdcBlue hover:text-vdcWhite"
               >
                 <h2>Spectator View</h2>
               </a>
@@ -213,7 +215,13 @@ export default function VetoBoard({
                           )
                         ) : (
                           gate(
-                            <h2 className={`${isBroadcast ? "text-2xl" : ""}`}>
+                            <h2
+                              className={`${
+                                isBroadcast
+                                  ? `text-2xl ${BROADCAST_REVEAL_CLASS}`
+                                  : ""
+                              }`}
+                            >
                               {row.map}
                             </h2>,
                             <h2 className="text-2xl">?</h2>,
@@ -242,7 +250,7 @@ export default function VetoBoard({
                               height={5000}
                               className={`size-10 xl:size-20 ${
                                 isGreyedPending ? "grayscale opacity-60" : ""
-                              }`}
+                              } ${isBroadcast ? BROADCAST_REVEAL_CLASS : ""}`}
                             />,
                           )}
                       </div>
@@ -306,7 +314,11 @@ function SideChoiceLine({
   isBroadcast: boolean;
 }) {
   return (
-    <div className="flex flex-row items-center gap-1.5 xl:justify-center">
+    <div
+      className={`flex flex-row items-center gap-1.5 xl:justify-center ${
+        isBroadcast ? BROADCAST_REVEAL_CLASS : ""
+      }`}
+    >
       {chooser?.Franchise.Brand?.logo && (
         <Image
           alt={chooser.name ?? ""}

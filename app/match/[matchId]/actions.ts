@@ -88,20 +88,15 @@ function revalidateMatch(matchID: number) {
   revalidatePath(`/match/${matchID}`);
 }
 
-export async function startVeto(matchID: number): Promise<ActionResult> {
-  const ctx = await requireVetoActor(matchID);
-  if ("error" in ctx) return { ok: false, error: ctx.error };
-  const { match } = ctx;
-
-  if (match.dateScheduled.getTime() - Date.now() > VETO_START_WINDOW_MS) {
-    return {
-      ok: false,
-      error: "Map bans cannot begin more than 12 hours before the match",
-    };
-  }
-
+async function createVetoRows(
+  matchID: number,
+  matchType: MatchType,
+  homeTeamId: number,
+  awayTeamId: number,
+  startedByUserId: string,
+): Promise<ActionResult> {
   const [banOrderStr, mapPoolStr] = await Promise.all([
-    ControlPanel.getBanOrder(match.matchType),
+    ControlPanel.getBanOrder(matchType),
     ControlPanel.getMapPool(),
   ]);
   const banOrder = banOrderStr.split(",");
@@ -114,8 +109,8 @@ export async function startVeto(matchID: number): Promise<ActionResult> {
   const skeleton = buildVetoSkeleton(
     matchID,
     banOrder,
-    match.home as number,
-    match.away as number,
+    homeTeamId,
+    awayTeamId,
     vetoUrl,
   );
 
@@ -135,7 +130,7 @@ export async function startVeto(matchID: number): Promise<ActionResult> {
         })
       )?.vetoUrl;
       console.log(
-        `[webmapban - m${matchID}]: start rejected for user ${ctx.userId} (already in progress)`,
+        `[webmapban - m${matchID}]: start rejected for user ${startedByUserId} (already in progress)`,
       );
       return {
         ok: false,
@@ -146,10 +141,68 @@ export async function startVeto(matchID: number): Promise<ActionResult> {
     throw error;
   }
 
-  console.log(`[webmapban - m${matchID}]: started by user ${ctx.userId}`);
+  console.log(`[webmapban - m${matchID}]: started by user ${startedByUserId}`);
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
   return { ok: true };
+}
+
+export async function startVeto(matchID: number): Promise<ActionResult> {
+  const ctx = await requireVetoActor(matchID);
+  if ("error" in ctx) return { ok: false, error: ctx.error };
+  const { match } = ctx;
+
+  if (match.dateScheduled.getTime() - Date.now() > VETO_START_WINDOW_MS) {
+    return {
+      ok: false,
+      error: "Map bans cannot begin more than 12 hours before the match",
+    };
+  }
+
+  return createVetoRows(
+    matchID,
+    match.matchType,
+    match.home as number,
+    match.away as number,
+    ctx.userId,
+  );
+}
+
+/** Staff override: no roster requirement and no 12h window, for fixing a match
+ *  whose veto never got started. Mutex and skeleton building are unchanged. */
+export async function forceStartVeto(matchID: number): Promise<ActionResult> {
+  const flags = await getWebMapbansFlags();
+  if (!flags.enabled) {
+    return { ok: false, error: "Web map bans are not enabled" };
+  }
+
+  const session = await auth();
+  if (!session?.user?.id) return { ok: false, error: "Not logged in" };
+  const roles = await getUserRoles(session.user.id);
+  if (!hasAccess(roles, VETO_STAFF_ROLES)) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  const match = await prisma.matches.findFirst({
+    where: { matchID },
+    select: { matchType: true, home: true, away: true },
+  });
+  if (!match || match.home === null || match.away === null) {
+    return { ok: false, error: "Match not found" };
+  }
+  if (!VETO_MATCH_TYPES.includes(match.matchType)) {
+    return { ok: false, error: "This match type has no veto" };
+  }
+
+  const result = await createVetoRows(
+    matchID,
+    match.matchType,
+    match.home,
+    match.away,
+    session.user.id,
+  );
+  revalidatePath("/staff/tech");
+  return result;
 }
 
 export async function previewVetoSelection(
@@ -322,5 +375,7 @@ export async function resetVeto(matchID: number): Promise<ActionResult> {
   );
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
+  // Reset is also reachable from the tech dashboard's veto list.
+  revalidatePath("/staff/tech");
   return { ok: true };
 }
