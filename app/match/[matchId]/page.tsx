@@ -108,7 +108,6 @@ export default async function Page({
   const awayTeamColor = toTailwindCustomHexCode(awayTeamBrand!.colorPrimary);
 
   const matchGames = matchInfo?.Games;
-  const playedMapBans: PlayedMapBans[] = [];
 
   let homeWins = 0,
     awayWins = 0;
@@ -116,29 +115,25 @@ export default async function Page({
   matchGames?.forEach((game) => {
     if (game.winner === homeTeam?.id) homeWins++;
     else awayWins++;
-
-    matchInfo?.MapBans.forEach((mapBan) => {
-      if (game.map?.toUpperCase() === mapBan.map?.toUpperCase()) {
-        playedMapBans.push({
-          ...mapBan,
-          gameId: game.gameID,
-        });
-      }
-    });
   });
 
-  const mapBans = matchInfo?.MapBans?.filter(
-    (mapban) =>
-      mapban.type !== MapBanType.PICK && mapban.type !== MapBanType.DECIDER,
-  );
-
-  const mapBansWithGameId = [...(mapBans ?? []), ...(playedMapBans ?? [])];
-  mapBansWithGameId.sort(
-    (firstItem, secondItem) => firstItem.order - secondItem.order,
-  );
+  // Every veto row renders; only maps with a submitted game link to its stats,
+  // so a picked-but-unplayed map still shows mid-series.
+  const mapBansWithGameId: PlayedMapBans[] = [...(matchInfo?.MapBans ?? [])]
+    .map((mapBan) => {
+      const playedGame = matchGames?.find(
+        (game) => game.map?.toUpperCase() === mapBan.map?.toUpperCase(),
+      );
+      return playedGame ? { ...mapBan, gameId: playedGame.gameID } : mapBan;
+    })
+    .sort((firstItem, secondItem) => firstItem.order - secondItem.order);
   const today = new Date();
   const matchDateObj = new Date(matchInfo!.dateScheduled);
   const isInFuture = matchDateObj > today;
+  const hasSubmittedGames = (matchGames?.length ?? 0) > 0;
+  // A veto can still be running (or awaiting results) after the scheduled time,
+  // so the pre-match view holds until games are actually submitted.
+  const showPreMatchView = isInFuture || !hasSubmittedGames;
 
   const matchDate = matchDateObj.toLocaleString(`en-US`, {
     month: `short`,
@@ -187,7 +182,7 @@ export default async function Page({
           </h1>
           <h1>{matchDate}</h1>
         </div>
-        {isInFuture ? (
+        {showPreMatchView ? (
           <>
             {vetoView && homeTeam && awayTeam && (
               <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
