@@ -10,7 +10,13 @@ const RECONNECT_MAX_DELAY_MS = 15000;
 const FALLBACK_POLL_MS = 15000;
 const CONNECT_TIMEOUT_MS = 5000;
 
-export default function VetoLiveConnector({ matchID }: { matchID: number }) {
+export default function VetoLiveConnector({
+  matchID,
+  hideStatus = false,
+}: {
+  matchID: number;
+  hideStatus?: boolean;
+}) {
   const router = useRouter();
   const attemptRef = useRef(0);
   const [viewerCount, setViewerCount] = useState<number | null>(null);
@@ -102,7 +108,7 @@ export default function VetoLiveConnector({ matchID }: { matchID: number }) {
     };
   }, [matchID, router, setRemoteSelectedMap]);
 
-  if (viewerCount === null) return null;
+  if (hideStatus || viewerCount === null) return null;
   return (
     <div className="flex flex-row items-center gap-1 text-gray-500 dark:text-gray-400">
       <EyeIcon className="size-4" />

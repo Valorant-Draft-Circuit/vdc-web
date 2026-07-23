@@ -32,7 +32,7 @@ export default async function Page({
   const showBoard = veto !== null && veto.state.phase !== "not-started";
 
   return (
-    <div className="dark fixed inset-0 z-60 flex flex-col justify-center overflow-hidden bg-black p-6 text-vdcWhite">
+    <div className="dark fixed inset-0 z-60 flex flex-col justify-center overflow-hidden bg-transparent p-6 text-vdcWhite">
       <BroadcastViewport />
       {showBoard ? (
         <VetoBoard

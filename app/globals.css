@@ -95,6 +95,13 @@ p {
 
 .broadcast-mode {
   overflow: hidden;
+  background: transparent;
+}
+
+/* OBS browser sources composite the page over the scene, so every ancestor
+   background must be cleared for the veto board to float on transparency. */
+.broadcast-mode body {
+  background: transparent;
 }
 
 .broadcast-mode nav,

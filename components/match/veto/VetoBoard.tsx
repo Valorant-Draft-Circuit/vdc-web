@@ -6,6 +6,7 @@ import { MapBanType } from "@prisma/client";
 import { sideChooserFor, VetoRow } from "@/lib/common/mapbansFlow";
 import Image from "next/image";
 import VetoActionPanel from "./VetoActionPanel";
+import { BroadcastRevealProvider, RevealGate } from "./BroadcastReveal";
 import { VetoSelectionProvider } from "./VetoSelectionContext";
 import { TilePreviewArt, TilePreviewName } from "./VetoTilePreview";
 import VetoTurnHeader from "./VetoTurnHeader";
@@ -127,109 +128,137 @@ export default function VetoBoard({
         )}
 
         {phase !== "not-started" && (
-          <div className="flex flex-col xl:flex-row gap-5">
-            {state.rows.map((row) => {
-              const mapUuid = maps[row.map?.toUpperCase() ?? ""];
-              const tileTeam = resolveTeam(row.team, teams);
-              const isDimmed =
-                row.type === MapBanType.BAN || row.type === MapBanType.DISCARD;
-              const isCurrentTurn = row.id === currentTurnRowId;
-              const isPendingMap = row.map === null;
-              const isGreyedPending = isPendingMap && !isCurrentTurn;
-              return (
-                <div
-                  key={row.id}
-                  className={`relative ${
-                    isBroadcast
-                      ? "xl:min-w-0 xl:flex-1 xl:min-h-[60vh]"
-                      : "xl:w-72 xl:min-h-80"
-                  }  bg-vdcWhite/40 dark:bg-vdcBlack/40 backdrop-blur-sm border ${
-                    isCurrentTurn ? "border-vdcRed" : "border-gray-500/40"
-                  } ${isBroadcast ? "rounded-none" : "rounded-lg"}`}
-                >
-                  {mapUuid && (
-                    <Image
-                      alt={row.map ?? ""}
-                      src={MAP_LIST_URL(mapUuid)}
-                      width={5000}
-                      height={5000}
-                      className={`absolute inset-0 -z-10 size-full object-cover ${
-                        isDimmed
-                          ? "veto-tile-reveal-dead grayscale brightness-35 dark:brightness-30"
-                          : "veto-tile-reveal brightness-55 dark:brightness-50"
-                      } ${isBroadcast ? "rounded-none" : "rounded-lg"}`}
-                    />
-                  )}
-                  {isPendingMap && isCurrentTurn && (
-                    <TilePreviewArt maps={maps} />
-                  )}
-                  <div className="flex h-full flex-row xl:flex-col gap-5 p-5 justify-between ">
-                    <div
-                      className={`flex flex-row xl:flex-col my-auto xl:my-0 xl:mx-auto xl:text-center ${
-                        mapUuid ? "text-vdcWhite drop-shadow-lg" : ""
-                      } ${isBroadcast ? "gap-10" : "gap-5"}`}
-                    >
-                      <h2
-                        className={`text-md tracking-wider uppercase my-auto xl:my-0 ${
-                          isGreyedPending
-                            ? "text-gray-500"
-                            : row.type === MapBanType.PICK
-                              ? "text-vdcGreen"
-                              : row.type === MapBanType.DECIDER
-                                ? "text-vdcBlue"
-                                : "text-vdcRed"
-                        } ${isBroadcast ? "text-2xl" : "text-md"}`}
-                      >
-                        {row.type}
-                      </h2>
-                      {isPendingMap ? (
-                        isCurrentTurn ? (
-                          <TilePreviewName />
-                        ) : (
-                          <h2
-                            className={`text-2xl ${
-                              isGreyedPending ? "text-gray-500" : ""
-                            }`}
-                          >
-                            ?
-                          </h2>
-                        )
-                      ) : (
-                        <h2 className={`${isBroadcast ? "text-2xl" : ""}`}>
-                          {row.map}
-                        </h2>
-                      )}
-                      {row.side && (
-                        <SideChoiceLine
-                          side={row.side}
-                          chooser={resolveSideChooser(row, state.rows, teams)}
-                          isBroadcast={isBroadcast}
-                        />
-                      )}
-                    </div>
-                    <div className="mt-auto self-end xl:self-center">
-                      {tileTeam?.Franchise.Brand?.logo && (
+          <BroadcastRevealProvider
+            stepCount={isBroadcast ? state.rows.length : Number.POSITIVE_INFINITY}
+          >
+            <div className="flex flex-col xl:flex-row gap-5">
+              {state.rows.map((row, rowIndex) => {
+                const mapUuid = maps[row.map?.toUpperCase() ?? ""];
+                const tileTeam = resolveTeam(row.team, teams);
+                const isDimmed =
+                  row.type === MapBanType.BAN ||
+                  row.type === MapBanType.DISCARD;
+                const isCurrentTurn = row.id === currentTurnRowId;
+                const isPendingMap = row.map === null;
+                const isGreyedPending = isPendingMap && !isCurrentTurn;
+                const gate = (
+                  node: React.ReactNode,
+                  fallback: React.ReactNode = null,
+                ) =>
+                  isBroadcast ? (
+                    <RevealGate index={rowIndex} fallback={fallback}>
+                      {node}
+                    </RevealGate>
+                  ) : (
+                    node
+                  );
+                return (
+                  <div
+                    key={row.id}
+                    className={`relative ${
+                      isBroadcast
+                        ? "xl:min-w-0 xl:flex-1 xl:min-h-[60vh]"
+                        : "xl:w-72 xl:min-h-80"
+                    }  bg-vdcWhite/40 dark:bg-vdcBlack/40 backdrop-blur-sm border ${
+                      isCurrentTurn ? "border-vdcRed" : "border-gray-500/40"
+                    } ${isBroadcast ? "rounded-none" : "rounded-lg"}`}
+                  >
+                    {mapUuid &&
+                      gate(
                         <Image
-                          alt={tileTeam.name ?? ""}
-                          src={`${TEAM_LOGOS_URL}${tileTeam.Franchise.Brand.logo}`}
+                          alt={row.map ?? ""}
+                          src={MAP_LIST_URL(mapUuid)}
                           width={5000}
                           height={5000}
-                          className={`size-10 xl:size-20 ${
-                            isGreyedPending ? "grayscale opacity-60" : ""
-                          }`}
-                        />
+                          className={`absolute inset-0 -z-10 size-full object-cover ${
+                            isDimmed
+                              ? "veto-tile-reveal-dead grayscale brightness-35 dark:brightness-30"
+                              : "veto-tile-reveal brightness-55 dark:brightness-50"
+                          } ${isBroadcast ? "rounded-none" : "rounded-lg"}`}
+                        />,
                       )}
+                    {isPendingMap && isCurrentTurn && (
+                      <TilePreviewArt maps={maps} />
+                    )}
+                    <div className="flex h-full flex-row xl:flex-col gap-5 p-5 justify-between ">
+                      <div
+                        className={`flex flex-row xl:flex-col my-auto xl:my-0 xl:mx-auto xl:text-center ${
+                          mapUuid ? "text-vdcWhite drop-shadow-lg" : ""
+                        } ${isBroadcast ? "gap-10" : "gap-5"}`}
+                      >
+                        <h2
+                          className={`text-md tracking-wider uppercase my-auto xl:my-0 ${
+                            isGreyedPending
+                              ? "text-gray-500"
+                              : row.type === MapBanType.PICK
+                                ? "text-vdcGreen"
+                                : row.type === MapBanType.DECIDER
+                                  ? "text-vdcBlue"
+                                  : "text-vdcRed"
+                          } ${isBroadcast ? "text-2xl" : "text-md"}`}
+                        >
+                          {row.type}
+                        </h2>
+                        {isPendingMap ? (
+                          isCurrentTurn ? (
+                            <TilePreviewName />
+                          ) : (
+                            <h2
+                              className={`text-2xl ${
+                                isGreyedPending ? "text-gray-500" : ""
+                              }`}
+                            >
+                              ?
+                            </h2>
+                          )
+                        ) : (
+                          gate(
+                            <h2 className={`${isBroadcast ? "text-2xl" : ""}`}>
+                              {row.map}
+                            </h2>,
+                            <h2 className="text-2xl">?</h2>,
+                          )
+                        )}
+                        {row.side &&
+                          gate(
+                            <SideChoiceLine
+                              side={row.side}
+                              chooser={resolveSideChooser(
+                                row,
+                                state.rows,
+                                teams,
+                              )}
+                              isBroadcast={isBroadcast}
+                            />,
+                          )}
+                      </div>
+                      <div className="mt-auto self-end xl:self-center">
+                        {tileTeam?.Franchise.Brand?.logo &&
+                          gate(
+                            <Image
+                              alt={tileTeam.name ?? ""}
+                              src={`${TEAM_LOGOS_URL}${tileTeam.Franchise.Brand.logo}`}
+                              width={5000}
+                              height={5000}
+                              className={`size-10 xl:size-20 ${
+                                isGreyedPending ? "grayscale opacity-60" : ""
+                              }`}
+                            />,
+                          )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </BroadcastRevealProvider>
         )}
 
         {ownership === "web" && isLive && actingLine && (
           <div className="flex flex-col gap-3">
-            {!viewerIsActing && <VetoTurnHeader headline={actingLine} />}
+            {!viewerIsActing && !isBroadcast && (
+              <VetoTurnHeader headline={actingLine} />
+            )}
             {viewerIsActing && state.currentMapTurn && (
               <VetoActionPanel
                 key={`map-${state.currentMapTurn.rowId}`}
@@ -260,9 +289,7 @@ export default function VetoBoard({
         )}
 
         {isBroadcast && isLive && (
-          <div className="flex flex-row justify-end">
-            <VetoLiveConnector matchID={matchID} />
-          </div>
+          <VetoLiveConnector matchID={matchID} hideStatus />
         )}
       </div>
     </VetoSelectionProvider>
