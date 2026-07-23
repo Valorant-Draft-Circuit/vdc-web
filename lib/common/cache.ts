@@ -22,6 +22,7 @@ import {
   TransactionGroup,
 } from "../queries/home/transactions";
 import { getPeerStatPool } from "../queries/stats/getPeerStatPool";
+import { getProfileViewCount } from "../queries/user/profileViews";
 import { getAgentCatalog } from "../queries/agents/getAgentCatalog";
 import { GameType } from "@prisma/client";
 import type { PeerRow } from "./indepth";
@@ -267,6 +268,18 @@ async function computePeerStatPool(
     getMmmrTierLinesCached(),
   ]);
   return getPeerStatPool({ gameType, catalog, tierLines, season });
+}
+
+export async function getProfileViewCountCached(
+  profileUserID: string,
+): Promise<number> {
+  const key = `profileViews-${profileUserID}`;
+  const hit = cache.get<number>(key);
+  if (hit !== undefined) return hit;
+
+  const viewCount = await getProfileViewCount(profileUserID);
+  cache.set(key, viewCount, minutes(5));
+  return viewCount;
 }
 
 export async function getRecentTransactionsCached(

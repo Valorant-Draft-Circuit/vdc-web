@@ -1,6 +1,9 @@
 import Image from "next/image";
+import { EyeIcon } from "@heroicons/react/24/solid";
 import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
+import ProfileViewTracker from "@/components/player/ProfileViewTracker";
+import { getProfileViewCountCached } from "@/lib/common/cache";
 import { avatarColor } from "@/lib/common/avatar";
 import {
   TEAM_LOGOS_URL,
@@ -26,7 +29,10 @@ export default async function PlayerInfo({
   const [riotIGN, riotTag] = parseRiotIGN(
     playerInfo.PrimaryRiotAccount!.riotIGN!,
   );
-  const mmrShow = await ControlPanel.getMMRDisplayState();
+  const [mmrShow, profileViewCount] = await Promise.all([
+    ControlPanel.getMMRDisplayState(),
+    getProfileViewCountCached(playerInfo.id),
+  ]);
 
   let isPlayerSigned = false;
   let playerTeam;
@@ -65,6 +71,15 @@ export default async function PlayerInfo({
   const playerAccolades = getAccolades(playerInfo.Accolades);
   return (
     <div className="relative bg-linear-to-b from-vdcGrey to-vdcBlack xl:col-span-5 xl:rounded-3xl px-10 xl:px-14 aspect-[3/2] sm:aspect-[5/2] xl:aspect-[7/2] flex flex-col justify-center overflow-hidden xl:shadow-2xl">
+      <ProfileViewTracker profileUserID={playerInfo.id} />
+      {profileViewCount > 0 && (
+        <div className="absolute top-4 right-5 z-20 flex flex-row items-center gap-1.5 text-gray-300">
+          <EyeIcon className="size-4" />
+          <h2 className="text-xs">
+            {profileViewCount.toLocaleString("en-US")} views
+          </h2>
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         <div className="absolute inset-0 bg-black/80 pointer-events-none" />
         <ProfileBanner playerInfo={playerInfo} />
