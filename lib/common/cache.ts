@@ -34,6 +34,10 @@ export function initCache() {
     cache = new NodeCache({
       stdTTL: 0,
       checkperiod: minutes(10), // prune expired keys every 10 mins
+      // Cached values are handed out by reference: node-cache otherwise deep
+      // clones on every get, which is ruinous for the peer stat pools. Treat
+      // anything read from this cache as read-only - copy before sorting.
+      useClones: false,
     });
   }
 }

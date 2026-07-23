@@ -11,6 +11,25 @@ const handle = app.getRequestHandler();
 
 const vetoRooms = new Map<number, Set<WebSocket>>();
 
+const HEARTBEAT_INTERVAL_MS = 30 * 1000;
+const livingSockets = new WeakSet<WebSocket>();
+
+function startHeartbeat() {
+  setInterval(() => {
+    for (const [matchID, room] of vetoRooms) {
+      for (const socket of room) {
+        if (!livingSockets.has(socket)) {
+          console.log(`[ws - m${matchID}] terminating unresponsive socket`);
+          socket.terminate();
+          continue;
+        }
+        livingSockets.delete(socket);
+        socket.ping();
+      }
+    }
+  }, HEARTBEAT_INTERVAL_MS).unref();
+}
+
 function broadcastRoomSize(matchID: number) {
   const room = vetoRooms.get(matchID);
   if (!room) return;
@@ -25,6 +44,8 @@ function joinRoom(matchID: number, socket: WebSocket) {
   const room = vetoRooms.get(matchID) ?? new Set<WebSocket>();
   room.add(socket);
   vetoRooms.set(matchID, room);
+  livingSockets.add(socket);
+  socket.on("pong", () => livingSockets.add(socket));
   console.log(`[ws - m${matchID}] joined. (room=${room.size})`);
   broadcastRoomSize(matchID);
   socket.on("close", () => {
@@ -69,6 +90,8 @@ app.prepare().then(() => {
       }
     }
   });
+
+  startHeartbeat();
 
   const server = createServer((req, res) => {
     handle(req, res, parse(req.url ?? "/", true));
