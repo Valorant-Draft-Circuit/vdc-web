@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { EyeIcon } from "@heroicons/react/24/solid";
 import { ImageWithFallback } from "@/components/theme/ImageWithFallback";
+import ProfileBannerImage from "@/components/player/ProfileBannerImage";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
 import ProfileViewTracker from "@/components/player/ProfileViewTracker";
 import { getProfileViewCountCached } from "@/lib/common/cache";
@@ -110,6 +111,7 @@ export default async function PlayerInfo({
                   pixels={224}
                   textClass="text-2xl"
                   shapeClass="rounded-none"
+                  userId={playerInfo.id}
                 />
               </span>
             </a>
@@ -206,12 +208,11 @@ function ProfileBanner({ playerInfo }: { playerInfo: PlayerProfile }) {
   const hasBanner = playerInfo.banner;
   if (hasBanner) {
     return (
-      <ImageWithFallback
-        alt={playerInfo.name ?? ""}
-        src={playerInfo.banner ?? ""}
+      <ProfileBannerImage
+        userId={playerInfo.id}
+        banner={playerInfo.banner ?? ""}
         fallbackSrc={playerInfo.image ?? "/vdc-flame.svg"}
-        fill
-        sizes="100vw"
+        alt={playerInfo.name ?? ""}
         className="absolute pointer-events-none inset-0 object-cover z-0 xl:z-10 brightness-35 dark:brightness-20"
       />
     );

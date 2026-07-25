@@ -5,7 +5,7 @@ export default async function News() {
   const newsList = await getNews();
 
   return (
-    <div className="flex flex-col xl:flex-row space-y-4 xl:space-x-4">
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
       {newsList.map(
         ({ title, date, featured_image, url, featured_image_alt }, i) => (
           <div
@@ -19,10 +19,10 @@ export default async function News() {
                   alt={featured_image_alt ?? "Featured Image"}
                   width={2000}
                   height={1000}
-                  className="rounded-t-lg w-fit"
+                  className="rounded-t-sm w-fit"
                 />
               </div>
-              <div className="bg-gray-200 dark:bg-vdcGrey p-4 xl:h-36 xl:w-full rounded-b-lg my-auto">
+              <div className="bg-gray-200 dark:bg-vdcGrey p-4 xl:h-36 xl:w-full rounded-b-sm my-auto">
                 <h1 className="font-bold text-sm text-vdcRed">{date}</h1>
                 <h1 className="mt-1 text-vdcBlack dark:text-vdcWhite">
                   {title}

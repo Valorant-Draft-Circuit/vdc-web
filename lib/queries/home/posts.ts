@@ -17,7 +17,7 @@ export type News = {
 export async function getNews(): Promise<News[]> {
   try {
     const payload = await api.posts.browse({
-      limit: 3,
+      limit: 6,
       filter: "feature_image:-null",
     });
 

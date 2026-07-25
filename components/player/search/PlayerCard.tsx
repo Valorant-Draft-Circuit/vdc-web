@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { isUserPlaying } from "@/lib/common/player";
 import PlayerAvatar from "@/components/theme/PlayerAvatar";
 import { avatarColor, isAnimatedImage } from "@/lib/common/avatar";
+import { fetchFreshDiscordMedia } from "@/lib/common/discordMedia";
 
 export default function PlayerCard({
   player,
@@ -18,15 +19,30 @@ export default function PlayerCard({
   player: MeiliPlayer;
   mmrShow: boolean;
 }) {
+  const [bannerSrc, setBannerSrc] = useState<string | null>(
+    player.banner ?? null,
+  );
   const [isBannerValid, setIsBannerValid] = useState(false);
   useEffect(() => {
+    let active = true;
     async function checkBanner() {
       if (!player.banner) return;
-      const res = await fetch(player.banner);
-      if (res.ok) setIsBannerValid(true);
+      const res = await fetch(player.banner).catch(() => null);
+      if (res?.ok) {
+        if (active) setIsBannerValid(true);
+        return;
+      }
+      const { banner: fresh } = await fetchFreshDiscordMedia(String(player.id));
+      if (active && fresh) {
+        setBannerSrc(fresh);
+        setIsBannerValid(true);
+      }
     }
     checkBanner();
-  }, [player.banner]);
+    return () => {
+      active = false;
+    };
+  }, [player.banner, player.id]);
   const isPlaying = isUserPlaying(player);
 
   return (
@@ -38,10 +54,10 @@ export default function PlayerCard({
       {isBannerValid && (
         <Image
           alt={player.discordName}
-          src={player.banner ?? ""}
+          src={bannerSrc ?? ""}
           fill
           sizes="100vw"
-          unoptimized={isAnimatedImage(player.banner ?? "")}
+          unoptimized={isAnimatedImage(bannerSrc ?? "")}
           className="absolute pointer-events-none inset-0 object-cover -z-10 brightness-40 dark:brightness-20 rounded-xl"
         />
       )}
@@ -53,6 +69,7 @@ export default function PlayerCard({
         sizeClass="size-18"
         pixels={72}
         textClass="text-lg"
+        userId={String(player.id)}
       />
 
       <div className="flex-1">

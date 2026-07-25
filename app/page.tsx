@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth/auth";
 import HeroSection from "../components/home/HeroSection";
 import HowToPlay from "../components/home/HowToPlay";
 import News from "../components/home/News";
+import MediaSocials from "../components/home/MediaSocials";
 import { CHANNEL_URL, getLatestYouTubeVideo } from "@/lib/queries/home/youtube";
 import { Suspense } from "react";
 import NewsSkeleton from "../components/home/NewsSkeleton";
@@ -40,9 +41,7 @@ export default async function Home() {
       {!session ? (
         <div className="overflow-hidden rounded-lg">
           <div className="px-4 py-2 sm:px-6">
-            <h1 className="text-vdcRed text-lg lg:text-xl">
-              How do I play?
-            </h1>
+            <h1 className="text-vdcRed text-lg lg:text-xl">How do I play?</h1>
           </div>
           <div className="px-2 py-2">
             <HowToPlay />
@@ -63,8 +62,8 @@ export default async function Home() {
           <div className="px-4 py-2 sm:p-6">
             <Suspense
               fallback={
-                <div className="flex flex-col xl:flex-row space-y-4 xl:space-x-4">
-                  {Array.from({ length: 3 }).map((_, i) => (
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
                     <NewsSkeleton key={i} />
                   ))}
                 </div>
@@ -89,7 +88,7 @@ export default async function Home() {
               </span>
             </h1>
           </div>
-          <div className="px-4 py-2 sm:p-6 hover:scale-105 transition duration-150 ease-in-out 4xl:hover:scale-101">
+          <div className="px-4 py-2 sm:p-6">
             <div>
               <iframe
                 className="w-full xl:h-full aspect-video rounded-xl"
@@ -100,6 +99,10 @@ export default async function Home() {
               ></iframe>
             </div>
           </div>
+          <div className="px-4 py-2 sm:px-6">
+            <h1 className="text-lg lg:text-xl">more of our socials</h1>
+          </div>
+          <MediaSocials />
         </div>
       </div>
     </>

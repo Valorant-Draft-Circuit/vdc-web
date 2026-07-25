@@ -24,7 +24,7 @@ type Props = {
   rows: LeaderRow[];
   viewerId: string | null;
   season: number;
-  linkTier: string;
+  linkTier: string | null;
   showTotals: boolean;
 };
 
@@ -91,9 +91,10 @@ export default function LeaderboardTable({
       cell: ({ row }) => {
         const player = row.original;
         const isViewer = viewerId !== null && player.userId === viewerId;
+        const rowTier = linkTier ?? player.bestTier.tier.toLowerCase();
         return (
           <Link
-            href={`/pickems/picks/${player.userId}?tier=${linkTier}&season=${season}`}
+            href={`/pickems/picks/${player.userId}?tier=${rowTier}&season=${season}`}
             className="flex items-center gap-2.5 transition-colors hover:cursor-pointer hover:text-vdcRed"
           >
             <PlayerAvatar
@@ -103,6 +104,7 @@ export default function LeaderboardTable({
               sizeClass="size-7"
               pixels={28}
               textClass="text-[11px]"
+              userId={player.userId}
             />
             {player.name}
             {isViewer && (

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { isAnimatedImage } from "@/lib/common/avatar";
+import { fetchFreshDiscordMedia } from "@/lib/common/discordMedia";
 
 function initials(name: string): string {
   const trimmed = name.trim();
@@ -24,6 +25,7 @@ type Props = {
   pixels: number;
   textClass: string;
   shapeClass?: string;
+  userId?: string;
 };
 
 export default function PlayerAvatar({
@@ -34,18 +36,45 @@ export default function PlayerAvatar({
   pixels,
   textClass,
   shapeClass = "rounded-full",
+  userId,
 }: Props) {
+  const [currentImage, setCurrentImage] = useState(image);
   const [failed, setFailed] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTried, setRefreshTried] = useState(false);
 
-  if (image && !failed) {
+  async function handleError() {
+    if (userId && !refreshTried) {
+      setRefreshTried(true);
+      setRefreshing(true);
+      const { image: fresh } = await fetchFreshDiscordMedia(userId);
+      setRefreshing(false);
+      if (fresh && fresh !== currentImage) {
+        setCurrentImage(fresh);
+        return;
+      }
+    }
+    setFailed(true);
+  }
+
+  if (refreshing) {
+    return (
+      <div
+        className={`${sizeClass} flex-none ${shapeClass} animate-pulse`}
+        style={{ backgroundColor: fallbackColor }}
+      />
+    );
+  }
+
+  if (currentImage && !failed) {
     return (
       <Image
-        src={image}
+        src={currentImage}
         alt={name}
         width={pixels}
         height={pixels}
-        unoptimized={isAnimatedImage(image)}
-        onError={() => setFailed(true)}
+        unoptimized={isAnimatedImage(currentImage)}
+        onError={handleError}
         className={`${sizeClass} flex-none ${shapeClass} object-cover`}
       />
     );

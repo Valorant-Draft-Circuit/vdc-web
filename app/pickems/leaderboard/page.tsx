@@ -95,7 +95,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
       ? hasAccess(await getUserRoles(viewerId), MODERATION_ROLES)
       : false;
 
-  const linkTier = view === "overall" ? "mythic" : view;
+  const linkTier = view === "overall" ? null : view;
   const activeScopeKey = isGroupRanking ? "groups" : scopeKey;
 
   return (

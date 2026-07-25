@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAgentsCached } from "@/lib/common/cache";
 import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
+import { normalizeAgentName } from "@/lib/common/agents";
 import { Agents } from "@/lib/common/valorant-api";
 import type { LobbyRosters, RosterEntry } from "@/lib/common/match";
 
@@ -71,7 +72,7 @@ function RosterRow({ entry, agents }: { entry: RosterEntry; agents: Agents }) {
 
   const agentIcon = (
     <Image
-      src={AGENTURL(agents[entry.agent.toUpperCase()])}
+      src={AGENTURL(agents[normalizeAgentName(entry.agent)])}
       alt={entry.agent}
       width={100}
       height={100}

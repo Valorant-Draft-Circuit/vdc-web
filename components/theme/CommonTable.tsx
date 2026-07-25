@@ -1,5 +1,6 @@
 "use client";
 import { AGENTURL } from "@/lib/common/constants/agents";
+import { normalizeAgentName } from "@/lib/common/agents";
 import {
   FIELDS,
   FormattedGameStat,
@@ -168,7 +169,7 @@ export default function CommonTable({
           return (
             <div className="flex flex-wrap gap-1">
               {val.map((agent: string) => {
-                const agentUuid = agents[agent.toUpperCase()];
+                const agentUuid = agents[normalizeAgentName(agent)];
                 if (!agentUuid) return null;
                 return (
                   <Image

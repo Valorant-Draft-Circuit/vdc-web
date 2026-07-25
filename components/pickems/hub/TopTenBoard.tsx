@@ -42,35 +42,40 @@ export default function TopTenBoard({
         </p>
       ) : (
         <ol className="flex flex-col gap-1">
-          {rows.map((row, index) => (
-            <li key={row.userId}>
-              <Link
-                href={`/pickems/picks/${row.userId}?season=${season}`}
-                className="flex items-center gap-3 rounded px-2 py-1.5 hover:bg-black/5 dark:hover:bg-white/5"
-              >
-                <h2 className="w-5 flex-none text-center text-xs font-bold tabular-nums text-vdcGrey dark:text-gray-400">
-                  {index + 1}
-                </h2>
-                <PlayerAvatar
-                  name={row.name}
-                  image={row.image}
-                  fallbackColor={accent}
-                  sizeClass="size-6"
-                  pixels={24}
-                  textClass="text-[10px]"
-                />
-                <h2 className="flex-1 truncate text-sm">{row.name}</h2>
-                {boardTier === null && (
-                  <h2 className="text-[10px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
-                    {row.resolvedTiers} {row.resolvedTiers === 1 ? "tier" : "tiers"}
+          {rows.map((row, index) => {
+            const rowTier = (boardTier ?? row.bestTier.tier).toLowerCase();
+            return (
+              <li key={row.userId}>
+                <Link
+                  href={`/pickems/picks/${row.userId}?tier=${rowTier}&season=${season}`}
+                  className="flex items-center gap-3 rounded px-2 py-1.5 hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  <h2 className="w-5 flex-none text-center text-xs font-bold tabular-nums text-vdcGrey dark:text-gray-400">
+                    {index + 1}
                   </h2>
-                )}
-                <h2 className="text-sm font-bold tabular-nums">
-                  {formatPoints(row.points)}
-                </h2>
-              </Link>
-            </li>
-          ))}
+                  <PlayerAvatar
+                    name={row.name}
+                    image={row.image}
+                    fallbackColor={accent}
+                    sizeClass="size-6"
+                    pixels={24}
+                    textClass="text-[10px]"
+                    userId={row.userId}
+                  />
+                  <h2 className="flex-1 truncate text-sm">{row.name}</h2>
+                  {boardTier === null && (
+                    <h2 className="text-[10px] uppercase tracking-wide text-vdcGrey dark:text-gray-400">
+                      {row.resolvedTiers}{" "}
+                      {row.resolvedTiers === 1 ? "tier" : "tiers"}
+                    </h2>
+                  )}
+                  <h2 className="text-sm font-bold tabular-nums">
+                    {formatPoints(row.points)}
+                  </h2>
+                </Link>
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>

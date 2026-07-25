@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "../components/theme/ThemeProvider";
 import NavBar from "../components/navigation/NavBar";
+import LiveBanner from "../components/navigation/LiveBanner";
 import Footer from "../components/footer/Footer";
 import { initCache } from "@/lib/common/cache";
 import Banner from "@/components/theme/Banner";
@@ -35,6 +36,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NavBar />
+          <LiveBanner />
           {preview && <Banner />}
           <div className="mx-auto max-w-7xl xl:max-w-11/12 4xl:max-w-3/4 xl:px-2">
             <div className="min-h-screen">{children}</div>

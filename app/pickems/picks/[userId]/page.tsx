@@ -94,6 +94,7 @@ export default async function ReadonlyPicksPage({
               sizeClass="size-9"
               pixels={36}
               textClass="text-[13px]"
+              userId={userId}
             />
             <div>
               <h1 className="text-lg font-bold">{playerName}&apos;s picks</h1>

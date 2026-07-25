@@ -4,6 +4,7 @@ import LoadingSpinner from "@/components/theme/LoadingSpinner";
 import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
+import { normalizeAgentName } from "@/lib/common/agents";
 import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
 import { Agents, Maps } from "@/lib/common/valorant-api";
 import { GameType, Tier } from "@prisma/client";
@@ -473,7 +474,7 @@ function IndividualOverview({
     <div className="m-auto flex flex-row gap-1">
       <div className="p-1">
         <Image
-          src={AGENTURL(agents[agent.toUpperCase()])}
+          src={AGENTURL(agents[normalizeAgentName(agent)])}
           alt={agent}
           width={500}
           height={500}

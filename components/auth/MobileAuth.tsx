@@ -41,6 +41,7 @@ export default async function MobileAuth() {
               sizeClass="size-12"
               pixels={48}
               textClass="text-sm"
+              userId={session.user.id}
             />
           </Link>
         </div>

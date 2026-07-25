@@ -5,6 +5,7 @@ import { Adapter } from "next-auth/adapters";
 import { prisma } from "../prisma";
 import { OAuthConfig } from "next-auth/providers";
 import { updatePlayerDocument } from "@/lib/meilisearch/updatePlayerDocument";
+import { getMediaSource } from "@/lib/common/discord";
 
 declare module "next-auth" {
   interface User {
@@ -203,21 +204,5 @@ async function handleDiscordCallback(account, user) {
       where: { id: user.id },
       data: dataToUpdate,
     });
-  }
-}
-
-function getMediaSource(
-  asset: string | null,
-  assetType: string,
-  id: string
-): string | null {
-  const assetSize = 2048;
-
-  if (!asset) return null;
-  const format = asset.startsWith("a_") ? "gif" : "webp";
-  if (assetType === "avatar") {
-    return `https://cdn.discordapp.com/avatars/${id}/${asset}.${format}?size=${assetSize}`;
-  } else {
-    return `https://cdn.discordapp.com/banners/${id}/${asset}.${format}?size=${assetSize}`;
   }
 }

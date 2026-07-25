@@ -1,6 +1,7 @@
 export function normalizeAgentName(raw: string): string {
-  if (raw === "KAYO") return "KAY/O";
-  return raw.toUpperCase();
+  const upper = raw.toUpperCase();
+  if (upper === "KAYO") return "KAY/O";
+  return upper;
 }
 
 export function agentToUrlSlug(displayName: string): string {
