@@ -65,6 +65,7 @@ export default function CommonTable({
   season,
   hiddenFields,
   exportName = "vdc-stats",
+  rosterIgns,
 }: {
   data;
   agents: Record<string, string>;
@@ -73,6 +74,7 @@ export default function CommonTable({
   season?: number;
   hiddenFields?: string[];
   exportName?: string;
+  rosterIgns?: string[];
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [combineFilter, setCombineFilter] = useState<CombineFilter>("all");
@@ -85,6 +87,11 @@ export default function CommonTable({
       desc: true,
     },
   ]);
+
+  const rosterIgnSet = useMemo(
+    () => new Set(rosterIgns ?? []),
+    [rosterIgns],
+  );
 
   const columns = useMemo<
     ColumnDef<FormattedStat | FormattedGameStat>[]
@@ -144,7 +151,7 @@ export default function CommonTable({
         if (Array.isArray(val)) {
           if (key === "roles") {
             return (
-              <div className="flex flex-nowrap gap-1">
+              <div className="flex w-max flex-nowrap gap-1">
                 {val.map((iconUrl: string) => (
                   <Image
                     key={iconUrl}
@@ -152,7 +159,7 @@ export default function CommonTable({
                     alt="role"
                     width={16}
                     height={16}
-                    className="size-4 invert dark:invert-0"
+                    className="size-4 shrink-0 invert dark:invert-0"
                   />
                 ))}
               </div>
@@ -297,6 +304,18 @@ export default function CommonTable({
     );
   }
 
+  const isSectioned = rosterIgns != null;
+  const sortedRows = table.getRowModel().rows;
+  const rowIgn = (row: Row<TableRowData>) =>
+    (row.original as FormattedStat).name ?? "";
+  const rosterRows = isSectioned
+    ? sortedRows.filter((row) => rosterIgnSet.has(rowIgn(row)))
+    : sortedRows;
+  const subRows = isSectioned
+    ? sortedRows.filter((row) => !rosterIgnSet.has(rowIgn(row)))
+    : [];
+  const columnCount = table.getVisibleFlatColumns().length;
+
   return (
     <div className="rounded-md bg-slate-100 dark:bg-vdcGrey p-4 sm:p-5">
       {gameType === "combine" && (
@@ -354,8 +373,23 @@ export default function CommonTable({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row, idx) => (
-              <TableRow row={row} idx={idx} key={idx} />
+            {rosterRows.map((row) => (
+              <TableRow row={row} key={row.id} />
+            ))}
+            {isSectioned && subRows.length > 0 && (
+              <tr>
+                <td
+                  colSpan={columnCount}
+                  className="bg-slate-200 dark:bg-vdcBlack/40 py-1"
+                >
+                  <div className="sticky left-0 w-max px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+                    Substitutes
+                  </div>
+                </td>
+              </tr>
+            )}
+            {subRows.map((row) => (
+              <TableRow row={row} key={row.id} />
             ))}
           </tbody>
         </table>
@@ -506,7 +540,7 @@ function TableCol({
   );
 }
 
-function TableRow({ row }: { row: Row<TableRowData>; idx: number }) {
+function TableRow({ row }: { row: Row<TableRowData> }) {
   return (
     <tr
       key={row.id}

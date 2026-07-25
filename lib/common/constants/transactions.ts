@@ -11,6 +11,7 @@ export const ROSTER_TRANSACTION_TYPES = [
   TransactionType.ACTIVATE,
   TransactionType.UPDATE_TIER,
   TransactionType.CAPTAIN,
+  TransactionType.RESCHEDULE,
 ] as const;
 
 export const LEAGUE_TRANSACTION_TYPES = [

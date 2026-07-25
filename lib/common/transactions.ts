@@ -49,6 +49,28 @@ function stringEntries(value: unknown): string[] {
   return value.filter((entry): entry is string => typeof entry === "string");
 }
 
+export type RescheduleDetails = { teamNames: string[]; newDate: Date | null };
+
+export function parseRescheduleDetails(
+  details: string | null,
+): RescheduleDetails | null {
+  if (!details) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(details);
+    const teamNames = stringEntries(parsed.teams);
+    if (teamNames.length === 0) {
+      return null;
+    }
+    const newDate =
+      typeof parsed.newDate === "string" ? new Date(parsed.newDate) : null;
+    return { teamNames, newDate };
+  } catch {
+    return null;
+  }
+}
+
 export function parseTradeDetails(details: string | null): TradeDetails | null {
   if (!details) {
     return null;

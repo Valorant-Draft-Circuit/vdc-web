@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TransactionType } from "@prisma/client";
 import {
   STINT_ENDED_COLOR_MAP,
   STINT_ENDED_LABELS,
@@ -23,7 +24,21 @@ export default function TransactionRowItem({
       >
         {pillLabel(row)}
       </h2>
-      {row.tradeDetails ? (
+      {row.type === TransactionType.RESCHEDULE ? (
+        <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-col">
+            <h2 className="truncate">{row.label}</h2>
+            {row.rescheduleNewDate && (
+              <h2 className="text-gray-500 dark:text-gray-400">
+                → {row.rescheduleNewDate}
+              </h2>
+            )}
+          </div>
+          <h2 className="ml-auto w-10 flex-none text-right text-sm text-gray-500">
+            {row.dateLabel}
+          </h2>
+        </div>
+      ) : row.tradeDetails ? (
         <TradeDetailsPopover
           label={row.label}
           details={row.tradeDetails}

@@ -6,8 +6,9 @@ import {
   LEAGUE_TRANSACTION_TYPES,
   ROSTER_TRANSACTION_TYPES,
 } from "@/lib/common/constants/transactions";
-import { formatRelativeAge } from "@/lib/common/format";
+import { formatPlainDate, formatRelativeAge } from "@/lib/common/format";
 import {
+  parseRescheduleDetails,
   parseTradeDetails,
   type TradeDetails,
 } from "@/lib/common/transactions";
@@ -25,6 +26,7 @@ export type RecentTransactionRow = {
   franchiseSlug: string | null;
   dateLabel: string;
   tradeDetails: TradeDetails | null;
+  rescheduleNewDate: string | null;
 };
 
 export type TransactionGroup = {
@@ -186,9 +188,27 @@ function toRow(
     displayType === TransactionType.TRADE
       ? parseTradeDetails(transaction.details)
       : null;
-  const label = tradeDetails
-    ? `${tradeDetails.sides[0].franchiseName} ⇄ ${tradeDetails.sides[1].franchiseName}`
-    : rowLabel(transaction);
+
+  const reschedule =
+    displayType === TransactionType.RESCHEDULE
+      ? parseRescheduleDetails(transaction.details)
+      : null;
+
+  let label: string;
+  if (reschedule) {
+    label = reschedule.teamNames.join(" vs ");
+  } else if (displayType === TransactionType.RESCHEDULE) {
+    label = "Match rescheduled";
+  } else if (tradeDetails) {
+    label = `${tradeDetails.sides[0].franchiseName} ⇄ ${tradeDetails.sides[1].franchiseName}`;
+  } else {
+    label = rowLabel(transaction);
+  }
+
+  const rescheduleNewDate = reschedule?.newDate
+    ? formatPlainDate(reschedule.newDate)
+    : null;
+
   return {
     id: transaction.id,
     type: displayType,
@@ -200,6 +220,7 @@ function toRow(
     franchiseSlug: transaction.Team?.Franchise.slug ?? null,
     dateLabel: formatRelativeAge(transaction.date),
     tradeDetails: tradeDetails,
+    rescheduleNewDate: rescheduleNewDate,
   };
 }
 

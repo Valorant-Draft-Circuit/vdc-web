@@ -23,6 +23,10 @@ export default async function TeamPanel({
 }) {
   const season = await getSeasonCached();
 
+  const rosterIgns = team.Roster.map((player) => player.riotName).filter(
+    (ign): ign is string => Boolean(ign),
+  );
+
   const viewTabs: TabElement[] = [
     {
       query: "overview",
@@ -46,7 +50,12 @@ export default async function TeamPanel({
               <div className="h-64 rounded-md bg-slate-100 dark:bg-vdcGrey animate-pulse" />
             }
           >
-            <TeamStatsPanel teamId={team.id} season={season} tier={team.tier} />
+            <TeamStatsPanel
+              teamId={team.id}
+              season={season}
+              tier={team.tier}
+              rosterIgns={rosterIgns}
+            />
           </Suspense>
         ) : null,
     },

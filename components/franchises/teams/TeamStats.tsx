@@ -7,9 +7,15 @@ type Props = {
   teamId: number;
   season: number;
   tier: Tier;
+  rosterIgns: string[];
 };
 
-export default async function TeamStatsPanel({ teamId, season, tier }: Props) {
+export default async function TeamStatsPanel({
+  teamId,
+  season,
+  tier,
+  rosterIgns,
+}: Props) {
   const [data, agents] = await Promise.all([
     getStatsBy({ teamId, season }),
     getAgentsCached(),
@@ -21,6 +27,7 @@ export default async function TeamStatsPanel({ teamId, season, tier }: Props) {
       hiddenFields={["team"]}
       tier={tier.toLowerCase()}
       season={season}
+      rosterIgns={rosterIgns}
     />
   );
 }
