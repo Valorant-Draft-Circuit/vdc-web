@@ -1,5 +1,12 @@
 "use client";
-import { FireIcon, StarIcon, TrophyIcon } from "@heroicons/react/24/solid";
+import {
+  ChartBarIcon,
+  CheckBadgeIcon,
+  FireIcon,
+  StarIcon,
+  TrophyIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
 import { JSX, SVGProps, useState } from "react";
 
@@ -15,12 +22,30 @@ type Accolade = {
 type AccoladeProps = {
   metadata: Accolade;
   icon: JSX.Element;
-  bgColorFrom: string;
-  bgColorTo: string;
+  bgColorFrom?: string;
+  bgColorTo?: string;
+  bgGradient?: string;
 };
 
-function Accolade({ metadata, icon, bgColorFrom, bgColorTo }: AccoladeProps) {
+const TIER_WINNER_GRADIENT: Record<Tier, string> = {
+  MYTHIC: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcPurple",
+  EXPERT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcBlue",
+  APPRENTICE: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcGreen",
+  PROSPECT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcYellow",
+  RECRUIT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcOrange",
+  MIXED: "bg-gradient-to-br from-yellow-300 to-amber-500",
+};
+
+function Accolade({
+  metadata,
+  icon,
+  bgColorFrom,
+  bgColorTo,
+  bgGradient,
+}: AccoladeProps) {
   const [show, setShow] = useState(false);
+  const gradientClasses =
+    bgGradient ?? `bg-gradient-to-br ${bgColorFrom} ${bgColorTo}`;
   return (
     <div
       className="relative group"
@@ -28,7 +53,7 @@ function Accolade({ metadata, icon, bgColorFrom, bgColorTo }: AccoladeProps) {
       onMouseLeave={() => setShow(false)}
     >
       <div
-        className={`flex flex-row px-2 py-1 bg-gradient-to-br ${bgColorFrom} ${bgColorTo} rounded-md text-xs text-vdcBlack gap-1`}
+        className={`flex flex-row px-2 py-1 ${gradientClasses} rounded-md text-xs text-vdcBlack gap-1`}
       >
         {icon}
         <h2>S{metadata.season}</h2>
@@ -86,6 +111,67 @@ export function AST({ metadata }: { metadata: Accolade }) {
       }
       bgColorFrom="from-pink-100"
       bgColorTo="to-pink-400"
+    />
+  );
+}
+
+export function PICKEM_1ST({ metadata }: { metadata: Accolade }) {
+  return (
+    <Accolade
+      metadata={metadata}
+      icon={
+        <ChartBarIcon className="hover:opacity-90 size-3 text-yellow-900 m-auto drop-shadow-2xl" />
+      }
+      bgGradient="bg-gradient-to-br from-yellow-100 via-amber-400 to-yellow-600"
+    />
+  );
+}
+
+export function PICKEM_2ND({ metadata }: { metadata: Accolade }) {
+  return (
+    <Accolade
+      metadata={metadata}
+      icon={
+        <ChartBarIcon className="hover:opacity-90 size-3 text-slate-700 m-auto drop-shadow-2xl" />
+      }
+      bgGradient="bg-gradient-to-br from-slate-100 via-slate-300 to-slate-500"
+    />
+  );
+}
+
+export function PICKEM_3RD({ metadata }: { metadata: Accolade }) {
+  return (
+    <Accolade
+      metadata={metadata}
+      icon={
+        <ChartBarIcon className="hover:opacity-90 size-3 text-amber-950 m-auto drop-shadow-2xl" />
+      }
+      bgGradient="bg-gradient-to-br from-orange-200 via-amber-600 to-amber-800"
+    />
+  );
+}
+
+export function PICKEM_TIER_1ST({ metadata }: { metadata: Accolade }) {
+  return (
+    <Accolade
+      metadata={metadata}
+      icon={
+        <CheckBadgeIcon className="hover:opacity-90 size-3 text-yellow-900 m-auto drop-shadow-2xl" />
+      }
+      bgGradient={TIER_WINNER_GRADIENT[metadata.tier]}
+    />
+  );
+}
+
+export function PICKEM_TOP_GROUP({ metadata }: { metadata: Accolade }) {
+  return (
+    <Accolade
+      metadata={metadata}
+      icon={
+        <UserGroupIcon className="hover:opacity-90 size-3 text-purple-600 m-auto drop-shadow-2xl" />
+      }
+      bgColorFrom="from-purple-100"
+      bgColorTo="to-purple-500"
     />
   );
 }

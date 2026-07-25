@@ -13,7 +13,17 @@ import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { STATUS_LABELS } from "@/lib/common/constants/leagueStatus";
 import Link from "next/link";
 import { parseRiotIGN } from "@/lib/common/player";
-import { AST, MVP, WIN, WIN_FM } from "../accolades/Accolades";
+import {
+  AST,
+  MVP,
+  WIN,
+  WIN_FM,
+  PICKEM_1ST,
+  PICKEM_2ND,
+  PICKEM_3RD,
+  PICKEM_TIER_1ST,
+  PICKEM_TOP_GROUP,
+} from "../accolades/Accolades";
 import { LeagueStatus, Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 import { PlayerProfile } from "@/lib/types/player";
@@ -258,6 +268,21 @@ function getAccolades(accolades) {
         break;
       case "AST":
         symbol = <AST metadata={accolade} />;
+        break;
+      case "PICKEM_1ST":
+        symbol = <PICKEM_1ST metadata={accolade} />;
+        break;
+      case "PICKEM_2ND":
+        symbol = <PICKEM_2ND metadata={accolade} />;
+        break;
+      case "PICKEM_3RD":
+        symbol = <PICKEM_3RD metadata={accolade} />;
+        break;
+      case "PICKEM_TIER_1ST":
+        symbol = <PICKEM_TIER_1ST metadata={accolade} />;
+        break;
+      case "PICKEM_TOP_GROUP":
+        symbol = <PICKEM_TOP_GROUP metadata={accolade} />;
         break;
       default:
         symbol = null;
