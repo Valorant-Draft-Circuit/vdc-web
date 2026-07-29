@@ -8,7 +8,7 @@ import {
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
-import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { TIERS_ASCENDING, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { deriveTeamIdFromStats } from "@/lib/common/player";
 
 export type FormattedContract = {
@@ -103,11 +103,9 @@ function derivedTier(
   tierlines: Tierlines,
 ): string {
   const value = mmr ?? -1;
-  if (value <= tierlines.RECRUIT.max) return "RECRUIT";
-  if (value <= tierlines.PROSPECT.max) return "PROSPECT";
-  if (value <= tierlines.APPRENTICE.max) return "APPRENTICE";
-  if (value <= tierlines.EXPERT.max) return "EXPERT";
-  if (value <= tierlines.MYTHIC.max) return "MYTHIC";
+  for (const tier of TIERS_ASCENDING) {
+    if (value <= tierlines[tier].max) return tier;
+  }
   return "N/A";
 }
 

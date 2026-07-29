@@ -1,13 +1,17 @@
+import { Suspense } from "react";
 import { Tier } from "@prisma/client";
 import StandingsCard from "./StandingsCard";
-import { getSeasonCached, getPlayoffOddsCached } from "@/lib/common/cache";
+import PlayoffOddsInline, {
+  PlayoffOddsInlineFallback,
+} from "./PlayoffOddsInline";
+import { getSeasonCached } from "@/lib/common/cache";
 import {
   getApexRankings,
   getFranchiseStandings,
   getStandingsByTier,
-  PlayoffOddsRow,
 } from "@/lib/queries/standings/standings";
 import { isTier } from "@/lib/common/tier";
+import { getLeagueState } from "@/lib/queries/control/control";
 import { PLAYOFF_ODDS_TOOLTIP } from "@/lib/common/playoffOdds";
 import InfoTooltip from "@/components/theme/InfoTooltip";
 
@@ -16,25 +20,22 @@ export default async function StandingsPanel({
 }: {
   query: Tier | string;
 }) {
-  const currentSeason = await getSeasonCached();
+  const [currentSeason, leagueState] = await Promise.all([
+    getSeasonCached(),
+    getLeagueState(),
+  ]);
+  const tier = query !== "franchises" && isTier(query) ? query : null;
+  const showOdds = tier !== null && leagueState === "REGULAR_SEASON";
   let standings;
   let apexRanks;
-  let playoffOdds: PlayoffOddsRow[] | null = null;
 
   if (query === "franchises") {
     standings = await getFranchiseStandings(currentSeason);
     apexRanks = 3;
-  } else if (isTier(query)) {
-    [standings, playoffOdds] = await Promise.all([
-      getStandingsByTier(currentSeason, query),
-      getPlayoffOddsCached(currentSeason, query),
-    ]);
+  } else if (tier) {
+    standings = await getStandingsByTier(currentSeason, tier);
     apexRanks = getApexRankings(standings);
   }
-
-  const oddsBySlug = new Map(
-    (playoffOdds ?? []).map((row) => [row.franchiseSlug, row.odds])
-  );
 
   if (standings.length === 0) {
     return (
@@ -51,7 +52,7 @@ export default async function StandingsPanel({
   }
   return (
     <div className="flex flex-col gap-3 bg-vdcRed p-5 rounded-2xl">
-      {playoffOdds && (
+      {showOdds && (
         <div className="flex items-center justify-end gap-1.5 px-1">
           <h2 className="text-xs tracking-wider uppercase text-vdcWhite">
             Playoff odds
@@ -71,7 +72,17 @@ export default async function StandingsPanel({
           ranking={index + 1}
           apexRanks={apexRanks}
           query={query}
-          playoffOdds={oddsBySlug.get(standing.franchiseSlug) ?? null}
+          oddsSlot={
+            showOdds && tier ? (
+              <Suspense fallback={<PlayoffOddsInlineFallback />}>
+                <PlayoffOddsInline
+                  season={currentSeason}
+                  tier={tier}
+                  franchiseSlug={standing.franchiseSlug}
+                />
+              </Suspense>
+            ) : undefined
+          }
         />
       ))}
     </div>

@@ -5,9 +5,14 @@ import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
 import { normalizeAgentName } from "@/lib/common/agents";
+import {
+  TIER_BG_GRADIENT_MAP,
+  TIER_BG_MAP,
+  TIER_OUTLINE_MAP,
+} from "@/lib/common/constants/tiers";
 import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
 import { Agents, Maps } from "@/lib/common/valorant-api";
-import { GameType, Tier } from "@prisma/client";
+import { GameType } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -129,36 +134,9 @@ function ComebineGame({
   lobbyContext: MatchLobbyContext | undefined;
 }) {
   const tier = stat.Game.tier;
-  const tierBgMap: Record<Tier, string> = {
-    MYTHIC: "bg-vdcPurple/15",
-    EXPERT: "bg-vdcBlue/13",
-    APPRENTICE: "bg-vdcGreen/7",
-    PROSPECT: "bg-vdcYellow/5",
-    RECRUIT: "bg-vdcOrange/10",
-    MIXED: "bg-vdcRed/10",
-  };
-
-  const tierBgGradientMap: Record<Tier, string> = {
-    MYTHIC: "from-vdcPurple/30",
-    EXPERT: "from-vdcBlue/30",
-    APPRENTICE: "from-vdcGreen/30",
-    PROSPECT: "from-vdcYellow/30",
-    RECRUIT: "from-vdcOrange/30",
-    MIXED: "from-vdcRed/30",
-  };
-
-  const tierOutlineMap: Record<Tier, string> = {
-    MYTHIC: "outline-vdcPurple",
-    EXPERT: "outline-vdcBlue",
-    APPRENTICE: "outline-vdcGreen",
-    PROSPECT: "outline-vdcYellow",
-    RECRUIT: "outline-vdcOrange",
-    MIXED: "outline-vdcRed",
-  };
-
-  const tierBgColor = tierBgMap[tier];
-  const tierBgFrom = tierBgGradientMap[tier];
-  const tierOutlineColor = tierOutlineMap[tier];
+  const tierBgColor = TIER_BG_MAP[tier];
+  const tierBgFrom = TIER_BG_GRADIENT_MAP[tier];
+  const tierOutlineColor = TIER_OUTLINE_MAP[tier];
 
   const statPairs = [
     ["A", (stat.ratingAttack ?? 0).toFixed(2)],

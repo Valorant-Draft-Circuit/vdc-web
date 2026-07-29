@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { TIERS_ASCENDING } from "@/lib/common/constants/tiers";
 import { resolveMatch, type GameResult } from "@/lib/pickems/resolve";
 import {
   isWinnerCorrect,
@@ -42,13 +43,6 @@ export type LeaderRow = TierScoreRow & {
 export type LeaderboardScope =
   { kind: "global" } | { kind: "group"; groupId: number };
 
-const ALL_TIERS: Tier[] = [
-  Tier.RECRUIT,
-  Tier.PROSPECT,
-  Tier.APPRENTICE,
-  Tier.EXPERT,
-  Tier.MYTHIC,
-];
 
 function winnerAccuracy(row: LeaderRow): number {
   if (row.resolved === 0) {
@@ -63,7 +57,7 @@ export const getLeaderboard = cache(
     tier: Tier | null,
     scope: LeaderboardScope,
   ): Promise<LeaderRow[]> => {
-    const tiersToScore = tier === null ? ALL_TIERS : [tier];
+    const tiersToScore = tier === null ? TIERS_ASCENDING : [tier];
 
     let memberIds: Set<string> | null = null;
     if (scope.kind === "group") {

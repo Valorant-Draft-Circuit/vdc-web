@@ -1,4 +1,5 @@
 import { LeagueStatus, Tier } from "@prisma/client";
+import { TIER_RANK } from "@/lib/common/constants/tiers";
 
 export function isUserPlaying(player) {
   if (
@@ -133,15 +134,6 @@ export type FreeAgentSeasonSummary = {
   avgKast: number;
   kda: number;
   adr: number;
-};
-
-const TIER_RANK: Record<Tier, number> = {
-  MYTHIC: 5,
-  EXPERT: 4,
-  APPRENTICE: 3,
-  PROSPECT: 2,
-  RECRUIT: 1,
-  MIXED: 0,
 };
 
 /**

@@ -1,5 +1,5 @@
 import { getMmmrTierLinesCached } from "@/lib/common/cache";
-import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import { TIERS_ASCENDING, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { MIN_GAMES_BY_MATCH_TYPE } from "@/lib/common/constants/matchFormat";
 import {
   SeasonBoundary,
@@ -109,37 +109,19 @@ export async function getFreeAgentCountByTier(
   faType: LeagueStatus,
   tier: Tier,
 ) {
-  const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } =
-    await getMmmrTierLinesCached();
+  const tierLines = await getMmmrTierLinesCached();
 
-  let mmrRange;
-  switch (tier) {
-    case Tier.RECRUIT:
-      mmrRange = { lte: RECRUIT.max };
-      break;
-    case Tier.PROSPECT:
-      mmrRange = {
-        gt: RECRUIT.max,
-        lte: PROSPECT.max,
-      };
-      break;
-    case Tier.APPRENTICE:
-      mmrRange = {
-        gt: PROSPECT.max,
-        lte: APPRENTICE.max,
-      };
-      break;
-    case Tier.EXPERT:
-      mmrRange = {
-        gt: APPRENTICE.max,
-        lte: EXPERT.max,
-      };
-      break;
-    case Tier.MYTHIC:
-      mmrRange = { gt: EXPERT.max };
-      break;
-    default:
-      throw new Error(`Invalid tier: ${tier}`);
+  const index = (TIERS_ASCENDING as readonly Tier[]).indexOf(tier);
+  if (index === -1) {
+    throw new Error(`Invalid tier: ${tier}`);
+  }
+
+  const mmrRange: { gt?: number; lte?: number } = {};
+  if (index > 0) {
+    mmrRange.gt = tierLines[TIERS_ASCENDING[index - 1]].max;
+  }
+  if (index < TIERS_ASCENDING.length - 1) {
+    mmrRange.lte = tierLines[TIERS_ASCENDING[index]].max;
   }
 
   const count = await prisma.user.count({

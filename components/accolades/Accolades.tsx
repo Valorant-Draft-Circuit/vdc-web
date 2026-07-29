@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Tier } from "@prisma/client";
 import { JSX, SVGProps, useState } from "react";
+import { TIER_WINNER_GRADIENT_MAP } from "@/lib/common/constants/tiers";
 
 type Accolade = {
   id: number;
@@ -25,15 +26,6 @@ type AccoladeProps = {
   bgColorFrom?: string;
   bgColorTo?: string;
   bgGradient?: string;
-};
-
-const TIER_WINNER_GRADIENT: Record<Tier, string> = {
-  MYTHIC: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcPurple",
-  EXPERT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcBlue",
-  APPRENTICE: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcGreen",
-  PROSPECT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcYellow",
-  RECRUIT: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcOrange",
-  MIXED: "bg-gradient-to-br from-yellow-300 to-amber-500",
 };
 
 function Accolade({
@@ -158,7 +150,7 @@ export function PICKEM_TIER_1ST({ metadata }: { metadata: Accolade }) {
       icon={
         <CheckBadgeIcon className="hover:opacity-90 size-3 text-yellow-900 m-auto drop-shadow-2xl" />
       }
-      bgGradient={TIER_WINNER_GRADIENT[metadata.tier]}
+      bgGradient={TIER_WINNER_GRADIENT_MAP[metadata.tier]}
     />
   );
 }

@@ -1,7 +1,7 @@
-export const PLAYOFF_ODDS_SIMULATIONS = 5000;
+export const PLAYOFF_ODDS_SIMULATIONS = 10_000;
 
 export const PLAYOFF_ODDS_TOOLTIP =
-  "Estimated from 5,000 simulations of the remaining schedule. Map win chances come from each team's season map record; league tiebreakers are applied in every simulated season. Updates as results come in.";
+  "Estimated from 10,000 simulations of the remaining schedule. Map win chances come from each team's season map record; league tiebreakers are applied in every simulated season. Updates as results come in.";
 
 const STRENGTH_PSEUDO_MAPS = 6;
 const LIKELY_IN_THRESHOLD = 0.75;

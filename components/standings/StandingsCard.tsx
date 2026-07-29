@@ -2,23 +2,20 @@ import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { Standing } from "@/lib/queries/standings/standings";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  formatPlayoffOdds,
-  playoffOddsColorClass,
-} from "@/lib/common/playoffOdds";
+import { ReactNode } from "react";
 
 export default function StandingsCard({
   standing,
   ranking,
   apexRanks,
   query,
-  playoffOdds,
+  oddsSlot,
 }: {
   standing: Standing;
   ranking: number;
   apexRanks: number;
   query: string;
-  playoffOdds: number | null;
+  oddsSlot?: ReactNode;
 }) {
   const tier = query.toLocaleLowerCase();
   const link =
@@ -26,6 +23,8 @@ export default function StandingsCard({
       ? `/franchises/${standing.franchiseSlug}?team=${tier}`
       : `/franchises/${standing.franchiseSlug}`;
   const rwpFormatted = (standing.rwp * 100).toFixed(0);
+  const mapWinPctFormatted = (standing.mapWinPct * 100).toFixed(0);
+  const isFranchiseView = query === "franchises";
   return (
     <>
       <Link href={link}>
@@ -58,16 +57,13 @@ export default function StandingsCard({
             <h1 className="text-sm xl:text-sm">
               {standing.wins}W {standing.losses}L
             </h1>
-            <h1 className="text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
-            {playoffOdds != null && (
-              <h1
-                className={`text-sm xl:text-sm ${playoffOddsColorClass(
-                  playoffOdds
-                )}`}
-              >
-                Playoff Odds: {formatPlayoffOdds(playoffOdds)}
+            {isFranchiseView && (
+              <h1 className="text-sm xl:text-sm">
+                Map Win%: {mapWinPctFormatted}%
               </h1>
             )}
+            <h1 className="text-sm xl:text-sm">RWP: {rwpFormatted}%</h1>
+            {oddsSlot}
           </div>
         </div>
       </Link>

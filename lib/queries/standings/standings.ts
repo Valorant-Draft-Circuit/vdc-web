@@ -19,8 +19,14 @@ export type Standing = {
   teamName: string;
   wins: number;
   losses: number;
+  mapWinPct: number;
   rwp: number;
 };
+
+function mapWinPercent(wins: number, losses: number): number {
+  const total = wins + losses;
+  return total > 0 ? wins / total : 0;
+}
 
 export type TeamStats = {
   wins: number;
@@ -76,6 +82,7 @@ export async function getStandingsByTier(
     teamName: team.name,
     wins: team.wins,
     losses: team.losses,
+    mapWinPct: mapWinPercent(team.wins, team.losses),
     rwp: Math.round(team.rwp * 100) / 100,
   }));
 }
@@ -252,21 +259,15 @@ export async function getFranchiseStandings(
 }
 
 function compareStandings(left: Standing, right: Standing): number {
-  
-
-  // 1) compare wins (more is good!)
-  if (right.wins > left.wins) return 1;
-  if (right.wins < left.wins) return -1;
-
-  // 2) then losses (less is good!)
-  if (left.losses < right.losses) return -1;
-  if (left.losses > right.losses) return 1;
-
-  // 3) then compare RWP (higher is better!)
-  if (right.rwp > left.rwp) return 1;
-  if (right.rwp < left.rwp) return -1;
-
-  // 4) alphabetical (if it somehow gets to this...)
+  if (right.mapWinPct !== left.mapWinPct) {
+    return right.mapWinPct - left.mapWinPct;
+  }
+  if (right.wins !== left.wins) {
+    return right.wins - left.wins;
+  }
+  if (right.rwp !== left.rwp) {
+    return right.rwp - left.rwp;
+  }
   return left.franchiseSlug.localeCompare(right.franchiseSlug);
 }
 /**
@@ -335,6 +336,7 @@ function buildFranchiseStanding(
     teamLogo: franchise.Brand!.logo,
     wins,
     losses,
+    mapWinPct: mapWinPercent(wins, losses),
     rwp,
   };
 }

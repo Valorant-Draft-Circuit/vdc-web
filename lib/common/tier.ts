@@ -1,6 +1,7 @@
 import { Tier } from "@prisma/client";
 import { ControlPanel } from "@/prisma";
 import { getMmmrTierLinesCached } from "./cache";
+import { TIERS_ASCENDING } from "./constants/tiers";
 
 type TierRange = { min: number; max: number };
 
@@ -16,29 +17,25 @@ export const isTier = (value: string): value is Tier => {
   return Object.values(Tier).includes(value as Tier);
 };
 
+function tierFromMmr(mmr: number, tierLines: MmrTierLines): Tier {
+  for (let index = 0; index < TIERS_ASCENDING.length - 1; index++) {
+    const tier = TIERS_ASCENDING[index];
+    if (mmr <= tierLines[tier].max) return tier;
+  }
+  return TIERS_ASCENDING[TIERS_ASCENDING.length - 1];
+}
+
 export function determineTierWithTierLines(
   mmr: number | null,
   tierLines: MmrTierLines,
 ) {
   if (mmr === null) return null;
-
-  const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } = tierLines;
-  if (mmr <= RECRUIT.max) return Tier.RECRUIT;
-  if (mmr <= PROSPECT.max) return Tier.PROSPECT;
-  if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
-  if (mmr <= EXPERT.max) return Tier.EXPERT;
-  return Tier.MYTHIC;
+  return tierFromMmr(mmr, tierLines);
 }
 
 export async function determineTier(mmr: number | null) {
   if (mmr === null) return null;
-  const { RECRUIT, PROSPECT, APPRENTICE, EXPERT } =
-    await getMmmrTierLinesCached();
-  if (mmr <= RECRUIT.max) return Tier.RECRUIT;
-  if (mmr <= PROSPECT.max) return Tier.PROSPECT;
-  if (mmr <= APPRENTICE.max) return Tier.APPRENTICE;
-  if (mmr <= EXPERT.max) return Tier.EXPERT;
-  return Tier.MYTHIC;
+  return tierFromMmr(mmr, await getMmmrTierLinesCached());
 }
 
 export async function getMMRTierLines(): Promise<MmrTierLines> {
