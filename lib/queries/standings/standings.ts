@@ -451,62 +451,53 @@ function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
   const sorted = [...teamStats].sort((a, b) => b.wins - a.wins);
 
   // find teams with equal wins
-  const winCounts: Map<number, Array<TeamStats>> = new Map<number, Array<TeamStats>>();
+  const winCounts: Map<number, Array<TeamStats>> = new Map<
+    number,
+    Array<TeamStats>
+  >();
   const tiebreakers: { team1: TeamStats; team2: TeamStats }[] = [];
   for (let i = 0; i < sorted.length; i++) {
     const team = sorted[i];
     if (winCounts.has(team.wins)) {
       winCounts.get(team.wins)?.push(team);
-    } else{
+    } else {
       winCounts.set(team.wins, [team]);
     }
   }
-  [...winCounts.entries()].filter(([, teams]) => teams.length > 1).forEach(([, teams]) => {
-    const length = teams.length;
-    for (let i = 0; i < length-1; i++) {
-      for (let x = i+1; x < length; x++) {
-        tiebreakers.push({team1: teams[i], team2: teams[x]});
-      }
-    }
-  });
-
-  // apply h2h tiebreakers
-  tiebreakers.forEach(({ team1, team2 }) => {
-    allGames.forEach((game) => {
-      if (
-        (game.Match?.home === team1.id && game.Match?.away === team2.id) ||
-        (game.Match?.home === team2.id && game.Match?.away === team1.id)
-      ) {
-        if (game.winner === team1.id) {
-          team1.h2hWins++;
-          team2.h2hWins--;
+  [...winCounts.entries()]
+    .filter(([, teams]) => teams.length > 1)
+    .forEach(([, teams]) => {
+      const length = teams.length;
+      for (let i = 0; i < length - 1; i++) {
+        for (let x = i + 1; x < length; x++) {
+          tiebreakers.push({ team1: teams[i], team2: teams[x] });
         }
-        else if (game.winner === team2.id) {
-          team2.h2hWins++;
-          team1.h2hWins--;
-        }
-
       }
     });
+
+  // for each tied, get net h2h wins and net h2h round differential. 
+  tiebreakers.forEach(({ team1, team2 }) => {
     allGames.forEach((game) => {
-      if (
+      const isHeadToHead =
         (game.Match?.home === team1.id && game.Match?.away === team2.id) ||
-        (game.Match?.home === team2.id && game.Match?.away === team1.id)
-      ) {
-        // then check if have even h2h and do h2h round diff
-        if (team1.h2hWins === team2.h2hWins) {
-          const roundDiff = game.roundsWonHome - game.roundsWonAway;
-          // first determine whos home whos away
-          if (team1.id === game.Match?.home) {
-            //team 1 is home
-            team1.h2hRounds += roundDiff;
-            team2.h2hRounds += -roundDiff;
-          } else {
-            // team 2 is home
-            team2.h2hRounds += roundDiff;
-            team1.h2hRounds += -roundDiff;
-          }
-        }
+        (game.Match?.home === team2.id && game.Match?.away === team1.id);
+      if (!isHeadToHead) return;
+
+      if (game.winner === team1.id) {
+        team1.h2hWins++;
+        team2.h2hWins--;
+      } else if (game.winner === team2.id) {
+        team2.h2hWins++;
+        team1.h2hWins--;
+      }
+
+      const homeRoundDiff = game.roundsWonHome - game.roundsWonAway;
+      if (team1.id === game.Match?.home) {
+        team1.h2hRounds += homeRoundDiff;
+        team2.h2hRounds -= homeRoundDiff;
+      } else {
+        team2.h2hRounds += homeRoundDiff;
+        team1.h2hRounds -= homeRoundDiff;
       }
     });
   });
