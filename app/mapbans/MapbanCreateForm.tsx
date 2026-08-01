@@ -8,10 +8,13 @@ import {
   ComboboxInput,
   ComboboxOption,
   ComboboxOptions,
+  Radio,
+  RadioGroup,
 } from "@headlessui/react";
 import { Tier } from "@prisma/client";
 import { PickerTeam } from "@/lib/queries/teams/teams";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
+import { TIERS_LIST, TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
 import {
   MAPBAN_LOBBY_FORMATS,
   MapBanLobbyFormat,
@@ -29,20 +32,30 @@ function TierTabs({
 }) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
-      {tiers.map((tier) => (
-        <button
-          key={tier}
-          type="button"
-          onClick={() => onSelect(tier)}
-          className={`rounded-md px-3 py-1 uppercase tracking-wider hover:cursor-pointer ${
-            tier === selected
-              ? "bg-vdcRed text-vdcWhite"
-              : "border border-gray-500/40 hover:brightness-90"
-          }`}
-        >
-          <h2>{tier}</h2>
-        </button>
-      ))}
+      {tiers.map((tier) => {
+        const hex = TIER_HEX_COLOR_MAP[tier];
+        const isSelected = tier === selected;
+        return (
+          <button
+            key={tier}
+            type="button"
+            onClick={() => onSelect(tier)}
+            style={
+              isSelected
+                ? { backgroundColor: hex, borderColor: hex }
+                : { borderColor: hex }
+            }
+            className="rounded-md border px-3 py-1 hover:cursor-pointer hover:brightness-90"
+          >
+            <h2
+              className={`uppercase tracking-wider ${isSelected ? "text-vdcWhite" : ""}`}
+              style={isSelected ? undefined : { color: hex }}
+            >
+              {tier}
+            </h2>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -115,13 +128,15 @@ function TeamCombobox({
 export default function MapbanCreateForm({ teams }: { teams: PickerTeam[] }) {
   const router = useRouter();
 
-  const tiersInOrder: Tier[] = [];
-  for (const team of teams) {
-    if (!tiersInOrder.includes(team.tier)) tiersInOrder.push(team.tier);
-  }
+  const availableTiers = new Set(teams.map((team) => team.tier));
+  const tiersInOrder = TIERS_LIST.filter((tier) => availableTiers.has(tier));
 
-  const [homeTier, setHomeTier] = useState<Tier | null>(tiersInOrder[0] ?? null);
-  const [awayTier, setAwayTier] = useState<Tier | null>(tiersInOrder[0] ?? null);
+  const [homeTier, setHomeTier] = useState<Tier | null>(
+    tiersInOrder[0] ?? null,
+  );
+  const [awayTier, setAwayTier] = useState<Tier | null>(
+    tiersInOrder[0] ?? null,
+  );
   const [homeTeam, setHomeTeam] = useState<PickerTeam | null>(null);
   const [awayTeam, setAwayTeam] = useState<PickerTeam | null>(null);
   const [format, setFormat] = useState<MapBanLobbyFormat>("BO1");
@@ -164,7 +179,9 @@ export default function MapbanCreateForm({ teams }: { teams: PickerTeam[] }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <h2 className="uppercase tracking-wider text-vdcRed">Home (bans first)</h2>
+        <h2 className="uppercase tracking-wider text-vdcRed">
+          Home (bans first)
+        </h2>
         <TierTabs
           tiers={tiersInOrder}
           selected={homeTier}
@@ -193,20 +210,30 @@ export default function MapbanCreateForm({ teams }: { teams: PickerTeam[] }) {
         />
       </div>
 
-      <label className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <h2 className="uppercase tracking-wider text-vdcRed">Format</h2>
-        <select
-          className="rounded-md border border-gray-500/40 bg-transparent p-2"
+        <RadioGroup
           value={format}
-          onChange={(event) => setFormat(event.target.value as MapBanLobbyFormat)}
+          onChange={setFormat}
+          className="flex flex-row flex-wrap gap-2"
         >
           {MAPBAN_LOBBY_FORMATS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
+            <Radio
+              key={option}
+              value={option}
+              className={({ checked }) =>
+                `rounded-md border px-4 py-1 hover:cursor-pointer hover:brightness-90 ${
+                  checked ? "border-vdcRed bg-vdcRed" : "border-gray-500/40"
+                }`
+              }
+            >
+              {({ checked }) => (
+                <h1 className={checked ? "text-vdcWhite" : ""}>{option}</h1>
+              )}
+            </Radio>
           ))}
-        </select>
-      </label>
+        </RadioGroup>
+      </div>
 
       <button
         type="button"
