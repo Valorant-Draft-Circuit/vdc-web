@@ -36,6 +36,7 @@ export type TeamStats = {
   totalRounds: number;
   rwp: number;
   h2hWins: number;
+  h2hRounds: number;
   id: number;
   name: string;
   Franchise: {
@@ -425,6 +426,7 @@ function calculateTeamStats(team: ActiveTeam, allGames: Game[]) {
     totalRounds,
     rwp,
     h2hWins: 0,
+    h2hRounds: 0,
   };
 }
 
@@ -449,12 +451,24 @@ function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
   const sorted = [...teamStats].sort((a, b) => b.wins - a.wins);
 
   // find teams with equal wins
+  const winCounts: Map<number, Array<TeamStats>> = new Map<number, Array<TeamStats>>();
   const tiebreakers: { team1: TeamStats; team2: TeamStats }[] = [];
-  for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i].wins === sorted[i - 1].wins) {
-      tiebreakers.push({ team1: sorted[i - 1], team2: sorted[i] });
+  for (let i = 0; i < sorted.length; i++) {
+    const team = sorted[i];
+    if (winCounts.has(team.wins)) {
+      winCounts.get(team.wins)?.push(team);
+    } else{
+      winCounts.set(team.wins, [team]);
     }
   }
+  [...winCounts.entries()].filter(([, teams]) => teams.length > 1).forEach(([, teams]) => {
+    const length = teams.length;
+    for (let i = 0; i < length-1; i++) {
+      for (let x = i+1; x < length; x++) {
+        tiebreakers.push({team1: teams[i], team2: teams[x]});
+      }
+    }
+  });
 
   // apply h2h tiebreakers
   tiebreakers.forEach(({ team1, team2 }) => {
@@ -463,16 +477,44 @@ function applyTiebreakers(teamStats: TeamStats[], allGames: Game[]) {
         (game.Match?.home === team1.id && game.Match?.away === team2.id) ||
         (game.Match?.home === team2.id && game.Match?.away === team1.id)
       ) {
-        if (game.winner === team1.id) team1.h2hWins++;
-        else if (game.winner === team2.id) team2.h2hWins++;
+        if (game.winner === team1.id) {
+          team1.h2hWins++;
+          team2.h2hWins--;
+        }
+        else if (game.winner === team2.id) {
+          team2.h2hWins++;
+          team1.h2hWins--;
+        }
+
+      }
+    });
+    allGames.forEach((game) => {
+      if (
+        (game.Match?.home === team1.id && game.Match?.away === team2.id) ||
+        (game.Match?.home === team2.id && game.Match?.away === team1.id)
+      ) {
+        // then check if have even h2h and do h2h round diff
+        if (team1.h2hWins === team2.h2hWins) {
+          const roundDiff = game.roundsWonHome - game.roundsWonAway;
+          // first determine whos home whos away
+          if (team1.id === game.Match?.home) {
+            //team 1 is home
+            team1.h2hRounds += roundDiff;
+            team2.h2hRounds += -roundDiff;
+          } else {
+            // team 2 is home
+            team2.h2hRounds += roundDiff;
+            team1.h2hRounds += -roundDiff;
+          }
+        }
       }
     });
   });
-
-  // final sort: wins → H2H → RWP -> alphabetical (if it gets to it... lmao)
+  // final sort: wins → H2H → H2H Round Diff -> RWP -> alphabetical (if it gets to it... lmao)
   return sorted.sort((a, b) => {
     if (b.wins !== a.wins) return b.wins - a.wins;
     if (b.h2hWins !== a.h2hWins) return b.h2hWins - a.h2hWins;
+    if (b.h2hRounds !== a.h2hRounds) return b.h2hRounds - a.h2hRounds;
     if (b.rwp !== a.rwp) return b.rwp - a.rwp;
     return a.name.localeCompare(b.name);
   });
