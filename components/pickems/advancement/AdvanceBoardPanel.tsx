@@ -1,6 +1,7 @@
 import { Tier } from "@prisma/client";
 
 import { getAdvanceBoard } from "@/lib/queries/pickems/getAdvanceBoard";
+import { getAdvanceResult } from "@/lib/queries/pickems/getAdvanceResult";
 import { getMyPicks } from "@/lib/queries/pickems/getUserPicks";
 import AdvancePicker from "@/components/pickems/advancement/AdvancePicker";
 
@@ -21,9 +22,10 @@ export default async function AdvanceBoardPanel({
   accent,
   canSave,
 }: Props) {
-  const [board, myPicks] = await Promise.all([
+  const [board, myPicks, resultTeamIds] = await Promise.all([
     getAdvanceBoard(tier, season),
     userId ? getMyPicks(userId, season, tier) : Promise.resolve(null),
+    getAdvanceResult(tier, season),
   ]);
 
   if (board.teams.length === 0) {
@@ -42,6 +44,7 @@ export default async function AdvanceBoardPanel({
       locked={locked}
       accent={accent}
       canSave={canSave}
+      resultTeamIds={resultTeamIds}
     />
   );
 }

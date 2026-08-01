@@ -20,7 +20,16 @@ type Props = {
   locked: boolean;
   accent: string;
   canSave: boolean;
+  resultTeamIds: number[];
 };
+
+type SlotStatus = "exact" | "made" | "miss";
+
+function slotStatusClass(status: SlotStatus): string {
+  if (status === "exact") return "border-vdcGreen bg-vdcGreen/20";
+  if (status === "made") return "border-vdcGreen";
+  return "border-vdcRed opacity-70";
+}
 
 export default function AdvancePicker({
   board,
@@ -29,6 +38,7 @@ export default function AdvancePicker({
   locked,
   accent,
   canSave,
+  resultTeamIds,
 }: Props) {
   const teamById = useMemo(() => {
     const map = new Map<number, AdvanceTeam>();
@@ -58,6 +68,24 @@ export default function AdvancePicker({
   );
   const filled = selected.length;
   const slotColumns = Math.ceil(board.n / 2);
+
+  const resolved = resultTeamIds.length > 0;
+  const actualSeedByTeam = useMemo(() => {
+    const map = new Map<number, number>();
+    resultTeamIds.forEach((teamId, index) => map.set(teamId, index + 1));
+    return map;
+  }, [resultTeamIds]);
+
+  function slotStatus(teamId: number | null, index: number): SlotStatus | null {
+    if (!resolved || teamId === null) {
+      return null;
+    }
+    const actualSeed = actualSeedByTeam.get(teamId);
+    if (actualSeed === undefined) {
+      return "miss";
+    }
+    return actualSeed === index + 1 ? "exact" : "made";
+  }
 
   const addTeam = (teamId: number) => {
     if (locked || selected.includes(teamId) || selected.length >= board.n) {
@@ -140,11 +168,18 @@ export default function AdvancePicker({
                 </div>
               );
             }
+            const status = slotStatus(teamId, index);
             return (
               <div
                 key={index}
-                className="relative flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border-[1.5px] p-3 text-center text-[11px] font-bold"
-                style={{ borderColor: accent, backgroundColor: `${accent}2e` }}
+                className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border-[1.5px] p-3 text-center text-[11px] font-bold ${
+                  status ? slotStatusClass(status) : ""
+                }`}
+                style={
+                  status
+                    ? undefined
+                    : { borderColor: accent, backgroundColor: `${accent}2e` }
+                }
               >
                 <h1 className="absolute left-2 top-1 text-base font-extrabold leading-none text-vdcGrey dark:text-gray-400 p-1">
                   {index + 1}
@@ -177,6 +212,32 @@ export default function AdvancePicker({
           })}
         </div>
       </div>
+
+      {resolved && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-vdcGrey dark:text-gray-400">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="inline-block size-3 rounded-sm border-[1.5px] border-vdcGreen bg-vdcGreen/20"
+              aria-hidden="true"
+            />
+            <h2>Exact seed</h2>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="inline-block size-3 rounded-sm border-[1.5px] border-vdcGreen"
+              aria-hidden="true"
+            />
+            <h2>Made cutoff</h2>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="inline-block size-3 rounded-sm border-[1.5px] border-vdcRed opacity-70"
+              aria-hidden="true"
+            />
+            <h2>Missed</h2>
+          </div>
+        </div>
+      )}
 
       <div
         className="mt-1 flex flex-wrap gap-1.5"
