@@ -98,9 +98,9 @@ const BRACKET_STRUCTURES: Record<number, StructureSlot[][]> = {
   10: [
     [
       { type: "bye", seed: 1 },
-      { type: "seeds", seeds: [7, 10] },
-      { type: "bye", seed: 2 },
       { type: "seeds", seeds: [8, 9] },
+      { type: "bye", seed: 2 },
+      { type: "seeds", seeds: [7, 10] },
     ],
     [
       { type: "feeders", feeders: [0, 1] },
