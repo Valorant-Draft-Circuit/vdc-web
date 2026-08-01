@@ -87,6 +87,24 @@ export default function AdvancePicker({
     return actualSeed === index + 1 ? "exact" : "made";
   }
 
+  const pointsAwarded = useMemo(() => {
+    if (!resolved) {
+      return 0;
+    }
+    let points = 0;
+    selected.forEach((teamId, index) => {
+      const actualSeed = actualSeedByTeam.get(teamId);
+      if (actualSeed === undefined) {
+        return;
+      }
+      points += 2;
+      if (actualSeed === index + 1) {
+        points += 1;
+      }
+    });
+    return points;
+  }, [resolved, selected, actualSeedByTeam]);
+
   const addTeam = (teamId: number) => {
     if (locked || selected.includes(teamId) || selected.length >= board.n) {
       return;
@@ -147,7 +165,7 @@ export default function AdvancePicker({
         >
           <h1>Playoff slots</h1>
           <h1>
-            {filled} / {board.n} filled
+            {resolved ? `${pointsAwarded} pts` : `${filled} / ${board.n} filled`}
           </h1>
         </div>
         <div
@@ -207,6 +225,17 @@ export default function AdvancePicker({
                 <h2 className="line-clamp-2 leading-tight text-md">
                   {team.name}
                 </h2>
+                {status && (
+                  <h2
+                    className={`text-[10px] font-bold uppercase tracking-wide ${
+                      status === "miss" ? "text-vdcRed" : "text-vdcGreen"
+                    }`}
+                  >
+                    {status === "miss"
+                      ? "Missed"
+                      : `Actual #${actualSeedByTeam.get(teamId)}`}
+                  </h2>
+                )}
               </div>
             );
           })}
