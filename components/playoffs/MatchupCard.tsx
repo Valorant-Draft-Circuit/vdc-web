@@ -65,11 +65,17 @@ function TeamRow({
   );
 }
 
-function EmptyRow({ team }: { team?: SeriesSide["team"] }) {
+function EmptyRow({
+  team,
+  seed,
+}: {
+  team?: SeriesSide["team"];
+  seed?: number;
+}) {
   return (
     <div className="flex items-center gap-2 px-3 py-2">
       <h2 className="w-4 text-xs text-center flex-none text-gray-400">
-        {team?.seed ?? "-"}
+        {team?.seed ?? seed ?? "-"}
       </h2>
       {team ? (
         <TeamLogo logo={team.logo} alt={team.franchiseSlug} />
@@ -94,9 +100,9 @@ export default function MatchupCard({
   if (slot.kind === "tbd") {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
-        <EmptyRow team={slot.home} />
+        <EmptyRow team={slot.home} seed={slot.homeSeed} />
         <div className="border-t border-gray-200 dark:border-gray-700" />
-        <EmptyRow team={slot.away} />
+        <EmptyRow team={slot.away} seed={slot.awaySeed} />
       </div>
     );
   }
@@ -106,7 +112,7 @@ export default function MatchupCard({
       <div className="rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 px-3 py-2">
           <p className="w-4 text-xs text-center flex-none text-gray-500">
-            {slot.team?.seed ?? "-"}
+            {slot.team?.seed ?? slot.seed ?? "-"}
           </p>
           {slot.team ? (
             <>

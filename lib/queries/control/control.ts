@@ -34,8 +34,18 @@ export async function getLeagueState(): Promise<string | null> {
 export type WebMapbansFlags = {
   enabled: boolean;
   staffOnly: boolean;
-  allowlist: string[];
 };
+
+export const getPlayoffOddsEnabled = cache(async (): Promise<boolean> => {
+  const row = await prisma.controlPanel.findFirst({
+    where: { id: ControlPanelID.PLAYOFF_ODDS_ENABLED },
+    select: { value: true },
+  });
+  if (!row?.value) {
+    return true;
+  }
+  return row.value === "true";
+});
 
 export const getWebMapbansFlags = cache(async (): Promise<WebMapbansFlags> => {
   const rows = await prisma.controlPanel.findMany({
@@ -44,7 +54,6 @@ export const getWebMapbansFlags = cache(async (): Promise<WebMapbansFlags> => {
         in: [
           ControlPanelID.WEB_MAPBANS_ENABLED,
           ControlPanelID.WEB_MAPBANS_STAFF_ONLY,
-          ControlPanelID.WEB_MAPBANS_ALLOWLIST,
         ],
       },
     },
@@ -56,21 +65,13 @@ export const getWebMapbansFlags = cache(async (): Promise<WebMapbansFlags> => {
   const staffOnlyRow = rows.find(
     (row) => row.id === ControlPanelID.WEB_MAPBANS_STAFF_ONLY,
   );
-  const allowlistRow = rows.find(
-    (row) => row.id === ControlPanelID.WEB_MAPBANS_ALLOWLIST,
-  );
   // Fail closed: the feature stays off until an admin row explicitly enables it,
-  // and stays staff-only until an admin row explicitly lifts the restriction;
-  // a missing allowlist row admits nobody extra.
+  // and stays staff-only until an admin row explicitly lifts the restriction.
   const enabled = enabledRow?.value === "true";
   const staffOnly = staffOnlyRow?.value
     ? staffOnlyRow.value === "true"
     : true;
-  const allowlist = (allowlistRow?.value ?? "")
-    .split(",")
-    .map((discordId) => discordId.trim())
-    .filter((discordId) => discordId.length > 0);
-  return { enabled, staffOnly, allowlist };
+  return { enabled, staffOnly };
 });
 
 export async function getAllControlPanel(): Promise<ControlPanelItem[]> {

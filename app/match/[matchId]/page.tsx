@@ -15,7 +15,6 @@ import {
   MatchVeto,
 } from "@/lib/queries/match/getVetoState";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
-import { getDiscordIdByUserId } from "@/lib/queries/user/user";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { Roles } from "@/prisma";
@@ -308,21 +307,15 @@ async function loadVetoView(
   ]);
   const viewerIsStaff = hasAccess(viewerRoles, VETO_STAFF_ROLES);
   if (mapbansFlags.staffOnly && !viewerIsStaff) {
-    const viewerDiscordId = userId ? await getDiscordIdByUserId(userId) : null;
-    const viewerIsAllowlisted =
-      viewerDiscordId !== null &&
-      mapbansFlags.allowlist.includes(viewerDiscordId);
     const vetoExists = veto.state.phase !== "not-started";
-    if (!viewerIsAllowlisted && !vetoExists) return null;
-    if (!viewerIsAllowlisted) {
-      return {
-        veto,
-        viewerTeamId: null,
-        viewerIsStaff: false,
-        viewerActsForAnyTeam: false,
-        canStart: false,
-      };
-    }
+    if (!vetoExists) return null;
+    return {
+      veto,
+      viewerTeamId: null,
+      viewerIsStaff: false,
+      viewerActsForAnyTeam: false,
+      canStart: false,
+    };
   }
 
   const viewerActsForAnyTeam = mapbansFlags.staffOnly && viewerIsStaff;

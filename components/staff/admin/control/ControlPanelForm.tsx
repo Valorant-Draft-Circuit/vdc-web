@@ -28,8 +28,10 @@ type ControlsSectionProps = {
 
 export default function ControlPanelForm({
   initialControls,
+  sections,
 }: {
   initialControls: ControlPanelItem[];
+  sections: string[];
 }) {
   const items: ConfigItem[] = useMemo(
     () =>
@@ -51,6 +53,8 @@ export default function ControlPanelForm({
       pickems: [],
       webMapbans: [],
       queuebot: [],
+      playoff: [],
+      matchPoller: [],
     };
     items.forEach((item) => {
       for (const [groupName, controlIds] of Object.entries(CONTROL_GROUPS)) {
@@ -95,30 +99,8 @@ export default function ControlPanelForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 flex flex-col max-w-4xl mx-auto"
     >
-      <GeneralControls
-        generalControls={groupedControls.general}
-        control={control}
-      />
-      <DraftControls draftControls={groupedControls.draft} control={control} />
-      <MmrControls mmrControls={groupedControls.mmr} control={control} />
-      <BanControls banControls={groupedControls.ban} control={control} />
-      {groupedControls.pickems.length > 0 && (
-        <PickemControls
-          pickemControls={groupedControls.pickems}
-          control={control}
-        />
-      )}
-      {groupedControls.webMapbans.length > 0 && (
-        <WebMapbansControls
-          webMapbansControls={groupedControls.webMapbans}
-          control={control}
-        />
-      )}
-      {groupedControls.queuebot.length > 0 && (
-        <QueuebotControls
-          queuebotControls={groupedControls.queuebot}
-          control={control}
-        />
+      {sections.map((section) =>
+        renderSection(section, groupedControls[section] ?? [], control),
       )}
       <button
         type="submit"
@@ -129,6 +111,72 @@ export default function ControlPanelForm({
       </button>
     </form>
   );
+}
+
+function renderSection(
+  section: string,
+  items: ConfigItem[],
+  control: Control,
+) {
+  if (items.length === 0) {
+    return null;
+  }
+  switch (section) {
+    case "general":
+      return (
+        <GeneralControls
+          key={section}
+          generalControls={items}
+          control={control}
+        />
+      );
+    case "draft":
+      return (
+        <DraftControls key={section} draftControls={items} control={control} />
+      );
+    case "mmr":
+      return <MmrControls key={section} mmrControls={items} control={control} />;
+    case "ban":
+      return <BanControls key={section} banControls={items} control={control} />;
+    case "pickems":
+      return (
+        <PickemControls
+          key={section}
+          pickemControls={items}
+          control={control}
+        />
+      );
+    case "webMapbans":
+      return (
+        <WebMapbansControls
+          key={section}
+          webMapbansControls={items}
+          control={control}
+        />
+      );
+    case "queuebot":
+      return (
+        <QueuebotControls
+          key={section}
+          queuebotControls={items}
+          control={control}
+        />
+      );
+    case "playoff":
+      return (
+        <PlayoffControls key={section} playoffControls={items} control={control} />
+      );
+    case "matchPoller":
+      return (
+        <MatchPollerControls
+          key={section}
+          matchPollerControls={items}
+          control={control}
+        />
+      );
+    default:
+      return null;
+  }
 }
 
 export function parseOptions(notes: string): string[] | null {
@@ -254,11 +302,46 @@ function WebMapbansControls({
       controls={webMapbansControls}
       control={control}
       renderField={(field, label) =>
-        label.toUpperCase() === "WEB_MAPBANS_ALLOWLIST" ||
         label.toUpperCase() === "WEB_MAPBANS_PAGER_MINUTES" ? (
           <InputField field={field} label={label} />
         ) : (
           <SwitchField field={field} label={label} />
+        )
+      }
+    />
+  );
+}
+
+function PlayoffControls({
+  playoffControls,
+  control,
+}: ControlsSectionProps & { playoffControls: ConfigItem[] }) {
+  return (
+    <ConfigSection
+      title="Playoff Predictions"
+      controls={playoffControls}
+      control={control}
+      renderField={(field, label) => (
+        <SwitchField field={field} label={label} />
+      )}
+    />
+  );
+}
+
+function MatchPollerControls({
+  matchPollerControls,
+  control,
+}: ControlsSectionProps & { matchPollerControls: ConfigItem[] }) {
+  return (
+    <ConfigSection
+      title="Auto-Submit Poller"
+      controls={matchPollerControls}
+      control={control}
+      renderField={(field, label) =>
+        label.toLowerCase() === "match_poller_enabled" ? (
+          <SwitchField field={field} label={label} />
+        ) : (
+          <InputField field={field} label={label} />
         )
       }
     />

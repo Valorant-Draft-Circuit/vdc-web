@@ -11,7 +11,10 @@ import {
   getStandingsByTier,
 } from "@/lib/queries/standings/standings";
 import { isTier } from "@/lib/common/tier";
-import { getLeagueState } from "@/lib/queries/control/control";
+import {
+  getLeagueState,
+  getPlayoffOddsEnabled,
+} from "@/lib/queries/control/control";
 import { PLAYOFF_ODDS_TOOLTIP } from "@/lib/common/playoffOdds";
 import InfoTooltip from "@/components/theme/InfoTooltip";
 
@@ -20,12 +23,14 @@ export default async function StandingsPanel({
 }: {
   query: Tier | string;
 }) {
-  const [currentSeason, leagueState] = await Promise.all([
+  const [currentSeason, leagueState, oddsEnabled] = await Promise.all([
     getSeasonCached(),
     getLeagueState(),
+    getPlayoffOddsEnabled(),
   ]);
   const tier = query !== "franchises" && isTier(query) ? query : null;
-  const showOdds = tier !== null && leagueState === "REGULAR_SEASON";
+  const showOdds =
+    tier !== null && leagueState === "REGULAR_SEASON" && oddsEnabled;
   let standings;
   let apexRanks;
 

@@ -47,8 +47,17 @@ export const PICKEM_CONTROL = [
 export const WEB_MAPBANS_CONTROL = [
   ControlPanelID.WEB_MAPBANS_ENABLED,
   ControlPanelID.WEB_MAPBANS_STAFF_ONLY,
-  ControlPanelID.WEB_MAPBANS_ALLOWLIST,
   ControlPanelID.WEB_MAPBANS_PAGER_MINUTES,
+];
+
+export const PLAYOFF_CONTROL = [ControlPanelID.PLAYOFF_ODDS_ENABLED];
+
+export const MATCH_POLLER_CONTROL = [
+  ControlPanelID.MATCH_POLLER_ENABLED,
+  ControlPanelID.MATCH_POLLER_ALLOWLIST,
+  ControlPanelID.MATCH_POLLER_INTERVAL_MS,
+  ControlPanelID.MATCH_POLLER_START_DELAY_MS,
+  ControlPanelID.MATCH_POLLER_GIVEUP_MS,
 ];
 
 export const QueuebotControlID = {
@@ -79,4 +88,6 @@ export const CONTROL_GROUPS: Record<string, readonly number[]> = {
   pickems: PICKEM_CONTROL,
   webMapbans: WEB_MAPBANS_CONTROL,
   queuebot: QUEUEBOT_CONTROL,
+  playoff: PLAYOFF_CONTROL,
+  matchPoller: MATCH_POLLER_CONTROL,
 };

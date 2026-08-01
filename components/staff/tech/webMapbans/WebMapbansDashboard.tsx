@@ -119,15 +119,9 @@ function SourceSection({
 }
 
 function RolloutFlagsCard({ flags }: { flags: WebMapbanMetrics["flags"] }) {
-  const allowlistEntries = flags.allowlist
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length > 0);
-
   const rows = [
     { label: "Enabled", value: flags.enabled === "true" ? "ON" : "OFF" },
     { label: "Staff only", value: flags.staffOnly === "true" ? "ON" : "OFF" },
-    { label: "Allowlisted", value: `${allowlistEntries.length}` },
     { label: "Pager", value: `${flags.pagerMinutes || "30"} min` },
   ];
 

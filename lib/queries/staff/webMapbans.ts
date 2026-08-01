@@ -34,7 +34,6 @@ export type WebMapbanVeto = {
 export type WebMapbanFlags = {
   enabled: string;
   staffOnly: string;
-  allowlist: string;
   pagerMinutes: string;
 };
 
@@ -89,7 +88,6 @@ export const getWebMapbanMetrics = cache(
             in: [
               ControlPanelID.WEB_MAPBANS_ENABLED,
               ControlPanelID.WEB_MAPBANS_STAFF_ONLY,
-              ControlPanelID.WEB_MAPBANS_ALLOWLIST,
               ControlPanelID.WEB_MAPBANS_PAGER_MINUTES,
             ],
           },
@@ -195,7 +193,6 @@ export const getWebMapbanMetrics = cache(
       flags: {
         enabled: controlValue(ControlPanelID.WEB_MAPBANS_ENABLED),
         staffOnly: controlValue(ControlPanelID.WEB_MAPBANS_STAFF_ONLY),
-        allowlist: controlValue(ControlPanelID.WEB_MAPBANS_ALLOWLIST),
         pagerMinutes: controlValue(ControlPanelID.WEB_MAPBANS_PAGER_MINUTES),
       },
     };

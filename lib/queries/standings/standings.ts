@@ -11,7 +11,7 @@ import {
 } from "@/lib/common/playoffOdds";
 import { pseudoRandomUnitInterval } from "@/lib/common/random";
 import { ControlPanel } from "@/prisma";
-import { getLeagueState } from "../control/control";
+import { getLeagueState, getPlayoffOddsEnabled } from "../control/control";
 
 export type Standing = {
   franchiseSlug: string;
@@ -108,10 +108,12 @@ export async function getPlayoffOdds(
   seasonNumber: number,
   tier: Tier
 ): Promise<PlayoffOddsRow[] | null> {
-  const [leagueState, currentSeason] = await Promise.all([
+  const [leagueState, currentSeason, oddsEnabled] = await Promise.all([
     getLeagueState(),
     ControlPanel.getSeason(),
+    getPlayoffOddsEnabled(),
   ]);
+  if (!oddsEnabled) return null;
   if (leagueState !== "REGULAR_SEASON") return null;
   if (seasonNumber !== currentSeason) return null;
 

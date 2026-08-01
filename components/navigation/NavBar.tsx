@@ -15,10 +15,7 @@ import {
   RULEBOOK_URL,
 } from "@/lib/common/constants/urls";
 import { Roles } from "@/prisma";
-import {
-  FM_ACCESS_LIST,
-  MODERATION_ROLES,
-} from "@/lib/common/constants/roles";
+import { FM_ACCESS_LIST, MODERATION_ROLES } from "@/lib/common/constants/roles";
 
 export const navLinks = [
   {
@@ -76,17 +73,17 @@ export const staffLinks = {
   name: "Staff",
   links: [
     { name: "Admin", href: "/staff/admin", roles: [Roles.ADMIN] },
-    {
-      name: "Franchise Management",
-      href: "/staff/franchise-management",
-      roles: FM_ACCESS_LIST,
-    },
+    { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
     {
       name: "Moderation",
       href: "/staff/moderation",
       roles: MODERATION_ROLES,
     },
-    { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
+    {
+      name: "Franchise Management",
+      href: "/staff/franchise-management",
+      roles: FM_ACCESS_LIST,
+    },
   ],
 };
 

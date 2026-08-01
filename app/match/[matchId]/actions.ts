@@ -9,7 +9,6 @@ import { MapBansSide, MatchType, VetoSource } from "@prisma/client";
 import { buildVetoSkeleton, deriveVetoState } from "@/lib/common/mapbansFlow";
 import { emitVetoChanged, emitVetoPreview } from "@/lib/server/vetoEvents";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
-import { getDiscordIdByUserId } from "@/lib/queries/user/user";
 
 const VETO_START_WINDOW_MS = 12 * 60 * 60 * 1000;
 const VETO_MATCH_TYPES: MatchType[] = [
@@ -67,16 +66,11 @@ async function requireVetoActor(
   // rollout flag is on; launch removes the bypass with the flag.
   let actsForAnyTeam = false;
   if (flags.staffOnly) {
-    const [roles, discordId] = await Promise.all([
-      getUserRoles(session.user.id),
-      getDiscordIdByUserId(session.user.id),
-    ]);
+    const roles = await getUserRoles(session.user.id);
     const isStaff = hasAccess(roles, VETO_STAFF_ROLES);
-    const isAllowlisted =
-      discordId !== null && flags.allowlist.includes(discordId);
-    if (!isStaff && !isAllowlisted)
+    if (!isStaff)
       return { error: "Web map bans are in staff testing" as const };
-    actsForAnyTeam = isStaff;
+    actsForAnyTeam = true;
   }
 
   if (!actsForAnyTeam && viewerTeamId === null)

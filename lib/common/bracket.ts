@@ -23,8 +23,14 @@ export type SeriesSlot = {
   status: "complete" | "live" | "scheduled";
 };
 
-export type ByeSlot = { kind: "bye"; team: BracketTeam | null };
-export type TbdSlot = { kind: "tbd"; home?: BracketTeam; away?: BracketTeam };
+export type ByeSlot = { kind: "bye"; team: BracketTeam | null; seed?: number };
+export type TbdSlot = {
+  kind: "tbd";
+  home?: BracketTeam;
+  away?: BracketTeam;
+  homeSeed?: number;
+  awaySeed?: number;
+};
 export type Slot = SeriesSlot | ByeSlot | TbdSlot;
 
 export type Round = {
@@ -348,7 +354,14 @@ export function buildEmptyBracket(playoffTeamCount: number): Bracket {
     matchType: r === structure.length - 1 ? MatchType.BO5 : MatchType.BO3,
     slots: roundDef.map((item): Slot => {
       if (item.type === "bye") {
-        return { kind: "bye", team: null };
+        return { kind: "bye", team: null, seed: item.seed };
+      }
+      if (item.type === "seeds") {
+        return {
+          kind: "tbd",
+          homeSeed: item.seeds[0],
+          awaySeed: item.seeds[1],
+        };
       }
       return { kind: "tbd" };
     }),
