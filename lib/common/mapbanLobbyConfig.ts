@@ -1,15 +1,21 @@
-export const MAPBAN_LOBBY_FORMATS = ["BO1", "BO3", "BO5"] as const;
+import { MatchType } from "@prisma/client";
+
+export const MAPBAN_LOBBY_FORMATS = [
+  MatchType.BO2,
+  MatchType.BO3,
+  MatchType.BO5,
+] as const;
 export type MapBanLobbyFormat = (typeof MAPBAN_LOBBY_FORMATS)[number];
 
 export const MAPBAN_LOBBY_BAN_ORDERS: Record<MapBanLobbyFormat, string[]> = {
-  BO1: [
-    "BAN_HOME",
-    "BAN_AWAY",
-    "BAN_HOME",
-    "BAN_AWAY",
-    "BAN_HOME",
-    "BAN_AWAY",
-    "DECIDER",
+  BO2: [
+    "AWAY_BAN",
+    "HOME_BAN",
+    "AWAY_BAN",
+    "HOME_BAN",
+    "HOME_PICK",
+    "AWAY_PICK",
+    "DISCARD",
   ],
   BO3: [
     "BAN_HOME",
