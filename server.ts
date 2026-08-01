@@ -3,6 +3,13 @@ import { parse } from "url";
 import next from "next";
 import { WebSocketServer, WebSocket } from "ws";
 import { vetoEmitter } from "./lib/server/vetoEvents";
+import { mapbanEmitter } from "./lib/server/mapbanEvents";
+import {
+  mapbanLobbies,
+  shouldEvict,
+  touchLobby,
+} from "./lib/server/mapbanLobbies";
+import { MAPBAN_LOBBY_SWEEP_INTERVAL_MS } from "./lib/common/mapbanLobbyConfig";
 
 const dev = process.env.NODE_ENV !== "production";
 const port = Number(process.env.PORT ?? 3000);
@@ -10,6 +17,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const vetoRooms = new Map<number, Set<WebSocket>>();
+const mapbanRooms = new Map<string, Set<WebSocket>>();
 
 const HEARTBEAT_INTERVAL_MS = 30 * 1000;
 const livingSockets = new WeakSet<WebSocket>();
@@ -20,6 +28,17 @@ function startHeartbeat() {
       for (const socket of room) {
         if (!livingSockets.has(socket)) {
           console.log(`[ws - m${matchID}] terminating unresponsive socket`);
+          socket.terminate();
+          continue;
+        }
+        livingSockets.delete(socket);
+        socket.ping();
+      }
+    }
+    for (const [lobbyId, room] of mapbanRooms) {
+      for (const socket of room) {
+        if (!livingSockets.has(socket)) {
+          console.log(`[ws - lobby ${lobbyId}] terminating unresponsive socket`);
           socket.terminate();
           continue;
         }
@@ -54,6 +73,52 @@ function joinRoom(matchID: number, socket: WebSocket) {
     console.log(`[ws - m${matchID}] left (room=${room.size})`);
     broadcastRoomSize(matchID);
   });
+}
+
+function broadcastMapbanRoomSize(lobbyId: string) {
+  const room = mapbanRooms.get(lobbyId);
+  if (!room) return;
+  for (const socket of room) {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(`viewers:${room.size}`);
+    }
+  }
+}
+
+function joinMapbanRoom(lobbyId: string, socket: WebSocket) {
+  const room = mapbanRooms.get(lobbyId) ?? new Set<WebSocket>();
+  room.add(socket);
+  mapbanRooms.set(lobbyId, room);
+  livingSockets.add(socket);
+  touchLobby(lobbyId);
+  socket.on("pong", () => livingSockets.add(socket));
+  console.log(`[ws - lobby ${lobbyId}] joined. (room=${room.size})`);
+  broadcastMapbanRoomSize(lobbyId);
+  socket.on("close", () => {
+    room.delete(socket);
+    if (room.size === 0) mapbanRooms.delete(lobbyId);
+    console.log(`[ws - lobby ${lobbyId}] left (room=${room.size})`);
+    broadcastMapbanRoomSize(lobbyId);
+  });
+}
+
+function startLobbySweeper() {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [lobbyId, lobby] of mapbanLobbies()) {
+      const room = mapbanRooms.get(lobbyId);
+      const hasSockets = !!room && room.size > 0;
+      if (!shouldEvict(lobby, now, hasSockets)) continue;
+      if (room) {
+        for (const socket of room) {
+          if (socket.readyState === WebSocket.OPEN) socket.close();
+        }
+        mapbanRooms.delete(lobbyId);
+      }
+      mapbanLobbies().delete(lobbyId);
+      console.log(`[ws - lobby ${lobbyId}] evicted`);
+    }
+  }, MAPBAN_LOBBY_SWEEP_INTERVAL_MS).unref();
 }
 
 process.on("unhandledRejection", (reason) => {
@@ -91,7 +156,26 @@ app.prepare().then(() => {
     }
   });
 
+  mapbanEmitter().on("mapbanChanged", (lobbyId: string) => {
+    const room = mapbanRooms.get(lobbyId);
+    if (!room) return;
+    for (const socket of room) {
+      if (socket.readyState === WebSocket.OPEN) socket.send("changed");
+    }
+  });
+
+  mapbanEmitter().on("mapbanPreview", (lobbyId: string, map: string | null) => {
+    const room = mapbanRooms.get(lobbyId);
+    if (!room) return;
+    for (const socket of room) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(`preview:${map ?? ""}`);
+      }
+    }
+  });
+
   startHeartbeat();
+  startLobbySweeper();
 
   const server = createServer((req, res) => {
     handle(req, res, parse(req.url ?? "/", true));
@@ -109,6 +193,16 @@ app.prepare().then(() => {
         return;
       }
       wss.handleUpgrade(req, socket, head, (ws) => joinRoom(matchID, ws));
+      return;
+    }
+    if (pathname === "/ws/mapbans") {
+      const lobbyId = typeof query.lobbyId === "string" ? query.lobbyId : "";
+      if (!lobbyId || !mapbanLobbies().has(lobbyId)) {
+        console.warn(`[ws - lobby] rejected upgrade with bad lobbyId: ${req.url}`);
+        socket.destroy();
+        return;
+      }
+      wss.handleUpgrade(req, socket, head, (ws) => joinMapbanRoom(lobbyId, ws));
       return;
     }
     handleUpgrade(req, socket, head);

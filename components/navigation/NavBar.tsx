@@ -7,6 +7,7 @@ import AuthSection from "../auth/AuthSection";
 import SideBar from "./side/SideBar";
 import {
   PlayIcon,
+  CalendarDaysIcon,
   InformationCircleIcon,
   LinkIcon,
 } from "@heroicons/react/24/solid";
@@ -20,15 +21,22 @@ import { FM_ACCESS_LIST, MODERATION_ROLES } from "@/lib/common/constants/roles";
 export const navLinks = [
   {
     name: "Season",
-    icon: <PlayIcon />,
+    icon: <CalendarDaysIcon />,
     links: [
       { name: "Schedule", href: "/schedule" },
       { name: "Standings", href: "/standings" },
       { name: "Playoffs", href: "/playoffs" },
-      { name: "Pick'ems", href: "/pickems" },
       { name: "Stats", href: "/stats" },
       { name: "Players", href: "/player" },
       { name: "Franchises", href: "/franchises" },
+    ],
+  },
+  {
+    name: "Play",
+    icon: <PlayIcon />,
+    links: [
+      { name: "Pick'ems", href: "/pickems" },
+      { name: "Map Bans", href: "/mapbans" },
     ],
   },
   {

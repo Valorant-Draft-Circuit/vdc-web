@@ -11,10 +11,10 @@ const FALLBACK_POLL_MS = 15000;
 const CONNECT_TIMEOUT_MS = 5000;
 
 export default function VetoLiveConnector({
-  matchID,
+  wsPath,
   hideStatus = false,
 }: {
-  matchID: number;
+  wsPath: string;
   hideStatus?: boolean;
 }) {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function VetoLiveConnector({
       if (disposed) return;
       const protocol = window.location.protocol === "https:" ? "wss" : "ws";
       const pendingSocket = new WebSocket(
-        `${protocol}://${window.location.host}/ws/veto?matchID=${matchID}`,
+        `${protocol}://${window.location.host}${wsPath}`,
       );
       socket = pendingSocket;
       // Dev servers without the ws endpoint can hang the upgrade forever
@@ -106,7 +106,7 @@ export default function VetoLiveConnector({
       stopPollingFallback();
       socket?.close();
     };
-  }, [matchID, router, setRemoteSelectedMap]);
+  }, [wsPath, router, setRemoteSelectedMap]);
 
   if (hideStatus || viewerCount === null) return null;
   return (

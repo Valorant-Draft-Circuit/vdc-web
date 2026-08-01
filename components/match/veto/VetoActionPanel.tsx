@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  previewVetoSelection,
-  submitMapPick,
-  submitSidePick,
-} from "@/app/match/[matchId]/actions";
 import { MAP_LIST_URL } from "@/lib/common/constants/maps";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import {
@@ -21,13 +16,21 @@ import VetoTurnHeader from "./VetoTurnHeader";
 type MapTurn = { kind: "map"; turnType: string; remainingMaps: string[] };
 type SideTurn = { kind: "side"; rowId: number; map: string };
 
+export type VetoActionResult = { ok: boolean; error?: string };
+
+export type VetoActions = {
+  preview: (map: string | null) => Promise<VetoActionResult>;
+  submitMap: (map: string) => Promise<VetoActionResult>;
+  submitSide: (rowId: number, side: MapBansSide) => Promise<VetoActionResult>;
+};
+
 export default function VetoActionPanel({
-  matchID,
+  actions,
   headline,
   turn,
   maps,
 }: {
-  matchID: number;
+  actions: VetoActions;
   headline: string;
   turn: MapTurn | SideTurn;
   maps: Record<string, string>;
@@ -43,7 +46,7 @@ export default function VetoActionPanel({
     const nextSelection = selection === value ? null : value;
     setSelection(nextSelection);
     if (turn.kind === "map") {
-      void previewVetoSelection(matchID, nextSelection);
+      void actions.preview(nextSelection);
     }
   };
 
@@ -52,10 +55,10 @@ export default function VetoActionPanel({
     startTransition(async () => {
       const result =
         turn.kind === "map"
-          ? await submitMapPick(matchID, selection)
-          : await submitSidePick(matchID, turn.rowId, selection as MapBansSide);
+          ? await actions.submitMap(selection)
+          : await actions.submitSide(turn.rowId, selection as MapBansSide);
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? null);
       }
       setSelection(null);
       setAnimatedMap(null);

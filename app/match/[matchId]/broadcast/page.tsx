@@ -4,6 +4,11 @@ import { getMapsCached } from "@/lib/common/cache";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
 import { getMatch } from "@/lib/queries/match/match";
 import { getVetoState } from "@/lib/queries/match/getVetoState";
+import {
+  previewVetoSelection,
+  submitMapPick,
+  submitSidePick,
+} from "../actions";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -36,14 +41,17 @@ export default async function Page({
       <BroadcastViewport />
       {showBoard ? (
         <VetoBoard
-          matchID={matchInfo.matchID}
           veto={veto}
           teams={{ home: matchInfo.Home, away: matchInfo.Away }}
           maps={maps}
           viewerTeamId={null}
-          viewerIsStaff={false}
           viewerActsForAnyTeam={false}
-          canStart={false}
+          actions={{
+            preview: previewVetoSelection.bind(null, matchInfo.matchID),
+            submitMap: submitMapPick.bind(null, matchInfo.matchID),
+            submitSide: submitSidePick.bind(null, matchInfo.matchID),
+          }}
+          wsPath={`/ws/veto?matchID=${matchInfo.matchID}`}
           variant="broadcast"
         />
       ) : (

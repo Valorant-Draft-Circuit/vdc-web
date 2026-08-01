@@ -18,6 +18,13 @@ import { getWebMapbansFlags } from "@/lib/queries/control/control";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { Roles } from "@/prisma";
+import {
+  previewVetoSelection,
+  submitMapPick,
+  submitSidePick,
+} from "./actions";
+import VetoStartButton from "@/components/match/veto/VetoStartButton";
+import VetoResetButton from "@/components/match/veto/VetoResetButton";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { MapBansSide, MapBanType } from "@prisma/client";
 import { Metadata } from "next";
@@ -194,14 +201,36 @@ export default async function Page({
             {vetoView && homeTeam && awayTeam && (
               <div className="p-5 xl:p-0 xl:py-5 text-sm xl:text-lg">
                 <VetoBoard
-                  matchID={matchInfo.matchID}
                   veto={vetoView.veto}
                   teams={{ home: homeTeam, away: awayTeam }}
                   maps={maps}
                   viewerTeamId={vetoView.viewerTeamId}
-                  viewerIsStaff={vetoView.viewerIsStaff}
                   viewerActsForAnyTeam={vetoView.viewerActsForAnyTeam}
-                  canStart={vetoView.canStart}
+                  actions={{
+                    preview: previewVetoSelection.bind(null, matchInfo.matchID),
+                    submitMap: submitMapPick.bind(null, matchInfo.matchID),
+                    submitSide: submitSidePick.bind(null, matchInfo.matchID),
+                  }}
+                  wsPath={`/ws/veto?matchID=${matchInfo.matchID}`}
+                  headerControls={
+                    <>
+                      <a
+                        href={`/match/${matchInfo.matchID}/broadcast`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-md border border-vdcBlue px-2 py-1 text-xs uppercase tracking-wider text-vdcBlue hover:bg-vdcBlue hover:text-vdcWhite"
+                      >
+                        <h2>Spectator View</h2>
+                      </a>
+                      {vetoView.veto.state.phase === "not-started"
+                        ? vetoView.canStart && (
+                            <VetoStartButton matchID={matchInfo.matchID} />
+                          )
+                        : vetoView.viewerIsStaff && (
+                            <VetoResetButton matchID={matchInfo.matchID} />
+                          )}
+                    </>
+                  }
                 />
               </div>
             )}

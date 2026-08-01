@@ -154,3 +154,29 @@ export async function getTeamsInSeason(
     },
   });
 }
+
+export type PickerTeam = {
+  id: number;
+  name: string;
+  tier: Tier;
+  slug: string;
+};
+
+export async function getActiveTeamsForPicker(): Promise<PickerTeam[]> {
+  const teams = await prisma.teams.findMany({
+    where: { active: true },
+    select: {
+      id: true,
+      name: true,
+      tier: true,
+      Franchise: { select: { slug: true } },
+    },
+    orderBy: [{ tier: "asc" }, { name: "asc" }],
+  });
+  return teams.map((team) => ({
+    id: team.id,
+    name: team.name,
+    tier: team.tier,
+    slug: team.Franchise.slug,
+  }));
+}

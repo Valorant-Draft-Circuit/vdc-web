@@ -27,3 +27,19 @@ export async function getMatch(id: string) {
   });
   return match;
 }
+
+export async function getVetoTeamsByIds(
+  homeId: number,
+  awayId: number,
+): Promise<{ home: MatchTeam; away: MatchTeam } | null> {
+  const teams = await prisma.teams.findMany({
+    where: { id: { in: [homeId, awayId] } },
+    include: {
+      Franchise: { select: { Brand: true, slug: true } },
+    },
+  });
+  const home = teams.find((team) => team.id === homeId);
+  const away = teams.find((team) => team.id === awayId);
+  if (!home || !away) return null;
+  return { home, away };
+}

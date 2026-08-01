@@ -53,6 +53,23 @@ export function parseBanOrderToken(token: string): {
   return { type, isHome };
 }
 
+export function buildSkeletonRows(
+  banOrder: string[],
+  homeTeamId: number,
+  awayTeamId: number,
+): { order: number; type: MapBanType; team: number | null }[] {
+  return banOrder.map((token, index) => {
+    const { type, isHome } = parseBanOrderToken(token);
+    const isDefault =
+      type === MapBanType.DISCARD || type === MapBanType.DECIDER;
+    return {
+      order: index,
+      type,
+      team: isDefault ? null : isHome ? homeTeamId : awayTeamId,
+    };
+  });
+}
+
 export function buildVetoSkeleton(
   matchID: number,
   banOrder: string[],
@@ -60,19 +77,14 @@ export function buildVetoSkeleton(
   awayTeamId: number,
   vetoUrl: string,
 ) {
-  return banOrder.map((token, index) => {
-    const { type, isHome } = parseBanOrderToken(token);
-    const isDefault =
-      type === MapBanType.DISCARD || type === MapBanType.DECIDER;
-    return {
-      matchID,
-      order: index,
-      type,
-      team: isDefault ? null : isHome ? homeTeamId : awayTeamId,
-      source: "WEB" as const,
-      vetoUrl,
-    };
-  });
+  return buildSkeletonRows(banOrder, homeTeamId, awayTeamId).map((row) => ({
+    matchID,
+    order: row.order,
+    type: row.type,
+    team: row.team,
+    source: "WEB" as const,
+    vetoUrl,
+  }));
 }
 
 export function deriveVetoState(

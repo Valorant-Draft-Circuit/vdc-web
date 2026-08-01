@@ -5,14 +5,12 @@ import { MatchVeto } from "@/lib/queries/match/getVetoState";
 import { MapBanType } from "@prisma/client";
 import { sideChooserFor, VetoRow } from "@/lib/common/mapbansFlow";
 import Image from "next/image";
-import VetoActionPanel from "./VetoActionPanel";
+import VetoActionPanel, { VetoActions } from "./VetoActionPanel";
 import { BroadcastRevealProvider, RevealGate } from "./BroadcastReveal";
 import { VetoSelectionProvider } from "./VetoSelectionContext";
 import { TilePreviewArt, TilePreviewName } from "./VetoTilePreview";
 import VetoTurnHeader from "./VetoTurnHeader";
 import VetoLiveConnector from "./VetoLiveConnector";
-import VetoResetButton from "./VetoResetButton";
-import VetoStartButton from "./VetoStartButton";
 
 const GLASSY_PANEL_CLASSES =
   "rounded-md bg-vdcWhite/40 dark:bg-vdcBlack/40 backdrop-blur-sm p-5";
@@ -44,24 +42,24 @@ function resolveSideChooser(
 }
 
 export default function VetoBoard({
-  matchID,
   veto,
   teams,
   maps,
   viewerTeamId,
-  viewerIsStaff,
   viewerActsForAnyTeam,
-  canStart,
+  actions,
+  wsPath,
+  headerControls,
   variant = "page",
 }: {
-  matchID: number;
   veto: MatchVeto;
   teams: { home: MatchTeam; away: MatchTeam };
   maps: Record<string, string>;
   viewerTeamId: number | null;
-  viewerIsStaff: boolean;
   viewerActsForAnyTeam: boolean;
-  canStart: boolean;
+  actions: VetoActions;
+  wsPath: string;
+  headerControls?: React.ReactNode;
   variant?: "page" | "broadcast";
 }) {
   const isBroadcast = variant === "broadcast";
@@ -91,18 +89,8 @@ export default function VetoBoard({
           <div className="flex flex-row items-center justify-between">
             <h1>MAP BANS / PICKS</h1>
             <div className="flex flex-row items-center gap-3">
-              {isLive && <VetoLiveConnector matchID={matchID} />}
-              <a
-                href={`/match/${matchID}/broadcast`}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-md border border-vdcBlue px-2 py-1 text-xs uppercase tracking-wider text-vdcBlue hover:bg-vdcBlue hover:text-vdcWhite"
-              >
-                <h2>Spectator View</h2>
-              </a>
-              {phase === "not-started"
-                ? canStart && <VetoStartButton matchID={matchID} />
-                : viewerIsStaff && <VetoResetButton matchID={matchID} />}
+              {isLive && <VetoLiveConnector wsPath={wsPath} />}
+              {headerControls}
             </div>
           </div>
         )}
@@ -270,7 +258,7 @@ export default function VetoBoard({
             {viewerIsActing && state.currentMapTurn && (
               <VetoActionPanel
                 key={`map-${state.currentMapTurn.rowId}`}
-                matchID={matchID}
+                actions={actions}
                 headline={actingLine}
                 turn={{
                   kind: "map",
@@ -283,7 +271,7 @@ export default function VetoBoard({
             {viewerIsActing && state.currentSideTurn && (
               <VetoActionPanel
                 key={`side-${state.currentSideTurn.rowId}`}
-                matchID={matchID}
+                actions={actions}
                 headline={actingLine}
                 turn={{
                   kind: "side",
@@ -296,9 +284,7 @@ export default function VetoBoard({
           </div>
         )}
 
-        {isBroadcast && isLive && (
-          <VetoLiveConnector matchID={matchID} hideStatus />
-        )}
+        {isBroadcast && isLive && <VetoLiveConnector wsPath={wsPath} hideStatus />}
       </div>
     </VetoSelectionProvider>
   );
