@@ -160,6 +160,7 @@ export type PickerTeam = {
   name: string;
   tier: Tier;
   slug: string;
+  logo: string | null;
 };
 
 export async function getActiveTeamsForPicker(): Promise<PickerTeam[]> {
@@ -169,7 +170,7 @@ export async function getActiveTeamsForPicker(): Promise<PickerTeam[]> {
       id: true,
       name: true,
       tier: true,
-      Franchise: { select: { slug: true } },
+      Franchise: { select: { slug: true, Brand: { select: { logo: true } } } },
     },
     orderBy: [{ tier: "asc" }, { name: "asc" }],
   });
@@ -178,5 +179,6 @@ export async function getActiveTeamsForPicker(): Promise<PickerTeam[]> {
     name: team.name,
     tier: team.tier,
     slug: team.Franchise.slug,
+    logo: team.Franchise.Brand?.logo ?? null,
   }));
 }
