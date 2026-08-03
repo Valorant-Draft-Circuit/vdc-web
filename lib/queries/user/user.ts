@@ -2,7 +2,7 @@ import { cache } from "react";
 import { auth } from "@/lib/auth/auth";
 import { determineTier } from "@/lib/common/tier";
 import { prisma } from "@/lib/prisma";
-import { ControlPanel, Player } from "@/prisma";
+import { ControlPanel, Player, Roles } from "@/prisma";
 import { Prisma } from "@prisma/client";
 
 export type UserWithRelations = Prisma.UserGetPayload<{
@@ -120,6 +120,23 @@ export const getDiscordIdByUserId = cache(
     return discordAccount?.providerAccountId ?? null;
   },
 );
+
+export async function getAdminUserIds(
+  userIds: string[],
+): Promise<Set<string>> {
+  if (userIds.length === 0) {
+    return new Set();
+  }
+  const users = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, roles: true },
+  });
+  const adminBit = BigInt(Roles.ADMIN);
+  const adminIds = users
+    .filter((user) => (BigInt(user.roles) & adminBit) !== 0n)
+    .map((user) => user.id);
+  return new Set(adminIds);
+}
 
 export const getRiotAccountsByUserId = cache(
   async (userId: string): Promise<PlayerRiotAccounts | null> => {

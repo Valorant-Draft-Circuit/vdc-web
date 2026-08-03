@@ -3,10 +3,12 @@ import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { getHubOverview } from "@/lib/queries/pickems/getHubOverview";
 import { getLeaderboard } from "@/lib/queries/pickems/getLeaderboard";
 import { getGroupLeaderboard } from "@/lib/queries/pickems/getGroupLeaderboard";
+import { getAdminUserIds } from "@/lib/queries/user/user";
 import StandingHero from "./StandingHero";
 import StageCards from "./StageCards";
 import TopTenBoard from "./TopTenBoard";
 import TopGroupsBoard from "./TopGroupsBoard";
+import AdminPicksBoard from "./AdminPicksBoard";
 
 type Props = {
   stageTier: Tier;
@@ -34,6 +36,9 @@ export default async function HubOverviewPanel({
     : -1;
   const myRow = myIndex >= 0 ? board[myIndex] : null;
   const myRank = myIndex >= 0 ? myIndex + 1 : null;
+
+  const adminIds = await getAdminUserIds(board.map((row) => row.userId));
+  const adminRows = board.filter((row) => adminIds.has(row.userId));
 
   return (
     <div className="flex flex-col gap-4">
@@ -64,6 +69,12 @@ export default async function HubOverviewPanel({
           boardTier={boardTier}
         />
       </div>
+      <AdminPicksBoard
+        rows={adminRows}
+        season={season}
+        accent={accent}
+        boardTier={boardTier}
+      />
     </div>
   );
 }
