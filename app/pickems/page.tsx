@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Tier } from "@prisma/client";
 import {
+  ChartBarIcon,
   QuestionMarkCircleIcon,
   UserGroupIcon,
 } from "@heroicons/react/16/solid";
@@ -90,6 +91,13 @@ export default async function PickemsHub({ searchParams }: Props) {
           </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/pickems/sentiment?phase=matches&tier=${tabParam === "overview" ? (userTier?.toLowerCase() ?? "mythic") : tabParam}&season=${season}`}
+            className={GHOST_PILL}
+          >
+            <ChartBarIcon className="size-4" />
+            <h1>Sentiment</h1>
+          </Link>
           <Link href="/pickems/groups" className={GHOST_PILL}>
             <UserGroupIcon className="size-4" />
             <h1>Groups</h1>
