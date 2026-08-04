@@ -105,7 +105,8 @@ p {
 }
 
 .broadcast-mode nav,
-.broadcast-mode footer {
+.broadcast-mode footer,
+.broadcast-mode .live-banner {
   display: none;
 }
 

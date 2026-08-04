@@ -44,7 +44,7 @@ export default function LiveBannerBar({ initialLive }: Props) {
   }
 
   return (
-    <div className="relative">
+    <div className="live-banner relative">
       <a
         href={CHANNEL_URL}
         target="_blank"

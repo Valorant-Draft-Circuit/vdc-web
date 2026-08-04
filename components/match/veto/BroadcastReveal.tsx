@@ -1,10 +1,17 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const BroadcastRevealContext = createContext<number>(Number.POSITIVE_INFINITY);
 
 const HINT_VISIBLE_MS = 5000;
+const AUTO_REVEAL_INTERVAL_MS = 10000;
 
 export function BroadcastRevealProvider({
   stepCount,
@@ -16,6 +23,14 @@ export function BroadcastRevealProvider({
   const active = Number.isFinite(stepCount);
   const [revealStep, setRevealStep] = useState(stepCount);
   const [hintVisible, setHintVisible] = useState(true);
+  const autoTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopAutoReveal = () => {
+    if (autoTimerRef.current !== null) {
+      clearInterval(autoTimerRef.current);
+      autoTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     setRevealStep((current) => Math.min(current, stepCount));
@@ -30,6 +45,22 @@ export function BroadcastRevealProvider({
   useEffect(() => {
     if (!active) return;
     function handleKey(event: KeyboardEvent) {
+      if (event.key === "r" || event.key === "R") {
+        stopAutoReveal();
+        autoTimerRef.current = setInterval(() => {
+          setRevealStep((current) => {
+            const next = Math.min(current + 1, stepCount);
+            if (next >= stepCount) {
+              stopAutoReveal();
+            }
+            return next;
+          });
+        }, AUTO_REVEAL_INTERVAL_MS);
+        return;
+      }
+      if (event.key.startsWith("Arrow")) {
+        stopAutoReveal();
+      }
       if (event.key === "ArrowRight") {
         setRevealStep((current) => Math.min(current + 1, stepCount));
       } else if (event.key === "ArrowLeft") {
@@ -41,7 +72,10 @@ export function BroadcastRevealProvider({
       }
     }
     window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      stopAutoReveal();
+    };
   }, [active, stepCount]);
 
   if (!active) return <>{children}</>;
@@ -51,7 +85,7 @@ export function BroadcastRevealProvider({
       {children}
       {hintVisible && (
         <div className="pointer-events-none fixed bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-vdcBlack/70 px-4 py-2 text-xs text-gray-300">
-          <h2>← → reveal step · ↑ show all · ↓ hide all</h2>
+          <h2>R auto-reveal · ← → step · ↑ show all · ↓ hide all</h2>
         </div>
       )}
     </BroadcastRevealContext.Provider>
