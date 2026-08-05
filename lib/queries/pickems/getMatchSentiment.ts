@@ -11,8 +11,9 @@ import {
 import {
   tallyMatchup,
   findMatchUpsets,
+  findMatchChalk,
   type MatchupSentiment,
-  type MatchUpset,
+  type MatchConsensusOutcome,
 } from "@/lib/pickems/sentiment";
 
 export type TeamRef = {
@@ -29,7 +30,7 @@ export type MatchupSentimentView = MatchupSentiment & {
 
 export type SentimentSlate = { matchDay: number; dateLabel: string };
 
-export type UpsetView = MatchUpset & {
+export type ConsensusOutcomeView = MatchConsensusOutcome & {
   home: TeamRef | null;
   away: TeamRef | null;
 };
@@ -38,7 +39,8 @@ export type MatchSentiment = {
   slates: SentimentSlate[];
   selectedMatchDay: number | null;
   matchups: MatchupSentimentView[];
-  upsets: UpsetView[];
+  upsets: ConsensusOutcomeView[];
+  nailed: ConsensusOutcomeView[];
 };
 
 async function fetchSentimentMatches(tier: Tier, season: number) {
@@ -154,7 +156,7 @@ export const getMatchSentiment = cache(
       number,
       { home: TeamRef | null; away: TeamRef | null }
     >();
-    const upsetEntries: {
+    const consensusEntries: {
       sentiment: MatchupSentiment;
       result: ResolvedMatch;
     }[] = [];
@@ -174,17 +176,20 @@ export const getMatchSentiment = cache(
         home: toTeamRef(match.Home),
         away: toTeamRef(match.Away),
       });
-      upsetEntries.push({ sentiment, result });
+      consensusEntries.push({ sentiment, result });
     }
 
-    const upsets: UpsetView[] = findMatchUpsets(upsetEntries)
-      .slice(0, 5)
-      .map((upset) => ({
-        ...upset,
-        home: teamRefsByMatch.get(upset.matchId)?.home ?? null,
-        away: teamRefsByMatch.get(upset.matchId)?.away ?? null,
-      }));
+    const withTeamRefs = (
+      outcome: MatchConsensusOutcome,
+    ): ConsensusOutcomeView => ({
+      ...outcome,
+      home: teamRefsByMatch.get(outcome.matchId)?.home ?? null,
+      away: teamRefsByMatch.get(outcome.matchId)?.away ?? null,
+    });
 
-    return { slates: lockedSlates, selectedMatchDay, matchups, upsets };
+    const upsets = findMatchUpsets(consensusEntries).slice(0, 5).map(withTeamRefs);
+    const nailed = findMatchChalk(consensusEntries).slice(0, 5).map(withTeamRefs);
+
+    return { slates: lockedSlates, selectedMatchDay, matchups, upsets, nailed };
   },
 );

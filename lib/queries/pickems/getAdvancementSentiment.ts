@@ -5,6 +5,8 @@ import { getTeamsInSeason } from "@/lib/queries/teams/teams";
 import { getAdvanceResult } from "./getAdvanceResult";
 import {
   tallyAdvancement,
+  findMissedCut,
+  findSurpriseAdvancers,
   type AdvanceSentimentRow,
 } from "@/lib/pickems/sentiment";
 
@@ -23,6 +25,7 @@ export type AdvancementSentiment = {
   voters: number;
   rows: AdvanceSentimentRowView[];
   missedCut: AdvanceSentimentRowView[];
+  surpriseAdvancers: AdvanceSentimentRowView[];
 };
 
 export const getAdvancementSentiment = cache(
@@ -62,14 +65,14 @@ export const getAdvancementSentiment = cache(
 
     const advancedTeamIds = await getAdvanceResult(tier, season);
     const advancedIds = new Set(advancedTeamIds);
-    const missedCut =
-      advancedTeamIds.length === 0
-        ? []
-        : rows
-            .filter((row) => !advancedIds.has(row.teamId))
-            .slice(0, 5)
-            .map(withTeam);
+    const hasResult = advancedTeamIds.length > 0;
+    const missedCut = hasResult
+      ? findMissedCut(rows, advancedIds).map(withTeam)
+      : [];
+    const surpriseAdvancers = hasResult
+      ? findSurpriseAdvancers(rows, advancedIds).map(withTeam)
+      : [];
 
-    return { voters, rows: rows.map(withTeam), missedCut };
+    return { voters, rows: rows.map(withTeam), missedCut, surpriseAdvancers };
   },
 );

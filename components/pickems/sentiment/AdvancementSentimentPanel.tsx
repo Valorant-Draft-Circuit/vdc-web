@@ -85,6 +85,13 @@ export default async function AdvancementSentimentPanel({
             detail={`${Math.round(sentiment.missedCut[0].share * 100)}% expected them, missed cut`}
           />
         ) : null}
+        {sentiment.surpriseAdvancers.length > 0 ? (
+          <AggregateStatCard
+            label="Biggest surprise"
+            headline={sentiment.surpriseAdvancers[0].team?.name ?? "Team"}
+            detail={`only ${Math.round(sentiment.surpriseAdvancers[0].share * 100)}% expected them, made cut`}
+          />
+        ) : null}
       </div>
     </div>
   );

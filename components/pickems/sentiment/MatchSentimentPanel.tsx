@@ -119,6 +119,26 @@ export default async function MatchSentimentPanel({
             </ul>
           </div>
         ) : null}
+
+        {sentiment.nailed.length > 0 ? (
+          <div className="rounded-md border border-black/5 bg-vdcWhite/40 p-4 dark:border-white/10 dark:bg-vdcBlack/40">
+            <h2 className="mb-2 text-md font-bold uppercase tracking-wider text-vdcGreen">Crowd nailed it</h2>
+            <ul className="flex flex-col gap-1.5">
+              {sentiment.nailed.map((hit) => {
+                const home = hit.home?.name ?? "Home";
+                const away = hit.away?.name ?? "Away";
+                const crowd = OUTCOME_LABEL[hit.consensus](home, away);
+                return (
+                  <li key={hit.matchId} className="text-sm">
+                    <h3>
+                      Crowd called {crowd} ({Math.round(hit.consensusShare * 100)}%) and it landed.
+                    </h3>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </div>
   );

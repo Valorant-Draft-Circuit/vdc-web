@@ -89,17 +89,21 @@ export function tallyMatchup(
   };
 }
 
-export type MatchUpset = {
+export type MatchConsensusOutcome = {
   matchId: number;
   consensus: MatchOutcome;
   consensusShare: number;
   actual: MatchOutcome;
 };
 
-export function findMatchUpsets(
+export type MatchUpset = MatchConsensusOutcome;
+export type MatchChalk = MatchConsensusOutcome;
+
+function collectResolvedConsensus(
   entries: { sentiment: MatchupSentiment; result: ResolvedMatch }[],
-): MatchUpset[] {
-  const upsets: MatchUpset[] = [];
+  keep: (crowdWasRight: boolean) => boolean,
+): MatchConsensusOutcome[] {
+  const collected: MatchConsensusOutcome[] = [];
   for (const { sentiment, result } of entries) {
     if (!result.resolved || result.outcome === null) {
       continue;
@@ -107,8 +111,9 @@ export function findMatchUpsets(
     if (sentiment.totalPicks === 0) {
       continue;
     }
-    if (result.outcome !== sentiment.consensus) {
-      upsets.push({
+    const crowdWasRight = result.outcome === sentiment.consensus;
+    if (keep(crowdWasRight)) {
+      collected.push({
         matchId: sentiment.matchId,
         consensus: sentiment.consensus,
         consensusShare: sentiment.consensusShare,
@@ -116,7 +121,19 @@ export function findMatchUpsets(
       });
     }
   }
-  return upsets.sort((a, b) => b.consensusShare - a.consensusShare);
+  return collected.sort((a, b) => b.consensusShare - a.consensusShare);
+}
+
+export function findMatchUpsets(
+  entries: { sentiment: MatchupSentiment; result: ResolvedMatch }[],
+): MatchUpset[] {
+  return collectResolvedConsensus(entries, (crowdWasRight) => !crowdWasRight);
+}
+
+export function findMatchChalk(
+  entries: { sentiment: MatchupSentiment; result: ResolvedMatch }[],
+): MatchChalk[] {
+  return collectResolvedConsensus(entries, (crowdWasRight) => crowdWasRight);
 }
 
 export type AdvanceSentimentRow = {
@@ -156,6 +173,42 @@ export function tallyAdvancement(
   }
   rows.sort((a, b) => b.share - a.share || a.consensusSeed - b.consensusSeed);
   return { rows, voters };
+}
+
+export function findMissedCut(
+  rows: AdvanceSentimentRow[],
+  advancedIds: Set<number>,
+  limit = 5,
+): AdvanceSentimentRow[] {
+  const missed = rows.filter((row) => !advancedIds.has(row.teamId));
+  return missed.slice(0, limit);
+}
+
+export function findSurpriseAdvancers(
+  rows: AdvanceSentimentRow[],
+  advancedIds: Set<number>,
+  limit = 5,
+): AdvanceSentimentRow[] {
+  const rowByTeam = new Map<number, AdvanceSentimentRow>();
+  for (const row of rows) {
+    rowByTeam.set(row.teamId, row);
+  }
+
+  const surprises: AdvanceSentimentRow[] = [];
+  for (const teamId of advancedIds) {
+    const row = rowByTeam.get(teamId) ?? {
+      teamId,
+      count: 0,
+      share: 0,
+      consensusSeed: 0,
+    };
+    if (row.share < 0.5) {
+      surprises.push(row);
+    }
+  }
+
+  surprises.sort((a, b) => a.share - b.share || a.teamId - b.teamId);
+  return surprises.slice(0, limit);
 }
 
 export type SlotConsensus = {
