@@ -1,7 +1,12 @@
+import { cache } from "react";
 import { GameType, MatchType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Tier } from "@prisma/client";
-import { getAllActiveTeamsIn, ActiveTeam } from "../teams/teams";
+import {
+  getAllActiveTeamsIn,
+  getTeamsInSeason,
+  ActiveTeam,
+} from "../teams/teams";
 import { getAllGamesBy, Game } from "../games/games";
 import { MIN_GAMES_BY_MATCH_TYPE } from "@/lib/common/constants/matchFormat";
 import {
@@ -96,6 +101,31 @@ export function rankTeams(teams: ActiveTeam[], games: Game[]): TeamStats[] {
   const teamStats = teams.map((team) => calculateTeamStats(team, games));
   return applyTiebreakers(teamStats, games);
 }
+
+/**
+ * The higher-seeded of two teams in a tier's season,
+ */
+export const getHigherSeedTeamId = cache(
+  async (
+    tier: Tier,
+    season: number,
+    teamAId: number,
+    teamBId: number,
+  ): Promise<number | null> => {
+    const [teams, games] = await Promise.all([
+      getTeamsInSeason(tier, season),
+      getAllGamesBy(tier, season),
+    ]);
+    if (games.length === 0) return null;
+
+    const ranked = rankTeams(teams, games);
+    const rankOfA = ranked.findIndex((team) => team.id === teamAId);
+    const rankOfB = ranked.findIndex((team) => team.id === teamBId);
+    if (rankOfA === -1 || rankOfB === -1) return null;
+
+    return rankOfA < rankOfB ? teamAId : teamBId;
+  },
+);
 
 export type PlayoffOddsRow = {
   teamId: number;

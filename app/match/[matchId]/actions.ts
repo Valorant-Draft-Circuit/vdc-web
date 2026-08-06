@@ -5,10 +5,11 @@ import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel, Roles } from "@/prisma";
-import { MapBansSide, MatchType, VetoSource } from "@prisma/client";
+import { MapBansSide, MatchType, Tier, VetoSource } from "@prisma/client";
 import { buildVetoSkeleton, deriveVetoState } from "@/lib/common/mapbansFlow";
 import { emitVetoChanged, emitVetoPreview } from "@/lib/server/vetoEvents";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
+import { getHigherSeedTeamId } from "@/lib/queries/standings/standings";
 
 const VETO_START_WINDOW_MS = 12 * 60 * 60 * 1000;
 const VETO_MATCH_TYPES: MatchType[] = [
@@ -16,6 +17,7 @@ const VETO_MATCH_TYPES: MatchType[] = [
   MatchType.BO3,
   MatchType.BO5,
 ];
+const VETO_PLAYOFF_TYPES: MatchType[] = [MatchType.BO3, MatchType.BO5];
 const VETO_STAFF_ROLES = [Roles.ADMIN, Roles.LEAD_TECH];
 
 type ActionResult =
@@ -27,6 +29,8 @@ type VetoActorContext = {
     matchID: number;
     matchType: MatchType;
     dateScheduled: Date;
+    tier: Tier;
+    season: number;
     home: number | null;
     away: number | null;
   };
@@ -48,6 +52,8 @@ async function requireVetoActor(
       matchID: true,
       matchType: true,
       dateScheduled: true,
+      tier: true,
+      season: true,
       home: true,
       away: true,
     },
@@ -319,7 +325,22 @@ export async function submitSidePick(
     return { ok: false, error: "This veto is not running on the website" };
   }
 
-  const state = deriveVetoState(rows, mapPoolStr.split(","));
+  const deciderSideChooserTeamId = VETO_PLAYOFF_TYPES.includes(
+    ctx.match.matchType,
+  )
+    ? await getHigherSeedTeamId(
+        ctx.match.tier,
+        ctx.match.season,
+        ctx.match.home as number,
+        ctx.match.away as number,
+      )
+    : null;
+
+  const state = deriveVetoState(
+    rows,
+    mapPoolStr.split(","),
+    deciderSideChooserTeamId,
+  );
   if (state.phase !== "side-turns" || !state.currentSideTurn) {
     return { ok: false, error: "It is not a side turn" };
   }

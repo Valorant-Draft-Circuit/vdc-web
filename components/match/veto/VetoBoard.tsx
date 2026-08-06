@@ -30,12 +30,16 @@ function resolveSideChooser(
   row: VetoRow,
   allRows: VetoRow[],
   teams: { home: MatchTeam; away: MatchTeam },
+  deciderSideChooserTeamId: number | null,
 ): MatchTeam | null {
   if (row.team !== null) {
     return row.team === teams.home.id ? teams.away : teams.home;
   }
   try {
-    return resolveTeam(sideChooserFor(row, allRows), teams);
+    return resolveTeam(
+      sideChooserFor(row, allRows, deciderSideChooserTeamId),
+      teams,
+    );
   } catch {
     return null;
   }
@@ -223,6 +227,7 @@ export default function VetoBoard({
                                 row,
                                 state.rows,
                                 teams,
+                                veto.deciderSideChooserTeamId,
                               )}
                               isBroadcast={isBroadcast}
                             />,

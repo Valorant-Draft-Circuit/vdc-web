@@ -58,6 +58,7 @@ export default async function Page({
     vetoUrl: null,
     banOrder: lobby.banOrder,
     mapPool: lobby.mapPool,
+    deciderSideChooserTeamId: null,
   };
 
   return (

@@ -90,6 +90,7 @@ export function buildVetoSkeleton(
 export function deriveVetoState(
   rowsInput: VetoRow[],
   mapPool: string[],
+  deciderSideChooserTeamId?: number | null,
 ): VetoState {
   const rows = [...rowsInput].sort((a, b) => a.order - b.order);
   if (rows.length === 0) {
@@ -172,7 +173,7 @@ export function deriveVetoState(
         rowId: nextSideRow.id,
         order: nextSideRow.order,
         map: nextSideRow.map as string,
-        actingTeamId: sideChooserFor(nextSideRow, rows),
+        actingTeamId: sideChooserFor(nextSideRow, rows, deciderSideChooserTeamId),
       },
       autoFillRows: [],
     };
@@ -188,7 +189,17 @@ export function deriveVetoState(
   };
 }
 
-export function sideChooserFor(sideRow: VetoRow, allRows: VetoRow[]): number {
+export function sideChooserFor(
+  sideRow: VetoRow,
+  allRows: VetoRow[],
+  deciderSideChooserTeamId?: number | null,
+): number {
+  if (
+    sideRow.type === MapBanType.DECIDER &&
+    deciderSideChooserTeamId != null
+  ) {
+    return deciderSideChooserTeamId;
+  }
   const distinctTeamsInRowOrder = Array.from(
     new Set(allRows.map((row) => row.team)),
   );
