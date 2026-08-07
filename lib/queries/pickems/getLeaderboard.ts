@@ -17,6 +17,7 @@ import { getAdvanceResult } from "./getAdvanceResult";
 import { getTeamsInSeason } from "@/lib/queries/teams/teams";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import {
+  deriveBracketPicks,
   realBracketResults,
   scoreBracketPicks,
   type BracketPick,
@@ -360,7 +361,8 @@ async function scoreTier(
       nameByUser.get(userId) ?? null,
       imageByUser.get(userId) ?? null,
     );
-    const score = scoreBracketPicks(userPicks, bracketResults);
+    const derived = deriveBracketPicks(bracket, userPicks);
+    const score = scoreBracketPicks(derived, bracketResults);
     row.points += score.points;
     row.correct += score.correct;
     row.resolved += score.resolved;

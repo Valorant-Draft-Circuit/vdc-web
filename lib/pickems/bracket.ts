@@ -173,6 +173,59 @@ export function realBracketResults(bracket: Bracket): BracketRoundResult[] {
   });
 }
 
+export function deriveBracketPicks(
+  bracket: Bracket,
+  stored: BracketPick[],
+): BracketPick[] {
+  const totalRounds = bracket.rounds.length;
+  const storedByKey = new Map<string, BracketPick>();
+  for (const pick of stored) {
+    storedByKey.set(`${totalRounds - 1 - pick.round}:${pick.slot}`, pick);
+  }
+
+  const derived = new Map<string, BracketPick>();
+  const derivedWinner = (roundIndex: number, slotIndex: number) =>
+    derived.get(`${roundIndex}:${slotIndex}`)?.teamId;
+
+  for (let roundIndex = 0; roundIndex < totalRounds; roundIndex++) {
+    const round = bracket.rounds[roundIndex];
+    const maxLoser = maxLoserGames(round.matchType);
+    for (let slotIndex = 0; slotIndex < round.slots.length; slotIndex++) {
+      if (round.slots[slotIndex].kind === "bye") {
+        continue;
+      }
+      const key = `${roundIndex}:${slotIndex}`;
+      const storedPick = storedByKey.get(key);
+      if (!storedPick) {
+        continue;
+      }
+      const candidateIds = slotCandidates(
+        bracket,
+        roundIndex,
+        slotIndex,
+        derivedWinner,
+      );
+      if (candidateIds[0] === undefined || candidateIds[1] === undefined) {
+        continue;
+      }
+      if (storedPick.loserGames < 0 || storedPick.loserGames > maxLoser) {
+        continue;
+      }
+      const winnerId =
+        candidateIds[0] === storedPick.teamId
+          ? candidateIds[0]
+          : candidateIds[1];
+      derived.set(key, {
+        round: totalRounds - 1 - roundIndex,
+        slot: slotIndex,
+        teamId: winnerId,
+        loserGames: storedPick.loserGames,
+      });
+    }
+  }
+  return [...derived.values()];
+}
+
 export function scoreBracketPicks(
   picks: BracketPick[],
   results: BracketRoundResult[],

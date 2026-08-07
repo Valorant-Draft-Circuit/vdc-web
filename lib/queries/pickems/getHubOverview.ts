@@ -10,6 +10,7 @@ import {
 import { randomAdvanceSet, randomScore } from "@/lib/pickems/picks";
 import { lockCountdown } from "@/lib/pickems/format";
 import {
+  deriveBracketPicks,
   maxBracketPoints,
   realBracketResults,
   scoreBracketPicks,
@@ -211,7 +212,8 @@ async function summarizeBracketStage(
   if (userId) {
     const picks = await getUserBracketPicks(userId, season, tier);
     if (picks.length > 0) {
-      points = scoreBracketPicks(picks, realBracketResults(bracket)).points;
+      const derived = deriveBracketPicks(bracket, picks);
+      points = scoreBracketPicks(derived, realBracketResults(bracket)).points;
     }
   }
 

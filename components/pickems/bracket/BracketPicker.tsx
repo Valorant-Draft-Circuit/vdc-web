@@ -2,12 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import { MatchType, Tier } from "@prisma/client";
-import type {
-  Bracket,
-  BracketTeam,
-  SeriesSide,
-  Slot,
-} from "@/lib/common/bracket";
+import type { Bracket, BracketTeam } from "@/lib/common/bracket";
 import {
   BRACKET_WINNER_POINTS,
   maxLoserGames,
@@ -18,82 +13,10 @@ import {
   type BracketPick,
 } from "@/lib/pickems/bracket";
 import BracketConnectors from "@/components/playoffs/BracketConnectors";
-import BracketCard, {
-  ByeCard,
-  type CardMode,
-  type CardSide,
-} from "./BracketCard";
+import BracketCard, { ByeCard, type CardSide } from "./BracketCard";
 import { submitBracketPicks } from "@/app/pickems/actions";
 
 type CardInput = { top: string; bottom: string };
-
-type CardView = {
-  mode: CardMode;
-  top: CardSide;
-  bottom: CardSide;
-  outcome: "correct" | "wrong" | null;
-  pickedNote: string | null;
-};
-
-function buildCardView(params: {
-  slot: Slot;
-  pick: BracketPick | undefined;
-  locked: boolean;
-  predictedSides: (BracketTeam | null)[];
-  input: CardInput;
-  teamById: Map<number, BracketTeam>;
-}): CardView {
-  const { slot, pick, locked, predictedSides, input, teamById } = params;
-
-  if (locked && slot.kind === "series" && slot.status === "complete") {
-    const actualWinnerId = slot.home.isWinner
-      ? slot.home.team.id
-      : slot.away.team.id;
-    const userCorrect = pick !== undefined && pick.teamId === actualWinnerId;
-    const pickAppears =
-      pick !== undefined &&
-      (pick.teamId === slot.home.team.id || pick.teamId === slot.away.team.id);
-
-    const toActualSide = (series: SeriesSide): CardSide => ({
-      team: series.team,
-      value: "",
-      isWinner: series.isWinner,
-      realScore: series.score,
-      isWrongPick:
-        pick !== undefined && !userCorrect && pick.teamId === series.team.id,
-    });
-
-    const outcome = pick === undefined ? null : userCorrect ? "correct" : "wrong";
-    const pickedNote =
-      pick !== undefined && !userCorrect && !pickAppears
-        ? (teamById.get(pick.teamId)?.franchiseSlug ?? null)
-        : null;
-
-    return {
-      mode: "result",
-      top: toActualSide(slot.home),
-      bottom: toActualSide(slot.away),
-      outcome,
-      pickedNote,
-    };
-  }
-
-  const toPredictedSide = (index: 0 | 1): CardSide => ({
-    team: predictedSides[index] ?? null,
-    value: index === 0 ? input.top : input.bottom,
-    isWinner: pick !== undefined && predictedSides[index]?.id === pick.teamId,
-    realScore: null,
-    isWrongPick: false,
-  });
-
-  return {
-    mode: locked ? "pending" : "edit",
-    top: toPredictedSide(0),
-    bottom: toPredictedSide(1),
-    outcome: null,
-    pickedNote: null,
-  };
-}
 
 type Props = {
   bracket: Bracket;
@@ -309,6 +232,8 @@ export default function BracketPicker({
                           </div>
                         );
                       }
+                      const sides = candidatesByKey.get(key) ?? [null, null];
+                      const input = inputs.get(key) ?? { top: "", bottom: "" };
                       const pick = picks.get(key);
                       const realLoserGames =
                         pick !== undefined
@@ -317,34 +242,35 @@ export default function BracketPicker({
                             )
                           : undefined;
                       const cardPoints =
-                        pick !== undefined && realLoserGames !== undefined
+                        locked && pick !== undefined && realLoserGames !== undefined
                           ? BRACKET_WINNER_POINTS[pick.round] *
                             (realLoserGames === pick.loserGames ? 2 : 1)
-                          : 0;
-
-                      const card = buildCardView({
-                        slot,
-                        pick,
-                        locked,
-                        predictedSides: candidatesByKey.get(key) ?? [null, null],
-                        input: inputs.get(key) ?? { top: "", bottom: "" },
-                        teamById,
+                          : locked
+                            ? 0
+                            : null;
+                      const realScores =
+                        slot.kind === "series" && slot.status !== "scheduled"
+                          ? [slot.home.score, slot.away.score]
+                          : [null, null];
+                      const toSide = (index: 0 | 1): CardSide => ({
+                        team: sides[index],
+                        value: index === 0 ? input.top : input.bottom,
+                        isWinner:
+                          pick !== undefined && sides[index]?.id === pick.teamId,
+                        realScore: realScores[index],
                       });
-
                       return (
                         <div
                           key={key}
                           className="flex flex-1 flex-col justify-center py-3"
                         >
                           <BracketCard
-                            top={card.top}
-                            bottom={card.bottom}
+                            top={toSide(0)}
+                            bottom={toSide(1)}
                             maxScore={clinch(round.matchType)}
-                            mode={card.mode}
+                            editable={!locked}
                             accent={accent}
                             pointsEarned={cardPoints}
-                            outcome={card.outcome}
-                            pickedNote={card.pickedNote}
                             error={locked ? null : (errorsByKey.get(key) ?? null)}
                             onChange={(side, value) =>
                               setScore(key, side, value)
