@@ -7,7 +7,7 @@ import { getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { SECONDARY_MAP_LIST_URL } from "@/lib/common/constants/maps";
-import { toTailwindCustomHexCode } from "@/lib/common/format";
+import { correctMatchDate, toTailwindCustomHexCode } from "@/lib/common/format";
 import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
 import {
   getVetoState,
@@ -141,7 +141,7 @@ export default async function Page({
   // so the pre-match view holds until games are actually submitted.
   const showPreMatchView = isInFuture || !hasSubmittedGames;
 
-  const matchDate = matchDateObj.toLocaleString(`en-US`, {
+  const matchDate = correctMatchDate(matchDateObj).toLocaleString(`en-US`, {
     month: `short`,
     day: `2-digit`,
     weekday: "short",
