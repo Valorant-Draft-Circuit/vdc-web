@@ -18,6 +18,10 @@ import {
   MatchNightRecap,
 } from "../queries/home/matchNight";
 import {
+  getPlayoffResults,
+  PlayoffResults,
+} from "../queries/home/playoffResults";
+import {
   getRecentTransactions,
   TransactionGroup,
 } from "../queries/home/transactions";
@@ -229,6 +233,18 @@ export async function getMatchNightRecapCached(
   const recap = await getMatchNightRecap(season);
   cache.set(key, recap, minutes(30));
   return recap;
+}
+
+export async function getPlayoffResultsCached(
+  season: number,
+): Promise<PlayoffResults> {
+  const key = `s${season}-playoffResults`;
+  const hit = cache.get<PlayoffResults>(key);
+  if (hit !== undefined) return hit;
+
+  const results = await getPlayoffResults(season);
+  cache.set(key, results, minutes(5));
+  return results;
 }
 
 const peerPoolInFlight = new Map<string, Promise<PeerRow[]>>();

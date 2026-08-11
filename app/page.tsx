@@ -12,14 +12,18 @@ import UpcomingMatch, {
 import { getEveryUpcomingMatch } from "@/lib/queries/schedule/schedule";
 import MatchNightRecapLoader from "@/components/home/recap/MatchNightRecapLoader";
 import MatchNightRecapSkeleton from "@/components/home/recap/MatchNightRecapSkeleton";
+import PlayoffResultsLoader from "@/components/home/playoffs/PlayoffResultsLoader";
+import PlayoffResultsSkeleton from "@/components/home/playoffs/PlayoffResultsSkeleton";
 import RecentTransactionsLoader from "@/components/home/transactions/RecentTransactionsLoader";
 import RecentTransactionsSkeleton from "@/components/home/transactions/RecentTransactionsSkeleton";
+import { getLeagueState } from "@/lib/queries/control/control";
 
 export default async function Home() {
   const session = await auth();
   const mostRecentVideo = await getLatestYouTubeVideo();
   const upcomingMatches = await getEveryUpcomingMatch();
   const displayUpcomingMatches = upcomingMatches.length !== 0;
+  const isPlayoffs = (await getLeagueState()) === "PLAYOFFS";
 
   return (
     <>
@@ -48,9 +52,15 @@ export default async function Home() {
           </div>
         </div>
       ) : null}
-      <Suspense fallback={<MatchNightRecapSkeleton />}>
-        <MatchNightRecapLoader />
-      </Suspense>
+      {isPlayoffs ? (
+        <Suspense fallback={<PlayoffResultsSkeleton />}>
+          <PlayoffResultsLoader />
+        </Suspense>
+      ) : (
+        <Suspense fallback={<MatchNightRecapSkeleton />}>
+          <MatchNightRecapLoader />
+        </Suspense>
+      )}
       <Suspense fallback={<RecentTransactionsSkeleton />}>
         <RecentTransactionsLoader />
       </Suspense>

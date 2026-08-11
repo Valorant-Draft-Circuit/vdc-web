@@ -138,8 +138,17 @@ function buildSeriesSlot(
   match: PlayoffMatchInput | null,
 ): SeriesSlot {
   const matchType = match?.matchType ?? MatchType.BO3;
-  const homeScore = match?.homeScore ?? 0;
-  const awayScore = match?.awayScore ?? 0;
+  const homeIsMatchHome = match === null || match.homeTeamId === home.id;
+  const homeScore = match
+    ? homeIsMatchHome
+      ? match.homeScore
+      : match.awayScore
+    : 0;
+  const awayScore = match
+    ? homeIsMatchHome
+      ? match.awayScore
+      : match.homeScore
+    : 0;
   const clinch = clinchCount(matchType);
   const homeWon = homeScore >= clinch;
   const awayWon = awayScore >= clinch;
@@ -239,22 +248,6 @@ function buildStructuredRounds(
     });
   });
 
-  const sequentialMatches = matchesByDay.filter((m) =>
-    hasBothTeams(m, teamById),
-  );
-  let sequentialIndex = 0;
-  const takeNextSequential = () => {
-    while (sequentialIndex < sequentialMatches.length) {
-      const m = sequentialMatches[sequentialIndex];
-      sequentialIndex++;
-      if (!usedMatchIds.has(m.matchId)) {
-        usedMatchIds.add(m.matchId);
-        return m;
-      }
-    }
-    return null;
-  };
-
   const rounds: Round[] = [];
   structure.forEach((roundDef, r) => {
     const slots: Slot[] = [];
@@ -274,8 +267,7 @@ function buildStructuredRounds(
       const prev = rounds[r - 1];
       const home = participantOf(prev.slots[item.feeders[0]]);
       const away = participantOf(prev.slots[item.feeders[1]]);
-      const pairMatch = home && away ? takePairMatch(home, away) : null;
-      const match = pairMatch ?? takeNextSequential();
+      const match = home && away ? takePairMatch(home, away) : null;
       if (match) {
         slots.push(seriesFromMatch(match, teamById));
       } else {
