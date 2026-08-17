@@ -18,8 +18,8 @@ import {
   MatchNightRecap,
 } from "../queries/home/matchNight";
 import {
-  getPlayoffResults,
-  PlayoffResults,
+  getPlayoffHighlights,
+  OverallHighlights,
 } from "../queries/home/playoffResults";
 import {
   getRecentTransactions,
@@ -235,16 +235,16 @@ export async function getMatchNightRecapCached(
   return recap;
 }
 
-export async function getPlayoffResultsCached(
+export async function getPlayoffHighlightsCached(
   season: number,
-): Promise<PlayoffResults> {
-  const key = `s${season}-playoffResults`;
-  const hit = cache.get<PlayoffResults>(key);
+): Promise<OverallHighlights> {
+  const key = `s${season}-playoffHighlights`;
+  const hit = cache.get<OverallHighlights>(key);
   if (hit !== undefined) return hit;
 
-  const results = await getPlayoffResults(season);
-  cache.set(key, results, minutes(5));
-  return results;
+  const highlights = await getPlayoffHighlights(season);
+  cache.set(key, highlights, minutes(5));
+  return highlights;
 }
 
 const peerPoolInFlight = new Map<string, Promise<PeerRow[]>>();

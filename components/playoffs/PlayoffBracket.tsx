@@ -3,6 +3,7 @@ import { MatchType, Tier } from "@prisma/client";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import MatchupCard from "./MatchupCard";
 import BracketConnectors from "./BracketConnectors";
+import BracketSpoilerCover from "./BracketSpoilerCover";
 
 export default async function PlayoffBracket({
   tier,
@@ -30,8 +31,13 @@ export default async function PlayoffBracket({
   // round has exactly twice the slots of the next (4/6/8). The fallback layout
   // has arbitrary per-day counts, so it renders without connectors.
   const showConnectors = bracket.isInferable;
+  const hasResults = bracket.rounds.some((round) =>
+    round.slots.some(
+      (slot) => slot.kind === "series" && slot.status !== "scheduled",
+    ),
+  );
 
-  return (
+  const board = (
     <div className="bg-gray-100 dark:bg-vdcGrey/30 rounded-2xl p-6 border border-black/5 dark:border-white/10 overflow-x-auto">
       {!bracket.isInferable && (
         <h2 className="text-xs text-gray-500 dark:text-gray-400 mb-4">
@@ -79,5 +85,11 @@ export default async function PlayoffBracket({
         ))}
       </div>
     </div>
+  );
+
+  return hasResults ? (
+    <BracketSpoilerCover>{board}</BracketSpoilerCover>
+  ) : (
+    board
   );
 }

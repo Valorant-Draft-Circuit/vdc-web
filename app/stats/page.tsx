@@ -30,10 +30,12 @@ export default async function Page({ searchParams }: Props) {
     getUserTier({ isStats: true }),
   ]);
 
-  const gameTypes: GameType[] = [GameType.SEASON, GameType.COMBINE];
-  if (seasonState === "COMBINES") {
-    gameTypes.reverse();
-  }
+  const gameTypes: GameType[] =
+    seasonState === "COMBINES"
+      ? [GameType.COMBINE]
+      : seasonState === "PLAYOFFS"
+        ? [GameType.PLAYOFF, GameType.SEASON, GameType.COMBINE]
+        : [GameType.SEASON, GameType.COMBINE];
 
   const listOfAllSeasons = listAllSeasons(currentSeason);
 

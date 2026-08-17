@@ -1,10 +1,15 @@
-import { getPlayoffResultsCached, getSeasonCached } from "@/lib/common/cache";
+import { getPlayoffHighlightsCached, getSeasonCached } from "@/lib/common/cache";
+import { TIERS_LIST } from "@/lib/common/constants/tiers";
+import PlayoffBracket from "@/components/playoffs/PlayoffBracket";
 import PlayoffResults from "./PlayoffResults";
 
 export default async function PlayoffResultsLoader() {
   const season = await getSeasonCached();
-  const results = await getPlayoffResultsCached(season);
-  if (results.tiers.length === 0) return null;
+  const highlights = await getPlayoffHighlightsCached(season);
+  const brackets = TIERS_LIST.map((tier) => ({
+    tier,
+    node: <PlayoffBracket tier={tier} season={season} />,
+  }));
 
-  return <PlayoffResults results={results} />;
+  return <PlayoffResults brackets={brackets} highlights={highlights} />;
 }

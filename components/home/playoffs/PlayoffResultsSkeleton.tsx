@@ -1,7 +1,4 @@
 export default function PlayoffResultsSkeleton() {
-  const columns = [0, 1];
-  const rows = [0, 1, 2, 3];
-
   return (
     <section className="relative z-20">
       <div className="mt-5 px-4 py-2 text-lg sm:px-6 lg:text-xl">
@@ -17,19 +14,7 @@ export default function PlayoffResultsSkeleton() {
               />
             ))}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {columns.map((column) => (
-              <div key={column} className="flex flex-col gap-2">
-                <div className="h-3 w-24 animate-pulse rounded bg-slate-200 dark:bg-vdcBlack/40" />
-                {rows.map((row) => (
-                  <div
-                    key={row}
-                    className="h-9 animate-pulse rounded-md bg-slate-200 dark:bg-vdcBlack/40"
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
+          <div className="h-72 animate-pulse rounded-2xl bg-slate-200 dark:bg-vdcBlack/40" />
         </div>
       </div>
     </section>
