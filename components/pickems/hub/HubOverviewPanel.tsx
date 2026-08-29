@@ -1,5 +1,5 @@
 import { Tier } from "@prisma/client";
-import { TIER_HEX_COLOR_MAP } from "@/lib/common/constants/tiers";
+import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getHubOverview } from "@/lib/queries/pickems/getHubOverview";
 import { getLeaderboard } from "@/lib/queries/pickems/getLeaderboard";
 import { getGroupLeaderboard } from "@/lib/queries/pickems/getGroupLeaderboard";
@@ -9,6 +9,7 @@ import StageCards from "./StageCards";
 import TopTenBoard from "./TopTenBoard";
 import TopGroupsBoard from "./TopGroupsBoard";
 import AdminPicksBoard from "./AdminPicksBoard";
+import TierLeadersStrip, { type TierLeader } from "./TierLeadersStrip";
 
 type Props = {
   stageTier: Tier;
@@ -18,6 +19,18 @@ type Props = {
   boardTier: Tier | null;
 };
 
+async function getTierLeaders(season: number): Promise<TierLeader[]> {
+  const boards = await Promise.all(
+    TIERS_LIST.map((tier) =>
+      getLeaderboard(season, tier, { kind: "global" }),
+    ),
+  );
+  return TIERS_LIST.map((tier, index) => ({
+    tier,
+    leader: boards[index][0] ?? null,
+  }));
+}
+
 export default async function HubOverviewPanel({
   stageTier,
   season,
@@ -25,10 +38,11 @@ export default async function HubOverviewPanel({
   accent,
   boardTier,
 }: Props) {
-  const [overview, board, groupBoard] = await Promise.all([
+  const [overview, board, groupBoard, tierLeaders] = await Promise.all([
     getHubOverview(stageTier, season, userId),
     getLeaderboard(season, boardTier, { kind: "global" }),
     getGroupLeaderboard(season, boardTier),
+    boardTier === null ? getTierLeaders(season) : null,
   ]);
 
   const myIndex = userId
@@ -55,6 +69,9 @@ export default async function HubOverviewPanel({
         season={season}
         accent={TIER_HEX_COLOR_MAP[stageTier]}
       />
+      {tierLeaders !== null && (
+        <TierLeadersStrip leaders={tierLeaders} season={season} />
+      )}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <TopTenBoard
           rows={board.slice(0, 10)}

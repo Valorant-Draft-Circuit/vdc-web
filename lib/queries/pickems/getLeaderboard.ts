@@ -136,240 +136,242 @@ export const getLeaderboard = cache(
   },
 );
 
-async function scoreTier(
-  season: number,
-  tier: Tier,
-  memberIds: Set<string> | null,
-): Promise<Map<string, TierScoreRow>> {
-  const isExcluded = (userId: string) =>
-    memberIds !== null && !memberIds.has(userId);
+const scoreTier = cache(
+  async (
+    season: number,
+    tier: Tier,
+    memberIds: Set<string> | null,
+  ): Promise<Map<string, TierScoreRow>> => {
+    const isExcluded = (userId: string) =>
+      memberIds !== null && !memberIds.has(userId);
 
-  const rows = new Map<string, TierScoreRow>();
-  const ensureRow = (
-    userId: string,
-    name: string | null,
-    image: string | null,
-  ) => {
-    const existing = rows.get(userId);
-    if (existing) {
-      return existing;
-    }
-    const created: TierScoreRow = {
-      userId,
-      name: name ?? "Player",
-      image: image ?? null,
-      points: 0,
-      correct: 0,
-      resolved: 0,
-      hasResolvedPicks: false,
+    const rows = new Map<string, TierScoreRow>();
+    const ensureRow = (
+      userId: string,
+      name: string | null,
+      image: string | null,
+    ) => {
+      const existing = rows.get(userId);
+      if (existing) {
+        return existing;
+      }
+      const created: TierScoreRow = {
+        userId,
+        name: name ?? "Player",
+        image: image ?? null,
+        points: 0,
+        correct: 0,
+        resolved: 0,
+        hasResolvedPicks: false,
+      };
+      rows.set(userId, created);
+      return created;
     };
-    rows.set(userId, created);
-    return created;
-  };
 
-  const matches = await prisma.matches.findMany({
-    where: {
-      season,
-      tier,
-      matchType: { in: [MatchType.BO2, MatchType.PRE_SEASON] },
-      matchDay: { not: null },
-    },
-    select: {
-      matchID: true,
-      matchType: true,
-      matchDay: true,
-      home: true,
-      away: true,
-      Games: { select: { winner: true, gameType: true } },
-      PickemMatchPicks: {
-        select: {
-          userID: true,
-          predictedHomeScore: true,
-          predictedAwayScore: true,
-          Player: { select: { name: true, image: true } },
+    const matches = await prisma.matches.findMany({
+      where: {
+        season,
+        tier,
+        matchType: { in: [MatchType.BO2, MatchType.PRE_SEASON] },
+        matchDay: { not: null },
+      },
+      select: {
+        matchID: true,
+        matchType: true,
+        matchDay: true,
+        home: true,
+        away: true,
+        Games: { select: { winner: true, gameType: true } },
+        PickemMatchPicks: {
+          select: {
+            userID: true,
+            predictedHomeScore: true,
+            predictedAwayScore: true,
+            Player: { select: { name: true, image: true } },
+          },
         },
       },
-    },
-  });
+    });
 
-  const matchById = new Map<number, (typeof matches)[number]>();
-  const matchIdsByDay = new Map<number, number[]>();
-  const slatesPlayedByUser = new Map<string, Set<number>>();
-  const realPickKey = (userId: string, matchId: number) =>
-    `${userId}:${matchId}`;
-  const realPickByKey = new Map<string, { home: number; away: number }>();
-  const nameByUser = new Map<string, string | null>();
-  const imageByUser = new Map<string, string | null>();
+    const matchById = new Map<number, (typeof matches)[number]>();
+    const matchIdsByDay = new Map<number, number[]>();
+    const slatesPlayedByUser = new Map<string, Set<number>>();
+    const realPickKey = (userId: string, matchId: number) =>
+      `${userId}:${matchId}`;
+    const realPickByKey = new Map<string, { home: number; away: number }>();
+    const nameByUser = new Map<string, string | null>();
+    const imageByUser = new Map<string, string | null>();
 
-  for (const match of matches) {
-    matchById.set(match.matchID, match);
-    const matchDay = match.matchDay as number;
-    if (!matchIdsByDay.has(matchDay)) {
-      matchIdsByDay.set(matchDay, []);
-    }
-    matchIdsByDay.get(matchDay)!.push(match.matchID);
-
-    for (const pick of match.PickemMatchPicks) {
-      if (isExcluded(pick.userID)) {
-        continue;
+    for (const match of matches) {
+      matchById.set(match.matchID, match);
+      const matchDay = match.matchDay as number;
+      if (!matchIdsByDay.has(matchDay)) {
+        matchIdsByDay.set(matchDay, []);
       }
-      if (!slatesPlayedByUser.has(pick.userID)) {
-        slatesPlayedByUser.set(pick.userID, new Set());
-      }
-      slatesPlayedByUser.get(pick.userID)!.add(matchDay);
-      realPickByKey.set(realPickKey(pick.userID, match.matchID), {
-        home: pick.predictedHomeScore,
-        away: pick.predictedAwayScore,
-      });
-      nameByUser.set(pick.userID, pick.Player.name);
-      imageByUser.set(pick.userID, pick.Player.image);
-    }
-  }
+      matchIdsByDay.get(matchDay)!.push(match.matchID);
 
-  for (const [userId, slateDays] of slatesPlayedByUser) {
-    const row = ensureRow(
-      userId,
-      nameByUser.get(userId) ?? null,
-      imageByUser.get(userId) ?? null,
-    );
-    for (const matchDay of slateDays) {
-      for (const matchId of matchIdsByDay.get(matchDay) ?? []) {
-        const match = matchById.get(matchId)!;
-        const result = resolveMatch(
-          match.matchType,
-          match.home,
-          match.away,
-          match.Games as GameResult[],
-        );
-        if (!result.resolved) {
+      for (const pick of match.PickemMatchPicks) {
+        if (isExcluded(pick.userID)) {
           continue;
         }
-        const pick =
-          realPickByKey.get(realPickKey(userId, matchId)) ??
-          randomScore(userId, matchId, match.matchType);
-        row.points += scoreMatchPick(pick, result);
-        row.resolved += 1;
-        row.hasResolvedPicks = true;
-        if (isWinnerCorrect(pick, result)) {
-          row.correct += 1;
+        if (!slatesPlayedByUser.has(pick.userID)) {
+          slatesPlayedByUser.set(pick.userID, new Set());
         }
+        slatesPlayedByUser.get(pick.userID)!.add(matchDay);
+        realPickByKey.set(realPickKey(pick.userID, match.matchID), {
+          home: pick.predictedHomeScore,
+          away: pick.predictedAwayScore,
+        });
+        nameByUser.set(pick.userID, pick.Player.name);
+        imageByUser.set(pick.userID, pick.Player.image);
       }
     }
-  }
 
-  const advancePicks = await prisma.pickemAdvancePick.findMany({
-    where: { season, tier },
-    select: {
-      userID: true,
-      predictedTeam: true,
-      predictedSeed: true,
-      Player: { select: { name: true, image: true } },
-    },
-  });
-  const advanceByUser = new Map<string, SeededTeam[]>();
-  for (const pick of advancePicks) {
-    if (isExcluded(pick.userID)) {
-      continue;
-    }
-    if (!advanceByUser.has(pick.userID)) {
-      advanceByUser.set(pick.userID, []);
-    }
-    advanceByUser
-      .get(pick.userID)!
-      .push({ teamId: pick.predictedTeam, seed: pick.predictedSeed });
-    nameByUser.set(pick.userID, pick.Player.name);
-    imageByUser.set(pick.userID, pick.Player.image);
-  }
-
-  // Anyone who submitted an advancement pick shows on the board too, even before
-  // it resolves at playoffs (0 points until then).
-  for (const userId of advanceByUser.keys()) {
-    ensureRow(
-      userId,
-      nameByUser.get(userId) ?? null,
-      imageByUser.get(userId) ?? null,
-    );
-  }
-
-  const advanceActual = await getAdvanceResult(tier, season);
-  if (advanceActual.length > 0) {
-    const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(
-      (team) => team.id,
-    );
-    const advanceScoredUsers = new Set<string>([
-      ...slatesPlayedByUser.keys(),
-      ...advanceByUser.keys(),
-    ]);
-    for (const userId of advanceScoredUsers) {
+    for (const [userId, slateDays] of slatesPlayedByUser) {
       const row = ensureRow(
         userId,
         nameByUser.get(userId) ?? null,
         imageByUser.get(userId) ?? null,
       );
-      const predicted =
-        advanceByUser.get(userId) ??
-        randomAdvanceSet(
-          userId,
-          season,
-          tier,
-          teamIdsInSeason,
-          advanceActual.length,
-        );
-      row.points += scoreAdvancePick(predicted, advanceActual);
-      row.hasResolvedPicks = true;
+      for (const matchDay of slateDays) {
+        for (const matchId of matchIdsByDay.get(matchDay) ?? []) {
+          const match = matchById.get(matchId)!;
+          const result = resolveMatch(
+            match.matchType,
+            match.home,
+            match.away,
+            match.Games as GameResult[],
+          );
+          if (!result.resolved) {
+            continue;
+          }
+          const pick =
+            realPickByKey.get(realPickKey(userId, matchId)) ??
+            randomScore(userId, matchId, match.matchType);
+          row.points += scoreMatchPick(pick, result);
+          row.resolved += 1;
+          row.hasResolvedPicks = true;
+          if (isWinnerCorrect(pick, result)) {
+            row.correct += 1;
+          }
+        }
+      }
     }
-  }
 
-  const bracketPicks = await prisma.pickemBracketPick.findMany({
-    where: { season, tier },
-    select: {
-      userID: true,
-      round: true,
-      slot: true,
-      predictedTeam: true,
-      predictedLoserGames: true,
-      Player: { select: { name: true, image: true } },
-    },
-  });
-  if (bracketPicks.length === 0) {
-    return rows;
-  }
-
-  const bracketPicksByUser = new Map<string, BracketPick[]>();
-  for (const pick of bracketPicks) {
-    if (isExcluded(pick.userID)) {
-      continue;
-    }
-    if (!bracketPicksByUser.has(pick.userID)) {
-      bracketPicksByUser.set(pick.userID, []);
-    }
-    bracketPicksByUser.get(pick.userID)!.push({
-      round: pick.round,
-      slot: pick.slot,
-      teamId: pick.predictedTeam,
-      loserGames: pick.predictedLoserGames,
+    const advancePicks = await prisma.pickemAdvancePick.findMany({
+      where: { season, tier },
+      select: {
+        userID: true,
+        predictedTeam: true,
+        predictedSeed: true,
+        Player: { select: { name: true, image: true } },
+      },
     });
-    nameByUser.set(pick.userID, pick.Player.name);
-    imageByUser.set(pick.userID, pick.Player.image);
-  }
-
-  const bracket = await getPlayoffBracket(tier, season);
-  const bracketResults = realBracketResults(bracket);
-  for (const [userId, userPicks] of bracketPicksByUser) {
-    const row = ensureRow(
-      userId,
-      nameByUser.get(userId) ?? null,
-      imageByUser.get(userId) ?? null,
-    );
-    const derived = deriveBracketPicks(bracket, userPicks);
-    const score = scoreBracketPicks(derived, bracketResults);
-    row.points += score.points;
-    row.correct += score.correct;
-    row.resolved += score.resolved;
-    if (score.resolved > 0) {
-      row.hasResolvedPicks = true;
+    const advanceByUser = new Map<string, SeededTeam[]>();
+    for (const pick of advancePicks) {
+      if (isExcluded(pick.userID)) {
+        continue;
+      }
+      if (!advanceByUser.has(pick.userID)) {
+        advanceByUser.set(pick.userID, []);
+      }
+      advanceByUser
+        .get(pick.userID)!
+        .push({ teamId: pick.predictedTeam, seed: pick.predictedSeed });
+      nameByUser.set(pick.userID, pick.Player.name);
+      imageByUser.set(pick.userID, pick.Player.image);
     }
-  }
 
-  return rows;
-}
+    // Anyone who submitted an advancement pick shows on the board too, even before
+    // it resolves at playoffs (0 points until then).
+    for (const userId of advanceByUser.keys()) {
+      ensureRow(
+        userId,
+        nameByUser.get(userId) ?? null,
+        imageByUser.get(userId) ?? null,
+      );
+    }
+
+    const advanceActual = await getAdvanceResult(tier, season);
+    if (advanceActual.length > 0) {
+      const teamIdsInSeason = (await getTeamsInSeason(tier, season)).map(
+        (team) => team.id,
+      );
+      const advanceScoredUsers = new Set<string>([
+        ...slatesPlayedByUser.keys(),
+        ...advanceByUser.keys(),
+      ]);
+      for (const userId of advanceScoredUsers) {
+        const row = ensureRow(
+          userId,
+          nameByUser.get(userId) ?? null,
+          imageByUser.get(userId) ?? null,
+        );
+        const predicted =
+          advanceByUser.get(userId) ??
+          randomAdvanceSet(
+            userId,
+            season,
+            tier,
+            teamIdsInSeason,
+            advanceActual.length,
+          );
+        row.points += scoreAdvancePick(predicted, advanceActual);
+        row.hasResolvedPicks = true;
+      }
+    }
+
+    const bracketPicks = await prisma.pickemBracketPick.findMany({
+      where: { season, tier },
+      select: {
+        userID: true,
+        round: true,
+        slot: true,
+        predictedTeam: true,
+        predictedLoserGames: true,
+        Player: { select: { name: true, image: true } },
+      },
+    });
+    if (bracketPicks.length === 0) {
+      return rows;
+    }
+
+    const bracketPicksByUser = new Map<string, BracketPick[]>();
+    for (const pick of bracketPicks) {
+      if (isExcluded(pick.userID)) {
+        continue;
+      }
+      if (!bracketPicksByUser.has(pick.userID)) {
+        bracketPicksByUser.set(pick.userID, []);
+      }
+      bracketPicksByUser.get(pick.userID)!.push({
+        round: pick.round,
+        slot: pick.slot,
+        teamId: pick.predictedTeam,
+        loserGames: pick.predictedLoserGames,
+      });
+      nameByUser.set(pick.userID, pick.Player.name);
+      imageByUser.set(pick.userID, pick.Player.image);
+    }
+
+    const bracket = await getPlayoffBracket(tier, season);
+    const bracketResults = realBracketResults(bracket);
+    for (const [userId, userPicks] of bracketPicksByUser) {
+      const row = ensureRow(
+        userId,
+        nameByUser.get(userId) ?? null,
+        imageByUser.get(userId) ?? null,
+      );
+      const derived = deriveBracketPicks(bracket, userPicks);
+      const score = scoreBracketPicks(derived, bracketResults);
+      row.points += score.points;
+      row.correct += score.correct;
+      row.resolved += score.resolved;
+      if (score.resolved > 0) {
+        row.hasResolvedPicks = true;
+      }
+    }
+
+    return rows;
+  },
+);

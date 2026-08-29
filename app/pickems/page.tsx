@@ -118,7 +118,7 @@ export default async function PickemsHub({ searchParams }: Props) {
 
       <Suspense
         key={`${tabParam}-${season}`}
-        fallback={<HubOverviewSkeleton />}
+        fallback={<HubOverviewSkeleton showTierLeaders={tabParam === "overview"} />}
       >
         <HubOverviewPanel
           stageTier={stageTier}
