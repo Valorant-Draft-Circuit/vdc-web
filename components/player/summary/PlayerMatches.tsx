@@ -256,6 +256,8 @@ function SeasonGame({
     away: { id: stat.Game.Match!.away ?? 0 },
   };
   const matchDay = stat.Game.Match!.matchDay;
+  const matchDayLabel =
+    stat.Game.gameType === GameType.PLAYOFF ? "Playoffs" : `MD${matchDay}`;
   const map = stat.Game.map ?? "";
   let mapUrl;
   if (map) {
@@ -304,7 +306,7 @@ function SeasonGame({
                 mapUrl ? "text-vdcWhite" : "dark:text-vdcWhite text-vdcGrey"
               } text-xs `}
             >
-              {result} - {date} - MD{matchDay}
+              {result} - {date} - {matchDayLabel}
             </h1>
           </div>
           <div className="flex flex-row py-2 justify-between w-full xl:grid xl:grid-cols-[1fr_auto_1fr] xl:items-center xl:gap-x-8">
@@ -316,7 +318,7 @@ function SeasonGame({
                     mapUrl ? "text-gray-400" : "text-vdcGrey dark:text-gray-400"
                   } hidden xl:block text-xs`}
                 >
-                  {date} - MD{matchDay}
+                  {date} - {matchDayLabel}
                 </h1>
               </div>
               <div className="contents xl:hidden">

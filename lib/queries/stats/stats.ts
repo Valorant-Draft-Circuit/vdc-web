@@ -270,14 +270,20 @@ async function getPlayerStats(playerStatsQuery: PlayerStatsQuery) {
     throw new Error(`No user found with riotIGN: ${playerStatsQuery.riotIgn}`);
   }
 
+  const includedGameTypes =
+    playerStatsQuery.gameType === GameType.SEASON
+      ? [GameType.SEASON, GameType.PLAYOFF]
+      : [playerStatsQuery.gameType];
+
   return prisma.playerStats.findMany({
     where: {
       AND: [
         { userID: userId.userId },
-        { Game: { gameType: playerStatsQuery.gameType } },
+        { Game: { gameType: { in: includedGameTypes } } },
         { Game: { season: playerStatsQuery.season } },
       ],
     },
+    orderBy: { Game: { datePlayed: "asc" } },
     include: { Game: { include: { Match: true } } },
   });
 }
