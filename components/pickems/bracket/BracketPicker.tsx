@@ -8,6 +8,7 @@ import {
   maxLoserGames,
   pickableSlotCount,
   realBracketResults,
+  resolveBracketCardSides,
   scoreBracketPicks,
   slotCandidates,
   type BracketPick,
@@ -206,8 +207,16 @@ export default function BracketPicker({
     return "SAVE BRACKET";
   }
 
+  const showResultsLegend = earned !== null && earned.resolved > 0;
+
   return (
     <div className="flex flex-col gap-3">
+      {showResultsLegend && (
+        <p className="text-right text-[11px] text-vdcGrey dark:text-gray-400">
+          Gray number = actual result · boxed number = your predicted score ·
+          eliminated picks are replaced by the team that advanced
+        </p>
+      )}
       <div className="overflow-x-auto rounded-2xl border border-black/5 bg-gray-100 p-6 dark:border-white/10 dark:bg-vdcGrey/30">
         <div className="flex w-full items-stretch min-w-[44rem]">
           {bracket.rounds.map((round, roundIndex) => {
@@ -248,16 +257,14 @@ export default function BracketPicker({
                           : locked
                             ? 0
                             : null;
-                      const realScores =
-                        slot.kind === "series" && slot.status !== "scheduled"
-                          ? [slot.home.score, slot.away.score]
-                          : [null, null];
+                      const displaySides = resolveBracketCardSides(sides, slot);
                       const toSide = (index: 0 | 1): CardSide => ({
-                        team: sides[index],
+                        team: displaySides[index].team,
                         value: index === 0 ? input.top : input.bottom,
                         isWinner:
-                          pick !== undefined && sides[index]?.id === pick.teamId,
-                        realScore: realScores[index],
+                          pick !== undefined &&
+                          displaySides[index].team?.id === pick.teamId,
+                        realScore: displaySides[index].realScore,
                       });
                       return (
                         <div

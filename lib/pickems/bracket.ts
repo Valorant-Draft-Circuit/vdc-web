@@ -1,5 +1,10 @@
 import { MatchType } from "@prisma/client";
-import type { Bracket } from "@/lib/common/bracket";
+import type {
+  Bracket,
+  BracketTeam,
+  SeriesSide,
+  Slot,
+} from "@/lib/common/bracket";
 
 export type BracketPick = {
   round: number;
@@ -7,6 +12,44 @@ export type BracketPick = {
   teamId: number;
   loserGames: number;
 };
+
+export type BracketCardSide = {
+  team: BracketTeam | null;
+  realScore: number | null;
+};
+
+export function resolveBracketCardSides(
+  predictedTeams: (BracketTeam | null)[],
+  slot: Slot,
+): BracketCardSide[] {
+  if (slot.kind !== "series" || slot.status === "scheduled") {
+    return predictedTeams.map((team) => ({ team, realScore: null }));
+  }
+  const realSides = [slot.home, slot.away];
+  const sidesInPredictedOrder: (SeriesSide | null)[] = [null, null];
+  for (const [index, predicted] of predictedTeams.entries()) {
+    const playedSide = realSides.find(
+      (realSide) => realSide.team.id === predicted?.id,
+    );
+    if (playedSide) {
+      sidesInPredictedOrder[index] = playedSide;
+    }
+  }
+  for (const [index, side] of sidesInPredictedOrder.entries()) {
+    if (side === null) {
+      const advancingSide = realSides.find(
+        (realSide) => !sidesInPredictedOrder.includes(realSide),
+      );
+      sidesInPredictedOrder[index] = advancingSide ?? null;
+    }
+  }
+  return sidesInPredictedOrder.map((side) => {
+    if (side === null) {
+      return { team: null, realScore: null };
+    }
+    return { team: side.team, realScore: side.score };
+  });
+}
 
 export type BracketRoundResult = {
   round: number;
