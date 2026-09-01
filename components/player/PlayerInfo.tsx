@@ -22,7 +22,7 @@ import {
   PICKEM_1ST,
   PICKEM_2ND,
   PICKEM_3RD,
-  PICKEM_TIER_1ST,
+  PICKEM_TIER_WINNER,
   PICKEM_TOP_GROUP,
 } from "../accolades/Accolades";
 import { LeagueStatus, Tier } from "@prisma/client";
@@ -279,8 +279,8 @@ function getAccolades(accolades) {
       case "PICKEM_3RD":
         symbol = <PICKEM_3RD metadata={accolade} />;
         break;
-      case "PICKEM_TIER_1ST":
-        symbol = <PICKEM_TIER_1ST metadata={accolade} />;
+      case "PICKEM_TIER_WINNER":
+        symbol = <PICKEM_TIER_WINNER metadata={accolade} />;
         break;
       case "PICKEM_TOP_GROUP":
         symbol = <PICKEM_TOP_GROUP metadata={accolade} />;

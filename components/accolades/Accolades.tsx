@@ -143,7 +143,7 @@ export function PICKEM_3RD({ metadata }: { metadata: Accolade }) {
   );
 }
 
-export function PICKEM_TIER_1ST({ metadata }: { metadata: Accolade }) {
+export function PICKEM_TIER_WINNER({ metadata }: { metadata: Accolade }) {
   return (
     <Accolade
       metadata={metadata}
