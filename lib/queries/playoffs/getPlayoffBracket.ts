@@ -15,6 +15,7 @@ import {
 } from "@/lib/common/bracket";
 import { getSeasonCached } from "@/lib/common/cache";
 import { getLeagueState } from "@/lib/queries/control/control";
+import { seedsAreRevealed } from "./seedReveal";
 
 async function getPlayoffMatches(tier: Tier, season: number) {
   return prisma.matches.findMany({
@@ -53,18 +54,6 @@ function toPlayoffMatchInput(match: RawPlayoffMatch): PlayoffMatchInput {
     homeScore,
     awayScore,
   };
-}
-
-function seedsAreRevealed(
-  season: number,
-  currentSeason: number,
-  leagueState: string | null,
-): boolean {
-  return (
-    season < currentSeason ||
-    leagueState === "PLAYOFFS" ||
-    leagueState === "OFFSEASON"
-  );
 }
 
 export async function getPlayoffBracket(
