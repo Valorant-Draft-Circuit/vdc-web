@@ -14,7 +14,7 @@ import { Maps } from "@/lib/common/valorant-api";
 import { SeasonSummary as SeasonSummaryData, SeasonView } from "@/lib/queries/home/seasonSummary";
 import MapReportCard from "../recap/MapReportCard";
 import TopPerformersCard from "../recap/TopPerformersCard";
-import ChampionsCard from "./ChampionsCard";
+import PlacementsCard from "./PlacementsCard";
 
 type Props = {
   summary: SeasonSummaryData;
@@ -144,8 +144,8 @@ export default function SeasonSummary({ summary, mapUuidsByName, season }: Props
               mapUuidsByName={mapUuidsByName}
               showTierDots={isOverall}
             />
-            <ChampionsCard
-              champions={activeView.champions}
+            <PlacementsCard
+              placements={activeView.placements}
               showTierDots={isOverall}
             />
           </div>

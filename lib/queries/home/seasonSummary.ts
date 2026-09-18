@@ -10,7 +10,13 @@ import {
   RecapPerformer,
   RecapViewKey,
 } from "@/lib/common/matchNight/types";
-import { SeriesSlot } from "@/lib/common/bracket";
+import {
+  BracketTeam,
+  Round,
+  SeriesResult,
+  SeriesSlot,
+  seriesResult,
+} from "@/lib/common/bracket";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import {
   recapBanSelect,
@@ -20,8 +26,11 @@ import {
   toStatRows,
 } from "./recapShared";
 
-export type ChampionSummary = {
+const PODIUM_SIZE = 4;
+
+export type PlayoffPlacement = {
   tier: Tier;
+  rank: number;
   teamName: string;
   franchiseSlug: string;
   teamLogo: string | null;
@@ -33,7 +42,7 @@ export type SeasonView = {
   hasData: boolean;
   performers: RecapPerformer[];
   mapReport: RecapMapReport;
-  champions: ChampionSummary[];
+  placements: PlayoffPlacement[];
 };
 
 export type SeasonSummary = {
@@ -47,7 +56,7 @@ type TierSeason = {
   playedMaps: RecapMapEntry[];
   bannedMaps: RecapMapEntry[];
   matchCount: number;
-  champion: ChampionSummary | null;
+  placements: PlayoffPlacement[];
 };
 
 export const getSeasonSummary = cache(
@@ -69,10 +78,10 @@ export const getSeasonSummary = cache(
 );
 
 async function getTierSeason(season: number, tier: Tier): Promise<TierSeason> {
-  const [seasonGames, seasonBans, champion] = await Promise.all([
+  const [seasonGames, seasonBans, placements] = await Promise.all([
     findSeasonGames(season, tier),
     findSeasonBans(season, tier),
-    findTierChampion(season, tier),
+    findTierPlacements(season, tier),
   ]);
 
   const statRows = seasonGames.flatMap((game) => toStatRows(game, tier));
@@ -87,13 +96,13 @@ async function getTierSeason(season: number, tier: Tier): Promise<TierSeason> {
       hasData: seasonGames.length > 0,
       performers,
       mapReport: buildSeasonMapReport(playedMaps, bannedMaps, matchCount),
-      champions: champion ? [champion] : [],
+      placements,
     },
     performers,
     playedMaps,
     bannedMaps,
     matchCount,
-    champion,
+    placements,
   };
 }
 
@@ -107,16 +116,16 @@ function buildOverallSeasonView(tierSeasons: TierSeason[]): SeasonView {
     (total, tierSeason) => total + tierSeason.matchCount,
     0,
   );
-  const champions = tierSeasons
-    .map((tierSeason) => tierSeason.champion)
-    .filter((champion): champion is ChampionSummary => champion !== null);
+  const tierChampions = tierSeasons
+    .map((tierSeason) => tierSeason.placements.find((placement) => placement.rank === 1))
+    .filter((champion): champion is PlayoffPlacement => champion !== undefined);
 
   return {
     key: "OVERALL",
     hasData: playedTierSeasons.length > 0,
     performers: pooledPerformers,
     mapReport: buildSeasonMapReport(pooledPlayedMaps, pooledBannedMaps, pooledMatchCount),
-    champions,
+    placements: tierChampions,
   };
 }
 
@@ -142,37 +151,75 @@ async function findSeasonBans(season: number, tier: Tier) {
   });
 }
 
-async function findTierChampion(
+async function findTierPlacements(
   season: number,
   tier: Tier,
-): Promise<ChampionSummary | null> {
+): Promise<PlayoffPlacement[]> {
   const bracket = await getPlayoffBracket(tier, season);
   if (!bracket.seeded || bracket.rounds.length === 0) {
-    return null;
+    return [];
   }
 
   const finalRound = bracket.rounds[bracket.rounds.length - 1];
-  const finalSeries = finalRound.slots.find(
-    (slot): slot is SeriesSlot => slot.kind === "series",
+  const finalSeries = completeSeriesIn(finalRound)[0];
+  if (!finalSeries) {
+    return [];
+  }
+
+  const finalResult = seriesResult(finalSeries);
+  if (!finalResult) {
+    return [];
+  }
+
+  const placements: PlayoffPlacement[] = [
+    toPlacement(tier, 1, finalResult.winner),
+    toPlacement(tier, 2, finalResult.loser),
+  ];
+
+  if (bracket.rounds.length >= 2) {
+    const semifinalRound = bracket.rounds[bracket.rounds.length - 2];
+    const semifinalLosers = completeSeriesIn(semifinalRound)
+      .map(seriesResult)
+      .filter((result): result is SeriesResult => result !== null)
+      .map((result) => result.loser);
+    semifinalLosers.forEach((team, index) =>
+      placements.push(toPlacement(tier, 3 + index, team)),
+    );
+  }
+
+  return placements.slice(0, PODIUM_SIZE);
+}
+
+function completeSeriesIn(round: Round): SeriesSlot[] {
+  return round.slots.filter(
+    (slot): slot is SeriesSlot =>
+      slot.kind === "series" && slot.status === "complete",
   );
-  if (!finalSeries || finalSeries.status !== "complete") {
-    return null;
-  }
+}
 
-  const winningSide = finalSeries.home.isWinner
-    ? finalSeries.home
-    : finalSeries.away.isWinner
-      ? finalSeries.away
-      : null;
-  if (!winningSide) {
-    return null;
-  }
+type SeriesResult = { winner: BracketTeam; loser: BracketTeam };
 
+function seriesResult(series: SeriesSlot): SeriesResult | null {
+  if (series.home.isWinner) {
+    return { winner: series.home.team, loser: series.away.team };
+  }
+  if (series.away.isWinner) {
+    return { winner: series.away.team, loser: series.home.team };
+  }
+  return null;
+}
+
+function toPlacement(
+  tier: Tier,
+  rank: number,
+  team: BracketTeam,
+): PlayoffPlacement {
   return {
     tier,
-    teamName: winningSide.team.name,
-    franchiseSlug: winningSide.team.franchiseSlug,
-    teamLogo: winningSide.team.logo,
-    seed: winningSide.team.seed,
+    rank,
+    teamName: team.name,
+    franchiseSlug: team.franchiseSlug,
+    teamLogo: team.logo,
+    seed: team.seed,
   };
 }

@@ -190,13 +190,24 @@ function hasBothTeams(
   );
 }
 
+export type SeriesResult = { winner: BracketTeam; loser: BracketTeam };
+
+export function seriesResult(slot: SeriesSlot): SeriesResult | null {
+  if (slot.home.isWinner) {
+    return { winner: slot.home.team, loser: slot.away.team };
+  }
+  if (slot.away.isWinner) {
+    return { winner: slot.away.team, loser: slot.home.team };
+  }
+  return null;
+}
+
 function participantOf(slot: Slot): BracketTeam | undefined {
   if (slot.kind === "bye") {
     return slot.team ?? undefined;
   }
   if (slot.kind === "series") {
-    if (slot.home.isWinner) return slot.home.team;
-    if (slot.away.isWinner) return slot.away.team;
+    return seriesResult(slot)?.winner;
   }
   return undefined;
 }
