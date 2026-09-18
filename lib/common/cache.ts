@@ -18,6 +18,10 @@ import {
   MatchNightRecap,
 } from "../queries/home/matchNight";
 import {
+  getSeasonSummary,
+  SeasonSummary,
+} from "../queries/home/seasonSummary";
+import {
   getPlayoffHighlights,
   OverallHighlights,
 } from "../queries/home/playoffResults";
@@ -233,6 +237,18 @@ export async function getMatchNightRecapCached(
   const recap = await getMatchNightRecap(season);
   cache.set(key, recap, minutes(30));
   return recap;
+}
+
+export async function getSeasonSummaryCached(
+  season: number,
+): Promise<SeasonSummary | null> {
+  const key = `s${season}-seasonSummary`;
+  const hit = cache.get<SeasonSummary | null>(key);
+  if (hit !== undefined) return hit;
+
+  const summary = await getSeasonSummary(season);
+  cache.set(key, summary, minutes(30));
+  return summary;
 }
 
 export async function getPlayoffHighlightsCached(
