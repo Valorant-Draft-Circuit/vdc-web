@@ -14,6 +14,8 @@ import MatchNightRecapLoader from "@/components/home/recap/MatchNightRecapLoader
 import MatchNightRecapSkeleton from "@/components/home/recap/MatchNightRecapSkeleton";
 import PlayoffResultsLoader from "@/components/home/playoffs/PlayoffResultsLoader";
 import PlayoffResultsSkeleton from "@/components/home/playoffs/PlayoffResultsSkeleton";
+import SeasonSummaryLoader from "@/components/home/season/SeasonSummaryLoader";
+import SeasonSummarySkeleton from "@/components/home/season/SeasonSummarySkeleton";
 import RecentTransactionsLoader from "@/components/home/transactions/RecentTransactionsLoader";
 import RecentTransactionsSkeleton from "@/components/home/transactions/RecentTransactionsSkeleton";
 import { getLeagueState } from "@/lib/queries/control/control";
@@ -23,7 +25,23 @@ export default async function Home() {
   const mostRecentVideo = await getLatestYouTubeVideo();
   const upcomingMatches = await getEveryUpcomingMatch();
   const displayUpcomingMatches = upcomingMatches.length !== 0;
-  const isPlayoffs = (await getLeagueState()) === "PLAYOFFS";
+  const leagueState = await getLeagueState();
+  const isPlayoffs = leagueState === "PLAYOFFS";
+  const isOffseason = leagueState === "OFFSEASON";
+
+  const highlightSection = isOffseason ? (
+    <Suspense fallback={<SeasonSummarySkeleton />}>
+      <SeasonSummaryLoader />
+    </Suspense>
+  ) : isPlayoffs ? (
+    <Suspense fallback={<PlayoffResultsSkeleton />}>
+      <PlayoffResultsLoader />
+    </Suspense>
+  ) : (
+    <Suspense fallback={<MatchNightRecapSkeleton />}>
+      <MatchNightRecapLoader />
+    </Suspense>
+  );
 
   return (
     <>
@@ -52,15 +70,7 @@ export default async function Home() {
           </div>
         </div>
       ) : null}
-      {isPlayoffs ? (
-        <Suspense fallback={<PlayoffResultsSkeleton />}>
-          <PlayoffResultsLoader />
-        </Suspense>
-      ) : (
-        <Suspense fallback={<MatchNightRecapSkeleton />}>
-          <MatchNightRecapLoader />
-        </Suspense>
-      )}
+      {highlightSection}
       <Suspense fallback={<RecentTransactionsSkeleton />}>
         <RecentTransactionsLoader />
       </Suspense>

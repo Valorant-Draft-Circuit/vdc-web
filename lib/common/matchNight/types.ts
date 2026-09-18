@@ -69,6 +69,8 @@ export type RecapMapCount = {
 export type RecapMapReport = {
   mostPlayed: RecapMapCount | null;
   mostBanned: RecapMapCount | null;
+  leastPlayed?: RecapMapCount | null;
+  leastBanned?: RecapMapCount | null;
 };
 
 export type RecapMover = {

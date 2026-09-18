@@ -25,7 +25,9 @@ export default function MapReportCard({
 }: Props) {
   const tiles = [
     { label: "Most Played", entry: mapReport.mostPlayed, hover: "Played" },
+    { label: "Least Played", entry: mapReport.leastPlayed ?? null, hover: "Played" },
     { label: "Most Banned", entry: mapReport.mostBanned, hover: "Banned" },
+    { label: "Least Banned", entry: mapReport.leastBanned ?? null, hover: "Banned" },
   ].filter(
     (tile): tile is { label: string; entry: RecapMapCount; hover: string } =>
       tile.entry !== null,

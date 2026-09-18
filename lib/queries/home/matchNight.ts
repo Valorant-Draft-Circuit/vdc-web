@@ -7,7 +7,6 @@ import { buildMapReport } from "@/lib/common/matchNight/mapReport";
 import { buildStandingsMovers, sortMovers } from "@/lib/common/matchNight/movers";
 import { buildTopPerformers } from "@/lib/common/matchNight/performers";
 import {
-  NightStatRow,
   RecapMapEntry,
   RecapMover,
   RecapView,
@@ -15,6 +14,13 @@ import {
 import { getAllGamesBy } from "../games/games";
 import { getAllActiveTeamsIn } from "../teams/teams";
 import { rankTeams } from "../standings/standings";
+import {
+  recapBanSelect,
+  recapGameSelect,
+  toBannedMapEntry,
+  toPlayedMapEntry,
+  toStatRows,
+} from "./recapShared";
 
 export type MatchNightRecap = {
   overall: RecapView;
@@ -22,11 +28,6 @@ export type MatchNightRecap = {
 };
 
 const TOP_MOVERS_SHOWN = 5;
-
-const teamNameAndLogoSelect = {
-  name: true,
-  Franchise: { select: { Brand: { select: { logo: true } } } },
-} as const;
 
 type TierNight = {
   view: RecapView;
@@ -69,25 +70,7 @@ async function getTierNight(season: number, tier: Tier): Promise<TierNight> {
     getAllActiveTeamsIn(tier),
   ]);
 
-  const statRows: NightStatRow[] = nightGames.flatMap((game) =>
-    game.PlayerStats.filter(
-      (stat) => stat.Player.PrimaryRiotAccount?.riotIGN != null
-    ).map(
-      (stat) => ({
-        userID: stat.userID,
-        playerName: stat.Player.PrimaryRiotAccount?.riotIGN as string,
-        tier,
-        gameID: game.gameID,
-        map: game.map,
-        ...matchupFieldsOf(game),
-        ratingAttack: stat.ratingAttack,
-        ratingDefense: stat.ratingDefense,
-        acs: stat.acs,
-        kills: stat.kills,
-        deaths: stat.deaths,
-      })
-    )
-  );
+  const statRows = nightGames.flatMap((game) => toStatRows(game, tier));
 
   const gamesBeforeNight = seasonGames.filter(
     (game) => game.Match?.matchDay !== matchDay
@@ -101,26 +84,8 @@ async function getTierNight(season: number, tier: Tier): Promise<TierNight> {
           tier
         );
 
-  const playedMaps: RecapMapEntry[] = nightGames.map((game) => ({
-    map: game.map,
-    game: {
-      tier,
-      gameID: game.gameID,
-      ...matchupFieldsOf(game),
-    },
-  }));
-  const bannedMaps: RecapMapEntry[] = nightBans.map((ban) => ({
-    map: ban.map,
-    game: {
-      tier,
-      gameID: null,
-      matchID: ban.matchID,
-      homeTeamName: ban.Match.Home?.name ?? null,
-      homeTeamLogo: ban.Match.Home?.Franchise.Brand?.logo ?? null,
-      awayTeamName: ban.Match.Away?.name ?? null,
-      awayTeamLogo: ban.Match.Away?.Franchise.Brand?.logo ?? null,
-    },
-  }));
+  const playedMaps = nightGames.map((game) => toPlayedMapEntry(game, tier));
+  const bannedMaps = nightBans.map((ban) => toBannedMapEntry(ban, tier));
   const matchCount = new Set(
     nightGames.map((game) => game.Match?.matchID)
   ).size;
@@ -169,33 +134,7 @@ async function findNightGames(season: number, tier: Tier, matchDay: number) {
       winner: { not: null },
       Match: { matchDay },
     },
-    select: {
-      gameID: true,
-      map: true,
-      Match: {
-        select: {
-          matchID: true,
-          dateScheduled: true,
-          Home: { select: teamNameAndLogoSelect },
-          Away: { select: teamNameAndLogoSelect },
-        },
-      },
-      PlayerStats: {
-        select: {
-          userID: true,
-          ratingAttack: true,
-          ratingDefense: true,
-          acs: true,
-          kills: true,
-          deaths: true,
-          Player: {
-            select: {
-              PrimaryRiotAccount: { select: { riotIGN: true } },
-            },
-          },
-        },
-      },
-    },
+    select: recapGameSelect,
   });
 }
 
@@ -205,29 +144,8 @@ async function findNightBans(season: number, tier: Tier, matchDay: number) {
       type: MapBanType.BAN,
       Match: { season, tier, matchDay },
     },
-    select: {
-      map: true,
-      matchID: true,
-      Match: {
-        select: {
-          Home: { select: teamNameAndLogoSelect },
-          Away: { select: teamNameAndLogoSelect },
-        },
-      },
-    },
+    select: recapBanSelect,
   });
-}
-
-type NightGame = Awaited<ReturnType<typeof findNightGames>>[number];
-
-function matchupFieldsOf(game: NightGame) {
-  return {
-    matchID: game.Match?.matchID ?? null,
-    homeTeamName: game.Match?.Home?.name ?? null,
-    homeTeamLogo: game.Match?.Home?.Franchise.Brand?.logo ?? null,
-    awayTeamName: game.Match?.Away?.name ?? null,
-    awayTeamLogo: game.Match?.Away?.Franchise.Brand?.logo ?? null,
-  };
 }
 
 function buildOverallView(playedTierNights: TierNight[]): RecapView {
