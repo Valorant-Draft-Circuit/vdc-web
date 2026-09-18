@@ -13,9 +13,7 @@ import {
 import {
   BracketTeam,
   Round,
-  SeriesResult,
   SeriesSlot,
-  seriesResult,
 } from "@/lib/common/bracket";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import {
