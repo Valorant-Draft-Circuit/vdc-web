@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { getMediaSource } from "@/lib/common/discord";
+import {
+  DISCORD_GUILD_ID,
+  fetchGuildMember,
+  getGuildMediaSource,
+  getMediaSource,
+} from "@/lib/common/discord";
 import { updatePlayerDocument } from "@/lib/meilisearch/updatePlayerDocument";
 
 export type DiscordMedia = { image: string | null; banner: string | null };
@@ -47,8 +52,13 @@ export async function refreshDiscordMedia(userId: string): Promise<DiscordMedia>
     return stored;
   }
 
-  const image = getMediaSource(fresh.avatar ?? null, "avatar", discordId);
-  const banner = getMediaSource(fresh.banner ?? null, "banner", discordId);
+  const member = await fetchGuildMember(discordId);
+  const image =
+    getGuildMediaSource(member?.avatar ?? null, "avatar", DISCORD_GUILD_ID, discordId) ??
+    getMediaSource(fresh.avatar ?? null, "avatar", discordId);
+  const banner =
+    getGuildMediaSource(member?.banner ?? null, "banner", DISCORD_GUILD_ID, discordId) ??
+    getMediaSource(fresh.banner ?? null, "banner", discordId);
 
   const changes: { image?: string | null; banner?: string | null } = {};
   if (image !== user.image) {

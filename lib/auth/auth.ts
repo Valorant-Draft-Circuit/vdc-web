@@ -5,7 +5,12 @@ import { Adapter } from "next-auth/adapters";
 import { prisma } from "../prisma";
 import { OAuthConfig } from "next-auth/providers";
 import { updatePlayerDocument } from "@/lib/meilisearch/updatePlayerDocument";
-import { getMediaSource } from "@/lib/common/discord";
+import {
+  DISCORD_GUILD_ID,
+  fetchGuildMember,
+  getGuildMediaSource,
+  getMediaSource,
+} from "@/lib/common/discord";
 
 declare module "next-auth" {
   interface User {
@@ -170,10 +175,16 @@ async function handleDiscordCallback(account, user) {
   }).then((res) => res.json());
 
   const { avatar, id, banner } = freshProfile;
-  if (!avatar) return;
 
-  const imageSrc = getMediaSource(avatar, "avatar", id);
-  const bannerSrc = getMediaSource(banner, "banner", id);
+  const member = await fetchGuildMember(id);
+  const imageSrc =
+    getGuildMediaSource(member?.avatar ?? null, "avatar", DISCORD_GUILD_ID, id) ??
+    getMediaSource(avatar, "avatar", id);
+  const bannerSrc =
+    getGuildMediaSource(member?.banner ?? null, "banner", DISCORD_GUILD_ID, id) ??
+    getMediaSource(banner, "banner", id);
+
+  if (!imageSrc) return;
 
   const existingUser = await prisma.user.findUnique({
     where: { id: user.id },
