@@ -6,8 +6,9 @@ import { Session } from "next-auth";
 import Link from "next/link";
 import { SignOutButton } from "../auth/SignOut";
 import { getUser } from "@/lib/queries/user/user";
-import { getSignupState } from "@/lib/queries/control/control";
+import { getLeagueState, getSignupState } from "@/lib/queries/control/control";
 import { matchDayTimeWithFallback } from "@/lib/common/times";
+import { Flags } from "@/prisma";
 const PREVIEW = Boolean(process.env.PREVIEW);
 
 export default async function HeroSection({
@@ -96,6 +97,7 @@ async function Joined({ session }: { session: Session }) {
 
   const user = await getUser(session.user.id);
   const signupState = await getSignupState();
+  const seasonState = await getLeagueState();
   if (signupState === "CLOSED") {
     return (
       <>
@@ -149,6 +151,34 @@ async function Joined({ session }: { session: Session }) {
           </button>
         </div>
       </div>
+    );
+  } else if (seasonState === "COMBINES") {
+    const rankedBypass = ((BigInt(user?.flags ?? 0) ) & BigInt(Flags.RANKED_BYPASS))
+    const rankedGamesCompleted = user?.PrimaryRiotAccount?.MMR?.numRanked ?? 0;
+    const combineGamesCompleted = user?.PrimaryRiotAccount?.MMR?.numCombines ?? 0;
+    let combinesNeeded = Math.max(0, 8 - combineGamesCompleted);
+    if (rankedBypass) {
+      combinesNeeded = Math.max(0, 18 - Math.min(10, rankedGamesCompleted) - combineGamesCompleted);
+    }
+    
+    return (
+      <>
+        <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
+          {user!.name} has {rankedGamesCompleted} ranked games completed.
+          <br />
+          And needs {combinesNeeded} more combine games.
+        </h2>
+        <div>
+          <button
+            type="button"
+            className="rounded-md bg-vdcRed px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          >
+            <Link href={"/schedule"}>
+              <h1>View Schedule</h1>
+            </Link>
+          </button>
+        </div>
+      </>
     );
   }
   // TODO: set button to go to wherever user specified in user settings

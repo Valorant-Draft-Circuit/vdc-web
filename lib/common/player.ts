@@ -1,6 +1,5 @@
 import { LeagueStatus, Tier } from "@prisma/client";
 import { TIER_RANK } from "@/lib/common/constants/tiers";
-import { Player } from "@/prisma";
 
 export function isUserPlaying(player) {
   if (

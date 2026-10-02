@@ -90,6 +90,8 @@ export async function getUser(id: string) {
         select: {
           MMR: {
             select: {
+              numRanked: true,
+              numCombines: true,
               mmrEffective: true,
             },
           },
