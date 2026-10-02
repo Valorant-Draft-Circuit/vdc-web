@@ -13,6 +13,7 @@ type FreeAgentStat = {
   ratingAttack: number | null;
   ratingDefense: number | null;
   acs: number | null;
+  performance: number | null;
   kast: number | null;
   kills: number | null;
   deaths: number | null;
