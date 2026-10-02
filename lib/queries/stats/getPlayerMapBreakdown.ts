@@ -24,6 +24,7 @@ export type PlayerMapBreakdown = {
   };
   averages: {
     acs: number;
+    performance: number;
     kast: number;
     hsPercent: number;
     ratingAttack: number;
@@ -55,8 +56,8 @@ function emptyAccumulator(map: string): Accumulator {
     rounds: 0,
     roundsWon: 0,
     totals: { kills: 0, deaths: 0, assists: 0 },
-    averageSums: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0 },
-    averageCounts: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0 },
+    averageSums: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0, performance: 0 },
+    averageCounts: { acs: 0, kast: 0, hsPercent: 0, ratingAttack: 0, ratingDefense: 0, performance: 0 },
     roleCounts: emptyRoleCounts(),
     roleIcons: {
       DUELIST: null,
@@ -92,6 +93,7 @@ export const getPlayerMapBreakdown = cache(
         deaths: true,
         assists: true,
         acs: true,
+        performance: true,
         kast: true,
         hsPercent: true,
         ratingAttack: true,
@@ -137,6 +139,7 @@ export const getPlayerMapBreakdown = cache(
         acc.averageCounts[key] += 1;
       };
       addToAverage("acs", r.acs);
+      addToAverage("performance", r.performance);
       addToAverage("kast", r.kast);
       addToAverage("hsPercent", r.hsPercent);
       addToAverage("ratingAttack", r.ratingAttack);
@@ -176,6 +179,7 @@ export const getPlayerMapBreakdown = cache(
         totals: acc.totals,
         averages: {
           acs: mean(acc.averageSums.acs, acc.averageCounts.acs),
+          performance: mean(acc.averageSums.performance, acc.averageCounts.performance),
           kast: mean(acc.averageSums.kast, acc.averageCounts.kast),
           hsPercent: mean(acc.averageSums.hsPercent, acc.averageCounts.hsPercent),
           ratingAttack: mean(acc.averageSums.ratingAttack, acc.averageCounts.ratingAttack),

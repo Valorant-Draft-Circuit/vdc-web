@@ -7,6 +7,7 @@ export type LobbyStatRow = {
   team: number | null;
   agent: string;
   acs: number | null;
+  performance: number | null;
   ratingAttack: number | null;
   ratingDefense: number | null;
   hsPercent: number | null;
@@ -28,6 +29,7 @@ export const getLobbyStatsForGames = cache(
         team: true,
         agent: true,
         acs: true,
+        performance: true,
         ratingAttack: true,
         ratingDefense: true,
         hsPercent: true,

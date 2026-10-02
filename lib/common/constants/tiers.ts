@@ -5,6 +5,7 @@ import {
   VDC_ORANGE,
   VDC_PURPLE,
   VDC_YELLOW,
+  VDC_PINK,
 } from "./colors";
 
 export type RankedTier = Exclude<Tier, "MIXED">;
@@ -28,6 +29,15 @@ export const RANKED_TIERS: TierMeta[] = [
     bgGradient: "from-vdcPurple/30",
     outline: "outline-vdcPurple",
     winnerGradient: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcPurple",
+  },
+  {
+    tier: Tier.LEGEND,
+    token: "vdcPink",
+    hex: VDC_PINK,
+    bg: "bg-vdcPink/15",
+    bgGradient: "from-vdcPink/30",
+    outline: "outline-vdcPink",
+    winnerGradient: "bg-gradient-to-br from-yellow-300 via-amber-400 to-vdcPink",
   },
   {
     tier: Tier.EXPERT,

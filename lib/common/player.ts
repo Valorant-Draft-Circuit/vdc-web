@@ -1,5 +1,6 @@
 import { LeagueStatus, Tier } from "@prisma/client";
 import { TIER_RANK } from "@/lib/common/constants/tiers";
+import { Player } from "@/prisma";
 
 export function isUserPlaying(player) {
   if (
@@ -109,6 +110,7 @@ type FreeAgentGameStat = {
   ratingAttack: number | null;
   ratingDefense: number | null;
   acs: number | null;
+  performance: number | null;
   kast: number | null;
   kills: number | null;
   deaths: number | null;
@@ -131,6 +133,7 @@ export type FreeAgentSeasonSummary = {
   losses: number;
   avgRating: number;
   avgAcs: number;
+  avgPerformance: number;
   avgKast: number;
   kda: number;
   adr: number;
@@ -154,6 +157,8 @@ export function summarizeFreeAgentSeason(
   let ratingCount = 0;
   let acsSum = 0;
   let acsCount = 0;
+  let performanceSum = 0;
+  let performanceCount = 0;
   let kastSum = 0;
   let kastCount = 0;
   let totalKills = 0;
@@ -182,6 +187,10 @@ export function summarizeFreeAgentSeason(
       acsSum += stat.acs;
       acsCount += 1;
     }
+    if (stat.performance !== null) {
+      performanceSum += stat.performance;
+      performanceCount += 1;
+    }
     if (stat.kast !== null) {
       kastSum += stat.kast;
       kastCount += 1;
@@ -207,6 +216,7 @@ export function summarizeFreeAgentSeason(
     losses,
     avgRating: ratingCount === 0 ? 0 : ratingSum / ratingCount,
     avgAcs: acsCount === 0 ? 0 : acsSum / acsCount,
+    avgPerformance: performanceCount === 0 ? 0 : performanceSum / performanceCount,
     avgKast: kastCount === 0 ? 0 : kastSum / kastCount,
     kda:
       totalDeaths === 0

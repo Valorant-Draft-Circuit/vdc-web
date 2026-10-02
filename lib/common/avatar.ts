@@ -2,6 +2,7 @@ import {
   VDC_BLUE,
   VDC_GREEN,
   VDC_ORANGE,
+  VDC_PINK,
   VDC_PURPLE,
   VDC_RED,
   VDC_YELLOW,
@@ -9,6 +10,7 @@ import {
 
 const AVATAR_PALETTE = [
   VDC_PURPLE,
+  VDC_PINK,
   VDC_BLUE,
   VDC_GREEN,
   VDC_YELLOW,

@@ -26,6 +26,7 @@ export const recapGameSelect = {
       ratingAttack: true,
       ratingDefense: true,
       acs: true,
+      performance: true,
       kills: true,
       deaths: true,
       Player: {
@@ -74,6 +75,7 @@ export function toStatRows(game: RecapGame, tier: Tier): NightStatRow[] {
     ratingAttack: stat.ratingAttack,
     ratingDefense: stat.ratingDefense,
     acs: stat.acs,
+    performance: stat.performance,
     kills: stat.kills,
     deaths: stat.deaths,
   }));

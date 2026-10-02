@@ -22,6 +22,7 @@ export const HEADERS = [
   "ATK_RATING",
   "DEF_RATING",
   "ACS",
+  "PERFORMANCE",
   "K",
   "D",
   "A",
@@ -61,6 +62,7 @@ export const FIELDS = [
   { key: "attackRating", label: "ATK", title: "Attack Rating" },
   { key: "defenseRating", label: "DEF", title: "Defense Rating" },
   { key: "acs", label: "ACS", title: "Average Combat Score" },
+  { key: "performance", label: "PERF", title: "Performance Score" },
   { key: "totalKills", label: "K", title: "Kills" },
   { key: "totalDeaths", label: "D", title: "Deaths" },
   { key: "totalAssists", label: "A", title: "Assists" },
@@ -104,6 +106,7 @@ export type GroupedPlayerStats = {
   };
   _avg: {
     acs: number | null;
+    performance: number | null;
     ratingAttack: number | null;
     ratingDefense: number | null;
     kast: number | null;
@@ -139,6 +142,7 @@ export type GroupedGamePlayerStats = {
   };
   _avg: {
     acs: number | null;
+    performance: number | null;
     ratingAttack: number | null;
     ratingDefense: number | null;
     kast: number | null;
@@ -176,6 +180,7 @@ export type FormattedStat = {
   currentTier: Tier;
   matchesPlayed: number;
   acs: number | null;
+  performance: number | null;
   rating: number | null;
   attackRating: number | null;
   defenseRating: number | null;
@@ -204,6 +209,7 @@ export type FormattedGameStat = {
   team: string | null;
   agents: string[] | null;
   acs: number | null;
+  performance: number | null;
   attackRating: number | null;
   defenseRating: number | null;
   totalKills: number | null;
@@ -317,6 +323,7 @@ async function getStatsByTeam(teamId: number, season: number) {
     },
     _avg: {
       acs: true,
+      performance: true,
       ratingAttack: true,
       ratingDefense: true,
       kast: true,
@@ -407,6 +414,7 @@ async function getAggregatedPlayerStatsByMatch(
               exitKills: true,
               clutches: true,
               acs: true,
+              performance: true,
               ratingAttack: true,
               ratingDefense: true,
               kast: true,
@@ -448,6 +456,7 @@ async function getAggregatedPlayerStatsByMatch(
           },
           _avg: {
             acs: 0,
+            performance: 0,
             ratingAttack: 0,
             ratingDefense: 0,
             kast: 0,
@@ -519,6 +528,7 @@ export async function getPlayerStatsByGame(
     },
     _avg: {
       acs: true,
+      performance: true,
       ratingAttack: true,
       ratingDefense: true,
       kast: true,
@@ -586,6 +596,7 @@ async function getOverallPlayerStats(query: StatsQuery) {
     },
     _avg: {
       acs: true,
+      performance: true,
       ratingAttack: true,
       ratingDefense: true,
       kast: true,
@@ -652,6 +663,7 @@ async function formatStats(opts: {
         agents: stats.agents ?? null,
         team: stats.team,
         acs: stats._avg.acs,
+        performance: stats._avg.performance,
         attackRating: stats._avg.ratingAttack,
         defenseRating: stats._avg.ratingDefense,
         totalKills: kills,
@@ -704,6 +716,7 @@ async function formatStats(opts: {
         currentTier: user.tier,
         matchesPlayed: stats._count.userID,
         acs: stats._avg.acs,
+        performance: stats._avg.performance,
         rating:
           stats._avg.ratingAttack !== null && stats._avg.ratingDefense !== null
             ? (stats._avg.ratingAttack + stats._avg.ratingDefense) / 2

@@ -12,6 +12,7 @@ export type BestGameRef = {
   matchID: number;
   map: string | null;
   acs: number;
+  performance: number;
   kills: number;
   deaths: number;
   playerTeamId: number | null;
@@ -40,6 +41,7 @@ export type PlayerAgentBreakdown = {
   };
   averages: {
     acs: number;
+    performance: number;
     kast: number;
     hsPercent: number;
     ratingAttack: number;
@@ -76,11 +78,11 @@ function emptyAccumulator(agent: string): Accumulator {
       clutches: 0, damage: 0,
     },
     averageSums: {
-      acs: 0, kast: 0, hsPercent: 0,
+      acs: 0, kast: 0, hsPercent: 0, performance: 0,
       ratingAttack: 0, ratingDefense: 0,
     },
     averageCounts: {
-      acs: 0, kast: 0, hsPercent: 0,
+      acs: 0, kast: 0, hsPercent: 0, performance: 0,
       ratingAttack: 0, ratingDefense: 0,
     },
     bestGame: null,
@@ -123,6 +125,7 @@ export const getPlayerAgentBreakdown = cache(
         clutches: true,
         damage: true,
         acs: true,
+        performance: true,
         kast: true,
         hsPercent: true,
         ratingAttack: true,
@@ -174,17 +177,19 @@ export const getPlayerAgentBreakdown = cache(
         acc.averageCounts[key] += 1;
       };
       addToAverage("acs", r.acs);
+      addToAverage("performance", r.performance);
       addToAverage("kast", r.kast);
       addToAverage("hsPercent", r.hsPercent);
       addToAverage("ratingAttack", r.ratingAttack);
       addToAverage("ratingDefense", r.ratingDefense);
 
-      if (r.Game.Match && r.acs !== null) {
+      if (r.Game.Match && r.acs !== null && r.performance !== null) {
         const candidate: BestGameRef = {
           gameID: r.Game.gameID,
           matchID: r.Game.Match.matchID,
           map: r.Game.map,
           acs: r.acs,
+          performance: r.performance,
           kills: r.kills ?? 0,
           deaths: r.deaths ?? 0,
           playerTeamId: r.team,
@@ -213,6 +218,7 @@ export const getPlayerAgentBreakdown = cache(
         totals: acc.totals,
         averages: {
           acs: mean(acc.averageSums.acs, acc.averageCounts.acs),
+          performance: mean(acc.averageSums.performance, acc.averageCounts.performance),
           kast: mean(acc.averageSums.kast, acc.averageCounts.kast),
           hsPercent: mean(acc.averageSums.hsPercent, acc.averageCounts.hsPercent),
           ratingAttack: mean(

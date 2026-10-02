@@ -24,6 +24,7 @@ export type RosterPlayer = FranchiseTeamRosterPlayer & {
 type PlayerEnrichedStats = {
   matchesPlayed: number;
   acs: number | null;
+  performance: number | null;
   attackRating: number | null;
   defenseRating: number | null;
   totalKills: number | null;
@@ -56,6 +57,7 @@ export default async function getFranchiseDetails(slug, season) {
         ? {
             matchesPlayed: stats._count.userID,
             acs: stats._avg.acs,
+            performance: stats._avg.performance,
             attackRating: stats._avg.ratingAttack,
             defenseRating: stats._avg.ratingDefense,
             totalKills: stats._sum.kills,
@@ -176,6 +178,11 @@ async function getFranchise(slug) {
           Accounts: { where: { provider: "discord" } },
         },
       },
+      AGM5: {
+        include: {
+          Accounts: { where: { provider: "discord" } },
+        },
+      },
     },
   });
 }
@@ -210,6 +217,7 @@ async function getPlayerStats(franchise, season) {
     },
     _avg: {
       acs: true,
+      performance: true,
       ratingAttack: true,
       ratingDefense: true,
       kast: true,
@@ -341,6 +349,8 @@ export const getManagerFranchiseSlug = cache(async (userId: string) => {
         { agm1ID: userId },
         { agm2ID: userId },
         { agm3ID: userId },
+        { agm4ID: userId },
+        { agm5ID: userId },
       ],
     },
     select: { slug: true },
