@@ -10,6 +10,7 @@ export type MmrTierLines = {
   PROSPECT: TierRange;
   APPRENTICE: TierRange;
   EXPERT: TierRange;
+  LEGEND: TierRange;
   MYTHIC: TierRange;
 };
 

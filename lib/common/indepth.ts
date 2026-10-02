@@ -15,6 +15,7 @@ export type StatRow = {
   ratingAttack: number | null;
   ratingDefense: number | null;
   acs: number | null;
+  performance: number | null;
   kast: number | null;
   hsPercent: number | null;
   kills: number | null;
@@ -38,6 +39,7 @@ export type RawStatRow = {
   ratingAttack: number | null;
   ratingDefense: number | null;
   acs: number | null;
+  performance: number | null;
   kast: number | null;
   hsPercent: number | null;
   kills: number | null;
@@ -81,6 +83,7 @@ export function toStatRows(
       ratingAttack: row.ratingAttack,
       ratingDefense: row.ratingDefense,
       acs: row.acs,
+      performance: row.performance,
       kast: row.kast,
       hsPercent: row.hsPercent,
       kills: row.kills,
@@ -107,6 +110,7 @@ export type AggregatedStats = {
   losses: number;
   winPct: number;
   acs: number;
+  performance: number;
   adr: number;
   totalKills: number;
   totalDeaths: number;
@@ -163,6 +167,7 @@ export type StatAccumulator = {
   plants: number;
   defuses: number;
   acs: MeanAccumulator;
+  performance: MeanAccumulator;
   kast: MeanAccumulator;
   hsPercent: MeanAccumulator;
   ratingAttack: MeanAccumulator;
@@ -199,6 +204,7 @@ export function createStatAccumulator(): StatAccumulator {
     plants: 0,
     defuses: 0,
     acs: createMeanAccumulator(),
+    performance: createMeanAccumulator(),
     kast: createMeanAccumulator(),
     hsPercent: createMeanAccumulator(),
     ratingAttack: createMeanAccumulator(),
@@ -224,6 +230,7 @@ export function foldStatRow(acc: StatAccumulator, row: StatRow): void {
   acc.plants += presentOrZero(row.plants);
   acc.defuses += presentOrZero(row.defuses);
   foldMean(acc.acs, row.acs);
+  foldMean(acc.performance, row.performance);
   foldMean(acc.kast, row.kast);
   foldMean(acc.hsPercent, row.hsPercent);
   foldMean(acc.ratingAttack, row.ratingAttack);
@@ -241,6 +248,7 @@ export function finalizeAggregatedStats(acc: StatAccumulator): AggregatedStats {
     losses: acc.games - acc.wins,
     winPct: acc.games === 0 ? 0 : (acc.wins / acc.games) * 100,
     acs: meanValue(acc.acs),
+    performance: meanValue(acc.performance),
     adr: ratio(acc.damage, acc.rounds),
     totalKills: acc.kills,
     totalDeaths: acc.deaths,
@@ -314,6 +322,7 @@ export function derivePrimaryRole(
 
 export type ComparableStat =
   | "acs"
+  | "performance"
   | "adr"
   | "ratingOverall"
   | "ratingAttack"
@@ -329,6 +338,7 @@ export type ComparableStat =
 
 export const COMPARABLE_STAT_LABELS: Record<ComparableStat, string> = {
   acs: "ACS",
+  performance: "performance",
   adr: "ADR",
   ratingOverall: "Rating",
   ratingAttack: "ATK Rating",
@@ -361,6 +371,7 @@ export function formatStatValue(stat: ComparableStat, value: number): string {
 
 export const RADAR_STATS: ComparableStat[] = [
   "acs",
+  "performance",
   "kast",
   "fkPct",
   "hsPercent",
@@ -382,6 +393,7 @@ export function toPeerStats(
 ): Record<ComparableStat, number> {
   return {
     acs: agg.acs,
+    performance: agg.performance,
     adr: agg.adr,
     ratingOverall: agg.ratingOverall,
     ratingAttack: agg.ratingAttack,
@@ -471,6 +483,7 @@ export function percentileAndRank(
 export type TrendMetric =
   | "rating"
   | "acs"
+  | "performance"
   | "adr"
   | "kast"
   | "kd"
@@ -479,6 +492,7 @@ export type TrendMetric =
 export const TREND_METRIC_TO_COMPARABLE: Record<TrendMetric, ComparableStat> = {
   rating: "ratingOverall",
   acs: "acs",
+  performance: "performance",
   adr: "adr",
   kast: "kast",
   kd: "kd",
@@ -502,6 +516,7 @@ export function averageTrendMetrics(
 export const TREND_METRIC_LABELS: Record<TrendMetric, string> = {
   rating: "Rating",
   acs: "ACS",
+  performance: "PERFORMANCE",
   adr: "ADR",
   kast: "KAST%",
   kd: "K/D",
@@ -523,6 +538,8 @@ function metricValue(row: StatRow, metric: TrendMetric): number {
       );
     case "acs":
       return presentOrZero(row.acs);
+    case "performance":
+      return presentOrZero(row.performance);
     case "adr":
       return ratio(presentOrZero(row.damage), row.rounds);
     case "kast":

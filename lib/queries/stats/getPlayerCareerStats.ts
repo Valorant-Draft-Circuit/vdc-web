@@ -25,6 +25,7 @@ export const getPlayerCareerStats = cache(
         ratingAttack: true,
         ratingDefense: true,
         acs: true,
+        performance: true,
         kast: true,
         hsPercent: true,
         kills: true,

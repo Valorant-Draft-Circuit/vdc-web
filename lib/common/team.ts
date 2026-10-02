@@ -14,6 +14,7 @@ export type RosterStatRow = {
   badge: RosterBadge | null;
   rating: number | null;
   acs: number | null;
+  performance: number | null;
   kills: number | null;
   deaths: number | null;
   assists: number | null;
@@ -44,6 +45,7 @@ export function buildRosterStatRows(
       badge: deriveBadge(player),
       rating: stat ? combinedRating(stat) : null,
       acs: stat?.acs ?? null,
+      performance: stat?.performance ?? null,
       kills: stat?.totalKills ?? null,
       deaths: stat?.totalDeaths ?? null,
       assists: stat?.totalAssists ?? null,

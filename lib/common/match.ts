@@ -51,6 +51,7 @@ export type StatRank = { rank: number; total: number };
 export type MatchStatRanks = {
   rating: StatRank | null;
   acs: StatRank | null;
+  performance: StatRank | null;
   adr: StatRank | null;
   hs: StatRank | null;
 };
@@ -106,6 +107,10 @@ export function computeLobbyRanks(
     userID: row.userID,
     value: row.acs,
   }));
+  const performancePool = lobbyRows.map((row) => ({
+    userID: row.userID,
+    value: row.performance,
+  }));
   const damagePool = lobbyRows.map((row) => ({
     userID: row.userID,
     value: row.damage,
@@ -118,6 +123,7 @@ export function computeLobbyRanks(
   return {
     rating: rankWithinLobby(ratingPool, viewedUserId),
     acs: rankWithinLobby(acsPool, viewedUserId),
+    performance: rankWithinLobby(performancePool, viewedUserId),
     adr: rankWithinLobby(damagePool, viewedUserId),
     hs: rankWithinLobby(hsPool, viewedUserId),
   };
@@ -127,7 +133,7 @@ export function findLobbyMvp(lobbyRows: LobbyStatRow[]): string | null {
   const averagedPlayers = lobbyRows
     .map((row) => {
       const ranks = computeLobbyRanks(lobbyRows, row.userID);
-      const rankValues = [ranks.rating, ranks.acs, ranks.adr]
+      const rankValues = [ranks.rating, ranks.performance, ranks.acs, ranks.adr]
         .filter((statRank): statRank is StatRank => statRank !== null)
         .map((statRank) => statRank.rank);
       if (rankValues.length === 0) return null;

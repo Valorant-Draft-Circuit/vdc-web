@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { GameType, Prisma, Tier } from "@prisma/client";
+import { GameType, MatchType, Prisma, Tier } from "@prisma/client";
 
 export type Game = Prisma.GamesGetPayload<{
   where: {
@@ -18,6 +18,26 @@ export type Game = Prisma.GamesGetPayload<{
         home: true;
         away: true;
         matchDay: true;
+      };
+    };
+  };
+}>;
+
+export type PlayerStats = Prisma.PlayerStatsGetPayload<{
+   where: {
+    userID;
+    Game: {
+      winner: { not: null };
+      season: string;
+      Match: {
+        matchType: MatchType;
+      }
+    };
+  };
+  select: {
+    Game: {
+      select: {
+        tier: true;
       };
     };
   };
@@ -56,6 +76,36 @@ export async function getAllGamesBy(
   });
 }
 
+/**
+ * Fetch all Games played by the specified user in the season
+ * @param userID
+ * @param seasonNumber
+ * @returns all Games by the specified user in the season
+ */
+export async function getAllGamesByUser(
+  userID: string,
+  seasonNumber: number
+): Promise<PlayerStats[]> {
+  return prisma.playerStats.findMany({
+    where: {
+      userID: userID,
+      Game: {
+        season: seasonNumber,
+        winner: { not: null },
+        Match: {
+          matchType: MatchType.BO2,
+        }
+      },
+    },
+    select: {
+      Game: {
+        select: {
+          tier: true,
+        },
+      },
+    },
+  });
+}
 
 export function determineWinner(){
   
