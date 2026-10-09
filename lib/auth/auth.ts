@@ -53,6 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Discord({
       authorization:
         "https://discord.com/api/oauth2/authorize?scope=identify+guilds.join",
+      issuer: "https://discord.com",
     }),
     RiotProvider(),
   ],
