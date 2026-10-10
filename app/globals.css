@@ -35,10 +35,11 @@
 
   --color-vdcGrey: #32353a;
   --color-vdcCard: #1f1f24;
-  --color-vdcPurple: #9b59b6;
-  --color-vdcBlue: #3498db;
-  --color-vdcGreen: #2ecc71;
-  --color-vdcYellow: #f1c40f;
+  --color-vdcPurple: #A657A6;
+  --color-vdcPink: #fcb4ee;
+  --color-vdcBlue: #04AEE4;
+  --color-vdcGreen: #72C357;
+  --color-vdcYellow: #FEC335;
   --color-vdcOrange: #ff9266;
   --color-vdcWhite: #fffbf5;
   --color-vdcStaff: #68194f;
@@ -48,13 +49,13 @@
   --font-discord: "Discord", sans-serif;
   --font-roboto: "Roboto", sans-serif;
 }
-@source inline('{data-hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('{hover:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('{data-selected:,}border-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('data-selected:bg-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
-@source inline('from-{vdcRed,vdcPurple,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-hover:,}text-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{hover:,}text-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-hover:,}outline-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-selected:,}text-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('{data-selected:,}border-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('data-selected:bg-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
+@source inline('from-{vdcRed,vdcPurple,vdcPink,vdcBlue,vdcGreen,vdcYellow,vdcOrange}');
 
 body {
   background: var(--background);
