@@ -98,7 +98,9 @@ async function Joined({ session }: { session: Session }) {
   const user = await getUser(session.user.id);
   const signupState = await getSignupState();
   const seasonState = await getLeagueState();
-  if (signupState === "CLOSED") {
+  if (signupState === "CLOSED" && 
+      (user!.Status!.leagueStatus === LeagueStatus.UNREGISTERED ||
+       user!.Status!.leagueStatus === LeagueStatus.RETIRED)) {
     return (
       <>
         <h2 className="text-vdcRed lg:text-vdcWhite xl:text-vdcRed text-2xl">
