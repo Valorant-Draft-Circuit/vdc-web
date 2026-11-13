@@ -1,3 +1,6 @@
+import UnAuthorized from "@/components/auth/Unauthorized";
+import { viewerHasAccess } from "@/lib/auth/guards";
+import { ADMIN_ACCESS_LIST } from "@/lib/common/constants/roles";
 import KpiRow from "@/components/staff/admin/ops/KpiRow";
 import OpsInsights from "@/components/staff/admin/ops/OpsInsights";
 import QuoteBanner from "@/components/staff/admin/ops/QuoteBanner";
@@ -12,6 +15,7 @@ import { ControlPanel } from "@/prisma";
 import Link from "next/link";
 
 export default async function Page() {
+  if (!(await viewerHasAccess(ADMIN_ACCESS_LIST))) return <UnAuthorized />;
   const currentSeason = await ControlPanel.getSeason();
   const [leagueState, summary, composition, insights] = await Promise.all([
     ControlPanel.getLeagueState(),

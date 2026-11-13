@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -19,14 +22,9 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "blog.vdc.gg",
       },
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        protocol: "https",
-        hostname: "media.valorant-api.com",
-      },
+      ...(isDev
+        ? [{ protocol: "http" as const, hostname: "localhost" }]
+        : []),
       {
         protocol: "https",
         hostname: "vdc-assets.nyc3.cdn.digitaloceanspaces.com",

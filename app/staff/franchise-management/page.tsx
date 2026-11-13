@@ -1,7 +1,11 @@
+import UnAuthorized from "@/components/auth/Unauthorized";
+import { viewerHasAccess } from "@/lib/auth/guards";
+import { FM_ACCESS_LIST } from "@/lib/common/constants/roles";
 import Contracts from "@/components/staff/FM/Contracts";
 import SubUsagePanel from "@/components/staff/FM/SubUsagePanel";
 
 export default async function Page() {
+  if (!(await viewerHasAccess(FM_ACCESS_LIST))) return <UnAuthorized />;
   return (
     <div className="flex flex-col gap-2 px-4 py-2 sm:px-6">
       <section>

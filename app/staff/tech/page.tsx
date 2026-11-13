@@ -1,3 +1,6 @@
+import UnAuthorized from "@/components/auth/Unauthorized";
+import { viewerHasAccess } from "@/lib/auth/guards";
+import { TECH_ACCESS_LIST } from "@/lib/common/constants/roles";
 import Link from "next/link";
 import PlayerRoleSearch from "@/components/staff/tech/roles/PlayerRoleSearch";
 import WebMapbansDashboard from "@/components/staff/tech/webMapbans/WebMapbansDashboard";
@@ -5,6 +8,7 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { getWebMapbanMetrics } from "@/lib/queries/staff/webMapbans";
 
 export default async function Page() {
+  if (!(await viewerHasAccess(TECH_ACCESS_LIST))) return <UnAuthorized />;
   const season = await getSeasonCached();
   const metrics = await getWebMapbanMetrics(season);
 

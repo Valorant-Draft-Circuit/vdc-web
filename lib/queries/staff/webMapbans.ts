@@ -1,5 +1,7 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { TECH_ACCESS_LIST } from "@/lib/common/constants/roles";
 import { ControlPanel } from "@/prisma";
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
 import { MatchType, Tier, VetoSource } from "@prisma/client";
@@ -64,6 +66,7 @@ export type WebMapbanMetrics = {
 
 export const getWebMapbanMetrics = cache(
   async (season: number): Promise<WebMapbanMetrics> => {
+  await assertViewerAccess(TECH_ACCESS_LIST);
     const [rows, mapPoolStr, controlRows, upcomingMatches] = await Promise.all([
       prisma.mapBans.findMany({
         where: { Match: { season } },

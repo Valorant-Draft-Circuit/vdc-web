@@ -3,6 +3,8 @@ import { ModLogType, Prisma } from "@prisma/client";
 import { format, formatDistanceToNow } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import { MOD_TOOLS_EPOCH } from "@/prisma";
 import {
   ModLogDisplayType,
@@ -73,6 +75,7 @@ function toSanctionEntry(
 }
 
 export const getActiveSanctions = cache(async (): Promise<SanctionEntry[]> => {
+  await assertViewerAccess(MODERATION_ROLES);
   const now = new Date();
   const logs = await prisma.modLogs.findMany({
     where: {
@@ -93,6 +96,7 @@ export const getActiveSanctions = cache(async (): Promise<SanctionEntry[]> => {
 });
 
 export const getBans = cache(async (): Promise<SanctionEntry[]> => {
+  await assertViewerAccess(MODERATION_ROLES);
   const now = new Date();
   const logs = await prisma.modLogs.findMany({
     where: { type: ModLogType.BAN },
@@ -119,6 +123,7 @@ export type PickemDeletionEntry = PlayerIdentity & {
 
 export const getPickemDeletionQueue = cache(
   async (): Promise<PickemDeletionEntry[]> => {
+    await assertViewerAccess(MODERATION_ROLES);
     const logs = await prisma.modLogs.findMany({
       where: {
         type: ModLogType.NOTE,
@@ -172,6 +177,7 @@ const ESCALATION_WHERE = {
 
 export const getEscalationWatch = cache(
   async (): Promise<EscalationEntry[]> => {
+    await assertViewerAccess(MODERATION_ROLES);
     const escalationHaving = {
       discordID: { _count: { gte: ESCALATION_WARNING_THRESHOLD } },
     };
@@ -227,6 +233,7 @@ export type ModeratorActivityEntry = {
 
 export const getModeratorActivity = cache(
   async (): Promise<ModeratorActivityEntry[]> => {
+    await assertViewerAccess(MODERATION_ROLES);
     const grouped = await prisma.modLogs.groupBy({
       by: ["modID", "type"],
       where: EXCLUDING_PICKEM_DELETIONS,
@@ -287,6 +294,7 @@ export type PlayerModHistory = {
 
 export const getPlayerModHistory = cache(
   async (ign: string): Promise<PlayerModHistory | null> => {
+    await assertViewerAccess(MODERATION_ROLES);
     const user = await prisma.user.findFirst({
       where: { Accounts: { some: { riotIGN: ign } } },
       select: {

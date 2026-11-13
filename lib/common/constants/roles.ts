@@ -3,6 +3,12 @@ import { VDC_BLUE, VDC_GREEN, VDC_ORANGE, VDC_RED } from "./colors";
 
 export const SUPERUSER_ROLES = [Roles.OWNER, Roles.LEAD_TECH];
 
+export const ADMIN_ACCESS_LIST = [Roles.ADMIN];
+
+export const TECH_ACCESS_LIST = [Roles.LEAD_TECH];
+
+export const CONTROL_PANEL_ACCESS_LIST = [Roles.ADMIN, Roles.LEAD_TECH];
+
 export const MODERATION_ROLES = [
   Roles.ADMIN,
   Roles.LEAD_TECH,

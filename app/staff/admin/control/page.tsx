@@ -1,3 +1,6 @@
+import UnAuthorized from "@/components/auth/Unauthorized";
+import { viewerHasAccess } from "@/lib/auth/guards";
+import { ADMIN_ACCESS_LIST } from "@/lib/common/constants/roles";
 import ControlPanelForm from "@/components/staff/admin/control/ControlPanelForm";
 import { getAllControlPanel } from "@/lib/queries/control/control";
 import { Metadata } from "next";
@@ -8,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  if (!(await viewerHasAccess(ADMIN_ACCESS_LIST))) return <UnAuthorized />;
   const initialControls = await getAllControlPanel();
   return (
     <div className="min-h-full">

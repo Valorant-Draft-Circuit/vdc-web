@@ -1,3 +1,6 @@
+import UnAuthorized from "@/components/auth/Unauthorized";
+import { viewerHasAccess } from "@/lib/auth/guards";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import LeagueStateBadge from "@/components/staff/LeagueStateBadge";
 import ActiveMapBansPanel from "@/components/staff/moderation/ActiveMapBansPanel";
 import EscalationWatchPanel from "@/components/staff/moderation/EscalationWatchPanel";
@@ -22,6 +25,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ player?: string }>;
 }) {
+  if (!(await viewerHasAccess(MODERATION_ROLES))) return <UnAuthorized />;
   const { player } = await searchParams;
   const selectedIgn = player ?? null;
   const currentSeason = await ControlPanel.getSeason();

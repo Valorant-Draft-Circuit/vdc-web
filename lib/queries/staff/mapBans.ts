@@ -3,6 +3,8 @@ import { MatchType, ModLogType, Prisma, Tier } from "@prisma/client";
 import { format } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import { MOD_TOOLS_EPOCH } from "@/prisma";
 import { getMmmrTierLinesCached } from "@/lib/common/cache";
 import {
@@ -190,6 +192,7 @@ export type ActiveMapBanEntry = PlayerIdentity & {
 
 export const getActiveMapBans = cache(
   async (): Promise<ActiveMapBanEntry[]> => {
+    await assertViewerAccess(MODERATION_ROLES);
     const computed = await computeMapBans(await fetchMapBanRows());
     const active = computed.filter((ban) => ban.remaining > 0);
     if (active.length === 0) return [];

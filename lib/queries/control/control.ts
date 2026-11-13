@@ -1,6 +1,8 @@
 import { cache } from "react";
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { CONTROL_PANEL_ACCESS_LIST } from "@/lib/common/constants/roles";
 
 export type ControlPanelItem = {
   id: number;
@@ -75,6 +77,7 @@ export const getWebMapbansFlags = cache(async (): Promise<WebMapbansFlags> => {
 });
 
 export async function getAllControlPanel(): Promise<ControlPanelItem[]> {
+  await assertViewerAccess(CONTROL_PANEL_ACCESS_LIST);
   const rows = await prisma.controlPanel.findMany({ orderBy: { id: "asc" } });
   return rows.map((row) => ({
     id: row.id,

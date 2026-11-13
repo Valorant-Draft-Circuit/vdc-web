@@ -9,6 +9,8 @@ import {
   weeklySignupSeries,
 } from "@/lib/common/signups";
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { ADMIN_ACCESS_LIST } from "@/lib/common/constants/roles";
 import { GameType, LeagueStatus, MatchType, Tier } from "@prisma/client";
 import { addDays, subDays } from "date-fns";
 
@@ -31,6 +33,7 @@ export type AdminSummary = {
 };
 
 export async function getAdminSummary(): Promise<AdminSummary> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const [
     signedPlayerCount,
     freeAgentCount,
@@ -173,6 +176,7 @@ export async function getActiveTeamCountByTier(tier: Tier): Promise<number> {
 }
 
 export async function getRosterComposition(): Promise<TierComposition[]> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   return Promise.all(
     TIERS_LIST.map(async (tier) => {
       const [signed, fa, rfa, teams] = await Promise.all([
@@ -211,6 +215,7 @@ export type SignupQueue = {
 };
 
 export async function getSignupQueue(): Promise<SignupQueue> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const funnel = await Promise.all(
     SIGNUP_FUNNEL_STATUSES.map(async (status) => ({
       status,
@@ -264,6 +269,7 @@ export type UnreportedMatches = {
 };
 
 export async function getUnreportedMatches(season: number): Promise<UnreportedMatches> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const rows = await prisma.matches.findMany({
     where: {
       season,
@@ -321,6 +327,7 @@ export type UnderreportedGames = {
 export async function getUnderreportedGames(
   season: number,
 ): Promise<UnderreportedGames> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const rows = await prisma.games.findMany({
     where: {
       season,
@@ -372,6 +379,7 @@ export type UpcomingMissingVetos = {
 };
 
 export async function getUpcomingMissingVetos(season: number): Promise<UpcomingMissingVetos> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const now = new Date();
   const windowEnd = addDays(now, UPCOMING_VETO_WINDOW_DAYS);
 
@@ -424,6 +432,7 @@ async function getSeasonBoundaries(): Promise<SeasonBoundary[]> {
 }
 
 export async function getSignupTrend(): Promise<SignupTrend> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const [users, boundaries] = await Promise.all([
     prisma.user.findMany({ select: { createdAt: true } }),
     getSeasonBoundaries(),
@@ -448,6 +457,7 @@ export type OpsInsights = {
 };
 
 export async function getOpsInsights(season: number): Promise<OpsInsights> {
+  await assertViewerAccess(ADMIN_ACCESS_LIST);
   const [
     signupQueue,
     unreportedMatches,

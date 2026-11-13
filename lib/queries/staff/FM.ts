@@ -7,6 +7,8 @@ import {
   Tier,
 } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { assertViewerAccess } from "@/lib/auth/guards";
+import { FM_ACCESS_LIST } from "@/lib/common/constants/roles";
 import { cache } from "react";
 import { TIERS_ASCENDING, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { deriveTeamIdFromStats } from "@/lib/common/player";
@@ -24,6 +26,7 @@ export type FormattedContract = {
 };
 
 export async function getContractsData() {
+  await assertViewerAccess(FM_ACCESS_LIST);
   const contracts = await prisma.user.findMany({
     where: {
       OR: [
@@ -64,6 +67,7 @@ export async function getContractsData() {
 }
 
 export async function getFormattedContracts(): Promise<FormattedContract[]> {
+  await assertViewerAccess(FM_ACCESS_LIST);
   const [contracts, tierlines, FMAccess] = await Promise.all([
     getContractsData(),
     getMmmrTierLinesCached(),
@@ -139,6 +143,7 @@ type SubUsageAccumulator = {
 };
 
 export const getSeasonSubUsage = cache(async (): Promise<TierSubUsage[]> => {
+  await assertViewerAccess(FM_ACCESS_LIST);
   const season = await getSeasonCached();
   const seasonStats = await prisma.playerStats.findMany({
     where: { Game: { season: season, gameType: GameType.SEASON } },
