@@ -9,11 +9,16 @@ import { getSignupState } from "@/lib/queries/control/control";
 import type { SignUpInput } from "@/components/signup/SignUpForm";
 import { getAllGamesByUser } from "@/lib/queries/games/games";
 import { getMatchCount } from "@/lib/queries/match/match";
-import { isRateLimited } from "@/lib/common/rateLimit";
+import { headers } from "next/headers";
+import { clientIpFrom, isRateLimited } from "@/lib/common/rateLimit";
+import { verifyTurnstileToken } from "@/lib/common/turnstile";
 
 type SignUpResult = { ok: true } | { ok: false; error: string };
 
-export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
+export async function signupAction(
+  input: SignUpInput,
+  captchaToken?: string,
+): Promise<SignUpResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthenticated" };
@@ -29,6 +34,16 @@ export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
   }
   if (typeof input?.primaryValorantAccount !== "string") {
     return { ok: false, error: "Select a Riot account" };
+  }
+
+  const captchaSecret = process.env.TURNSTILE_SECRET_KEY;
+  if (captchaSecret) {
+    const ip = clientIpFrom(await headers());
+    if (!(await verifyTurnstileToken(captchaSecret, captchaToken, ip))) {
+      return { ok: false, error: "Captcha check failed, please try again" };
+    }
+  } else {
+    console.warn("[signup] TURNSTILE_SECRET_KEY is not set; captcha not verified");
   }
 
   const [status, ownedRiotAccount] = await Promise.all([

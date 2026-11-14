@@ -2,6 +2,7 @@ import "server-only";
 import { LeagueStatus } from "@prisma/client";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
+import { prisma } from "@/lib/prisma";
 import { MeiliPlayer } from "@/lib/types/meilisearch";
 
 export const PLAYER_SEARCH_PAGE_SIZE = 30;
@@ -33,6 +34,29 @@ export type PlayerSearchInput = {
 };
 
 export type PlayerSearchResult = { hits: MeiliPlayer[]; hasMore: boolean };
+
+/** MMR is never stored in the search index; it is read from the database only when it is public. */
+async function attachMmr(hits: MeiliPlayer[]): Promise<void> {
+  if (hits.length === 0) return;
+  const users = await prisma.user.findMany({
+    where: { id: { in: hits.map((hit) => String(hit.id)) } },
+    select: {
+      id: true,
+      PrimaryRiotAccount: {
+        select: { MMR: { select: { mmrEffective: true } } },
+      },
+    },
+  });
+  const mmrByUserId = new Map(
+    users.map((user) => [
+      user.id,
+      user.PrimaryRiotAccount?.MMR?.mmrEffective ?? null,
+    ]),
+  );
+  for (const hit of hits) {
+    hit.mmrEffective = mmrByUserId.get(String(hit.id)) ?? null;
+  }
+}
 
 /** Every filter value is checked against a fixed list, so nothing user-typed reaches the filter string. */
 export async function searchPlayers(
@@ -66,11 +90,10 @@ export async function searchPlayers(
     limit: PLAYER_SEARCH_PAGE_SIZE,
     offset: page * PLAYER_SEARCH_PAGE_SIZE,
     filter: filters,
-    attributesToRetrieve: options.includeMmr
-      ? [...PUBLIC_ATTRIBUTES, "mmrEffective"]
-      : PUBLIC_ATTRIBUTES,
+    attributesToRetrieve: PUBLIC_ATTRIBUTES,
   });
 
   const hits = result.hits as MeiliPlayer[];
+  if (options.includeMmr) await attachMmr(hits);
   return { hits, hasMore: hits.length === PLAYER_SEARCH_PAGE_SIZE };
 }

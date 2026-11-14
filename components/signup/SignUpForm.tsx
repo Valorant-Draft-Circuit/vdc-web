@@ -92,13 +92,14 @@ function SubmitSignUp() {
   }
   const ref = useRef<TurnstileInstance | null>(null);
   const [status, setStatus] = useState<CAPTCHA_STATUS | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
   const { handleSubmit } = useFormContext<SignUpInput>();
 
   const onSubmit: SubmitHandler<SignUpInput> = async (data) => {
     setLoading(true);
-    const result = await signupAction(data);
+    const result = await signupAction(data, captchaToken);
     setLoading(false);
 
     if (result.ok) {
@@ -110,6 +111,7 @@ function SubmitSignUp() {
       );
       ref.current?.reset();
       setStatus(null);
+      setCaptchaToken(undefined);
     }
   };
 
@@ -120,8 +122,15 @@ function SubmitSignUp() {
           siteKey="0x4AAAAAAALpf4cDrG3xTBbw"
           ref={ref}
           onError={() => setStatus(CAPTCHA_STATUS.ERROR)}
-          onExpire={() => ref.current?.reset()}
-          onSuccess={() => setStatus(CAPTCHA_STATUS.SOLVED)}
+          onExpire={() => {
+            setStatus(null);
+            setCaptchaToken(undefined);
+            ref.current?.reset();
+          }}
+          onSuccess={(token) => {
+            setCaptchaToken(token);
+            setStatus(CAPTCHA_STATUS.SOLVED);
+          }}
         />
         {status === CAPTCHA_STATUS.ERROR && (
           <button

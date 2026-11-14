@@ -59,7 +59,6 @@ async function getPlayerDocument(userId: string) {
       discordName: player.name,
       riotIGN: player.PrimaryRiotAccount?.riotIGN || null,
       tier: await determineTier(mmr),
-      mmrEffective: mmr,
       leagueStatus: player.Status?.leagueStatus || null,
       image: player.image,
     };
@@ -82,7 +81,6 @@ async function getPlayerDocument(userId: string) {
     discordName: player.name,
     riotIGN: player.PrimaryRiotAccount?.riotIGN || null,
     tier: player.Team?.tier || null,
-    mmrEffective: mmr,
     teamName: player.Team?.name || null,
     franchiseSlug: player.Team?.Franchise.slug || null,
     franchiseLogo: player.Team?.Franchise?.Brand?.logo || null,
