@@ -15,8 +15,7 @@ import { ChevronDownIcon, CheckIcon } from "@heroicons/react/16/solid";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ControllerRenderProps } from "react-hook-form";
-import { Maps } from "@/lib/common/valorant-api";
-import { getMapsCached } from "@/lib/common/cache";
+import { Maps, getMaps } from "@/lib/common/valorant-api";
 
 type FieldProps = {
   field: ControllerRenderProps;
@@ -182,7 +181,7 @@ export function MapPoolSelect({ field, label }: FieldProps) {
     let isMounted = true;
     async function loadMaps() {
       try {
-        const data = await getMapsCached();
+        const data = await getMaps();
         if (isMounted) {
           setMaps(data);
         }

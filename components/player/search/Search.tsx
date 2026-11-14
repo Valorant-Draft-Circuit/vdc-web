@@ -1,7 +1,7 @@
 "use client";
 
 import { MeiliPlayer } from "@/lib/types/meilisearch";
-import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
+import { searchPlayersAction } from "@/app/player/actions";
 import {
   Checkbox,
   Field,
@@ -19,6 +19,8 @@ import { STATUS_LABELS } from "@/lib/common/constants/leagueStatus";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 // import { LeagueStatus } from "@prisma/client";
 
+const SEARCH_DEBOUNCE_MS = 250;
+
 export default function PlayerSearch({ mmrShow }: { mmrShow: boolean }) {
   const defaultStatus = [
     // LeagueStatus.GENERAL_MANAGER,
@@ -35,41 +37,26 @@ export default function PlayerSearch({ mmrShow }: { mmrShow: boolean }) {
   const [tierFilter, setTierFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<string[]>(defaultStatus);
 
-  const index = meilisearchClient.getIndex("players");
-  const LIMIT = 30;
-
-  function buildFilter(): string[] {
-    const filters: string[] = [];
-    if (tierFilter) filters.push(`tier = "${tierFilter}"`);
-    if (statusFilter.length > 0) {
-      filters.push(
-        statusFilter.map((s) => `leagueStatus = "${s}"`).join(" OR ")
-      );
-    }
-    return filters;
-  }
-
   async function fetchPage(q: string, pageNumber: number) {
     setLoading(true);
-    const offset = pageNumber * LIMIT;
 
     try {
-      const res = await index.search(truncate(q, 50), {
-        limit: LIMIT,
-        offset,
-        filter: buildFilter(),
+      const { hits, hasMore: more } = await searchPlayersAction({
+        query: q,
+        page: pageNumber,
+        tier: tierFilter,
+        statuses: statusFilter,
       });
 
-      const hits = res.hits as MeiliPlayer[];
       if (pageNumber === 0) {
         setSearchResults(hits);
       } else {
         setSearchResults((prev) => [...prev, ...hits]);
       }
 
-      setHasMore(hits.length === LIMIT);
+      setHasMore(more);
     } catch (err) {
-      console.error("Meilisearch error:", err);
+      console.error("Player search error:", err);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -77,13 +64,11 @@ export default function PlayerSearch({ mmrShow }: { mmrShow: boolean }) {
   }
 
   useEffect(() => {
-    void fetchPage("", 0);
-  }, []);
-
-  useEffect(() => {
     setPage(0);
     setHasMore(true);
-    void fetchPage(query, 0);
+    const timer = setTimeout(() => void fetchPage(query, 0), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, tierFilter, statusFilter]);
 
   const loadMore = () => {
@@ -228,8 +213,4 @@ function StatusFilter({
       </MenuItems>
     </Menu>
   );
-}
-
-function truncate(text: string, length: number) {
-  return text.length <= length ? text : text.substr(0, length) + "\u2026";
 }

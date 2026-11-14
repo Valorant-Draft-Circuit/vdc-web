@@ -1,10 +1,12 @@
 "use client";
 
 import { MeiliPlayer } from "@/lib/types/meilisearch";
-import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
+import { searchPlayersAction } from "@/app/player/actions";
 import { Input } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import PlayerCard from "./PlayerCard";
+
+const SEARCH_DEBOUNCE_MS = 250;
 
 export default function PlayerRoleSearch() {
   const [query, setQuery] = useState("");
@@ -13,36 +15,27 @@ export default function PlayerRoleSearch() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const index = meilisearchClient.getIndex("players");
-  const LIMIT = 30;
-
   async function fetchPage(q: string, pageNumber: number) {
     setLoading(true);
-    const offset = pageNumber * LIMIT;
 
     try {
-      const res = await index.search(truncate(q, 50), {
-        limit: LIMIT,
-        offset,
+      const { hits, hasMore: more } = await searchPlayersAction({
+        query: q,
+        page: pageNumber,
       });
-      const hits = res.hits as MeiliPlayer[];
       if (pageNumber === 0) {
         setSearchResults(hits);
       } else {
         setSearchResults((prev) => [...prev, ...hits]);
       }
-      setHasMore(hits.length === LIMIT);
+      setHasMore(more);
     } catch (err) {
-      console.error("Meilisearch error:", err);
+      console.error("Player search error:", err);
       setHasMore(false);
     } finally {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    void fetchPage("", 0);
-  }, []);
 
   useEffect(() => {
     if (query.trim() === "") {
@@ -53,7 +46,8 @@ export default function PlayerRoleSearch() {
 
     setPage(0);
     setHasMore(true);
-    void fetchPage(query, 0);
+    const timer = setTimeout(() => void fetchPage(query, 0), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
   }, [query]);
 
   const loadMore = () => {
@@ -107,8 +101,4 @@ export default function PlayerRoleSearch() {
       )}
     </div>
   );
-}
-
-function truncate(text: string, length: number) {
-  return text.length <= length ? text : text.substr(0, length) + "\u2026";
 }

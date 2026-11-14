@@ -4,8 +4,11 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { Player, Roles } from "@/prisma";
+import { ROLES } from "@/lib/common/constants/roles";
 
 type UpdateResult = { ok: true } | { ok: false; error: string };
+
+const KNOWN_ROLE_VALUES = new Set(ROLES.map((role) => role.value.toString()));
 
 export async function updateRolesAction(
   vdcId: string,
@@ -19,6 +22,14 @@ export async function updateRolesAction(
   const userRoles = await getUserRoles(session.user.id);
   if (!hasAccess(userRoles, [Roles.LEAD_TECH])) {
     return { ok: false, error: "Unauthorized" };
+  }
+
+  if (
+    typeof vdcId !== "string" ||
+    !Array.isArray(roles) ||
+    !roles.every((role) => KNOWN_ROLE_VALUES.has(String(role)))
+  ) {
+    return { ok: false, error: "Invalid request" };
   }
 
   const bigintRoles = roles.map((val) => BigInt(val));

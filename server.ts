@@ -1,5 +1,4 @@
-import { createServer } from "http";
-import { parse } from "url";
+import { createServer, IncomingMessage } from "http";
 import next from "next";
 import { WebSocketServer, WebSocket } from "ws";
 import { vetoEmitter } from "./lib/server/vetoEvents";
@@ -21,6 +20,70 @@ const mapbanRooms = new Map<string, Set<WebSocket>>();
 
 const HEARTBEAT_INTERVAL_MS = 30 * 1000;
 const livingSockets = new WeakSet<WebSocket>();
+
+const MAX_SOCKETS_TOTAL = 5000;
+const MAX_SOCKETS_PER_IP = 30;
+const MAX_INBOUND_PAYLOAD_BYTES = 1024;
+const socketsByIp = new Map<string, number>();
+let socketCount = 0;
+
+function clientIp(req: IncomingMessage): string {
+  const header = (name: string) => {
+    const value = req.headers[name];
+    return Array.isArray(value) ? value[0] : value;
+  };
+  return (
+    header("cf-connecting-ip") ??
+    header("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.socket.remoteAddress ??
+    "unknown"
+  );
+}
+
+/** Browsers always send Origin on a WebSocket handshake; it must be this site. */
+function isSameOrigin(req: IncomingMessage): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return false;
+
+  // Behind a proxy the Host header may be rewritten, so accept the forwarded
+  // host and the configured site URL as well.
+  const allowedHosts = new Set<string>();
+  const forwardedHost = req.headers["x-forwarded-host"];
+  for (const host of [req.headers.host, forwardedHost].flat()) {
+    if (host) allowedHosts.add(host);
+  }
+  try {
+    if (process.env.AUTH_URL) {
+      allowedHosts.add(new URL(process.env.AUTH_URL).host);
+    }
+    return allowedHosts.has(new URL(origin).host);
+  } catch {
+    return false;
+  }
+}
+
+function tryReserveSocket(ip: string): boolean {
+  const forIp = socketsByIp.get(ip) ?? 0;
+  if (socketCount >= MAX_SOCKETS_TOTAL || forIp >= MAX_SOCKETS_PER_IP) {
+    return false;
+  }
+  socketsByIp.set(ip, forIp + 1);
+  socketCount += 1;
+  return true;
+}
+
+function releaseSocket(ip: string) {
+  const forIp = (socketsByIp.get(ip) ?? 1) - 1;
+  if (forIp <= 0) socketsByIp.delete(ip);
+  else socketsByIp.set(ip, forIp);
+  socketCount = Math.max(0, socketCount - 1);
+}
+
+/** Clients only listen; anything they send is a protocol violation. */
+function trackSocket(socket: WebSocket, ip: string) {
+  socket.on("message", () => socket.close(1008));
+  socket.on("close", () => releaseSocket(ip));
+}
 
 function startHeartbeat() {
   setInterval(() => {
@@ -131,7 +194,10 @@ process.on("uncaughtException", (error) => {
 
 app.prepare().then(() => {
   const handleUpgrade = app.getUpgradeHandler();
-  const wss = new WebSocketServer({ noServer: true });
+  const wss = new WebSocketServer({
+    noServer: true,
+    maxPayload: MAX_INBOUND_PAYLOAD_BYTES,
+  });
 
   vetoEmitter().on("vetoChanged", (matchID: number) => {
     const room = vetoRooms.get(matchID);
@@ -178,34 +244,62 @@ app.prepare().then(() => {
   startLobbySweeper();
 
   const server = createServer((req, res) => {
-    handle(req, res, parse(req.url ?? "/", true));
+    handle(req, res);
   });
 
   server.on("upgrade", (req, socket, head) => {
-    const { pathname, query } = parse(req.url ?? "/", true);
+    let pathname = "";
+    let query = new URLSearchParams();
+    try {
+      const url = new URL(req.url ?? "/", "http://localhost");
+      pathname = url.pathname;
+      query = url.searchParams;
+    } catch {
+      socket.destroy();
+      return;
+    }
+
+    if (pathname !== "/ws/veto" && pathname !== "/ws/mapbans") {
+      handleUpgrade(req, socket, head);
+      return;
+    }
+
+    const ip = clientIp(req);
+    if (!isSameOrigin(req)) {
+      socket.destroy();
+      return;
+    }
+
     if (pathname === "/ws/veto") {
-      const matchID = Number(query.matchID);
-      if (!Number.isInteger(matchID)) {
-        console.warn(
-          `[ws - m${matchID}] rejected upgrade with bad matchID: ${req.url}`,
-        );
+      const matchID = Number(query.get("matchID"));
+      if (!Number.isSafeInteger(matchID) || matchID <= 0) {
         socket.destroy();
         return;
       }
-      wss.handleUpgrade(req, socket, head, (ws) => joinRoom(matchID, ws));
-      return;
-    }
-    if (pathname === "/ws/mapbans") {
-      const lobbyId = typeof query.lobbyId === "string" ? query.lobbyId : "";
-      if (!lobbyId || !mapbanLobbies().has(lobbyId)) {
-        console.warn(`[ws - lobby] rejected upgrade with bad lobbyId: ${req.url}`);
+      if (!tryReserveSocket(ip)) {
         socket.destroy();
         return;
       }
-      wss.handleUpgrade(req, socket, head, (ws) => joinMapbanRoom(lobbyId, ws));
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        trackSocket(ws, ip);
+        joinRoom(matchID, ws);
+      });
       return;
     }
-    handleUpgrade(req, socket, head);
+
+    const lobbyId = query.get("lobbyId") ?? "";
+    if (!lobbyId || !mapbanLobbies().has(lobbyId)) {
+      socket.destroy();
+      return;
+    }
+    if (!tryReserveSocket(ip)) {
+      socket.destroy();
+      return;
+    }
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      trackSocket(ws, ip);
+      joinMapbanRoom(lobbyId, ws);
+    });
   });
 
   server.listen(port, () => {

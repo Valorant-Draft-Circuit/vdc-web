@@ -1,42 +1,26 @@
-import { getUserRoles, isAuthorizedForMeilisearch } from "@/lib/auth/access";
-import { auth } from "@/lib/auth/auth";
+import { rejectUnlessSearchAdmin } from "@/lib/auth/internalAuth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { NextRequest, NextResponse } from "next/server";
+
+const KNOWN_INDEXES = ["players"];
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ name: string }> },
 ) {
-  const url = request.nextUrl;
-  const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
-  const bypass =
-    meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY;
-
-  if (!bypass) {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json(
-        { message: "Unauthorized: no valid session" },
-        { status: 401 },
-      );
-    }
-    const userId = session.user?.id;
-    if (!userId)
-      return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
-
-    const userRoles = await getUserRoles(userId);
-    if (!isAuthorizedForMeilisearch(userRoles)) {
-      return NextResponse.json(
-        { message: "Forbidden: insufficient permissions" },
-        { status: 403 },
-      );
-    }
-  }
+  const rejection = await rejectUnlessSearchAdmin(request);
+  if (rejection) return rejection;
 
   const indexName = (await params).name;
+  if (!KNOWN_INDEXES.includes(indexName)) {
+    return NextResponse.json(
+      { message: "Unknown index", status: 400 },
+      { status: 400 },
+    );
+  }
 
   try {
-    await meilisearchClient.getIndex(indexName);
+    await meilisearchClient.getIndex(indexName).getRawInfo();
     return NextResponse.json(
       { message: "Index already exists", status: 409 },
       { status: 409 },

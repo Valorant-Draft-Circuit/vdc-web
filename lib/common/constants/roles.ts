@@ -1,4 +1,4 @@
-import { Roles } from "@/prisma";
+import { Roles } from "@/prisma/enums";
 import { VDC_BLUE, VDC_GREEN, VDC_ORANGE, VDC_RED } from "./colors";
 
 export const SUPERUSER_ROLES = [Roles.OWNER, Roles.LEAD_TECH];

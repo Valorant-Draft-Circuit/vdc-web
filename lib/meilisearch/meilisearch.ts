@@ -1,46 +1,50 @@
+import "server-only";
 import { MeiliSearch, Index } from "meilisearch";
 
-class MeilisearchClient {
-  private static instance: MeilisearchClient;
-  private client: MeiliSearch;
+function createClient(): MeiliSearch {
+  const host =
+    process.env.MEILISEARCH_URL ?? process.env.NEXT_PUBLIC_MEILISEARCH_URL;
+  const apiKey = getMeilisearchKey();
 
-  private constructor() {
-    const host = process.env.NEXT_PUBLIC_MEILISEARCH_URL;
-    const apiKey = process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY;
-
-    if (!host) {
-      throw new Error("MEILISEARCH_URL is not defined");
-    }
-    this.client = new MeiliSearch({ host, apiKey });
+  if (!host) {
+    throw new Error("MEILISEARCH_URL is not defined");
   }
+  return new MeiliSearch({ host, apiKey });
+}
 
-  public static getInstance(): MeilisearchClient {
-    if (!MeilisearchClient.instance) {
-      MeilisearchClient.instance = new MeilisearchClient();
-    }
+/** The legacy NEXT_PUBLIC_ name is read only as a deploy-time fallback; this module is server-only. */
+export function getMeilisearchKey(): string | undefined {
+  return (
+    process.env.MEILISEARCH_MASTER_KEY ??
+    process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY
+  );
+}
 
-    return MeilisearchClient.instance;
-  }
+let client: MeiliSearch | null = null;
 
-  public getIndex(index: string): Index {
-    return this.client.index(index);
-  }
+function getClient(): MeiliSearch {
+  if (!client) client = createClient();
+  return client;
+}
 
-  public createIndex(index: string) {
-    return this.client.createIndex(index);
-  }
+export const meilisearchClient = {
+  getIndex(index: string): Index {
+    return getClient().index(index);
+  },
 
-  public async waitForTaskCompletion(taskUid, timeout = 5_000) {
+  createIndex(index: string) {
+    return getClient().createIndex(index);
+  },
+
+  async waitForTaskCompletion(taskUid: number, timeout = 5_000) {
     const start = Date.now();
     while (Date.now() - start < timeout) {
-      const task = await this.client.getTask(taskUid);
+      const task = await getClient().getTask(taskUid);
       if (task.status === "succeeded") return task;
       if (task.status === "failed")
         throw new Error(task.error?.message || "Task failed");
-      await new Promise((req) => setTimeout(req, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
     throw new Error("Task timed out");
-  }
-}
-
-export const meilisearchClient = MeilisearchClient.getInstance();
+  },
+};

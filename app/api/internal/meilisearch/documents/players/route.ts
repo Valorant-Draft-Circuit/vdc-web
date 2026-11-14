@@ -1,5 +1,4 @@
-import { getUserRoles, isAuthorizedForMeilisearch } from "@/lib/auth/access";
-import { auth } from "@/lib/auth/auth";
+import { rejectUnlessSearchAdmin } from "@/lib/auth/internalAuth";
 import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
 import { prisma } from "@/lib/prisma";
 import { LeagueStatus } from "@prisma/client";
@@ -7,32 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { determineTier } from "@/lib/common/tier";
 
 export async function GET(request: NextRequest) {
-  const url = request.nextUrl;
-  const meiliAuthFromUrl = url.searchParams.get("meiliauth") ?? "";
-  const bypass =
-    meiliAuthFromUrl === process.env.NEXT_PUBLIC_MEILISEARCH_MASTER_KEY;
-
-  if (!bypass) {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json(
-        { message: "Unauthorized: no valid session" },
-        { status: 401 },
-      );
-    }
-
-    const userId = session.user?.id;
-    if (!userId)
-      return NextResponse.json({ message: "Unauthorized." }, { status: 403 });
-
-    const userRoles = await getUserRoles(userId);
-    if (!isAuthorizedForMeilisearch(userRoles)) {
-      return NextResponse.json(
-        { message: "Forbidden: insufficient permissions" },
-        { status: 403 },
-      );
-    }
-  }
+  const rejection = await rejectUnlessSearchAdmin(request);
+  if (rejection) return rejection;
 
   const players = await getPlayers();
   if (!players || !Array.isArray(players)) {
@@ -52,9 +27,10 @@ export async function GET(request: NextRequest) {
       task: result,
       status: 200,
     });
-  } catch (err) {
+  } catch (error) {
+    console.error("[search] bulk player document update failed", error);
     return NextResponse.json(
-      { message: err || "Failed to add player documents", status: 400 },
+      { message: "Failed to add player documents", status: 400 },
       { status: 400 },
     );
   }

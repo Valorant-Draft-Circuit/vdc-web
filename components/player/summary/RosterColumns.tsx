@@ -3,10 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getAgentsCached } from "@/lib/common/cache";
 import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
 import { normalizeAgentName } from "@/lib/common/agents";
-import { Agents } from "@/lib/common/valorant-api";
+import { Agents, getAgents } from "@/lib/common/valorant-api";
 import type { LobbyRosters, RosterEntry } from "@/lib/common/match";
 
 export default function RosterColumns({ rosters }: { rosters: LobbyRosters }) {
@@ -16,7 +15,7 @@ export default function RosterColumns({ rosters }: { rosters: LobbyRosters }) {
     let isMounted = true;
     async function loadAgents() {
       try {
-        const data = await getAgentsCached();
+        const data = await getAgents();
         if (isMounted) {
           setAgents(data);
         }

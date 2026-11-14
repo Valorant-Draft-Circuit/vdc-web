@@ -1,5 +1,5 @@
-// import { auth } from "@/lib/auth";
-import { connection } from "next/server";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth/auth";
 import VerticalTab from "@/components/tabs/VerticalTab";
 import { TabElement } from "@/components/tabs/types";
 import ConnectedAccounts from "@/components/me/connected-accounts/ConnectedAccounts";
@@ -28,7 +28,8 @@ const tabs: TabElement[] = [
 ];
 
 export default async function page() {
-  await connection();
+  const session = await auth();
+  if (!session?.user?.id) redirect("/signin");
   return (
     <div className="mx-auto py-10 max-w-7xl xl:py-12 flex flex-col gap-10">
       <VerticalTab tabElements={tabs} params="section" />

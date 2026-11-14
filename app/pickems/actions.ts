@@ -20,10 +20,22 @@ import {
 import { getBracketLock } from "@/lib/queries/pickems/getBracketBoard";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import { validateBracketPicks } from "@/lib/pickems/bracket";
+import { isRateLimited } from "@/lib/common/rateLimit";
 
 type Result = { ok: true } | { ok: false; error: string };
 
 const MAX_GROUP_NAME_LENGTH = 60;
+const MAX_PICKS_PER_SUBMIT = 100;
+const MAX_JOIN_CODE_LENGTH = 16;
+const TIER_VALUES = new Set<string>(Object.values(Tier));
+
+function isBoundedList(value: unknown, max: number): value is unknown[] {
+  return Array.isArray(value) && value.length <= max;
+}
+
+function areIntegers(...values: unknown[]): boolean {
+  return values.every((value) => Number.isInteger(value));
+}
 const SUSPENDED_ERROR = "Suspended players cannot participate in Pick'ems";
 
 async function isSuspended(userId: string): Promise<boolean> {
@@ -46,6 +58,15 @@ export async function submitMatchPicks(input: {
   const userId = session.user.id;
   if (await isSuspended(userId)) {
     return { ok: false, error: SUSPENDED_ERROR };
+  }
+
+  if (!isBoundedList(input?.picks, MAX_PICKS_PER_SUBMIT)) {
+    return { ok: false, error: "Invalid picks" };
+  }
+  for (const pick of input.picks) {
+    if (!areIntegers(pick?.matchId, pick?.homeScore, pick?.awayScore)) {
+      return { ok: false, error: "Invalid picks" };
+    }
   }
 
   for (const pick of input.picks) {
@@ -110,6 +131,13 @@ export async function submitAdvancePick(input: {
   if (await isSuspended(userId)) {
     return { ok: false, error: SUSPENDED_ERROR };
   }
+  if (
+    !TIER_VALUES.has(input?.tier) ||
+    !isBoundedList(input.teams, MAX_PICKS_PER_SUBMIT) ||
+    !input.teams.every((team) => areIntegers(team?.teamId, team?.seed))
+  ) {
+    return { ok: false, error: "Invalid picks" };
+  }
   const season = await getSeasonCached();
 
   const lock = await getAdvanceLock(input.tier, season);
@@ -166,6 +194,15 @@ export async function submitBracketPicks(input: {
   if (await isSuspended(userId)) {
     return { ok: false, error: SUSPENDED_ERROR };
   }
+  if (
+    !TIER_VALUES.has(input?.tier) ||
+    !isBoundedList(input.picks, MAX_PICKS_PER_SUBMIT) ||
+    !input.picks.every((pick) =>
+      areIntegers(pick?.round, pick?.slot, pick?.teamId, pick?.loserGames),
+    )
+  ) {
+    return { ok: false, error: "Invalid picks" };
+  }
   const season = await getSeasonCached();
 
   const lock = await getBracketLock(input.tier, season);
@@ -212,6 +249,12 @@ export async function createGroup(input: {
     return { ok: false, error: SUSPENDED_ERROR };
   }
 
+  if (typeof input?.name !== "string" || typeof input.image !== "string") {
+    return { ok: false, error: "Invalid group" };
+  }
+  if (isRateLimited(`pickem-group-create:${session.user.id}`, 10, 60 * 60_000)) {
+    return { ok: false, error: "Too many groups created, try again later" };
+  }
   const name = input.name.trim();
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
     return { ok: false, error: "Name must be 1-60 chars" };
@@ -251,6 +294,13 @@ export async function updateGroup(input: {
     return { ok: false, error: SUSPENDED_ERROR };
   }
 
+  if (
+    typeof input?.name !== "string" ||
+    typeof input.image !== "string" ||
+    !Number.isInteger(input.groupId)
+  ) {
+    return { ok: false, error: "Invalid group" };
+  }
   const name = input.name.trim();
   if (name.length === 0 || name.length > MAX_GROUP_NAME_LENGTH) {
     return { ok: false, error: "Name must be 1-60 chars" };
@@ -286,6 +336,16 @@ export async function joinGroupByCode(input: {
     return { ok: false, error: SUSPENDED_ERROR };
   }
 
+  if (
+    typeof input?.code !== "string" ||
+    input.code.length > MAX_JOIN_CODE_LENGTH
+  ) {
+    return { ok: false, error: "Invalid code" };
+  }
+  if (isRateLimited(`pickem-group-join:${session.user.id}`, 10, 60_000)) {
+    return { ok: false, error: "Too many attempts, try again shortly" };
+  }
+
   const group = await prisma.pickemGroup.findUnique({
     where: { joinCode: input.code.trim().toUpperCase() },
     select: { id: true },
@@ -314,6 +374,9 @@ export async function leaveGroup(input: { groupId: number }): Promise<Result> {
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthenticated" };
   }
+  if (!Number.isInteger(input?.groupId)) {
+    return { ok: false, error: "Group not found" };
+  }
 
   await prisma.pickemGroupMember.deleteMany({
     where: { groupID: input.groupId, userID: session.user.id },
@@ -339,6 +402,9 @@ export async function deleteGroup(input: { groupId: number }): Promise<Result> {
   const roles = await getUserRoles(session.user.id);
   if (!hasAccess(roles, MODERATION_ROLES)) {
     return { ok: false, error: "Not authorized" };
+  }
+  if (!Number.isInteger(input?.groupId)) {
+    return { ok: false, error: "Group not found" };
   }
 
   const group = await prisma.pickemGroup.findUnique({

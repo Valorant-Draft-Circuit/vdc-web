@@ -9,11 +9,11 @@ import {
   MOD_LOG_TYPE_HEX_COLOR_MAP,
   MOD_LOG_TYPE_ORDER,
 } from "@/lib/common/constants/modLogs";
-import {
-  ESCALATION_WARNING_THRESHOLD,
+import type {
   EscalationEntry,
   EscalationFilter,
 } from "@/lib/queries/staff/moderation";
+import { ESCALATION_WARNING_THRESHOLD } from "@/lib/common/moderation";
 
 const PILL_BASE =
   "rounded-full border-[1.5px] border-[var(--type-accent)] px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors hover:cursor-pointer";

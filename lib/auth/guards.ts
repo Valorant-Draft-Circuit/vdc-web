@@ -1,3 +1,4 @@
+import "server-only";
 import { cache } from "react";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";

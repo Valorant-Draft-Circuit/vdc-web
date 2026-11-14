@@ -15,6 +15,8 @@ import {
 
 type Result = { ok: true } | { ok: false; error: string };
 
+const MAX_CHANGES_PER_SAVE = 200;
+
 export async function saveDeletionQueue(
   changes: { logId: number; actioned: boolean }[],
 ): Promise<Result> {
@@ -26,6 +28,17 @@ export async function saveDeletionQueue(
   const roles = await getUserRoles(session.user.id);
   if (!hasAccess(roles, MODERATION_ROLES)) {
     return { ok: false, error: "Not authorized" };
+  }
+
+  if (
+    !Array.isArray(changes) ||
+    changes.length > MAX_CHANGES_PER_SAVE ||
+    !changes.every(
+      (change) =>
+        Number.isInteger(change?.logId) && typeof change.actioned === "boolean",
+    )
+  ) {
+    return { ok: false, error: "Invalid request" };
   }
 
   const modName = session.user.name ?? session.user.id;

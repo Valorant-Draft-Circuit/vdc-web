@@ -4,7 +4,7 @@ export type MeiliPlayer = {
   discordName: string;
   riotIGN: string;
   tier: string;
-  mmrEffective: string;
+  mmrEffective?: string;
   teamName: string;
   franchiseSlug: string;
   franchiseLogo: string;

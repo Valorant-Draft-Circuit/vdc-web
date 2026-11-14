@@ -2,6 +2,19 @@
 
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function SignInNotice() {
+  const error = useSearchParams().get("error");
+  if (error !== "riot-link-only") return null;
+  return (
+    <h2 className="mb-2 text-sm text-vdcWhite">
+      Sign in with Discord first, then link your Riot account from your account
+      page.
+    </h2>
+  );
+}
 
 export default function SignInPage() {
   return (
@@ -10,6 +23,9 @@ export default function SignInPage() {
         <div className="flex justify-center mb-6">
           <Image alt="vdc fl" src="/vdc-flame.svg" width={90} height={40} />
         </div>
+        <Suspense fallback={null}>
+          <SignInNotice />
+        </Suspense>
         <button
           type="button"
           onClick={() => signIn("discord", { callbackUrl: "/" })}

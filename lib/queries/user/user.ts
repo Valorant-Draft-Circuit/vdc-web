@@ -11,6 +11,11 @@ export type UserWithRelations = Prisma.UserGetPayload<{
       where: {
         provider: "riot";
       };
+      select: {
+        id: true;
+        providerAccountId: true;
+        riotIGN: true;
+      };
     };
     Team: {
       include: {
@@ -74,6 +79,11 @@ export async function getUser(id: string) {
       Accounts: {
         where: {
           provider: "riot",
+        },
+        select: {
+          id: true,
+          providerAccountId: true,
+          riotIGN: true,
         },
       },
       Team: {

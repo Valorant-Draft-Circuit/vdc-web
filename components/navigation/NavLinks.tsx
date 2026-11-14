@@ -1,5 +1,5 @@
 import { DropDown } from "./DropDowns";
-import { getNavLinks, staffLinks } from "./NavBar";
+import { getNavLinks, staffLinks } from "./links";
 import HomeLink from "./HomeLink";
 import { auth } from "@/lib/auth/auth";
 import { getUserRoles, hasAccess } from "@/lib/auth/access";

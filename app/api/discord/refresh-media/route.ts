@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { clientIpFrom, isRateLimited } from "@/lib/common/rateLimit";
 import {
   refreshDiscordMedia,
   type DiscordMedia,
@@ -8,6 +9,8 @@ import {
 export const dynamic = "force-dynamic";
 
 const COOLDOWN_MS = 10 * 60 * 1000;
+const REQUESTS_PER_MINUTE_PER_IP = 60;
+const MAX_USER_ID_LENGTH = 64;
 const lastRefreshedAt = new Map<string, number>();
 const inFlight = new Map<string, Promise<DiscordMedia>>();
 
@@ -40,10 +43,37 @@ async function urlIsBroken(url: string | null): Promise<boolean> {
   }
 }
 
+/** Older browsers omit Sec-Fetch-Site, so fall back to comparing Origin with Host. */
+function isSameOriginRequest(request: NextRequest): boolean {
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (fetchSite) return fetchSite === "same-origin";
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+  if (!origin || !host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
+  // Only this site's own pages call this; other sites and plain scripts are turned away.
+  if (!isSameOriginRequest(request)) {
+    return Response.json({ image: null, banner: null }, { status: 403 });
+  }
+  const ip = clientIpFrom(request.headers);
+  if (isRateLimited(`refresh-media:${ip}`, REQUESTS_PER_MINUTE_PER_IP, 60_000)) {
+    return Response.json({ image: null, banner: null }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const userId = body?.userId;
-  if (typeof userId !== "string" || userId.length === 0) {
+  if (
+    typeof userId !== "string" ||
+    userId.length === 0 ||
+    userId.length > MAX_USER_ID_LENGTH
+  ) {
     return Response.json({ image: null, banner: null }, { status: 400 });
   }
 

@@ -8,6 +8,7 @@ import { MODERATION_ROLES } from "@/lib/common/constants/roles";
 import { MOD_TOOLS_EPOCH } from "@/prisma";
 import {
   ModLogDisplayType,
+  ESCALATION_WARNING_THRESHOLD,
   PICKEM_DELETION_PREFIX,
   classifyModLog,
   extractPostMortemUrl,
@@ -160,7 +161,6 @@ export type EscalationEntry = PlayerIdentity & {
   logCount: number;
 };
 
-export const ESCALATION_WARNING_THRESHOLD = 5;
 
 const PICKEM_DELETION_WHERE = {
   type: ModLogType.NOTE,

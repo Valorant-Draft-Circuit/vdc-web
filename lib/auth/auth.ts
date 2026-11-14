@@ -65,15 +65,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    signIn: () => {
+    signIn: async ({ account }) => {
+      // Riot is link-only: it can be attached to a signed-in Discord user,
+      // but can never create a user or start a session on its own.
+      if (account?.provider === "riot" && !(await hasActiveSession())) {
+        return "/signin?error=riot-link-only";
+      }
       return true;
     },
     redirect: ({ url, baseUrl }) => {
-      return url.startsWith(baseUrl) ? url : baseUrl;
+      if (url.startsWith("/") && !url.startsWith("//")) {
+        return `${baseUrl}${url}`;
+      }
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
+      } catch {
+        // fall through to the site root
+      }
+      return baseUrl;
     },
     jwt({ token, user, account }) {
       if (account && user) {
-        token.access_token = account.access_token;
         token.id = user.id;
         token.roles = user.roles;
       }
@@ -102,6 +114,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
+
+async function hasActiveSession(): Promise<boolean> {
+  try {
+    const session = await auth();
+    return Boolean(session?.user?.id);
+  } catch (error) {
+    console.error("[auth] could not read the current session", error);
+    return false;
+  }
+}
 
 async function updateMeilisearch(user) {
   try {

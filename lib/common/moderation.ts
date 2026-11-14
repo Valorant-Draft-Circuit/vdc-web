@@ -1,6 +1,8 @@
 import { ModLogType } from "@prisma/client";
 import { addHours, format } from "date-fns";
 
+export const ESCALATION_WARNING_THRESHOLD = 5;
+
 export type ModLogDisplayType = ModLogType | "PICKEM_GROUP_DELETE";
 
 export type PickemDeletionDetails = {

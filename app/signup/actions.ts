@@ -9,6 +9,7 @@ import { getSignupState } from "@/lib/queries/control/control";
 import type { SignUpInput } from "@/components/signup/SignUpForm";
 import { getAllGamesByUser } from "@/lib/queries/games/games";
 import { getMatchCount } from "@/lib/queries/match/match";
+import { isRateLimited } from "@/lib/common/rateLimit";
 
 type SignUpResult = { ok: true } | { ok: false; error: string };
 
@@ -22,6 +23,33 @@ export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
   const signupState = await getSignupState();
   if (signupState === "CLOSED") {
     return { ok: false, error: "Signups are closed" };
+  }
+  if (isRateLimited(`signup:${accountID}`, 5, 10 * 60_000)) {
+    return { ok: false, error: "Too many attempts, try again later" };
+  }
+  if (typeof input?.primaryValorantAccount !== "string") {
+    return { ok: false, error: "Select a Riot account" };
+  }
+
+  const [status, ownedRiotAccount] = await Promise.all([
+    prisma.status.findUnique({
+      where: { userID: accountID },
+      select: { leagueStatus: true },
+    }),
+    prisma.account.findFirst({
+      where: {
+        userId: accountID,
+        provider: "riot",
+        providerAccountId: input.primaryValorantAccount,
+      },
+      select: { id: true },
+    }),
+  ]);
+  if (status?.leagueStatus !== LeagueStatus.UNREGISTERED) {
+    return { ok: false, error: "You have already signed up" };
+  }
+  if (!ownedRiotAccount) {
+    return { ok: false, error: "That Riot account is not linked to you" };
   }
   const role = signupState === "RFA_ONLY" ? "RFA" : input.role;
 
@@ -57,7 +85,6 @@ export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
       tiers[tier] = 1;
     }
   }
-  console.log(tiers)
   const highestValue = Math.max(...Object.values(tiers) as number[]);
   const highestTiers = Object.entries(tiers)
     .filter(([, count]) => count === highestValue)
@@ -87,7 +114,6 @@ export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
   } else {
     tier = highestTiers[0] as Tier;
   }
-  console.log(tier);
   const tierGames = await getMatchCount(tier, MatchType.BO2, season-1);
   if (tierGames === null ) {
     return { ok: false, error: "Somehow there was no matches in your tier, make a tech ticket"};
@@ -99,7 +125,6 @@ export async function signupAction(input: SignUpInput): Promise<SignUpResult> {
     [Flags.RANKED_BYPASS],
   );
   }
-  console.log(tierGames);
 
   fetch(`https://numbers.vdc.gg/signup/${accountID}`, {
     method: "POST",

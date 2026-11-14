@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@headlessui/react";
 
-import { meilisearchClient } from "@/lib/meilisearch/meilisearch";
+import { searchPlayersAction } from "@/app/player/actions";
 import { MeiliPlayer } from "@/lib/types/meilisearch";
 
 export default function PlayerSearchBox() {
@@ -12,27 +12,25 @@ export default function PlayerSearchBox() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<MeiliPlayer[]>([]);
 
-  const index = meilisearchClient.getIndex("players");
-
   useEffect(() => {
     if (query.trim() === "") {
       setResults([]);
       return;
     }
     let cancelled = false;
-    index
-      .search(query.slice(0, 50), { limit: 10 })
-      .then((res) => {
-        if (cancelled) return;
-        const hits = res.hits as MeiliPlayer[];
-        const withIgn = hits.filter((hit) => hit.riotIGN);
-        setResults(withIgn.slice(0, 5));
-      })
-      .catch(() => setResults([]));
+    const timer = setTimeout(() => {
+      searchPlayersAction({ query })
+        .then(({ hits }) => {
+          if (cancelled) return;
+          const withIgn = hits.filter((hit) => hit.riotIGN);
+          setResults(withIgn.slice(0, 5));
+        })
+        .catch(() => setResults([]));
+    }, 250);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   function select(ign: string) {

@@ -31,9 +31,10 @@ export async function GET(request: NextRequest) {
   try {
     const awards = await getSeasonPickemAwards(season);
     return NextResponse.json(awards);
-  } catch (err) {
+  } catch (error) {
+    console.error("[pickems] awards lookup failed", error);
     return NextResponse.json(
-      { message: err instanceof Error ? err.message : String(err) },
+      { message: "Failed to load awards." },
       { status: 500 },
     );
   }

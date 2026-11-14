@@ -1,11 +1,8 @@
 "use client";
 import { AGENTURL } from "@/lib/common/constants/agents";
 import { normalizeAgentName } from "@/lib/common/agents";
-import {
-  FIELDS,
-  FormattedGameStat,
-  FormattedStat,
-} from "@/lib/queries/stats/stats";
+import type { FormattedGameStat, FormattedStat } from "@/lib/queries/stats/stats";
+import { FIELDS } from "@/lib/common/constants/statFields";
 import {
   ArrowDownTrayIcon,
   ChevronDownIcon,

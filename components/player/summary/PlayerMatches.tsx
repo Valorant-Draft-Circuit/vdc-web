@@ -1,7 +1,6 @@
 "use client";
 
 import LoadingSpinner from "@/components/theme/LoadingSpinner";
-import { getAgentsCached, getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { AGENTS, AGENTURL } from "@/lib/common/constants/agents";
 import { normalizeAgentName } from "@/lib/common/agents";
@@ -11,7 +10,7 @@ import {
   TIER_OUTLINE_MAP,
 } from "@/lib/common/constants/tiers";
 import { MAP_LIST_URL, MAPS } from "@/lib/common/constants/maps";
-import { Agents, Maps } from "@/lib/common/valorant-api";
+import { Agents, Maps, getAgents, getMaps } from "@/lib/common/valorant-api";
 import { GameType } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -80,7 +79,7 @@ function Match({
     let isMounted = true;
     async function loadMaps() {
       try {
-        const data = await getMapsCached();
+        const data = await getMaps();
         if (isMounted) {
           setMaps(data);
         }
@@ -423,7 +422,7 @@ function IndividualOverview({
     let isMounted = true;
     async function loadAgents() {
       try {
-        const data = await getAgentsCached();
+        const data = await getAgents();
         if (isMounted) {
           setAgents(data);
         }

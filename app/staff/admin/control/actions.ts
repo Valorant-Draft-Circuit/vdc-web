@@ -8,6 +8,8 @@ import { Roles } from "@/prisma";
 
 type UpdateResult = { ok: true } | { ok: false; error: string };
 
+const MAX_UPDATES_PER_SAVE = 200;
+
 export async function updateControlPanelAction(
   updates: Record<string, string | string[]>,
 ): Promise<UpdateResult> {
@@ -21,7 +23,20 @@ export async function updateControlPanelAction(
     return { ok: false, error: "Unauthorized" };
   }
 
-  const ops = Object.entries(updates).map(([name, rawValue]) => {
+  const entries =
+    updates && typeof updates === "object" ? Object.entries(updates) : null;
+  const isValidValue = (value: unknown) =>
+    typeof value === "string" ||
+    (Array.isArray(value) && value.every((item) => typeof item === "string"));
+  if (
+    !entries ||
+    entries.length > MAX_UPDATES_PER_SAVE ||
+    !entries.every(([, value]) => isValidValue(value))
+  ) {
+    return { ok: false, error: "Invalid request" };
+  }
+
+  const ops = entries.map(([name, rawValue]) => {
     const value = Array.isArray(rawValue) ? rawValue.join(",") : String(rawValue);
     return prisma.controlPanel.updateMany({
       where: { name },
