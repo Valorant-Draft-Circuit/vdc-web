@@ -15,6 +15,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { LeagueStatus } from "@prisma/client";
 import { UserWithRelations } from "@/lib/queries/user/user";
 import { signupAction } from "@/app/signup/actions";
+import { SIGNUP_CAPTCHA_ACTION } from "@/lib/common/turnstile";
 
 export type SignUpInput = {
   accountID: string;
@@ -120,6 +121,7 @@ function SubmitSignUp() {
       <div className="flex flex-row gap-2">
         <Turnstile
           siteKey="0x4AAAAAAALpf4cDrG3xTBbw"
+          options={{ action: SIGNUP_CAPTCHA_ACTION }}
           ref={ref}
           onError={() => setStatus(CAPTCHA_STATUS.ERROR)}
           onExpire={() => {

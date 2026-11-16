@@ -11,7 +11,11 @@ import { getAllGamesByUser } from "@/lib/queries/games/games";
 import { getMatchCount } from "@/lib/queries/match/match";
 import { headers } from "next/headers";
 import { clientIpFrom, isRateLimited } from "@/lib/common/rateLimit";
-import { verifyTurnstileToken } from "@/lib/common/turnstile";
+import {
+  SIGNUP_CAPTCHA_ACTION,
+  parseHostnameList,
+  verifyTurnstileToken,
+} from "@/lib/common/turnstile";
 
 type SignUpResult = { ok: true } | { ok: false; error: string };
 
@@ -39,7 +43,12 @@ export async function signupAction(
   const captchaSecret = process.env.TURNSTILE_SECRET_KEY;
   if (captchaSecret) {
     const ip = clientIpFrom(await headers());
-    if (!(await verifyTurnstileToken(captchaSecret, captchaToken, ip))) {
+    const verified = await verifyTurnstileToken(captchaSecret, captchaToken, {
+      remoteIp: ip,
+      expectedAction: SIGNUP_CAPTCHA_ACTION,
+      allowedHostnames: parseHostnameList(process.env.TURNSTILE_HOSTNAMES),
+    });
+    if (!verified) {
       return { ok: false, error: "Captcha check failed, please try again" };
     }
   } else {
