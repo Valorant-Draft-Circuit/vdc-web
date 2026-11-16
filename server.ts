@@ -12,6 +12,12 @@ import { MAPBAN_LOBBY_SWEEP_INTERVAL_MS } from "./lib/common/mapbanLobbyConfig";
 
 const dev = process.env.NODE_ENV !== "production";
 const port = Number(process.env.PORT ?? 3000);
+
+// `next start` sets this itself; a custom server has to. Without it, Next's
+// requests to itself copy the proxy's forwarded protocol and attempt TLS
+// against this plain-HTTP port.
+process.env.__NEXT_PRIVATE_ORIGIN ??= `http://localhost:${port}`;
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
