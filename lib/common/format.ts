@@ -13,12 +13,22 @@ export const MATCH_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   day: "numeric",
 };
 
+export const MATCH_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "short",
+};
+
+// Intl.DateTimeFormat rather than toLocaleDateString, which would prepend a
+// date to time-only options.
 export function formatDate(
   date: Date | string,
   options: Intl.DateTimeFormatOptions = MATCH_DATE_OPTIONS,
   timeZone: string = LEAGUE_TIME_ZONE,
 ) {
-  return new Date(date).toLocaleDateString("en-US", { ...options, timeZone });
+  return new Intl.DateTimeFormat("en-US", { ...options, timeZone }).format(
+    new Date(date),
+  );
 }
 
 export function formatRelativeAge(date: Date) {

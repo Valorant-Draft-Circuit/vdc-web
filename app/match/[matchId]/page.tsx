@@ -7,7 +7,7 @@ import { getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { SECONDARY_MAP_LIST_URL } from "@/lib/common/constants/maps";
-import { toTailwindCustomHexCode } from "@/lib/common/format";
+import { MATCH_TIME_OPTIONS, toTailwindCustomHexCode } from "@/lib/common/format";
 import LocalDate from "@/components/common/LocalDate";
 import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
 import {
@@ -185,7 +185,7 @@ export default async function Page({
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-between text-sm xl:text-lg p-2 xl:p-0 xl:py-2">
+        <div className="flex flex-row flex-wrap justify-between gap-x-4 text-sm xl:text-lg p-2 xl:p-0 xl:py-2">
           <h1>
             SEASON {matchInfo?.season} MATCH DAY {matchInfo.matchDay}
           </h1>
@@ -197,6 +197,7 @@ export default async function Page({
                 day: "2-digit",
                 weekday: "short",
                 year: "numeric",
+                ...MATCH_TIME_OPTIONS,
               }}
             />
           </h1>
