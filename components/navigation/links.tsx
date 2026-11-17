@@ -3,6 +3,7 @@ import {
   CalendarDaysIcon,
   InformationCircleIcon,
   LinkIcon,
+  UserIcon
 } from "@heroicons/react/24/solid";
 import {
   BEHAVIOR_GUIDELINE_URL,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/common/constants/urls";
 import { Roles } from "@/prisma/enums";
 import { FM_ACCESS_LIST, MODERATION_ROLES } from "@/lib/common/constants/roles";
+import { hasAccess } from "@/lib/auth/access"
 
 export const navLinks = [
   {
@@ -72,6 +74,7 @@ export const navLinks = [
 
 export const staffLinks = {
   name: "Staff",
+  icon: <UserIcon/>,
   links: [
     { name: "Admin", href: "/staff/admin", roles: [Roles.ADMIN] },
     { name: "Tech", href: "/staff/tech", roles: [Roles.LEAD_TECH] },
@@ -88,11 +91,18 @@ export const staffLinks = {
   ],
 };
 
-export function getNavLinks(pickemEnabled: boolean) {
+export function getNavLinks(pickemEnabled: boolean, userRoles: string) {
+  const filteredStaffLinks = staffLinks.links.filter((link) =>
+    hasAccess(userRoles, link.roles),
+  );
+  const filteredStaffNavLink = { ...staffLinks, links: filteredStaffLinks};
+  const completeNavLinks = navLinks.concat(
+    filteredStaffLinks.length > 0 ? [filteredStaffNavLink] : []
+  );
   if (pickemEnabled) {
-    return navLinks;
+    return completeNavLinks;
   }
-  return navLinks.map((navItem) => ({
+  return completeNavLinks.map((navItem) => ({
     ...navItem,
     links: navItem.links.map((link) =>
       link.href === "/pickems" ? { ...link, href: "/pickems/about" } : link,
