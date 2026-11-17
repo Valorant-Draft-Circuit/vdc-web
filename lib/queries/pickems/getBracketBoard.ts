@@ -2,7 +2,6 @@ import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
-import { correctMatchDate } from "@/lib/common/format";
 import { slateLockTime } from "@/lib/pickems/format";
 import { getPlayoffBracket } from "@/lib/queries/playoffs/getPlayoffBracket";
 import type { Bracket } from "@/lib/common/bracket";
@@ -37,7 +36,7 @@ export const getBracketLock = cache(
     if (firstPlayoffMatch._min.dateScheduled === null) {
       return null;
     }
-    return slateLockTime(correctMatchDate(firstPlayoffMatch._min.dateScheduled));
+    return slateLockTime(firstPlayoffMatch._min.dateScheduled);
   },
 );
 

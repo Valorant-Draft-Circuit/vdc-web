@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { correctMatchDate } from "@/lib/common/format";
 import { formatDayShort, slateLockTime } from "@/lib/pickems/format";
 import {
   resolveMatch,
@@ -121,7 +120,7 @@ export const getMatchSentiment = cache(
 
     const lockedSlates: SentimentSlate[] = [];
     for (const [matchDay, dayMatches] of matchesByDay) {
-      const firstMatchTime = correctMatchDate(dayMatches[0].dateScheduled);
+      const firstMatchTime = dayMatches[0].dateScheduled;
       if (now > slateLockTime(firstMatchTime)) {
         lockedSlates.push({
           matchDay,

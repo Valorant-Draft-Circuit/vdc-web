@@ -9,7 +9,6 @@ import { getUserRoles, hasAccess } from "@/lib/auth/access";
 import { getLeagueStatus } from "@/lib/queries/user/user";
 import { prisma } from "@/lib/prisma";
 import { getAgentsCached, getSeasonCached } from "@/lib/common/cache";
-import { correctMatchDate } from "@/lib/common/format";
 import { isLegalScore } from "@/lib/pickems/picks";
 import { slateLockTime } from "@/lib/pickems/format";
 import { MODERATION_ROLES } from "@/lib/common/constants/roles";
@@ -96,7 +95,7 @@ export async function submitMatchPicks(input: {
       _min: { dateScheduled: true },
     });
     const slateLock = slate._min.dateScheduled;
-    if (slateLock && slateLockTime(correctMatchDate(slateLock)) <= new Date()) {
+    if (slateLock && slateLockTime(slateLock) <= new Date()) {
       return { ok: false, error: "This slate is locked" };
     }
 

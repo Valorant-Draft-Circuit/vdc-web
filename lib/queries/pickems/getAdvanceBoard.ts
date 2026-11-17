@@ -2,7 +2,6 @@ import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ControlPanelID } from "@/prisma/enums/_controlpanel";
-import { correctMatchDate } from "@/lib/common/format";
 import { getTeamsInSeason } from "@/lib/queries/teams/teams";
 import { getPlayoffTeamCount } from "@/lib/queries/standings/standings";
 
@@ -72,7 +71,7 @@ export const getAdvanceLock = cache(
     if (firstRegularSeasonMatch._min.dateScheduled === null) {
       return null;
     }
-    return correctMatchDate(firstRegularSeasonMatch._min.dateScheduled);
+    return firstRegularSeasonMatch._min.dateScheduled;
   },
 );
 

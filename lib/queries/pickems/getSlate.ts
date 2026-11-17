@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { correctMatchDate } from "@/lib/common/format";
 import { formatDayShort, slateLockTime } from "@/lib/pickems/format";
 
 export type TeamRef = {
@@ -50,7 +49,7 @@ function toSlateMatch(
   return {
     matchId: match.matchID,
     matchType: match.matchType,
-    dateScheduled: correctMatchDate(match.dateScheduled),
+    dateScheduled: match.dateScheduled,
     home: toTeamRef(match.Home),
     away: toTeamRef(match.Away),
   };

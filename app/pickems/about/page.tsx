@@ -85,8 +85,8 @@ export default async function PickemsAboutPage() {
         <h2 className="text-lg font-bold">Locks</h2>
         <ul className="ml-5 list-disc text-sm text-vdcBlack dark:text-vdcWhite">
           <li>
-            A slate locks at the first match of that match day. Edit your picks
-            any time before then.
+            A slate locks 12 hours before the first match of that match day.
+            Edit your picks any time before then.
           </li>
           <li>
             Advancement locks at the first regular-season game of the tier,
