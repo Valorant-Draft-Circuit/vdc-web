@@ -7,7 +7,8 @@ import { getMapsCached } from "@/lib/common/cache";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
 import { TIER_COLOR_MAP } from "@/lib/common/constants/tiers";
 import { SECONDARY_MAP_LIST_URL } from "@/lib/common/constants/maps";
-import { correctMatchDate, toTailwindCustomHexCode } from "@/lib/common/format";
+import { toTailwindCustomHexCode } from "@/lib/common/format";
+import LocalDate from "@/components/common/LocalDate";
 import { getMatch, MatchDetail, MatchTeam } from "@/lib/queries/match/match";
 import {
   getVetoState,
@@ -141,12 +142,6 @@ export default async function Page({
   // so the pre-match view holds until games are actually submitted.
   const showPreMatchView = isInFuture || !hasSubmittedGames;
 
-  const matchDate = correctMatchDate(matchDateObj).toLocaleString(`en-US`, {
-    month: `short`,
-    day: `2-digit`,
-    weekday: "short",
-    year: `numeric`,
-  });
   const hasMapBaps = matchInfo?.MapBans.length !== 0;
   return (
     <div className="mx-auto max-w-7xl pb-10 xl:px-8 xl:py-12">
@@ -194,7 +189,17 @@ export default async function Page({
           <h1>
             SEASON {matchInfo?.season} MATCH DAY {matchInfo.matchDay}
           </h1>
-          <h1>{matchDate}</h1>
+          <h1>
+            <LocalDate
+              date={matchDateObj}
+              options={{
+                month: "short",
+                day: "2-digit",
+                weekday: "short",
+                year: "numeric",
+              }}
+            />
+          </h1>
         </div>
         {showPreMatchView ? (
           <>

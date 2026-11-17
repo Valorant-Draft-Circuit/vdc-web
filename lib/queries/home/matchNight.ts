@@ -2,7 +2,6 @@ import { cache } from "react";
 import { GameType, MapBanType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { TIERS_LIST } from "@/lib/common/constants/tiers";
-import { formatDate } from "@/lib/common/format";
 import { buildMapReport } from "@/lib/common/matchNight/mapReport";
 import { buildStandingsMovers, sortMovers } from "@/lib/common/matchNight/movers";
 import { buildTopPerformers } from "@/lib/common/matchNight/performers";
@@ -96,7 +95,7 @@ async function getTierNight(season: number, tier: Tier): Promise<TierNight> {
     view: {
       key: tier,
       matchDay,
-      nightDateLabel: nightDate !== null ? formatDate(nightDate) : null,
+      nightDate,
       performers: buildTopPerformers(statRows),
       mapReport: buildMapReport(playedMaps, bannedMaps, matchCount),
       movers: allMovers.slice(0, TOP_MOVERS_SHOWN),
@@ -168,7 +167,7 @@ function buildOverallView(playedTierNights: TierNight[]): RecapView {
   return {
     key: "OVERALL",
     matchDay: null,
-    nightDateLabel: null,
+    nightDate: null,
     performers: pooledPerformers,
     mapReport: buildMapReport(
       pooledPlayedMaps,
@@ -184,7 +183,7 @@ function emptyTierNight(tier: Tier): TierNight {
     view: {
       key: tier,
       matchDay: null,
-      nightDateLabel: null,
+      nightDate: null,
       performers: [],
       mapReport: { mostPlayed: null, mostBanned: null },
       movers: [],

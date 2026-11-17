@@ -1,6 +1,5 @@
 import { cache } from "react";
 import { determineIfKnockout, packageMatch } from "@/lib/common/match";
-import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
 import { ContractStatus, GameType } from "@prisma/client";
 
@@ -89,14 +88,7 @@ export default async function getFranchiseDetails(slug, season) {
         const knockoutType = determineIfKnockout(game);
 
         if (game.home === team.id || game.away === team.id) {
-          const formattedDate = formatDate(game.dateScheduled);
-          const packagedMatch = packageMatch(
-            game,
-            0,
-            0,
-            formattedDate,
-            knockoutType,
-          );
+          const packagedMatch = packageMatch(game, 0, 0, knockoutType);
           return packagedMatch;
         }
       })
@@ -113,12 +105,10 @@ export default async function getFranchiseDetails(slug, season) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             map.winner === game.home ? homeWins++ : awayWins++;
           });
-          const formattedDate = formatDate(game.dateScheduled);
           const packagedMatch = packageMatch(
             game,
             homeWins,
             awayWins,
-            formattedDate,
             knockoutType,
           );
           return packagedMatch;

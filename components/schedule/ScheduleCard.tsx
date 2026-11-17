@@ -1,3 +1,4 @@
+import LocalDate from "@/components/common/LocalDate";
 import MatchCard from "./MatchCard";
 
 export default function ScheduleCard({
@@ -7,7 +8,7 @@ export default function ScheduleCard({
   matchDay;
   season;
 }) {
-  const formattedDate = matchDay.split("|")[0];
+  const [dayLabel, scheduledAt] = matchDay.split("|");
   const matchType =
     season[matchDay][0].knockoutType === "PLAYOFFS"
       ? `${season[matchDay][0].knockoutType} R${season[matchDay][0].playoffRound}`
@@ -19,7 +20,7 @@ export default function ScheduleCard({
     <div className="overflow-hidden rounded-lg shadow-sm bg-vdcRed p-3 px-auto">
       <div className="px-4 pb-2 sm:px-6 text-vdcWhite text-md xl:text-xl xl:pb-0">
         <h1>
-          {formattedDate} - {matchType}
+          <LocalDate date={scheduledAt} /> - {dayLabel} - {matchType}
         </h1>
       </div>
       <div className="px-2 sm:p-6 flex flex-col gap-2">

@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/16/solid";
 import { pickRandomMapSplashes } from "@/lib/common/maps";
 import { formatPoints } from "@/lib/pickems/format";
+import { DateTooltip } from "@/components/common/LocalDate";
 import type {
   HubOverview,
   StageSummary,
@@ -76,7 +77,11 @@ function StageCard({
             {stage.name}
           </h1>
         </div>
-        <h2 className="flex items-center gap-1.5 text-xs">
+        <DateTooltip
+          as="h2"
+          date={summary.lockTime}
+          className="flex items-center gap-1.5 text-xs"
+        >
           {summary.state !== "open" && <LockClosedIcon className="size-3" />}
           <span
             className={
@@ -87,7 +92,7 @@ function StageCard({
           >
             {summary.statusLabel}
           </span>
-        </h2>
+        </DateTooltip>
         <p className="text-xs text-vdcGrey dark:text-gray-400">
           {stage.description}
         </p>

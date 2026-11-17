@@ -86,7 +86,7 @@ export type RecapMover = {
 export type RecapView = {
   key: RecapViewKey;
   matchDay: number | null;
-  nightDateLabel: string | null;
+  nightDate: Date | null;
   performers: RecapPerformer[];
   mapReport: RecapMapReport;
   movers: RecapMover[];

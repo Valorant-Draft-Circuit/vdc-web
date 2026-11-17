@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Tier } from "@prisma/client";
 import { LockClosedIcon } from "@heroicons/react/16/solid";
 
@@ -9,7 +9,8 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getUserTier } from "@/lib/queries/user/user";
 import { getAdvanceLock } from "@/lib/queries/pickems/getAdvanceBoard";
-import { lockCountdown } from "@/lib/pickems/format";
+import { LOCK_DATE_OPTIONS, lockCountdown } from "@/lib/pickems/format";
+import LocalDate, { DateTooltip } from "@/components/common/LocalDate";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import AdvanceBoardPanel from "@/components/pickems/advancement/AdvanceBoardPanel";
 import AdvancePickerSkeleton from "@/components/pickems/advancement/AdvancePickerSkeleton";
@@ -68,15 +69,15 @@ export default async function AdvancementPage({ searchParams }: Props) {
   const locked = advanceLock === null || advanceLock <= now;
   const accent = TIER_HEX_COLOR_MAP[tier];
 
-  let lockLabel: string;
+  let lockLabel: ReactNode;
   if (advanceLock === null) {
     lockLabel = "Window not open";
   } else if (locked) {
-    const lockedOn = advanceLock.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    });
-    lockLabel = `Locked ${lockedOn}`;
+    lockLabel = (
+      <>
+        Locked <LocalDate date={advanceLock} options={LOCK_DATE_OPTIONS} />
+      </>
+    );
   } else {
     lockLabel = lockCountdown(advanceLock, now);
   }
@@ -96,10 +97,14 @@ export default async function AdvancementPage({ searchParams }: Props) {
             {tier}
           </h2>
         </div>
-        <h1 className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400">
+        <DateTooltip
+          as="h1"
+          date={advanceLock}
+          className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400"
+        >
           <LockClosedIcon className="size-3" />
           {lockLabel}
-        </h1>
+        </DateTooltip>
       </div>
 
       <PickemTierTabs

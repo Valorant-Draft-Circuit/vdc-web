@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Listbox,
   ListboxButton,
@@ -16,6 +16,7 @@ import {
 } from "@/lib/common/matchNight/types";
 import { Maps } from "@/lib/common/valorant-api";
 import { MatchNightRecap as MatchNightRecapData } from "@/lib/queries/home/matchNight";
+import LocalDate from "@/components/common/LocalDate";
 import MapReportCard from "./MapReportCard";
 import StandingsMoversCard from "./StandingsMoversCard";
 import TopPerformersCard from "./TopPerformersCard";
@@ -162,10 +163,14 @@ function viewKeyLabel(key: RecapViewKey): string {
   return key === "OVERALL" ? "Overall" : key;
 }
 
-function headerTitle(view: RecapView): string {
+function headerTitle(view: RecapView): ReactNode {
   if (view.key === "OVERALL") return "All Tiers";
-  if (view.matchDay === null || view.nightDateLabel === null) {
+  if (view.matchDay === null || view.nightDate === null) {
     return "No games yet";
   }
-  return `Match Day ${view.matchDay} · ${view.nightDateLabel}`;
+  return (
+    <>
+      Match Day {view.matchDay} · <LocalDate date={view.nightDate} />
+    </>
+  );
 }

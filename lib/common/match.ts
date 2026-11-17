@@ -5,7 +5,6 @@ export function packageMatch(
   match,
   homeWins,
   awayWins,
-  formattedDate,
   knockoutType?,
   playoffRound?,
 ) {
@@ -13,7 +12,7 @@ export function packageMatch(
   const awayTeam = match.Away!;
   return {
     id: match.matchID,
-    date: formattedDate,
+    dateScheduled: match.dateScheduled as Date,
     tier: match.tier,
     homeWins: homeWins,
     awayWins: awayWins,

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeSlashIcon } from "@heroicons/react/24/solid";
 import TeamLogo from "@/components/home/recap/TeamLogo";
+import LocalDate from "@/components/common/LocalDate";
 import { FranchiseTeam } from "@/lib/queries/franchises/franchises";
 import { Tier } from "@prisma/client";
 
@@ -98,7 +99,9 @@ function TeamMatchRow({
       onClick={() => router.push(`/match/${match.id}`)}
       className="flex items-center gap-2 py-2 border-b border-vdcBlack/5 dark:border-vdcWhite/5 last:border-b-0 hover:cursor-pointer hover:opacity-90"
     >
-      <h2 className="text-xs text-gray-500 w-20 flex-none">{match.date}</h2>
+      <h2 className="text-xs text-gray-500 w-20 flex-none">
+        <LocalDate date={match.dateScheduled} />
+      </h2>
       <Link
         href={`/franchises/${opponent.slug}?team=${tier.toLowerCase()}`}
         onClick={(event) => event.stopPropagation()}

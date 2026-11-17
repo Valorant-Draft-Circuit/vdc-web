@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Tier } from "@prisma/client";
 import { LockClosedIcon } from "@heroicons/react/16/solid";
 
@@ -9,7 +9,12 @@ import { getSeasonCached } from "@/lib/common/cache";
 import { TIER_HEX_COLOR_MAP, TIERS_LIST } from "@/lib/common/constants/tiers";
 import { getUserTier } from "@/lib/queries/user/user";
 import { getBracketLock } from "@/lib/queries/pickems/getBracketBoard";
-import { lockCountdown, SLATE_LOCK_LEAD_HOURS } from "@/lib/pickems/format";
+import {
+  LOCK_DATE_OPTIONS,
+  lockCountdown,
+  SLATE_LOCK_LEAD_HOURS,
+} from "@/lib/pickems/format";
+import LocalDate, { DateTooltip } from "@/components/common/LocalDate";
 import PickemTierTabs from "@/components/pickems/common/PickemTierTabs";
 import BracketBoardPanel from "@/components/pickems/bracket/BracketBoardPanel";
 import PlayoffBracketSkeleton from "@/components/playoffs/PlayoffBracketSkeleton";
@@ -66,15 +71,15 @@ export default async function BracketPage({ searchParams }: Props) {
   const locked = bracketLock !== null && bracketLock <= now;
   const accent = TIER_HEX_COLOR_MAP[tier];
 
-  let lockLabel: string;
+  let lockLabel: ReactNode;
   if (bracketLock === null) {
     lockLabel = `Locks ${SLATE_LOCK_LEAD_HOURS}h before the first playoff match`;
   } else if (locked) {
-    const lockedOn = bracketLock.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    });
-    lockLabel = `Locked ${lockedOn}`;
+    lockLabel = (
+      <>
+        Locked <LocalDate date={bracketLock} options={LOCK_DATE_OPTIONS} />
+      </>
+    );
   } else {
     lockLabel = lockCountdown(bracketLock, now);
   }
@@ -94,10 +99,14 @@ export default async function BracketPage({ searchParams }: Props) {
             {tier}
           </h2>
         </div>
-        <h1 className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400">
+        <DateTooltip
+          as="h1"
+          date={bracketLock}
+          className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/5 px-3 py-1.5 text-xs font-normal text-vdcGrey dark:border-white/10 dark:bg-black/25 dark:text-gray-400"
+        >
           <LockClosedIcon className="size-3" />
           {lockLabel}
-        </h1>
+        </DateTooltip>
       </div>
 
       <PickemTierTabs

@@ -1,5 +1,4 @@
 import { determineIfKnockout, packageMatch } from "@/lib/common/match";
-import { formatDate } from "@/lib/common/format";
 import { prisma } from "@/lib/prisma";
 import { ControlPanel } from "@/prisma";
 import { MatchType, Prisma, Tier } from "@prisma/client";
@@ -97,70 +96,37 @@ export async function getScheduleByTier(tier: Tier, season: number) {
       });
     }
 
-    let formattedDate = formatDate(match.dateScheduled);
+    // Keyed "<label>|<ISO time>": the card renders the date in the viewer's
+    // timezone and the panel parses the time to find the nearest day.
+    const iso = match.dateScheduled.toISOString();
     if (match.matchType === MatchType.PRE_SEASON) {
-      formattedDate = `${formattedDate} - Preseason|${match.dateScheduled}`;
-      if (!preseasonDatesToMatches[formattedDate]) {
-        preseasonDatesToMatches[formattedDate] = [];
-      }
-      const packagedMatch = packageMatch(
-        match,
-        homeWins,
-        awayWins,
-        formattedDate,
+      const dayKey = `Preseason|${iso}`;
+      preseasonDatesToMatches[dayKey] ??= [];
+      preseasonDatesToMatches[dayKey].push(
+        packageMatch(match, homeWins, awayWins),
       );
-      preseasonDatesToMatches[formattedDate].push(packagedMatch);
     } else if (match.matchType === MatchType.BO2) {
-      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
-      if (!regularSeasonDatesToMatches[formattedDate]) {
-        regularSeasonDatesToMatches[formattedDate] = [];
-      }
-
-      const packagedMatch = packageMatch(
-        match,
-        homeWins,
-        awayWins,
-        formattedDate,
-        knockoutType,
+      const dayKey = `MD${match.matchDay}|${iso}`;
+      regularSeasonDatesToMatches[dayKey] ??= [];
+      regularSeasonDatesToMatches[dayKey].push(
+        packageMatch(match, homeWins, awayWins, knockoutType),
       );
-      regularSeasonDatesToMatches[formattedDate].push(packagedMatch);
     } else if (match.matchType === MatchType.BO3) {
       if (lastMatchDay !== match.matchDay) {
         playoffRound += 1;
         lastMatchDay = match.matchDay;
       }
-
-      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
-
-      if (!bo3DatesToMatches[formattedDate]) {
-        bo3DatesToMatches[formattedDate] = [];
-      }
-
-      const packagedMatch = packageMatch(
-        match,
-        homeWins,
-        awayWins,
-        formattedDate,
-        knockoutType,
-        playoffRound,
+      const dayKey = `MD${match.matchDay}|${iso}`;
+      bo3DatesToMatches[dayKey] ??= [];
+      bo3DatesToMatches[dayKey].push(
+        packageMatch(match, homeWins, awayWins, knockoutType, playoffRound),
       );
-
-      bo3DatesToMatches[formattedDate].push(packagedMatch);
     } else if (match.matchType === MatchType.BO5) {
-      formattedDate = `${formattedDate} - MD${match.matchDay}|${match.dateScheduled}`;
-
-      if (!bo5DatesToMatches[formattedDate]) {
-        bo5DatesToMatches[formattedDate] = [];
-      }
-
-      const packagedMatch = packageMatch(
-        match,
-        homeWins,
-        awayWins,
-        formattedDate,
-        knockoutType,
+      const dayKey = `MD${match.matchDay}|${iso}`;
+      bo5DatesToMatches[dayKey] ??= [];
+      bo5DatesToMatches[dayKey].push(
+        packageMatch(match, homeWins, awayWins, knockoutType),
       );
-      bo5DatesToMatches[formattedDate].push(packagedMatch);
     }
   });
 

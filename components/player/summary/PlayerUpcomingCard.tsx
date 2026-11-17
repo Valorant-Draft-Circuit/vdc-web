@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getUpcomingMatchesForTeam } from "@/lib/queries/schedule/schedule";
 import { TEAM_LOGOS_URL } from "@/lib/common/constants/urls";
-import { correctMatchDate } from "@/lib/common/format";
+import LocalDate from "@/components/common/LocalDate";
 
 const MAX_ROWS = 3;
 
@@ -57,14 +57,6 @@ function UpcomingRow({
   opponentId: number;
   opponentLogo: string | null;
 }) {
-  const matchDate = correctMatchDate(dateScheduled);
-  const dayOfWeek = matchDate.toLocaleString("en-US", {
-    weekday: "short",
-  });
-  const dateLabel = matchDate.toLocaleString("en-US", {
-    month: "short",
-    day: "2-digit",
-  });
   const logoSrc = opponentLogo
     ? `${TEAM_LOGOS_URL}${opponentLogo}`
     : "/vdc-flame.svg";
@@ -74,9 +66,14 @@ function UpcomingRow({
       <Link href={`/match/${matchID}`} className="contents">
         <div className="flex flex-col w-14">
           <span className="text-[10px] text-gray-500 dark:text-gray-400">
-            {dayOfWeek}
+            <LocalDate date={dateScheduled} options={{ weekday: "short" }} />
           </span>
-          <h1 className="text-xs">{dateLabel}</h1>
+          <h1 className="text-xs">
+            <LocalDate
+              date={dateScheduled}
+              options={{ month: "short", day: "2-digit" }}
+            />
+          </h1>
         </div>
         <span className="hidden xl:inline text-[10px] text-gray-500 dark:text-gray-400">
           vs
