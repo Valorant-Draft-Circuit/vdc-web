@@ -69,74 +69,124 @@ export async function getUpcomingMatchesForTeam(teamId: number, limit = 3) {
   return upcomingMatches;
 }
 
-export async function getScheduleByTier(tier: Tier, season: number) {
-  const preseasonDatesToMatches = {};
-  const regularSeasonDatesToMatches = {};
-  const bo3DatesToMatches = {};
-  const bo5DatesToMatches = {};
+type ScheduleSection = keyof Schedule;
+type UpcomingMatch = Awaited<ReturnType<typeof getUpcomingMatches>>[number];
 
-  const upcomingMatches = await getUpcomingMatches({
-    tier: tier,
-    season: season,
-  });
-  let playoffRound = 0;
-  let lastMatchDay;
-  upcomingMatches.map((match) => {
-    const knockoutType = determineIfKnockout(match);
+const SECTION_BY_TYPE: Partial<Record<MatchType, ScheduleSection>> = {
+  [MatchType.PRE_SEASON]: "preSeason",
+  [MatchType.BO2]: "regularSeason",
+  [MatchType.BO3]: "bo3Season",
+  [MatchType.BO5]: "bo5Season",
+};
 
-    let homeWins = 0;
-    let awayWins = 0;
-    if (match.Games) {
-      match.Games.forEach((game) => {
-        if (game.winner === match.Home?.id) {
-          homeWins++;
-        } else {
-          awayWins++;
-        }
-      });
+/** The start time most of a block's matches share; ties go to the earliest. */
+function mainSlot(dates: Date[]): Date {
+  const counts = new Map<number, number>();
+  for (const date of dates) {
+    counts.set(date.getTime(), (counts.get(date.getTime()) ?? 0) + 1);
+  }
+  let best = Infinity;
+  let bestCount = 0;
+  for (const [time, count] of counts) {
+    if (count > bestCount || (count === bestCount && time < best)) {
+      best = time;
+      bestCount = count;
     }
+  }
+  return new Date(best);
+}
 
-    // Keyed "<label>|<ISO time>": the card renders the date in the viewer's
-    // timezone and the panel parses the time to find the nearest day.
-    const iso = match.dateScheduled.toISOString();
-    if (match.matchType === MatchType.PRE_SEASON) {
-      const dayKey = `Preseason|${iso}`;
-      preseasonDatesToMatches[dayKey] ??= [];
-      preseasonDatesToMatches[dayKey].push(
-        packageMatch(match, homeWins, awayWins),
-      );
-    } else if (match.matchType === MatchType.BO2) {
-      const dayKey = `MD${match.matchDay}|${iso}`;
-      regularSeasonDatesToMatches[dayKey] ??= [];
-      regularSeasonDatesToMatches[dayKey].push(
-        packageMatch(match, homeWins, awayWins, knockoutType),
-      );
-    } else if (match.matchType === MatchType.BO3) {
-      if (lastMatchDay !== match.matchDay) {
-        playoffRound += 1;
-        lastMatchDay = match.matchDay;
-      }
-      const dayKey = `MD${match.matchDay}|${iso}`;
-      bo3DatesToMatches[dayKey] ??= [];
-      bo3DatesToMatches[dayKey].push(
-        packageMatch(match, homeWins, awayWins, knockoutType, playoffRound),
-      );
-    } else if (match.matchType === MatchType.BO5) {
-      const dayKey = `MD${match.matchDay}|${iso}`;
-      bo5DatesToMatches[dayKey] ??= [];
-      bo5DatesToMatches[dayKey].push(
-        packageMatch(match, homeWins, awayWins, knockoutType),
-      );
+function countWins(match: UpcomingMatch) {
+  let homeWins = 0;
+  let awayWins = 0;
+  for (const game of match.Games ?? []) {
+    if (game.winner === match.Home?.id) {
+      homeWins++;
+    } else {
+      awayWins++;
     }
-  });
+  }
+  return { homeWins, awayWins };
+}
 
-  const matches = {
-    preSeason: preseasonDatesToMatches,
-    regularSeason: regularSeasonDatesToMatches,
-    bo3Season: bo3DatesToMatches,
-    bo5Season: bo5DatesToMatches,
+export async function getScheduleByTier(
+  tier: Tier,
+  season: number,
+): Promise<Schedule> {
+  const upcomingMatches = await getUpcomingMatches({ tier, season });
+
+  // Playoff round N is the Nth BO3 match day.
+  const bo3MatchDays = [
+    ...new Set(
+      upcomingMatches
+        .filter((match) => match.matchType === MatchType.BO3)
+        .map((match) => match.matchDay),
+    ),
+  ].sort((a, b) => (a ?? 0) - (b ?? 0));
+
+  // One block per match day, so a match moved to another time or date stays
+  // with its day. Pre-season has no match days and groups by start time.
+  const groups = new Map<
+    string,
+    { section: ScheduleSection; label: string; matches: UpcomingMatch[] }
+  >();
+  for (const match of upcomingMatches) {
+    const section = SECTION_BY_TYPE[match.matchType];
+    if (!section) continue;
+    const isPreseason = section === "preSeason";
+    const groupId = isPreseason
+      ? `${section}:${match.dateScheduled.toISOString()}`
+      : `${section}:${match.matchDay}`;
+    let group = groups.get(groupId);
+    if (!group) {
+      group = {
+        section,
+        label: isPreseason ? "Preseason" : `MD${match.matchDay}`,
+        matches: [],
+      };
+      groups.set(groupId, group);
+    }
+    group.matches.push(match);
+  }
+
+  const blocks = [...groups.values()]
+    .map((group) => ({
+      ...group,
+      slot: mainSlot(group.matches.map((match) => match.dateScheduled)),
+    }))
+    .sort((a, b) => a.slot.getTime() - b.slot.getTime());
+
+  const schedule: Schedule = {
+    preSeason: {},
+    regularSeason: {},
+    bo3Season: {},
+    bo5Season: {},
   };
-  return matches;
+  for (const { section, label, matches, slot } of blocks) {
+    // Keyed "<label>|<ISO slot time>": the card renders the slot in the
+    // viewer's timezone and the panel parses it to find the nearest day.
+    schedule[section][`${label}|${slot.toISOString()}`] = matches.map(
+      (match) => {
+        const { homeWins, awayWins } = countWins(match);
+        if (section === "preSeason") {
+          return packageMatch(match, homeWins, awayWins);
+        }
+        const knockoutType = determineIfKnockout(match);
+        const playoffRound =
+          section === "bo3Season"
+            ? bo3MatchDays.indexOf(match.matchDay) + 1
+            : undefined;
+        return packageMatch(
+          match,
+          homeWins,
+          awayWins,
+          knockoutType,
+          playoffRound,
+        );
+      },
+    );
+  }
+  return schedule;
 }
 
 type GetUpcomingMatchesOptions = {

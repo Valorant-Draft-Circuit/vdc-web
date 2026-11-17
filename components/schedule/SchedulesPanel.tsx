@@ -36,15 +36,28 @@ export default function SchedulePanel({
       return;
     }
 
-    const today = new Date();
-    const todayMMDD = (today.getMonth() + 1) * 100 + today.getDate();
-
-    const nearestMatch = matchDays.find((day) => {
-      const matchDate = new Date(day.split("|")[1]);
-      const matchDateMMDD =
-        (matchDate.getMonth() + 1) * 100 + matchDate.getDate();
-      return matchDateMMDD >= todayMMDD;
-    });
+    // Jump to the block holding the soonest match from today on, so a match
+    // moved away from its block's main time still pulls the jump there.
+    // Compared as real dates so a season that crosses New Year works.
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const blocks = {
+      ...schedule.preSeason,
+      ...schedule.regularSeason,
+      ...schedule.bo3Season,
+      ...schedule.bo5Season,
+    };
+    let nearestMatch: string | undefined;
+    let soonest = Infinity;
+    for (const day of matchDays) {
+      for (const match of blocks[day] ?? []) {
+        const start = new Date(match.dateScheduled).getTime();
+        if (start >= startOfToday.getTime() && start < soonest) {
+          soonest = start;
+          nearestMatch = day;
+        }
+      }
+    }
 
     setNearestDay(nearestMatch ?? matchDays[matchDays.length - 1]);
 
@@ -54,7 +67,7 @@ export default function SchedulePanel({
     } else {
       scrollToDay(matchDays[matchDays.length - 1]);
     }
-  }, [matchDays]);
+  }, [matchDays, schedule]);
 
   const scrollToDay = (day: string) => {
     const el = cardRefs.current[day];

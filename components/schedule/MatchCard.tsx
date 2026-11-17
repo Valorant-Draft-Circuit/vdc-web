@@ -7,6 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import LocalDate from "@/components/common/LocalDate";
+import { MATCH_TIME_OPTIONS } from "@/lib/common/format";
 
 type Team = {
   slug: string;
@@ -23,7 +25,14 @@ type Match = {
   tier: Tier;
 };
 
-export default function MatchCard({ match }: { match: Match }) {
+export default function MatchCard({
+  match,
+  offSlotDate,
+}: {
+  match: Match;
+  /** Set when this match starts at a different time than its block. */
+  offSlotDate?: Date | string;
+}) {
   const goToMatch = () => router.push(`/match/${match.id}`);
   const router = useRouter();
 
@@ -33,7 +42,11 @@ export default function MatchCard({ match }: { match: Match }) {
       className="flex flex-row h-22 gap-8 sm:gap-3 py-3 w-full xl:px-24 m-auto justify-evenly rounded-2xl bg-gray-100 dark:bg-vdcGrey drop-shadow-lg hover:cursor-pointer hover:opacity-98 transition-opacity ease-in-out duration-150"
     >
       <HomeBadge home={match.Home} tier={match.tier} />
-      <MatchScore homeWins={match?.homeWins} awayWins={match?.awayWins} />
+      <MatchScore
+        homeWins={match?.homeWins}
+        awayWins={match?.awayWins}
+        offSlotDate={offSlotDate}
+      />
       <AwayBadge away={match.Away} tier={match.tier} />
     </div>
   );
@@ -93,46 +106,68 @@ function AwayBadge({ away, tier }: { away: Team; tier: Tier }) {
 function MatchScore({
   homeWins,
   awayWins,
+  offSlotDate,
 }: {
   homeWins?: number;
   awayWins?: number;
+  offSlotDate?: Date | string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center w-25 xl:w-30 text-center m-auto">
+      <ScoreOrVersus
+        homeWins={homeWins}
+        awayWins={awayWins}
+        offSlotDate={offSlotDate}
+      />
+    </div>
+  );
+}
+
+function ScoreOrVersus({
+  homeWins,
+  awayWins,
+  offSlotDate,
+}: {
+  homeWins?: number;
+  awayWins?: number;
+  offSlotDate?: Date | string;
 }) {
   const [revealed, setRevealed] = useState(false);
-  let pastGame = true;
   if (homeWins === 0 && awayWins === 0) {
-    pastGame = false;
+    // A moved match shows when it plays in place of VS; the block header
+    // already gives the time for the rest.
+    if (offSlotDate) {
+      return (
+        <div className="flex flex-col items-center whitespace-nowrap leading-tight">
+          <h1 className="text-sm sm:text-base text-vdcRed">
+            <LocalDate date={offSlotDate} />
+          </h1>
+          <h2 className="text-[11px] text-gray-500 dark:text-gray-400">
+            <LocalDate date={offSlotDate} options={MATCH_TIME_OPTIONS} />
+          </h2>
+        </div>
+      );
+    }
+    return <h1 className="text-2xl lg:text-4xl text-vdcRed">VS</h1>;
   }
-  if (!pastGame) {
+  if (!revealed) {
     return (
-      <div className="flex w-25 xl:w-30 text-center m-auto">
-        <h1 className="m-auto text-2xl lg:text-4xl text-vdcRed">VS</h1>
-      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setRevealed(true);
+        }}
+        className="rounded-sm px-7 py-3 sm:px-6 sm:py-2 xl:px-10 xl:py-3 text-sm font-semibold shadow-xs bg-vdcGrey dark:bg-vdcBlack hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer transition-all duration-75 "
+      >
+        <EyeSlashIcon className="w-5 sm:w-7 text-vdcWhite" />
+      </button>
     );
   }
   return (
-    <div className="flex w-25 xl:w-30 text-center m-auto">
-      {!revealed && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setRevealed(true);
-          }}
-          className="m-auto rounded-sm px-7 py-3 sm:px-6 sm:py-2 xl:px-10 xl:py-3 text-sm font-semibold shadow-xs bg-vdcGrey dark:bg-vdcBlack hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vdcGrey hover:cursor-pointer transition-all duration-75 "
-        >
-          <EyeSlashIcon className="w-5 sm:w-7 text-vdcWhite" />
-        </button>
-      )}
-      <div
-        className={
-          revealed
-            ? "flex flex-row gap-3 xl:gap-5 m-auto text-lg sm:text-2xl xl:text-3xl my-auto items-center"
-            : "hidden"
-        }
-      >
-        <h1 className="">{homeWins}</h1>
-        <h1 className="text-2xl lg:text-4xl text-vdcRed">VS</h1>
-        <h1 className="">{awayWins}</h1>
-      </div>
+    <div className="flex flex-row gap-3 xl:gap-5 text-lg sm:text-2xl xl:text-3xl items-center">
+      <h1>{homeWins}</h1>
+      <h1 className="text-2xl lg:text-4xl text-vdcRed">VS</h1>
+      <h1>{awayWins}</h1>
     </div>
   );
 }
