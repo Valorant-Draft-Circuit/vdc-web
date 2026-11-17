@@ -45,7 +45,7 @@ export default function SideLinks({
         />
       </InactivityWrapper>
       <div
-        className={`bg-vdcBlack flex flex-col justify-between pb-10 pl-2 pr-12 relative border-2 border-transparent transition-all duration-100 ${
+        className={`bg-vdcBlack flex flex-col min-h-screen justify-between pb-10 pl-2 pr-12 relative border-2 border-transparent transition-all duration-100 ${
           open ? "w-auto" : "-translate-x-full hidden"
         }`}
       >
