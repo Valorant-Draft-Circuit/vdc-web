@@ -17,9 +17,10 @@ type Props = {
   initialImage?: string;
 };
 
+// Web Crypto, not Math.random: this value is sent to a server action.
 function randomAgentUuid(options: AgentOption[]): string {
-  const index = Math.floor(Math.random() * options.length);
-  return options[index].uuid;
+  const [value] = crypto.getRandomValues(new Uint32Array(1));
+  return options[value % options.length].uuid;
 }
 
 export default function GroupEditorModal({

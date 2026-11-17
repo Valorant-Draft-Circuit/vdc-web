@@ -10,6 +10,7 @@ import { buildVetoSkeleton, deriveVetoState } from "@/lib/common/mapbansFlow";
 import { emitVetoChanged, emitVetoPreview } from "@/lib/server/vetoEvents";
 import { getWebMapbansFlags } from "@/lib/queries/control/control";
 import { getHigherSeedTeamId } from "@/lib/queries/standings/standings";
+import { sanitizeForLog } from "@/lib/common/log";
 
 const VETO_START_WINDOW_MS = 12 * 60 * 60 * 1000;
 const VETO_MATCH_TYPES: MatchType[] = [
@@ -88,6 +89,11 @@ function revalidateMatch(matchID: number) {
   revalidatePath(`/match/${matchID}`);
 }
 
+// Action arguments come from the client, so sanitize them before logging.
+function vetoLogTag(matchID: number): string {
+  return `[webmapban - m${sanitizeForLog(matchID)}]`;
+}
+
 async function createVetoRows(
   matchID: number,
   matchType: MatchType,
@@ -130,7 +136,7 @@ async function createVetoRows(
         })
       )?.vetoUrl;
       console.log(
-        `[webmapban - m${matchID}]: start rejected for user ${startedByUserId} (already in progress)`,
+        `${vetoLogTag(matchID)}: start rejected for user ${startedByUserId} (already in progress)`,
       );
       return {
         ok: false,
@@ -141,7 +147,7 @@ async function createVetoRows(
     throw error;
   }
 
-  console.log(`[webmapban - m${matchID}]: started by user ${startedByUserId}`);
+  console.log(`${vetoLogTag(matchID)}: started by user ${startedByUserId}`);
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
   return { ok: true };
@@ -279,13 +285,13 @@ export async function submitMapPick(
   });
   if (updated.count === 0) {
     console.log(
-      `[webmapban - m${matchID}]: ${state.currentMapTurn.type} ${normalizedPick} by user ${ctx.userId} lost the turn race`,
+      `${vetoLogTag(matchID)}: ${state.currentMapTurn.type} ${normalizedPick} by user ${ctx.userId} lost the turn race`,
     );
     return { ok: false, error: "That turn was already taken - refreshing" };
   }
 
   console.log(
-    `[webmapban - m${matchID}]: user ${ctx.userId} ${state.currentMapTurn.type} ${normalizedPick} (order ${state.currentMapTurn.order})`,
+    `${vetoLogTag(matchID)}: user ${ctx.userId} ${state.currentMapTurn.type} ${normalizedPick} (order ${state.currentMapTurn.order})`,
   );
   emitVetoPreview(matchID, null);
 
@@ -300,7 +306,7 @@ export async function submitMapPick(
       data: { map: autoFill.map },
     });
     console.log(
-      `[webmapban - m${matchID}]: auto-filled ${autoFill.map} (row ${autoFill.rowId})`,
+      `${vetoLogTag(matchID)}: auto-filled ${autoFill.map} (row ${autoFill.rowId})`,
     );
   }
 
@@ -360,13 +366,13 @@ export async function submitSidePick(
   });
   if (updated.count === 0) {
     console.log(
-      `[webmapban - m${matchID}]: side ${side} on ${state.currentSideTurn.map} by user ${ctx.userId} lost the turn race`,
+      `${vetoLogTag(matchID)}: side ${sanitizeForLog(side)} on ${state.currentSideTurn.map} by user ${ctx.userId} lost the turn race`,
     );
     return { ok: false, error: "That side was already picked - refreshing" };
   }
 
   console.log(
-    `[webmapban - m${matchID}]: user ${ctx.userId} picked ${side} on ${state.currentSideTurn.map} (row ${rowId})`,
+    `${vetoLogTag(matchID)}: user ${ctx.userId} picked ${sanitizeForLog(side)} on ${state.currentSideTurn.map} (row ${sanitizeForLog(rowId)})`,
   );
 
   emitVetoChanged(matchID);
@@ -386,7 +392,7 @@ export async function resetVeto(matchID: number): Promise<ActionResult> {
   await prisma.mapBans.deleteMany({ where: { matchID } });
 
   console.log(
-    `[webmapban - m${matchID}]: reset by staff user ${session.user.id}`,
+    `${vetoLogTag(matchID)}: reset by staff user ${session.user.id}`,
   );
   emitVetoChanged(matchID);
   revalidateMatch(matchID);
