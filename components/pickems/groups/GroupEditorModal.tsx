@@ -17,10 +17,24 @@ type Props = {
   initialImage?: string;
 };
 
-// Web Crypto, not Math.random: this value is sent to a server action.
+// Uniform index from Web Crypto (not Math.random: the pick is sent to a server
+// action). Draws at or above the largest multiple of `length` are retried, so
+// the modulo is unbiased.
+function secureRandomIndex(length: number): number {
+  if (length <= 0) {
+    throw new RangeError("length must be positive");
+  }
+  const limit = 2 ** 32 - (2 ** 32 % length);
+  for (;;) {
+    const [value] = crypto.getRandomValues(new Uint32Array(1));
+    if (value < limit) {
+      return value % length;
+    }
+  }
+}
+
 function randomAgentUuid(options: AgentOption[]): string {
-  const [value] = crypto.getRandomValues(new Uint32Array(1));
-  return options[value % options.length].uuid;
+  return options[secureRandomIndex(options.length)].uuid;
 }
 
 export default function GroupEditorModal({
