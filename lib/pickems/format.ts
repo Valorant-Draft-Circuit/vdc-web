@@ -1,7 +1,7 @@
 const MS_PER_HOUR = 1000 * 60 * 60;
 const MS_PER_MINUTE = 1000 * 60;
 
-export const SLATE_LOCK_LEAD_HOURS = 12;
+export const SLATE_LOCK_LEAD_HOURS = 0;
 
 // Match times are stored as true UTC instants (9pm ET = 02:00Z the next day),
 // so day labels are formatted in league time rather than the server's zone.
