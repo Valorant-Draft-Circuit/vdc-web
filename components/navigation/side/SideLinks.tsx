@@ -39,7 +39,7 @@ export default function SideLinks({
       <div className={'absolute z-50'}>
         <InactivityWrapper>
           <ArrowRightIcon
-            className={`w-12 h-12 p-1 mt-10 ml-5 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer absolute shadow-2xl transition-transform duration-100 ${
+            className={`w-12 h-12 p-1 mt-10 ml-5 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer shadow-2xl transition-transform duration-100 ${
               open && "rotate-180 translate-x-72"
             }`}
             onClick={() => setOpen(!open)}
