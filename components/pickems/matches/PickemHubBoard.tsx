@@ -5,6 +5,8 @@ import { getSlates } from "@/lib/queries/pickems/getSlate";
 import { getMyPicks } from "@/lib/queries/pickems/getUserPicks";
 import { getAdvanceLock } from "@/lib/queries/pickems/getAdvanceBoard";
 import { getReadonlyPicks } from "@/lib/queries/pickems/getReadonlyPicks";
+import { LOCK_DATE_OPTIONS } from "@/lib/pickems/format";
+import LocalDate from "@/components/common/LocalDate";
 import PickemHubClient from "@/components/pickems/matches/PickemHubClient";
 import ResultSlateGrid from "@/components/pickems/matches/ResultSlateGrid";
 
@@ -48,10 +50,7 @@ export default async function PickemHubBoard({
               Playoffs Advancement PICK&apos;EM window is open!
             </b>{" "}
             Predict the teams that make playoffs. Locks{" "}
-            {advanceLock!.toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}
+            <LocalDate date={advanceLock!} options={LOCK_DATE_OPTIONS} />
           </p>
           <Link
             href={`/pickems/advancement?tier=${tier.toLowerCase()}&season=${season}`}

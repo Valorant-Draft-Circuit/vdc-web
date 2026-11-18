@@ -5,6 +5,7 @@ import type { Score } from "@/lib/pickems/picks";
 import { LockClosedIcon } from "@heroicons/react/16/solid";
 import { lockBadgeShort } from "@/lib/pickems/format";
 import TeamMark from "@/components/pickems/common/TeamMark";
+import LocalDate, { DateTooltip } from "@/components/common/LocalDate";
 import MatchPills from "./MatchPills";
 
 type Props = {
@@ -50,14 +51,18 @@ export default function CompactGrid({
                   Match Day {slate.matchDay}
                 </h2>
                 <p className="text-[11px] font-normal text-vdcGrey dark:text-gray-400">
-                  {slate.dateLabel}
+                  <LocalDate date={slate.firstMatchTime} />
                 </p>
               </div>
               <div className="flex flex-col items-end gap-[3px] text-[10px] text-vdcGrey dark:text-gray-400">
-                <h2 className="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 dark:bg-black/30">
+                <DateTooltip
+                  as="h2"
+                  date={slate.lockTime}
+                  className="inline-flex items-center gap-1 rounded-full bg-black/10 px-2 py-0.5 dark:bg-black/30"
+                >
                   <LockClosedIcon className="size-3" />
                   {lockBadgeShort(slate.lockTime, now)}
-                </h2>
+                </DateTooltip>
                 <p style={countStyle}>
                   {pickedCount}/{slate.matches.length}
                 </p>

@@ -54,6 +54,11 @@
     "overrides": {
       "deepmerge-ts": "^8.0.0",
       "minimatch@>=10 <11.0.1": "^11.0.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
   }
 }

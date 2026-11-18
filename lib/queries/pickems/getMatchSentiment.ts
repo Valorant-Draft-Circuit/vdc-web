@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatDayShort, slateLockTime } from "@/lib/pickems/format";
+import { slateLockTime } from "@/lib/pickems/format";
 import {
   resolveMatch,
   type GameResult,
@@ -27,7 +27,7 @@ export type MatchupSentimentView = MatchupSentiment & {
   away: TeamRef | null;
 };
 
-export type SentimentSlate = { matchDay: number; dateLabel: string };
+export type SentimentSlate = { matchDay: number };
 
 export type ConsensusOutcomeView = MatchConsensusOutcome & {
   home: TeamRef | null;
@@ -120,12 +120,8 @@ export const getMatchSentiment = cache(
 
     const lockedSlates: SentimentSlate[] = [];
     for (const [matchDay, dayMatches] of matchesByDay) {
-      const firstMatchTime = dayMatches[0].dateScheduled;
-      if (now > slateLockTime(firstMatchTime)) {
-        lockedSlates.push({
-          matchDay,
-          dateLabel: formatDayShort(firstMatchTime),
-        });
+      if (now > slateLockTime(dayMatches[0].dateScheduled)) {
+        lockedSlates.push({ matchDay });
       }
     }
     lockedSlates.sort((a, b) => a.matchDay - b.matchDay);

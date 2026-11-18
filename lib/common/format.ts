@@ -3,19 +3,32 @@ export function toTailwindCustomHexCode(color) {
   return `#${colorHex}`;
 }
 
-// TODO: remove this when we figure out whats going on with date issue
-export function correctMatchDate(date: Date) {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() - 1);
-  return newDate;
-}
+// Match times are stored as true UTC instants: 9pm ET is 02:00Z the next day.
+// Formatting must name a zone, or a UTC server prints the UTC calendar day.
+export const LEAGUE_TIME_ZONE = "America/New_York";
 
-export function formatDate(date: Date) {
-  return correctMatchDate(date).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+export const MATCH_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+};
+
+export const MATCH_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "short",
+};
+
+// Intl.DateTimeFormat rather than toLocaleDateString, which would prepend a
+// date to time-only options.
+export function formatDate(
+  date: Date | string,
+  options: Intl.DateTimeFormatOptions = MATCH_DATE_OPTIONS,
+  timeZone: string = LEAGUE_TIME_ZONE,
+) {
+  return new Intl.DateTimeFormat("en-US", { ...options, timeZone }).format(
+    new Date(date),
+  );
 }
 
 export function formatRelativeAge(date: Date) {

@@ -1,4 +1,5 @@
 import TeamMark from "@/components/pickems/common/TeamMark";
+import LocalDate from "@/components/common/LocalDate";
 import { formatPoints } from "@/lib/pickems/format";
 import { legalScores } from "@/lib/pickems/picks";
 import type {
@@ -115,7 +116,7 @@ export default function ResultSlateGrid({
                 Match Day {slate.matchDay}
               </h2>
               <p className="text-[11px] font-normal text-vdcGrey dark:text-gray-400">
-                {slate.dateLabel}
+                <LocalDate date={slate.firstMatchTime} />
               </p>
             </div>
             <h2 className="text-right text-[10px] font-normal text-vdcGrey dark:text-gray-400">

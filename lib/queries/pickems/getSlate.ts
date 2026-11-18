@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { MatchType, Tier } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatDayShort, slateLockTime } from "@/lib/pickems/format";
+import { slateLockTime } from "@/lib/pickems/format";
 
 export type TeamRef = {
   id: number;
@@ -23,7 +23,7 @@ export type Slate = {
   tier: Tier;
   matchDay: number;
   lockTime: Date;
-  dateLabel: string;
+  firstMatchTime: Date;
   matches: SlateMatch[];
 };
 
@@ -119,7 +119,7 @@ export const getSlates = cache(
         tier,
         matchDay,
         lockTime,
-        dateLabel: formatDayShort(firstMatchTime),
+        firstMatchTime,
         matches,
       });
     }

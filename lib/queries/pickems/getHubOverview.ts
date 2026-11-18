@@ -26,6 +26,7 @@ export type StageState = "open" | "locked" | "dead";
 export type StageSummary = {
   state: StageState;
   statusLabel: string;
+  lockTime?: Date | null;
   points: number | null;
   maxPoints: number;
 };
@@ -126,6 +127,7 @@ async function summarizeMatchesStage(
   return {
     state,
     statusLabel,
+    lockTime: nextOpenSlate?.lockTime,
     points,
     maxPoints: resolvedCount * CORRECT_WINNER_POINTS,
   };
@@ -180,7 +182,7 @@ async function summarizeAdvancementStage(
     }
   }
 
-  return { state, statusLabel, points, maxPoints };
+  return { state, statusLabel, lockTime: lock, points, maxPoints };
 }
 
 async function summarizeBracketStage(
@@ -217,7 +219,13 @@ async function summarizeBracketStage(
     }
   }
 
-  return { state: isOpen ? "open" : "locked", statusLabel, points, maxPoints };
+  return {
+    state: isOpen ? "open" : "locked",
+    statusLabel,
+    lockTime: lock,
+    points,
+    maxPoints,
+  };
 }
 
 export const getHubOverview = cache(
