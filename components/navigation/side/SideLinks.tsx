@@ -13,13 +13,15 @@ import { getNavLinks } from "../links";
 export default function SideLinks({
   preview,
   pickemEnabled,
+  userRoles,
   mobileAuth,
 }: {
   preview: boolean;
   pickemEnabled: boolean;
+  userRoles: string;
   mobileAuth: ReactNode;
 }) {
-  const visibleNavLinks = getNavLinks(pickemEnabled);
+  const visibleNavLinks = getNavLinks(pickemEnabled, userRoles);
   const [open, setOpen] = useState(false);
   const currentPath = usePathname();
 
@@ -43,7 +45,7 @@ export default function SideLinks({
         />
       </InactivityWrapper>
       <div
-        className={`bg-vdcBlack flex flex-col justify-between pb-10 pl-2 pr-12 h-screen relative border-2 border-transparent transition-all duration-100 ${
+        className={`bg-vdcBlack flex flex-col justify-between pb-10 pl-2 pr-12 min-h-screen relative border-2 border-transparent transition-all duration-100 ${
           open ? "w-auto" : "-translate-x-full hidden"
         }`}
       >

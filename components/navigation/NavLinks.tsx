@@ -12,10 +12,7 @@ export default async function NavLinks() {
   if (isLoggedIn && session?.user?.id) {
     userRoles = await getUserRoles(session.user.id);
   }
-  const filteredStaffLinks = staffLinks.links.filter((link) =>
-    hasAccess(userRoles, link.roles),
-  );
-  const visibleNavLinks = getNavLinks(await getPickemEnabled());
+  const visibleNavLinks = getNavLinks(await getPickemEnabled(), userRoles);
 
   return (
     <div className="flex flex-col text-xl sm:ml-24 space-y-1 ">
@@ -28,13 +25,6 @@ export default async function NavLinks() {
             links={navItem.links}
           />
         ))}
-        {isLoggedIn && filteredStaffLinks.length > 0 && (
-          <DropDown
-            key={staffLinks.name}
-            title={staffLinks.name}
-            links={filteredStaffLinks}
-          />
-        )}
       </div>
     </div>
   );
