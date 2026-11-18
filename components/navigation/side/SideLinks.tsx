@@ -36,11 +36,11 @@ export default function SideLinks({
   }, []);
   return (
     <>
-      <div className={'absolute z-50'}>
+      <div className={'absolute z-50 left-[min(calc(100%+1.25rem),calc(100dvw-3.5rem))]'}>
         <InactivityWrapper>
           <ArrowRightIcon
-            className={`w-12 h-12 p-1 mt-10 ml-5 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer shadow-2xl transition-transform duration-100 ${
-              open && "rotate-180 translate-x-72"
+            className={`w-12 h-12 p-1 mt-10 hover:scale-110 bg-vdcBlack text-vdcRed rounded-full cursor-pointer shadow-2xl transition-transform duration-100 ${
+              open && "rotate-180"
             }`}
             onClick={() => setOpen(!open)}
           />
