@@ -18,7 +18,7 @@
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
     "@marsidev/react-turnstile": "^1.6.3",
-    "@prisma/client": "6.19.3",
+    "@prisma/client": "7.10.1",
     "@tanstack/react-table": "^8.21.3",
     "@tryghost/content-api": "^1.12.15",
     "date-fns": "^4.4.0",
